@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "orta.vscode-jest",
+    "editorconfig.editorconfig",
+    "dbaeumer.vscode-eslint",
+  ],
+  "unwantedRecommendations": [
+    "ms-vscode.vscode-typescript-tslint-plugin",
+    "esbenp.prettier-vscode",
+    "eg2.tslint"
+  ]
+}

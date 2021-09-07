@@ -1,0 +1,24 @@
+// @use '../../styles/theme' as *;
+
+.button {
+  align-items: center;
+  background-color: #444;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 15px 0 rgb(0, 0, 0 / 10%);
+  cursor: pointer;
+  display: flex;
+  height: 2rem;
+  justify-content: center;
+  min-width: 6rem;
+  outline: none;
+  transition: all 0.2s;
+
+  &:hover {
+    box-shadow: 0 2px 15px 0 rgb(0, 0, 0 / 15%);
+  }
+
+  &:active {
+    box-shadow: none;
+  }
+}

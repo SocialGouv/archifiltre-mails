@@ -1,0 +1,41 @@
+{
+  "root": true,
+  "extends": [
+    "@socialgouv/eslint-config-typescript",
+    "@socialgouv/eslint-config-react"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "sourceType": "module"
+  },
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "__static": true
+  },
+  "plugins": [
+    "unused-imports"
+  ],
+  "rules": {
+    // "@typescript-eslint/no-floating-promises": "off",
+    "@typescript-eslint/no-misused-promises": "off",
+    "prefer-template": "warn",
+    "@typescript-eslint/consistent-type-imports": "error",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "unused-imports/no-unused-imports": "error",
+    "import/default": "off",
+    "unused-imports/no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_"
+      }
+    ]
+  }
+}
