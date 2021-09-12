@@ -11,6 +11,11 @@
     "dev": "electron-webpack dev",
     "debug": "cross-env 'ELECTRON_ARGS=[\"--inspect-brk=9229\"]' yarn dev"
   },
+  "electronWebpack": {
+    "renderer": {
+      "webpackConfig": "webpack.renderer.config.js"
+    }
+  },
   "devDependencies": {
     "@socialgouv/eslint-config-react": "^1.88.0",
     "@socialgouv/eslint-config-typescript": "^1.88.0",
@@ -32,9 +37,9 @@
     "eslint-plugin-unused-imports": "^1.1.4",
     "husky": "^7.0.2",
     "jest": "^27.1.0",
-    "node-sass": "^6.0.1",
     "prettier": "^2.3.2",
     "rimraf": "^3.0.2",
+    "sass": "^1.39.2",
     "sass-loader": "^10",
     "source-map-support": "^0.5.19",
     "stylelint": "^13.13.1",

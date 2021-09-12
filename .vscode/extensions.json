@@ -3,6 +3,7 @@
     "orta.vscode-jest",
     "editorconfig.editorconfig",
     "dbaeumer.vscode-eslint",
+    "clinyong.vscode-css-modules"
   ],
   "unwantedRecommendations": [
     "ms-vscode.vscode-typescript-tslint-plugin",

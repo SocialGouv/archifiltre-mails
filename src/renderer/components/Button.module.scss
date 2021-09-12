@@ -1,11 +1,11 @@
 // @use '../../styles/theme' as *;
 
-.button {
+.button-class {
   align-items: center;
   background-color: #444;
   border: 0;
   border-radius: 12px;
-  box-shadow: 0 2px 15px 0 rgb(0, 0, 0 / 10%);
+  box-shadow: 0 2px 15px 0 rgb(0 0 0 / 10%);
   cursor: pointer;
   display: flex;
   height: 2rem;
@@ -15,7 +15,7 @@
   transition: all 0.2s;
 
   &:hover {
-    box-shadow: 0 2px 15px 0 rgb(0, 0, 0 / 15%);
+    box-shadow: 0 2px 15px 0 rgb(0 0 0 / 15%);
   }
 
   &:active {

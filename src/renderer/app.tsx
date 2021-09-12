@@ -4,7 +4,6 @@ import "./styles/global.scss";
 import React, { useEffect, useState } from "react";
 
 import { Button } from "./components/Button";
-import { ButtonSASS } from "./components/ButtonSASS";
 
 export const App: React.FC = () => {
     const [title, setTitle] = useState("toto");
@@ -19,7 +18,6 @@ export const App: React.FC = () => {
         <div>
             Hello {title}
             <Button>Coucou BUTTON</Button>
-            <ButtonSASS>COUCOU ButtonSASS</ButtonSASS>
         </div>
     );
 };

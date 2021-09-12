@@ -8,7 +8,7 @@ type ButtonProps = React.DetailedHTMLProps<
 >;
 
 export const Button: React.FC<ButtonProps> = (props) => (
-    <button {...props} className={style.button}>
+    <button {...props} className={style.buttonClass}>
         {props.children}
     </button>
 );
