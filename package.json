@@ -17,7 +17,8 @@
     "dist:win64-msi": "electron-builder --windows portable --x64 --windows=msi",
     "dist:mac": "electron-builder --mac dmg",
     "dist:mac-local": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
-    "dist:linux": "electron-builder --linux AppImage"
+    "dist:linux": "electron-builder --linux AppImage",
+    "lint": "eslint src/"
   },
   "electronWebpack": {
     "renderer": {
