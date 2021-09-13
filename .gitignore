@@ -1,6 +1,7 @@
 node_modules
 scripts/out/*
 dist/
+tmpws/
 
 ##
 ## Should be global, but it's an open source project

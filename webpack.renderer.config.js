@@ -5,7 +5,6 @@ module.exports =
         );
 
         styleRules.forEach((rule) => {
-            console.log(rule);
             const uses = rule.use;
             if (!Array.isArray(uses)) {
                 return;
