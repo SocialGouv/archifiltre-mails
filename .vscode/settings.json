@@ -14,4 +14,12 @@
   },
   "eslint.format.enable": true,
   "cssModules.camelCase": true,
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "renovate.json"
+      ],
+      "url": "https://docs.renovatebot.com/renovate-schema.json"
+    }
+  ]
 }
