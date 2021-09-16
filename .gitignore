@@ -6,6 +6,7 @@ tmpws/
 ##
 ## Should be global, but it's an open source project
 ##
+!**/.gitkeep
 *.log
 .env
 
