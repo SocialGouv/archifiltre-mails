@@ -2,5 +2,9 @@
   "enabled": true,
   "extends": [
     "github>SocialGouv/renovate-config:light"
+  ],
+  "dependencyDashboardLabels": [
+    "bot",
+    "dependency"
   ]
 }
