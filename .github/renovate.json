@@ -6,5 +6,6 @@
   "dependencyDashboardLabels": [
     "bot",
     "dependencies"
-  ]
+  ],
+  "updatePinnedDependencies": false
 }
