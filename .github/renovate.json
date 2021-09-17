@@ -7,5 +7,20 @@
     "bot",
     "dependencies"
   ],
-  "updatePinnedDependencies": false
+  "updatePinnedDependencies": false,
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "webpack",
+        "@types/webpack"
+      ],
+      "allowedVersions": "<5"
+    },
+    {
+      "matchPackageNames": [
+        "sass-loader"
+      ],
+      "allowedVersions": "<11"
+    }
+  ]
 }
