@@ -1,0 +1,96 @@
+{
+  "name": "archimail",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Visualisez, triez, et améliorez votre boite mail !",
+  "author": "Fabrique des ministère sociaux",
+  "license": "Apache-2.0",
+  "main": "index.js",
+  "repository": "git@github.com:SocialGouv/archimail.git",
+  "scripts": {
+    "dev": "electron-webpack dev",
+    "debug": "cross-env 'ELECTRON_ARGS=[\"--inspect-brk=9229\"]' yarn dev",
+    "compile": "electron-webpack",
+    "dist:win32": "electron-builder --windows portable --ia32",
+    "dist:win64": "electron-builder --windows portable --x64",
+    "dist:win32-msi": "electron-builder --windows portable --ia32 --windows=msi",
+    "dist:win64-msi": "electron-builder --windows portable --x64 --windows=msi",
+    "dist:mac": "electron-builder --mac dmg",
+    "dist:mac-local": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
+    "dist:linux": "electron-builder --linux AppImage",
+    "lint": "eslint src/"
+  },
+  "electronWebpack": {
+    "renderer": {
+      "webpackConfig": "webpack.renderer.config.js"
+    }
+  },
+  "build": {
+    "appId": "fr.gouv.social.fabrique.archimail",
+    "artifactName": "archimail-${version}.${ext}",
+    "files": [
+      "electron/dist",
+      "electron/build/icon.*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist/${os}-${arch}"
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "./electron/build/icon.icns",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "./electron/build/entitlements.mac.plist",
+      "entitlementsInherit": "./electron/build/entitlements.mac.plist"
+    },
+    "win": {
+      "icon": "./electron/build/icon.png"
+    },
+    "linux": {
+      "category": "Office",
+      "icon": "./electron/build/icon.png"
+    }
+  },
+  "devDependencies": {
+    "@socialgouv/eslint-config-react": "^1.90.1",
+    "@socialgouv/eslint-config-typescript": "^1.90.1",
+    "@tsconfig/node14": "^1.0.1",
+    "@types/jest": "^27.0.1",
+    "@types/node": "14",
+    "@types/react": "^17.0.21",
+    "@types/react-dom": "^17.0.9",
+    "@types/rimraf": "^3.0.2",
+    "@types/webpack": "4",
+    "@typescript-eslint/parser": "^4.31.1",
+    "axios": "^0.21.4",
+    "cross-env": "^7.0.3",
+    "electron": "^14.0.1",
+    "electron-builder": "^22.11.7",
+    "electron-notarize": "^1.1.1",
+    "electron-webpack": "^2.8.2",
+    "electron-webpack-ts": "^4.0.1",
+    "eslint": "^7.32.0",
+    "eslint-plugin-unused-imports": "^1.1.4",
+    "husky": "^7.0.2",
+    "jest": "^27.2.0",
+    "prettier": "^2.4.1",
+    "rimraf": "^3.0.2",
+    "sass": "^1.41.1",
+    "sass-loader": "10",
+    "stylelint": "^13.13.1",
+    "stylelint-config-sass-guidelines": "^8.0.0",
+    "stylelint-config-standard": "^22.0.0",
+    "ts-jest": "^27.0.5",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.3",
+    "unzip-crx-3": "^0.2.0",
+    "webpack": "4"
+  },
+  "dependencies": {
+    "normalize.css": "^8.0.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "source-map-support": "^0.5.20"
+  }
+}

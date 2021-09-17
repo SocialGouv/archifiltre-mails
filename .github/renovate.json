@@ -1,0 +1,26 @@
+{
+  "enabled": true,
+  "extends": [
+    "github>SocialGouv/renovate-config:light"
+  ],
+  "dependencyDashboardLabels": [
+    "bot",
+    "dependencies"
+  ],
+  "updatePinnedDependencies": false,
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "webpack",
+        "@types/webpack"
+      ],
+      "allowedVersions": "<5"
+    },
+    {
+      "matchPackageNames": [
+        "sass-loader"
+      ],
+      "allowedVersions": "<11"
+    }
+  ]
+}
