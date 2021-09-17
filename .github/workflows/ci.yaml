@@ -8,6 +8,7 @@ jobs:
   Quality:
     strategy:
       matrix:
+      # default mandatory matrix
         empty: [true]
       # Don't fast-fail on tag and main
       fail-fast: ${{ github.event_name == 'pull_request' || (github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')) }}
