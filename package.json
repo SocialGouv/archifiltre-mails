@@ -53,8 +53,8 @@
     }
   },
   "devDependencies": {
-    "@socialgouv/eslint-config-react": "^1.90.1",
-    "@socialgouv/eslint-config-typescript": "^1.90.1",
+    "@socialgouv/eslint-config-react": "^1.90.3",
+    "@socialgouv/eslint-config-typescript": "^1.90.3",
     "@tsconfig/node14": "^1.0.1",
     "@types/jest": "^27.0.1",
     "@types/node": "14",
