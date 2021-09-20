@@ -3,6 +3,9 @@
   "extends": [
     "github>SocialGouv/renovate-config:light"
   ],
+  "baseBranches": [
+    "dev"
+  ],
   "dependencyDashboardLabels": [
     "bot",
     "dependencies"
