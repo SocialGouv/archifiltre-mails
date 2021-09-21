@@ -19,7 +19,7 @@ Puis dans le "Run & Debug" de VSCode : "Attach to Electron"
 
 ## TODO
 - [ ] tests vs specs
-  - [ ] coverage + push result
+  - [x] coverage + push result
   - [ ] snapshots
   - [ ] spectron
 - [ ] Sign + notarize + build + deploy

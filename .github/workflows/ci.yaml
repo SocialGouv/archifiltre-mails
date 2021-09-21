@@ -37,11 +37,11 @@ jobs:
         run: yarn lint
 
       - name: Unit tests
-        run: yarn jest #--coverage
+        run: yarn jest --coverage
 
-  #     - name: Send test coverage to codecov
-  #       continue-on-error: true
-  #       uses: codecov/codecov-action@v2
+      - name: Send test coverage to codecov
+        continue-on-error: true
+        uses: codecov/codecov-action@v2
 
   #     - name: Build next version
   #       if: ${{ github.event_name == 'workflow_dispatch' }}
