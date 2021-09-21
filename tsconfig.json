@@ -9,8 +9,11 @@
   },
   "include": [
     "global.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.scss",
+    "src/**/*",
+    "src/**/*",
+  ],
+  "exclude": [
+    "test",
+    "./node_modules/"
   ]
 }

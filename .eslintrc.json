@@ -43,7 +43,8 @@
     {
       "files": [
         "src/renderer/**/*.ts*",
-        "src/common/**/*.ts*"
+        "src/common/**/*.ts*",
+        "tests/**/*.ts*"
       ],
       "env": {
         "browser": true,

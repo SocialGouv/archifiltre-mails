@@ -1,7 +1,12 @@
+import { ipcRenderer } from "electron";
 import React from "react";
 import { render } from "react-dom";
 
 import { App } from "./app";
+
+ipcRenderer.on("log", (event, log) => {
+    console.log(log);
+});
 
 console.log("echo from renderer");
 if (module.hot) {

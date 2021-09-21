@@ -1,4 +1,5 @@
 import { app, BrowserWindow, session } from "electron";
+import fs from "fs";
 import path from "path";
 import { format as formatUrl } from "url";
 
@@ -14,7 +15,6 @@ const REACT_DEVTOOLS_PATH = path.join(
 let mainWindow: BrowserWindow | null = null;
 
 if (module.hot) {
-    console.log("hot reload MAIN");
     module.hot.accept();
 }
 
@@ -29,9 +29,17 @@ async function createMainWindow() {
     });
 
     if (isDevelopment) {
-        await session.defaultSession.loadExtension(REACT_DEVTOOLS_PATH, {
-            allowFileAccess: true,
-        });
+        if (fs.existsSync(REACT_DEVTOOLS_PATH))
+            await session.defaultSession.loadExtension(REACT_DEVTOOLS_PATH, {
+                allowFileAccess: true,
+            });
+        else
+            window.once("focus", () => {
+                window.webContents.send(
+                    "log",
+                    `React devtools not found (${REACT_DEVTOOLS_PATH})`
+                );
+            });
         window.webContents.openDevTools();
     }
 

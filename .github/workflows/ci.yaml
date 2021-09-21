@@ -36,8 +36,8 @@ jobs:
       - name: Lint
         run: yarn lint
 
-  #     - name: Unit tests
-  #       run: yarn test-coverage
+      - name: Unit tests
+        run: yarn jest #--coverage
 
   #     - name: Send test coverage to codecov
   #       continue-on-error: true
