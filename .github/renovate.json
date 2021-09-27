@@ -24,6 +24,12 @@
         "sass-loader"
       ],
       "allowedVersions": "<11"
+    },
+    {
+      "matchPackageNames": [
+        "electron"
+      ],
+      "allowedVersions": "<14"
     }
   ]
 }

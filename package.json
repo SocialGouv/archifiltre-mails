@@ -18,7 +18,10 @@
     "dist:mac": "electron-builder --mac dmg",
     "dist:mac-local": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
     "dist:linux": "electron-builder --linux AppImage",
+    "start:mac": "open -n dist/mac-x64/mac/archimail.app",
     "lint": "eslint src/",
+    "lint:test": "eslint -c test/.eslintrc.json 'test/**/*.ts*'",
+    "lint:fix": "yarn lint --fix && yarn lint:test --fix",
     "devtools": "ts-node scripts/getReactDevtools.ts"
   },
   "electronWebpack": {
@@ -53,9 +56,13 @@
       "icon": "./electron/build/icon.png"
     }
   },
+  "engines": {
+    "node": "<14"
+  },
   "devDependencies": {
     "@socialgouv/eslint-config-react": "^1.90.4",
     "@socialgouv/eslint-config-typescript": "^1.90.4",
+    "@playwright/test": "^1.15.0",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.1.0",
     "@tsconfig/node14": "^1.0.1",
@@ -75,9 +82,11 @@
     "electron-webpack-ts": "^4.0.1",
     "eslint": "^7.32.0",
     "eslint-plugin-unused-imports": "^1.1.5",
+    "eslint-plugin-playwright": "^0.5.1",
     "husky": "^7.0.2",
     "jest": "^27.2.4",
     "identity-obj-proxy": "^3.0.0",
+    "jest-playwright-preset": "^1.7.0",
     "prettier": "^2.4.1",
     "rimraf": "^3.0.2",
     "sass": "^1.41.1",

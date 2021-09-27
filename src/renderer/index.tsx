@@ -8,12 +8,12 @@ ipcRenderer.on("log", (event, log) => {
     console.log(log);
 });
 
-console.log("echo from renderer");
+ipcRenderer.on("log-e2e", (event, log) => {
+    console.warn(log);
+});
+
 if (module.hot) {
-    console.log("hot reload RENDERER");
     module.hot.accept();
 }
 
 render(<App />, document.querySelector("#app"));
-
-console.log("hello again");

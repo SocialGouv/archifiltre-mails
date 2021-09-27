@@ -1,7 +1,4 @@
 {
-  "env": {
-    "jest": true
-  },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": "./test/tsconfig.json"
@@ -12,5 +9,34 @@
         "project": "./test/tsconfig.json"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "(components|integration|e2e|spectron)/**/*.ts*"
+      ],
+      "env": {
+        "jest": true
+      }
+    },
+    {
+      "files": [
+        "e2e/**/*.ts*"
+      ],
+      "extends": [
+        "@socialgouv/eslint-config-typescript",
+        "plugin:playwright/jest-playwright"
+      ],
+      "parserOptions": {
+        "project": "./test/e2e/tsconfig.json"
+      },
+      "settings": {
+        "import/resolver": {
+          "typescript": {
+            "project": "./test/e2e/tsconfig.json"
+          }
+        }
+      }
+    }
+  ]
 }

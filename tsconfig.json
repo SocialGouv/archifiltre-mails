@@ -6,6 +6,7 @@
       "DOM"
     ],
     "jsx": "react",
+    "target": "ES2016"
   },
   "include": [
     "global.d.ts",

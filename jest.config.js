@@ -15,9 +15,11 @@ const moduleNameMapper = {
     "\\.(css|less|sass|scss)$": "identity-obj-proxy",
 };
 
+const collectCoverageFrom = ["<rootDir>/src/**/!(*.d).ts*"];
+
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
-module.exports = {
-    collectCoverageFrom: ["<rootDir>/src/**/!(*.d).ts*"],
+const defaultConfig = {
+    collectCoverageFrom,
     globals: {
         "ts-jest": {
             tsconfig: "<rootDir>/test/tsconfig.json",
@@ -26,5 +28,40 @@ module.exports = {
     moduleFileExtensions: ["ts", "tsx", "js", "json"],
     moduleNameMapper,
     preset: "ts-jest",
-    testMatch: ["<rootDir>/test/**/?(*.)(spec|test).(ts|tsx)"],
+};
+
+/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
+module.exports = {
+    collectCoverageFrom,
+    projects: [
+        {
+            displayName: "integration",
+            testMatch: [
+                "<rootDir>/test/integration/**/?(*.)(spec|test).(ts|tsx)",
+            ],
+            ...defaultConfig,
+        },
+        {
+            displayName: "components",
+            testEnvironment: "jsdom",
+            testMatch: [
+                "<rootDir>/test/components/**/?(*.)(spec|test).(ts|tsx)",
+            ],
+            ...defaultConfig,
+        },
+        {
+            displayName: "e2e",
+            preset: "jest-playwright-preset",
+            testMatch: ["<rootDir>/test/e2e/**/?(*.)(spec|test).(ts|tsx)"],
+            transform: {
+                "^.+\\.ts$": "ts-jest",
+            },
+            ...defaultConfig,
+        },
+        {
+            displayName: "spectron",
+            testMatch: ["<rootDir>/test/spectron/**/?(*.)(spec|test).(ts|tsx)"],
+            ...defaultConfig,
+        },
+    ],
 };

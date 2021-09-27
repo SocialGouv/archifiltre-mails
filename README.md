@@ -1,4 +1,5 @@
 # archimail
+[![codecov](https://codecov.io/gh/SocialGouv/archimail/branch/main/graph/badge.svg?token=JPCHQWKTKZ)](https://codecov.io/gh/SocialGouv/archimail)
 
 ## Initialisation
 ```sh
@@ -19,9 +20,10 @@ Puis dans le "Run & Debug" de VSCode : "Attach to Electron"
 
 ## TODO
 - [ ] tests vs specs
-  - [x] coverage + push result
-  - [ ] snapshots
-  - [ ] spectron
+  - [ ] jest component tests + snapshots (Storybook ? (for visual regression tests))
+  - [ ] jest integration tests
+  - [ ] cypress e2e tests
+  - [ ] coverage + push result (https://dev.to/penx/combining-storybook-cypress-and-jest-code-coverage-4pa5)
 - [ ] Sign + notarize + build + deploy
   - [ ] Release channels (stable, beta, canary)
 - [ ] Auto update (electron-builder code pusher)
@@ -35,5 +37,5 @@ Puis dans le "Run & Debug" de VSCode : "Attach to Electron"
 - [ ] Tech doc tool (docusaurus? next? jekyll?) + github pages
 - [ ] CONTRIBUTING
 - [ ] README
-- [ ] CHANGELOG tech
+- [ ] CHANGELOG tech (https://keepachangelog.com/en/1.0.0/)
 - [ ] UPGRADE

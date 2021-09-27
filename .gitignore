@@ -3,6 +3,7 @@ scripts/out/*
 dist/
 tmpws/
 coverage/
+chromedriverlog.txt
 
 ##
 ## Should be global, but it's an open source project
