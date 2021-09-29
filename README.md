@@ -30,7 +30,7 @@ Puis dans le "Run & Debug" de VSCode : "Attach to Electron"
 - [ ] CI (tests, coverage, generate build)
 ### Services
 - [ ] Logger (winston + sentry + console + "renderer transport to main")
-- [ ] Tracker (matomo)
+- [ ] Tracker (matomo) (le casse 🍒)
 - [ ] Generic ipcServices (preLoad expose + [context isolation](https://www.electronjs.org/docs/latest/tutorial/context-isolation)?)
 
 ### Doc

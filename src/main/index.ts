@@ -25,7 +25,7 @@ async function createMainWindow() {
     const window = new BrowserWindow({
         webPreferences: {
             contextIsolation: false,
-            enableRemoteModule: true,
+            // enableRemoteModule: true,
             nativeWindowOpen: false,
             nodeIntegration: true,
             nodeIntegrationInWorker: true,

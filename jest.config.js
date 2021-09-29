@@ -58,10 +58,5 @@ module.exports = {
             },
             ...defaultConfig,
         },
-        {
-            displayName: "spectron",
-            testMatch: ["<rootDir>/test/spectron/**/?(*.)(spec|test).(ts|tsx)"],
-            ...defaultConfig,
-        },
     ],
 };

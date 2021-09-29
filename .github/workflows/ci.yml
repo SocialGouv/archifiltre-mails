@@ -25,19 +25,17 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: lts/*
+          node-version: '14'
           cache: yarn
 
       - name: Installing
-        run: |
-          sed -i "s/postinstall/disabled-postinstall/g" package.json
-          yarn --frozen-lockfile --perfer-offline
+        run: yarn --frozen-lockfile --perfer-offline
 
       - name: Lint
-        run: yarn lint
+        run: yarn lint && yarn lint:test
 
       - name: Unit tests
-        run: yarn jest --coverage
+        run: yarn jest --ci --coverage components integration
 
       - name: Send test coverage to codecov
         continue-on-error: true
@@ -61,17 +59,14 @@ jobs:
   #     - name: Set .env to production
   #       run: cp .env.prod .env
 
-  #     - name: Build electron
-  #       run: webpack --mode production --config webpack.electron-main.js
-
-  #     - name: Build renderer
-  #       run: webpack --mode production
+  #     - name: Build
+  #       run: yarn compile
 
   #     - name: Archive dist
   #       uses: actions/upload-artifact@v2
   #       with:
   #         name: electron-dist
-  #         path: electron/dist/
+  #         path: dist/
 
   # Build:
   #   # We build on any distribution channel
@@ -190,7 +185,7 @@ jobs:
   #       uses: actions/download-artifact@v2
   #       with:
   #         name: electron-dist
-  #         path: electron/dist/
+  #         path: dist/
 
   #     - name: Build
   #       run: yarn ${{ matrix.script }}
