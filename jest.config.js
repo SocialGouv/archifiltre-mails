@@ -19,7 +19,7 @@ const collectCoverageFrom = ["<rootDir>/src/**/!(*.d).ts*"];
 
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 const defaultConfig = {
-    collectCoverageFrom,
+    // collectCoverageFrom,
     globals: {
         "ts-jest": {
             tsconfig: "<rootDir>/test/tsconfig.json",
