@@ -49,14 +49,5 @@ module.exports = {
             ],
             ...defaultConfig,
         },
-        {
-            displayName: "e2e",
-            preset: "jest-playwright-preset",
-            testMatch: ["<rootDir>/test/e2e/**/?(*.)(spec|test).(ts|tsx)"],
-            transform: {
-                "^.+\\.ts$": "ts-jest",
-            },
-            ...defaultConfig,
-        },
     ],
 };

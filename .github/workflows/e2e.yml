@@ -1,0 +1,69 @@
+name: E2E
+on:
+  push:
+    branches: [main, feature/spectron-jest]
+  schedule:
+    - cron: '0 1 * * 0-4' # every night before week day, at 1pm
+
+env:
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
+jobs:
+  compile:
+    name: Compile application
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: ./.github/actions/setup-node
+
+      - name: Compiling
+        run: yarn compile
+
+      - name: Archive dist
+        uses: actions/upload-artifact@v2
+        with:
+          name: electron-dist
+          path: dist/
+
+
+  e2e:
+    env:
+      ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
+    name: Run E2E test on ${{ matrix.os }}
+    needs: compile
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: ./.github/actions/setup-node
+      - name: Download dist
+        uses: actions/download-artifact@v2
+        with:
+          name: electron-dist
+          path: dist/
+
+      - name: Test electron
+        run: yarn electron -v
+
+      - name: Install Playwright deps
+        run: yarn playwright install --with-deps chromium
+
+      - name: Start Xvfb server
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        uses: ./.github/actions/start-xvfb
+
+      - name: Run Playwright
+        timeout-minutes: 15
+        run: yarn test:e2e
+
+      - name: Clean Xvfb
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        uses: ./.github/actions/kill-xvfb
+

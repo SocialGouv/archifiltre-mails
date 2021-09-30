@@ -5,7 +5,7 @@
   "description": "Visualisez, triez, et améliorez votre boite mail !",
   "author": "Fabrique des ministère sociaux",
   "license": "Apache-2.0",
-  "main": "index.js",
+  "main": "dist/main/main.js",
   "repository": "git@github.com:SocialGouv/archimail.git",
   "scripts": {
     "dev": "electron-webpack dev",
@@ -22,7 +22,11 @@
     "lint": "eslint src/",
     "lint:test": "eslint -c test/.eslintrc.json 'test/**/*.ts*'",
     "lint:fix": "yarn lint --fix && yarn lint:test --fix",
-    "devtools": "ts-node scripts/getReactDevtools.ts"
+    "devtools": "ts-node scripts/getReactDevtools.ts",
+    "test": "jest",
+    "test:components": "jest components",
+    "test:integration": "jest integration",
+    "test:e2e": "playwright test"
   },
   "electronWebpack": {
     "renderer": {
@@ -57,7 +61,7 @@
     }
   },
   "engines": {
-    "node": "<14"
+    "node": "14"
   },
   "devDependencies": {
     "@playwright/test": "^1.15.0",

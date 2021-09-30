@@ -22,7 +22,9 @@ if (module.hot) {
 }
 
 async function createMainWindow() {
+    console.log("process.env.HEADLESS", process.env.HEADLESS);
     const window = new BrowserWindow({
+        show: !process.env.HEADLESS,
         webPreferences: {
             contextIsolation: false,
             // enableRemoteModule: true,

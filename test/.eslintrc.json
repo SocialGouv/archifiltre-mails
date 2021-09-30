@@ -13,7 +13,7 @@
   "overrides": [
     {
       "files": [
-        "(components|integration|e2e|spectron)/**/*.ts*"
+        "(components|integration)/**/*.ts*"
       ],
       "env": {
         "jest": true
@@ -24,18 +24,32 @@
         "e2e/**/*.ts*"
       ],
       "extends": [
-        "@socialgouv/eslint-config-typescript",
-        "plugin:playwright/jest-playwright"
+        "plugin:playwright/playwright-test"
       ],
-      "parserOptions": {
-        "project": "./test/e2e/tsconfig.json"
+      "env": {
+        "jest/globals": false
       },
-      "settings": {
-        "import/resolver": {
-          "typescript": {
-            "project": "./test/e2e/tsconfig.json"
-          }
-        }
+      "rules": {
+        "jest/no-try-expect": "off",
+        "jest/expect-expect": "off",
+        "jest/no-commented-out-tests": "off",
+        "jest/no-conditional-expect": "off",
+        "jest/no-deprecated-functions": "off",
+        "jest/no-disabled-tests": "off",
+        "jest/no-done-callback": "off",
+        "jest/no-export": "off",
+        "jest/no-focused-tests": "off",
+        "jest/no-identical-title": "off",
+        "jest/no-interpolation-in-snapshots": "off",
+        "jest/no-jasmine-globals": "off",
+        "jest/no-jest-import": "off",
+        "jest/no-mocks-import": "off",
+        "jest/no-standalone-expect": "off",
+        "jest/no-test-prefixes": "off",
+        "jest/valid-describe": "off",
+        "jest/valid-expect-in-promise": "off",
+        "jest/valid-expect": "off",
+        "jest/valid-title": "off"
       }
     }
   ]

@@ -1,25 +1,37 @@
 import type { ElectronApplication, Page } from "@playwright/test";
-import { _electron as electron } from "@playwright/test";
+import { _electron as electron, expect, test } from "@playwright/test";
 import path from "path";
 
-// playwrightTest.use({ headless: true });
-
-jest.setTimeout(50000);
-describe("App e2e", () => {
+test.describe("App e2e", () => {
     // eslint-disable-next-line @typescript-eslint/init-declarations
     let electronApp: ElectronApplication, win: Page;
-    beforeEach(async () => {
+    test.beforeEach(async () => {
+        const main = path.resolve(
+            __dirname,
+            "..",
+            "..",
+            "dist",
+            "main",
+            "main.js"
+        );
         electronApp = await electron.launch({
             args: [
-                "--disable-extensions",
-                path.join(__dirname, "../../dist/main/main.js"),
+                // "--disable_splash_screen",
+                // "--disable-extensions",
+                // "--disable-dev-shm-usage",
+                // "--no-sandbox",
+                // "--disable-gpu",
+                // "--headless",
+                // "--disable-software-rasterizer",
+                // "--disable-setuid-sandbox",
+                main,
             ],
             env: {
+                DISPLAY: ":0", //TODO: input as env var
                 E2E: "true",
-                ELECTRON_ENABLE_LOGGING: "true",
-                ELECTRON_ENABLE_STACK_DUMPING: "true",
                 NODE_ENV: "test-e2e",
             },
+            timeout: 120000,
         });
         await electronApp.evaluate(({ app }) => {
             // This runs in the main Electron process, parameter here is always
@@ -28,14 +40,15 @@ describe("App e2e", () => {
         });
 
         win = await electronApp.firstWindow();
+        win.on("console", console.log);
         await win.waitForLoadState();
     });
 
-    afterEach(async () => {
+    test.afterEach(async () => {
         await electronApp.close();
     });
 
-    it("should render the application", async () => {
+    test("should render the application", async () => {
         expect((await win.content()).includes("Hello toto")).toBeTruthy();
         await win.waitForTimeout(3000);
         expect((await win.content()).includes("Hello JEANMI")).toBeTruthy();

@@ -72,6 +72,7 @@ const defaultConfig = {
         },
     ],
     plugins: ["unused-imports"],
+    reportUnusedDisableDirectives: true,
     root: true,
 };
 
