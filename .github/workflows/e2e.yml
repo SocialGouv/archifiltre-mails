@@ -1,9 +1,9 @@
 name: E2E
 on:
   push:
-    branches: [main, feature/spectron-jest]
+    branches: [main]
   schedule:
-    - cron: '0 1 * * 0-4' # every night before week day, at 1pm
+    - cron: '0 1 * * 0-4' # every night before week day, at 1pm on dev
 
 env:
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
@@ -53,7 +53,7 @@ jobs:
         run: yarn electron -v
 
       - name: Install Playwright deps
-        run: yarn playwright install --with-deps chromium
+        run: yarn playwright install-deps chromium
 
       - name: Start Xvfb server
         if: ${{ matrix.os == 'ubuntu-latest' }}

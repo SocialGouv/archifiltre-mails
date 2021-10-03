@@ -34,8 +34,6 @@ test.describe("App e2e", () => {
             timeout: 120000,
         });
         await electronApp.evaluate(({ app }) => {
-            // This runs in the main Electron process, parameter here is always
-            // the result of the require('electron') in the main app script.
             return app.getAppPath();
         });
 
