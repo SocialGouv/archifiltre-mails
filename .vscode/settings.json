@@ -21,5 +21,7 @@
       ],
       "url": "https://docs.renovatebot.com/renovate-schema.json"
     }
-  ]
+  ],
+  "jest.jestCommandLine": "yarn jest",
+  "jest.autoRun": "off"
 }

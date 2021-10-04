@@ -1,8 +1,12 @@
 import { app, BrowserWindow, session } from "electron";
+import fs from "fs";
 import path from "path";
-import { format as formatUrl } from "url";
 
-const isDevelopment = process.env.NODE_ENV !== "production";
+const isTest = process.env.NODE_ENV?.startsWith("test");
+const isDevelopment = process.env.NODE_ENV !== "production" && !isTest;
+
+const isE2E = !!process.env.E2E;
+
 const REACT_DEVTOOLS_PATH = path.join(
     process.cwd(),
     "scripts",
@@ -14,14 +18,16 @@ const REACT_DEVTOOLS_PATH = path.join(
 let mainWindow: BrowserWindow | null = null;
 
 if (module.hot) {
-    console.log("hot reload MAIN");
     module.hot.accept();
 }
 
 async function createMainWindow() {
+    console.log("process.env.HEADLESS", process.env.HEADLESS);
     const window = new BrowserWindow({
+        show: !process.env.HEADLESS,
         webPreferences: {
             contextIsolation: false,
+            // enableRemoteModule: true,
             nativeWindowOpen: false,
             nodeIntegration: true,
             nodeIntegrationInWorker: true,
@@ -29,21 +35,35 @@ async function createMainWindow() {
     });
 
     if (isDevelopment) {
-        await session.defaultSession.loadExtension(REACT_DEVTOOLS_PATH, {
-            allowFileAccess: true,
-        });
+        if (fs.existsSync(REACT_DEVTOOLS_PATH))
+            await session.defaultSession.loadExtension(REACT_DEVTOOLS_PATH, {
+                allowFileAccess: true,
+            });
+        else
+            window.once("focus", () => {
+                window.webContents.send(
+                    "log",
+                    `React devtools not found (${REACT_DEVTOOLS_PATH})`
+                );
+            });
         window.webContents.openDevTools();
     }
 
-    await window.loadURL(
-        isDevelopment
-            ? `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`
-            : formatUrl({
-                  pathname: path.join(__dirname, "index.html"),
-                  protocol: "file",
-                  slashes: true,
-              })
-    );
+    let indexUrl = new URL(
+        `file://${path.join(__dirname, "index.html")}/`
+        // `file://${path.join(__dirname, "/../renderer/index.html")}`
+    ).toString();
+    if (isE2E) {
+        indexUrl = new URL(
+            `file://${path.join(__dirname, "/../renderer/index.html")}`
+        ).toString();
+    } else if (isDevelopment) {
+        indexUrl = `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`;
+    }
+    console.log("===========INDEX URL", indexUrl);
+    await window.loadURL(indexUrl);
+    window.webContents.send("log-e2e", process.env);
+    window.webContents.send("log-e2e", indexUrl);
 
     window.on("closed", () => {
         mainWindow = null;
@@ -78,3 +98,9 @@ app.on("activate", async () => {
 app.on("ready", async () => {
     mainWindow = await createMainWindow();
 });
+
+// (() => {
+//     throw new Error(
+//         `NODE_ENV=${process.env.NODE_ENV} ; E2E=${process.env.E2E}`
+//     );
+// })();

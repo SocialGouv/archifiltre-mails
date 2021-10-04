@@ -1,0 +1,21 @@
+name: Update LICENSE date
+on:
+  schedule:
+    - cron: '0 0 1 1 *' # every 1rst January on dev
+
+
+jobs:
+  update_date:
+    name: Update LICENSE date
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Found last year date, replace, and push
+        shell: bash
+        run: |
+          sed -i "s/Copyright $(date -d 'last year' +%Y)/Copyright $(date +%Y)/g" LICENSE
+          git add LICENSE
+          git commit -m "chore(license) update license year"
+          git push origin
