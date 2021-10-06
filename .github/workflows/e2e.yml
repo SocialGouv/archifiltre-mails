@@ -1,6 +1,8 @@
 name: E2E
 on:
   push:
+    branches: [ci-e2e/*, "*/e2e/*"]
+  pull_request:
     branches: [main]
   schedule:
     - cron: '0 1 * * 0-4' # every night before week day, at 1pm on dev
