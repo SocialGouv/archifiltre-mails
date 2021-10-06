@@ -3,7 +3,7 @@ const fs = require("fs");
 const { pathsToModuleNameMapper } = require("ts-jest/utils");
 
 const tsconfig = JSON.parse(
-    fs.readFileSync(path.resolve(__dirname, "test", "tsconfig.json"), {
+    fs.readFileSync(path.resolve(__dirname, "tests", "tsconfig.json"), {
         encoding: "utf-8",
     })
 );
@@ -22,7 +22,7 @@ const defaultConfig = {
     // collectCoverageFrom,
     globals: {
         "ts-jest": {
-            tsconfig: "<rootDir>/test/tsconfig.json",
+            tsconfig: "<rootDir>/tests/tsconfig.json",
         },
     },
     moduleFileExtensions: ["ts", "tsx", "js", "json"],
@@ -37,7 +37,7 @@ module.exports = {
         {
             displayName: "integration",
             testMatch: [
-                "<rootDir>/test/integration/**/?(*.)(spec|test).(ts|tsx)",
+                "<rootDir>/tests/integration/**/?(*.)(spec|test).(ts|tsx)",
             ],
             ...defaultConfig,
         },
@@ -45,7 +45,7 @@ module.exports = {
             displayName: "components",
             testEnvironment: "jsdom",
             testMatch: [
-                "<rootDir>/test/components/**/?(*.)(spec|test).(ts|tsx)",
+                "<rootDir>/tests/components/**/?(*.)(spec|test).(ts|tsx)",
             ],
             ...defaultConfig,
         },
