@@ -3,7 +3,7 @@ const fs = require("fs");
 const { pathsToModuleNameMapper } = require("ts-jest/utils");
 
 const tsconfig = JSON.parse(
-    fs.readFileSync(path.resolve(__dirname, "test", "tsconfig.json"), {
+    fs.readFileSync(path.resolve(__dirname, "tests", "tsconfig.json"), {
         encoding: "utf-8",
     })
 );
