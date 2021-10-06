@@ -20,7 +20,7 @@
     "dist:linux": "electron-builder --linux AppImage",
     "start:mac": "open -n dist/mac-x64/mac/archimail.app",
     "lint": "eslint src/",
-    "lint:test": "eslint -c test/.eslintrc.json 'test/**/*.ts*'",
+    "lint:test": "eslint -c tests/.eslintrc.json 'tests/**/*.ts*'",
     "lint:fix": "yarn lint --fix && yarn lint:test --fix",
     "devtools": "ts-node scripts/getReactDevtools.ts",
     "test": "jest",

@@ -1,12 +1,12 @@
 {
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": "./test/tsconfig.json"
+    "project": "./tests/tsconfig.json"
   },
   "settings": {
     "import/resolver": {
       "typescript": {
-        "project": "./test/tsconfig.json"
+        "project": "./tests/tsconfig.json"
       }
     }
   },

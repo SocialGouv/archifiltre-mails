@@ -22,7 +22,7 @@ const defaultConfig = {
     // collectCoverageFrom,
     globals: {
         "ts-jest": {
-            tsconfig: "<rootDir>/test/tsconfig.json",
+            tsconfig: "<rootDir>/tests/tsconfig.json",
         },
     },
     moduleFileExtensions: ["ts", "tsx", "js", "json"],
@@ -37,7 +37,7 @@ module.exports = {
         {
             displayName: "integration",
             testMatch: [
-                "<rootDir>/test/integration/**/?(*.)(spec|test).(ts|tsx)",
+                "<rootDir>/tests/integration/**/?(*.)(spec|test).(ts|tsx)",
             ],
             ...defaultConfig,
         },
@@ -45,7 +45,7 @@ module.exports = {
             displayName: "components",
             testEnvironment: "jsdom",
             testMatch: [
-                "<rootDir>/test/components/**/?(*.)(spec|test).(ts|tsx)",
+                "<rootDir>/tests/components/**/?(*.)(spec|test).(ts|tsx)",
             ],
             ...defaultConfig,
         },
