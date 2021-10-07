@@ -1,19 +1,18 @@
-# Contribuer au projet
-
 Archimail est un projet open-source auquel vous pouvez contribuer. Vous retrouverez ci-après les différentes règles et nomenclatures suivies dans ce dépôt.
 
-- [Contribuer au projet](#contribuer-au-projet)
-  - [Git](#git)
-    - [Branches et flux Git](#branches-et-flux-git)
-  - [Produit](#produit)
-    - [Tickets et fonctionnalités](#tickets-et-fonctionnalités)
-  - [Intégration continue et tests](#intégration-continue-et-tests)
-    - [CI: QA + tests](#ci-qa--tests)
-    - [E2E](#e2e)
-  - [Déploiement continu + sortie de version](#déploiement-continu--sortie-de-version)
+- [Git](#git)
+  - [Branches et flux Git](#branches-et-flux-git)
+  - [Commit](#commit)
+  - [Pull request](#pull-request)
+- [Produit](#produit)
+  - [Tickets et fonctionnalités](#tickets-et-fonctionnalités)
+- [Intégration continue et tests](#intégration-continue-et-tests)
+  - [CI: QA + tests classiques](#ci-qa--tests-classiques)
+  - [E2E](#e2e)
+- [Déploiement continu + sortie de version](#déploiement-continu--sortie-de-version)
 
-## Git
-### Branches et flux Git
+# Git
+## Branches et flux Git
 Le projet respecte une version allégée de "[GitFlow](https://danielkummer.github.io/git-flow-cheatsheet/index.fr_FR.html)".
 
 - 🧑‍💻 La branche de développement est `dev`
@@ -39,11 +38,23 @@ Le projet respecte une version allégée de "[GitFlow](https://danielkummer.gith
   - Exception faite pour les branches `*/e2e/*` (ex: `feature/e2e/icicle`, `hotfix/e2e/bug-chargement-empreinte`) qui adoptent cette nomenclature afin de déclencher les tests e2e en plus dans la CI
 - 🤖 Les branches préfixées `renovate/` sont réservées et ne doivent pas être utilisées
 
-**Représentation imagée :**
+### Représentation imagée :
 ![Archimail presque-"Git-flow"](./docs/img/archimail-git-flow.svg)
 
-## Produit
-### Tickets et fonctionnalités
+
+## Commit
+La convention de commit adoptée par le projet est [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) MAIS cette convention n'est imposée que sur les branches principales `dev` et `main`.  
+En effet, les pull requests étant "squash", seul importe le commit de merge en fin de pull request.  
+[Gitm😍ji](https://gitmoji.dev/) peut donc par exemple être utilisé à l'intérieur des branches si besoin.
+
+## Pull request
+Pour chaque fonctionnalité apportée ou bug corrigé, une pull request doit être faite.  
+Il faut obligatoirement lier une pull request à un ticket, sans ça, elle n'a aucun intérêt.  
+Vous pouvez vous aider du template prévu à cet effet. Il est important de bien respecter la convention [Semantic Pull Request](https://github.com/zeke/semantic-pull-requests) pour le titre des pull requests.  
+Comme dit plus haut, le format des commits sera ignoré au profit d'un squash de merge à la cloture de la pull request.
+
+# Produit
+## Tickets et fonctionnalités
 Les fonctionnalités suivent le processus de développement suivant :
 - Une idée arrive dans le [tableau des idées](https://github.com/orgs/SocialGouv/projects/10) (accès interne)
 - Cette idée est évaluée, travaillée, puis transformée ticket pour le [backlog global](https://github.com/orgs/SocialGouv/projects/9) (accès interne) avec le label "archimail"
@@ -63,18 +74,31 @@ Un ticket est considéré comme terminé (DoD) lorsque les conditions suivantes 
   - (voir [E2E](#e2e))
 - En respect de l'engagement de sécurité, 1 review obligatoire à partir de la complexité *M*
 
-## Intégration continue et tests
+# Intégration continue et tests
 Trois types de tests sont mis en place dans l'application : composants, intégration, et end-to-end (E2E).
 Les tests de composants sont comme des tests unitaires, à écrire autant que possible pour limiter au maximum les potentiels régressions graphiques.  
 Les tests d'intégration sont peuvent être liés aux critères d'acceptances (ou à une partie) afin de tester une fonctionnalité dans son ensemble.  
 Les tests E2E sont fortement et souvent liés aux critères d'acceptances en plus d'être "scénarisés" pour pendant les phases de recette.
 
-### CI: QA + tests classiques
+## CI: QA + tests classiques
 Les tests se situent dans le dossier [`./tests/`](./tests/) et peuvent être exécutés avec la commande `yarn test`.  
-Automatiquement, les branches TODO
+Automatiquement, les pull requests dont les branches sont à destination de `dev` et `main` sont contrôlées sur leur qualité via [CodeQL](https://codeql.github.com/) ainsi que sur notre CI interne.  
+Notre CI contrôlera de son côté l'uniformité du code (`lint`) et lancera les tests "classiques" (composants et intégration).
 
-### E2E
+## E2E
+Les tests E2E se situent dans le dossier [`./tests/e2e/`](./tests/e2e/) et peuvent être exécutés avec la commande `yarn test:e2e`.  
+Attention toutefois à bien installer les prérequis en amont. (cf [README](./README.md#e2e)).  
+
+Les tests e2e s'exécuteront automatique dans la CI suivant l'une de ces conditions :
+- toutes les nuits avant un jour de semaine travaillé à 1h du matin sur la branche `dev`
+- à chaque pull request en direction de la branche `main`
+- à chaque push sur les branches `ci-e2e/*` ou `*/e2e/*`
+
+Les tests e2e seront automatiquement lancé sur les trois systèmes d'opération ciblé à savoir Linux Ubuntu, Windows, et MacOS.  
+Il est donc important dans le cas de code spécifique à l'un des OS de bien définir une non exécution pour les autres.
+
+# Déploiement continu + sortie de version
 TODO
 
-## Déploiement continu + sortie de version
+# Code
 TODO

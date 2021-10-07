@@ -52,7 +52,6 @@ body:
       label: Critères d'acceptance
       description: Si connus, quels sont les critères à remplir pour considérer la problématique comme résolue ?
   - type: checkboxes
-    id: e2e
     attributes:
       label: Les tests e2e doivent-ils passer ?
       options:
