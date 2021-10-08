@@ -6,10 +6,13 @@ import { spawn } from "child_process";
 import { createWriteStream } from "fs";
 import path from "path";
 import { sync as rimraf } from "rimraf";
+import type { Stream } from "stream";
 import unzipCrx from "unzip-crx-3";
 
 const scriptsFolderPath = path.join(process.cwd(), "scripts");
 const REACT_DEVTOOLS_EXTENSION_ID = "fmkadmapgofadopljbjfkapdkoienihi";
+const TOKEN_START = ">>>>>";
+const TOKEN_END = "<<<<<";
 const getChromiumUserAgent = async () =>
     new Promise<string>((resolve) => {
         const electronChromiumVersionProcess = spawn(`yarn`, [
@@ -19,9 +22,9 @@ const getChromiumUserAgent = async () =>
 
         electronChromiumVersionProcess.stdout.on("data", (buffer: Buffer) => {
             const data = buffer.toString();
-            if (data.startsWith(">>>>>")) {
+            if (data.startsWith(TOKEN_START)) {
                 electronChromiumVersionProcess.kill("SIGINT");
-                resolve(data.replace(">>>>>", "").replace("<<<<<", ""));
+                resolve(data.replace(TOKEN_START, "").replace(TOKEN_END, ""));
             }
         });
     });
@@ -46,26 +49,26 @@ const getChromeVersion = (userAgent: string) => {
 const downloadFile = async (url: string, outputLocationPath: string) => {
     const writer = createWriteStream(outputLocationPath);
 
-    return axios({
-        method: "get",
-        responseType: "stream",
-        url,
-    }).then(async (response) => {
-        return new Promise((resolve, reject) => {
-            response.data.pipe(writer);
-            let error: Error | null = null;
-            writer.on("error", (err) => {
-                error = err;
-                writer.close();
-                reject(err);
-            });
-            writer.on("close", () => {
-                if (!error) {
-                    resolve(true);
-                }
+    return axios
+        .get<Stream>(url, {
+            responseType: "stream",
+        })
+        .then(async (response) => {
+            return new Promise((resolve, reject) => {
+                response.data.pipe(writer);
+                let error: Error | null = null;
+                writer.on("error", (err) => {
+                    error = err;
+                    writer.close();
+                    reject(err);
+                });
+                writer.on("close", () => {
+                    if (!error) {
+                        resolve(true);
+                    }
+                });
             });
         });
-    });
 };
 
 const getNaclArch = (userAgent: string) =>
