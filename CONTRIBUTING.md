@@ -45,7 +45,7 @@ Le projet respecte une version allégée de "[GitFlow](https://danielkummer.gith
 ## Commit
 La convention de commit adoptée par le projet est [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) MAIS cette convention n'est imposée que sur les branches principales `dev` et `main`.  
 En effet, les pull requests étant "squash", seul importe le commit de merge en fin de pull request.  
-[Gitm😍ji](https://gitmoji.dev/) peut donc par exemple être utilisé à l'intérieur des branches si besoin.
+[Gitm😍 ji](https://gitmoji.dev/) peut donc par exemple être utilisé à l'intérieur des branches si besoin.
 
 ## Pull request
 Pour chaque fonctionnalité apportée ou bug corrigé, une pull request doit être faite.  
@@ -57,17 +57,17 @@ Comme dit plus haut, le format des commits sera ignoré au profit d'un squash de
 ## Tickets et fonctionnalités
 Les fonctionnalités suivent le processus de développement suivant :
 - Une idée arrive dans le [tableau des idées](https://github.com/orgs/SocialGouv/projects/10) (accès interne)
-- Cette idée est évaluée, travaillée, puis transformée ticket pour le [backlog global](https://github.com/orgs/SocialGouv/projects/9) (accès interne) avec le label "archimail"
+- Cette idée est évaluée, travaillée, puis transformée en ticket pour le [backlog global](https://github.com/orgs/SocialGouv/projects/9) (accès interne) avec le label "archimail"
 - Ce ticket est une nouvelle fois travaillé pour être soit transformé en EPIC soit rattaché à une EPIC existante
   - Si il devient une EPIC, il acquiert le label "EPIC" et reste dans le même tableau
   - Si il est rattaché à une EPIC, il est raffiné puis transféré vers le [tableau de sprint d'Archimail](https://github.com/SocialGouv/archimail/projects/4) (accès public)
 
-Une ticket est toujours estimé avec une valeur business et une complexité, mesurés en **T-shirt sizing** (*S*, *M*, *L*, *XL*).
+Un ticket est toujours estimé avec une valeur business et une complexité, mesurés avec la technique du **T-shirt sizing** (*S*, *M*, *L*, *XL*).
 ![Qualification des tickets](docs/img/ticket-grooming.png)
 
 Un ticket est autant que possible accompagné de critères d'acceptance définis entre la qualité et la définition du besoin. Ces critères sont la représentation des tests d'intégration et/ou E2E qui seront créés pour valider la fonctionnalité associée.
 
-Un ticket est considéré comme terminé (DoD) lorsque les conditions suivantes sont remplies :
+Un ticket est considéré comme terminé (*DoD*) lorsque les conditions suivantes sont remplies :
 - Les critères d'acceptances ont été respectés
 - Tous les tests d'intégration passent au vert ✅
 - Si la valeur business est *XL* (ou *L* si besoin), tous les tests E2E passent au vert ✅
@@ -75,10 +75,13 @@ Un ticket est considéré comme terminé (DoD) lorsque les conditions suivantes 
 - En respect de l'engagement de sécurité, 1 review obligatoire à partir de la complexité *M*
 
 # Intégration continue et tests
-Trois types de tests sont mis en place dans l'application : composants, intégration, et end-to-end (E2E).
+Trois types de tests sont mis en place dans l'application : composants, intégration, et end-to-end (*E2E*).
 Les tests de composants sont comme des tests unitaires, à écrire autant que possible pour limiter au maximum les potentiels régressions graphiques.  
-Les tests d'intégration sont peuvent être liés aux critères d'acceptances (ou à une partie) afin de tester une fonctionnalité dans son ensemble.  
-Les tests E2E sont fortement et souvent liés aux critères d'acceptances en plus d'être "scénarisés" pendant les phases de recette.
+Les tests d'intégration peuvent être liés aux critères d'acceptances (ou à une partie) afin de tester une fonctionnalité précise dans son ensemble.  
+Les tests E2E sont fortement et souvent liés aux critères d'acceptances en plus d'être "scénarisés" pour être ensuite développés et exécutés pendant les phases de recette.
+
+## Bots
+Régulièrement, des bots de contrôle passent sur le code pour garantir le maintiens des dépendances à jour (Renovate 🧹), ainsi que l'application de leurs derniers patch de sécurité (Dependabot 🤖).
 
 ## CI: QA + tests classiques
 Les tests se situent dans le dossier [`./tests/`](./tests/) et peuvent être exécutés avec la commande `yarn test`.  
@@ -89,13 +92,13 @@ Notre CI contrôlera de son côté l'uniformité du code (`lint`) et lancera les
 Les tests E2E se situent dans le dossier [`./tests/e2e/`](./tests/e2e/) et peuvent être exécutés avec la commande `yarn test:e2e`.  
 Attention toutefois à bien installer les prérequis en amont. (cf [README](./README.md#e2e)).  
 
-Les tests e2e s'exécuteront automatique dans la CI suivant l'une de ces conditions :
-- toutes les nuits avant un jour de semaine travaillé à 1h du matin sur la branche `dev`
+Les tests e2e s'exécuteront automatiquement dans la CI suivant l'une de ces conditions :
+- toutes les nuits, avant un jour de semaine travaillé, à 1h du matin sur la branche `dev`
 - à chaque pull request en direction de la branche `main`
 - à chaque push sur les branches `ci-e2e/*` ou `*/e2e/*`
 
-Les tests e2e seront automatiquement lancés sur les trois systèmes d'exploitation ciblés à savoir Linux Ubuntu, Windows, et MacOS.  
-Il est donc important dans le cas de code spécifique à l'un des OS de bien définir une non exécution pour les autres.
+Les tests e2e seront automatiquement lancés sur les trois systèmes d'exploitation ciblés, à savoir Linux Ubuntu, Windows, et MacOS.  
+Il est donc important dans le cas de code spécifique à l'un des OS de bien définir une non exécution des tests pour les autres.
 
 # Déploiement continu + sortie de version
 TODO
