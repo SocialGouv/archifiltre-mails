@@ -1,6 +1,7 @@
 import { app, BrowserWindow, session } from "electron";
 import fs from "fs";
 import path from "path";
+import { URL } from "url";
 
 const isTest = process.env.NODE_ENV?.startsWith("test");
 const isDevelopment = process.env.NODE_ENV !== "production" && !isTest;
@@ -27,7 +28,6 @@ async function createMainWindow() {
         show: !process.env.HEADLESS,
         webPreferences: {
             contextIsolation: false,
-            // enableRemoteModule: true,
             nativeWindowOpen: false,
             nodeIntegration: true,
             nodeIntegrationInWorker: true,
