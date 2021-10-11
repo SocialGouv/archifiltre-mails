@@ -80,7 +80,7 @@
     "axios": "^0.21.4",
     "cross-env": "^7.0.3",
     "electron": "^15.1.2",
-    "electron-builder": "^22.11.11",
+    "electron-builder": "^22.13.1",
     "electron-notarize": "^1.1.1",
     "electron-webpack": "^2.8.2",
     "electron-webpack-ts": "^4.0.1",
