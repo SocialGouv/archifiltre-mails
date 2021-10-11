@@ -3,6 +3,7 @@ import "./styles/global.scss";
 
 import React, { useEffect, useState } from "react";
 
+import { userConfig } from "../common/core/config";
 import { Button } from "./components/Button";
 
 export const App: React.FC = () => {
@@ -17,7 +18,17 @@ export const App: React.FC = () => {
     return (
         <div>
             Hello {title}
-            <Button>Coucou BUTTON</Button>
+            <Button
+                onClick={() => {
+                    console.log(
+                        userConfig.get("collectData"),
+                        userConfig.get("locale"),
+                        userConfig
+                    );
+                }}
+            >
+                Coucou BUTTON
+            </Button>
         </div>
     );
 };

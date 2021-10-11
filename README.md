@@ -91,7 +91,8 @@ Sous license [Apache-2.0](LICENSE)
 ### Services
 - [ ] Logger (winston + sentry + console + "renderer transport to main")
 - [ ] Tracker (matomo) (le casse 🍒)
-- [ ] Generic ipcServices (preLoad expose + [context isolation](https://www.electronjs.org/docs/latest/tutorial/context-isolation)?)
+- [x] global and user config (shared over ipc)
+- [ ] i18n (i18next + react-i18next (start [here](./src/common/i18n/)))
 
 ### Doc
 - [ ] Tech doc tool (docusaurus? next? jekyll?) + github pages
