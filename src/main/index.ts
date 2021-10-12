@@ -1,16 +1,12 @@
-import { app, BrowserWindow, session } from "electron";
-import fs from "fs";
+import { app, BrowserWindow } from "electron";
 import path from "path";
 import { URL } from "url";
 
-import { IS_DEV, IS_E2E, userConfig } from "../common/core/config";
-
-const REACT_DEVTOOLS_PATH = path.join(
-    process.cwd(),
-    "scripts",
-    "out",
-    "react-devtools-extension"
-);
+import { IS_DEV, IS_E2E } from "../common/core/config";
+import { IsomorphicModuleFactory } from "../common/core/modules/Module";
+import { UserConfigModule } from "../common/core/modules/UserConfigModule";
+import { loadModules } from "./lib/ServiceManager";
+import { DevToolsModule } from "./modules/DevToolsService";
 
 // enable hot reload when needed
 if (module.hot) {
@@ -18,90 +14,59 @@ if (module.hot) {
 }
 
 /**
- * Main application class
+ * Stub index.html url for main window. As E2E is not packaged, it needs a direct access to generated file. In dev mode, calling localhost let the dev server handling the file.
  */
-class Archimail {
-    private mainWindow: BrowserWindow | null = null;
+const INDEX_URL = new URL(
+    IS_E2E
+        ? `file://${path.join(__dirname, "/../renderer/index.html")}`
+        : IS_DEV
+        ? `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`
+        : `file://${path.join(__dirname, "index.html")}/`
+).toString();
 
-    constructor() {
-        // quit application when all windows are closed
-        app.on("window-all-closed", () => {
-            // on macOS it is common for applications to stay open until the user explicitly quits
-            if (process.platform !== "darwin") {
-                app.quit();
-            }
-        });
+/**
+ * global reference
+ * prevent mainWindow from being garbage collected
+ */
+let mainWindow: BrowserWindow | null = null;
 
-        app.on("activate", async () => {
-            // on macOS it is common to re-create a window even after all windows have been closed
-            if (!this.mainWindow) {
-                await this.createMainWindow();
-            }
-        });
-
-        // create main BrowserWindow when electron is ready
-        app.on("ready", async () => {
-            await userConfig.init();
-            await this.createMainWindow();
-        });
+// quit application when all windows are closed
+app.on("window-all-closed", () => {
+    // on macOS it is common for applications to stay open until the user explicitly quits
+    if (process.platform !== "darwin") {
+        app.quit();
     }
+});
 
-    public async createMainWindow() {
-        const window = new BrowserWindow({
-            show: !process.env.HEADLESS,
-            webPreferences: {
-                contextIsolation: false,
-                nodeIntegration: true,
-                nodeIntegrationInWorker: true,
-            },
-        });
-
-        if (IS_DEV) {
-            if (fs.existsSync(REACT_DEVTOOLS_PATH))
-                await session.defaultSession.loadExtension(
-                    REACT_DEVTOOLS_PATH,
-                    {
-                        allowFileAccess: true,
-                    }
-                );
-            else
-                window.once("focus", () => {
-                    window.webContents.send(
-                        "log",
-                        `React devtools not found (${REACT_DEVTOOLS_PATH})`
-                    );
-                });
-            window.webContents.openDevTools();
-        }
-
-        let indexUrl = new URL(
-            `file://${path.join(__dirname, "index.html")}/`
-        ).toString();
-        if (IS_E2E) {
-            indexUrl = new URL(
-                `file://${path.join(__dirname, "/../renderer/index.html")}`
-            ).toString();
-        } else if (IS_DEV) {
-            indexUrl = `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`;
-        }
-        await window.loadURL(indexUrl);
-
-        window.on("closed", () => {
-            this.mainWindow = null;
-        });
-
-        window.webContents.on("devtools-opened", () => {
-            window.focus();
-            setImmediate(() => {
-                window.focus();
-            });
-        });
-
-        this.mainWindow = window;
+app.on("activate", async () => {
+    // on macOS it is common to re-create a window even after all windows have been closed
+    if (!mainWindow) {
+        await createMainWindow();
     }
-}
+});
 
-// global reference to full app
-// prevent mainWindow from being garbage collected
-// eslint-disable-next-line unused-imports/no-unused-vars
-const archimail = new Archimail();
+// create main BrowserWindow when electron is ready
+app.on("ready", async () => {
+    await loadModules(
+        IsomorphicModuleFactory.getInstance(UserConfigModule),
+        new DevToolsModule()
+    );
+    await createMainWindow();
+});
+const createMainWindow = async () => {
+    mainWindow = new BrowserWindow({
+        webPreferences: {
+            contextIsolation: false,
+            nodeIntegration: true,
+            nodeIntegrationInWorker: true,
+        },
+    });
+
+    if (IS_DEV) mainWindow.webContents.openDevTools();
+
+    await mainWindow.loadURL(INDEX_URL);
+
+    mainWindow.on("closed", () => {
+        mainWindow = null;
+    });
+};

@@ -3,11 +3,14 @@ import "./styles/global.scss";
 
 import React, { useEffect, useState } from "react";
 
-import { userConfig } from "../common/core/config";
+import { IsomorphicModuleFactory } from "../common/core/modules/Module";
+import { UserConfigModule } from "../common/core/modules/UserConfigModule";
 import { Button } from "./components/Button";
 
 export const App: React.FC = () => {
     const [title, setTitle] = useState("toto");
+
+    const userConfig = IsomorphicModuleFactory.getInstance(UserConfigModule);
 
     useEffect(() => {
         setTimeout(() => {
