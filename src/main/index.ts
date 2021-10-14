@@ -3,10 +3,9 @@ import path from "path";
 import { URL } from "url";
 
 import { IS_DEV, IS_E2E } from "../common/core/config";
-import { IsomorphicModuleFactory } from "../common/core/modules/Module";
-import { UserConfigModule } from "../common/core/modules/UserConfigModule";
-import { loadModules } from "./lib/ServiceManager";
-import { DevToolsModule } from "./modules/DevToolsService";
+import { loadIsomorphicModules } from "../common/core/isomorphic";
+import { loadModules } from "../common/lib/ModuleManager";
+import { DevToolsModule } from "./modules/DevToolsModule";
 
 // enable hot reload when needed
 if (module.hot) {
@@ -47,10 +46,8 @@ app.on("activate", async () => {
 
 // create main BrowserWindow when electron is ready
 app.on("ready", async () => {
-    await loadModules(
-        IsomorphicModuleFactory.getInstance(UserConfigModule),
-        new DevToolsModule()
-    );
+    await loadIsomorphicModules();
+    await loadModules(new DevToolsModule());
     await createMainWindow();
 });
 const createMainWindow = async () => {

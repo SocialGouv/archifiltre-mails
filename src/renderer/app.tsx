@@ -3,20 +3,23 @@ import "./styles/global.scss";
 
 import React, { useEffect, useState } from "react";
 
-import { IsomorphicModuleFactory } from "../common/core/modules/Module";
-import { UserConfigModule } from "../common/core/modules/UserConfigModule";
+import { useService } from "../common/core/modules/ContainerModule";
 import { Button } from "./components/Button";
 
 export const App: React.FC = () => {
     const [title, setTitle] = useState("toto");
 
-    const userConfig = IsomorphicModuleFactory.getInstance(UserConfigModule);
+    const userConfig = useService("userConfigService");
 
     useEffect(() => {
         setTimeout(() => {
             setTitle("JEANMI");
         }, 2000);
     });
+
+    if (!userConfig) {
+        return <>Chargement...</>;
+    }
 
     return (
         <div>

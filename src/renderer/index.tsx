@@ -1,8 +1,7 @@
 import React from "react";
 import { render } from "react-dom";
 
-import { IsomorphicModuleFactory } from "../common/core/modules/Module";
-import { UserConfigModule } from "../common/core/modules/UserConfigModule";
+import { loadIsomorphicModules } from "../common/core/isomorphic";
 import { App } from "./app";
 
 if (module.hot) {
@@ -10,6 +9,6 @@ if (module.hot) {
 }
 
 void (async () => {
-    await IsomorphicModuleFactory.getInstance(UserConfigModule).init();
+    await loadIsomorphicModules();
     render(<App />, document.querySelector("#app"));
 })();
