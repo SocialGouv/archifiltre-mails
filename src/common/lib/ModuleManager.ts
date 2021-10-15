@@ -1,5 +1,10 @@
-import type { Module } from "../core/modules/Module";
+import type { Module } from "../modules/Module";
 
+/**
+ * Load and init the given modules in the current process
+ *
+ * @param mods Given modules
+ */
 export const loadModules = async (...mods: Module[]): Promise<void> => {
     await Promise.all(
         mods.map(async (mod) => {

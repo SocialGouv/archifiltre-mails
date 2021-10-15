@@ -1,10 +1,10 @@
+import { IS_DEV, IS_E2E } from "@common/config";
+import { loadIsomorphicModules } from "@common/core/isomorphic";
+import { loadModules } from "@common/lib/ModuleManager";
 import { app, BrowserWindow } from "electron";
 import path from "path";
 import { URL } from "url";
 
-import { IS_DEV, IS_E2E } from "../common/core/config";
-import { loadIsomorphicModules } from "../common/core/isomorphic";
-import { loadModules } from "../common/lib/ModuleManager";
 import { DevToolsModule } from "./modules/DevToolsModule";
 
 // enable hot reload when needed
@@ -24,32 +24,14 @@ const INDEX_URL = new URL(
 ).toString();
 
 /**
- * global reference
- * prevent mainWindow from being garbage collected
+ * Global reference.
+ *
+ * Prevent mainWindow from being garbage collected.
  */
 let mainWindow: BrowserWindow | null = null;
-
-// quit application when all windows are closed
-app.on("window-all-closed", () => {
-    // on macOS it is common for applications to stay open until the user explicitly quits
-    if (process.platform !== "darwin") {
-        app.quit();
-    }
-});
-
-app.on("activate", async () => {
-    // on macOS it is common to re-create a window even after all windows have been closed
-    if (!mainWindow) {
-        await createMainWindow();
-    }
-});
-
-// create main BrowserWindow when electron is ready
-app.on("ready", async () => {
-    await loadIsomorphicModules();
-    await loadModules(new DevToolsModule());
-    await createMainWindow();
-});
+/**
+ * Create the main {@link BrowserWindow}.
+ */
 const createMainWindow = async () => {
     mainWindow = new BrowserWindow({
         webPreferences: {
@@ -67,3 +49,30 @@ const createMainWindow = async () => {
         mainWindow = null;
     });
 };
+
+// ----------------------------[EVENTS]----------------------------
+
+// quit application when all windows are closed
+app.on("window-all-closed", () => {
+    // on macOS it is common for applications to stay open until the user explicitly quits
+    if (process.platform !== "darwin") {
+        app.quit();
+    }
+});
+
+app.on("activate", async () => {
+    // on macOS it is common to re-create a window even after all windows have been closed
+    if (!mainWindow) {
+        await createMainWindow();
+    }
+});
+
+// when electron is ready
+app.on("ready", async () => {
+    // load shared/common modules
+    await loadIsomorphicModules();
+    // load "main-process" modules
+    await loadModules(new DevToolsModule());
+    // create actual main BrowserWindow
+    await createMainWindow();
+});

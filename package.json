@@ -29,6 +29,9 @@
     "test:e2e": "playwright test"
   },
   "electronWebpack": {
+    "main": {
+      "webpackConfig": "webpack.main.config.js"
+    },
     "renderer": {
       "webpackConfig": "webpack.renderer.config.js"
     }

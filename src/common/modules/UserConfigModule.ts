@@ -1,10 +1,10 @@
 import { app, ipcMain, ipcRenderer } from "electron";
 import Store from "electron-store";
 
-import type { Locale } from "../../i18n/raw";
-import { DEFAULT_LOCALE, SupportedLocales, validLocale } from "../../i18n/raw";
-import { randomString } from "../../utils";
 import { IS_MAIN } from "../config";
+import type { Locale } from "../i18n/raw";
+import { DEFAULT_LOCALE, SupportedLocales, validLocale } from "../i18n/raw";
+import { randomString } from "../utils";
 import { IsomorphicService } from "./ContainerModule";
 import { IsomorphicModule } from "./Module";
 
@@ -16,9 +16,16 @@ interface UserConfigV1 {
     locale: Locale;
 }
 
+/**
+ * Define how to get a config value
+ */
 type UserConfigGetter = <TKey extends keyof UserConfigV1>(
     key: TKey
 ) => UserConfigV1[TKey];
+
+/**
+ * Define how to set a config value
+ */
 type UserConfigSetter = <TKey extends keyof UserConfigV1>(
     key: TKey,
     value?: UserConfigV1[TKey]
@@ -40,6 +47,8 @@ const CONFIG_ASK_UPDATE_EVENT = "config.askUpdate";
  * Isomorphic module handling user config. Use `electron-store` under the hood on main side.
  *
  * Renderer processes can remotly access access to this config. But saves have to be done from main process.
+ *
+ * The config itself is accessible via the dedicated inner {@link service}.
  */
 export class UserConfigModule extends IsomorphicModule {
     private inited = false;
@@ -51,14 +60,6 @@ export class UserConfigModule extends IsomorphicModule {
         ? "main"
         : (globalThis._configId = globalThis._configId ?? randomString());
 
-    /**
-     * Init the config on both sides.
-     *
-     * Renderer processes must call this asap if config is needed.
-     *
-     * @async
-     * @returns void
-     */
     public async init(): Promise<void> {
         if (this.inited) {
             return;
@@ -121,12 +122,15 @@ export class UserConfigModule extends IsomorphicModule {
         this.inited = true;
     }
 
+    /**
+     * The linked service used to access config accross the application.
+     */
     public get service(): UserConfigService {
-        return new (class
+        return new (class InnerUserConfigService
             extends IsomorphicService
             implements UserConfigService
         {
-            public name = "UserConfigService";
+            readonly name = "UserConfigService";
 
             set = this.userConfigModule.set;
 
@@ -169,6 +173,12 @@ export class UserConfigModule extends IsomorphicModule {
 }
 
 export interface UserConfigService extends IsomorphicService {
+    /**
+     * Get a config by its name.
+     */
     readonly get: UserConfigGetter;
+    /**
+     * Set a config by its name and value.
+     */
     readonly set: UserConfigSetter;
 }
