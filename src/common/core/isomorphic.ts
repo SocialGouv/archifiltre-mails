@@ -6,7 +6,7 @@ import { UserConfigModule } from "../modules/UserConfigModule";
 import type { UnknownMapping } from "../utils/type";
 
 /**
- * Group modules that will be loaded on main AND renderer processes
+ * Group modules that will be loaded on main AND renderer processes.
  *
  * @param additionalServices Optional additional services to register before loading modules
  */

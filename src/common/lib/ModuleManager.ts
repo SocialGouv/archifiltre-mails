@@ -16,5 +16,6 @@ export const loadModules = async (...mods: Module[]): Promise<void> => {
         })
     ).catch((error) => {
         console.error(`<APP_ERROR> Cannot load modules.\n${error}`);
+        throw error;
     });
 };
