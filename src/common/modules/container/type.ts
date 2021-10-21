@@ -33,8 +33,7 @@ export interface Service {
 /**
  * Associate a given key to its service type
  */
-export type ReturnServiceType<TKey extends keyof ServicesKeyType> =
-    ServicesKeyType[TKey];
+export type ReturnServiceType<TKey extends ServiceKeys> = ServicesKeyType[TKey];
 
 /**
  * Ensure auto complete on union string even with a primitive string
