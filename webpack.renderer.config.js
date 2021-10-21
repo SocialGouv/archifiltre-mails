@@ -16,7 +16,10 @@ module.exports =
                     ...cssLoader.options,
                     esModule: true,
                     localsConvention: "camelCase",
-                    modules: "local",
+                    modules: {
+                        localIdentName: "[local]___[hash:base64:5]",
+                        mode: "local",
+                    },
                     sourceMap: true,
                 };
             }
