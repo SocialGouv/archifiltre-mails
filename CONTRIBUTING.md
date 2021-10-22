@@ -30,11 +30,11 @@ Le projet respecte une version allégée de "[GitFlow](https://danielkummer.gith
   - Quand un bug est détecté dans `main`
     - Elles doivent partir de la branche `main`
     - Elle doivent aussi avoir leurs commits (liés au bug) de picoré (🍒 "cherry-pick") vers la branche `dev`
-      - Un rebasage ("rebase") **est déconseillé** car picorer a l'avantage de conserver l'historique des commits sur la branche d'arrivé
+      - Un rebasage ("rebase") **est déconseillé** car picorer a l'avantage de conserver l'historique des commits sur la branche d'arrivée
 - 👷 Les branches liées à l'intégration continue doivent commencer par le préfixe `ci/` ou `ci-*/`
 - Les autres préfixes seront interprétés de manière standard (par rapport à l'exécution de la CI)
 - Les autres noms de branches (sans préfixe) ne sont pas gérés
-- Les multiple préfixes ne considérerons que le premier préfixe vis-à-vis des règles précédentes (ex: `feature/icicle/refacto` => ok feature ; `icicle/feature/refacto` => ko)
+- Les multiples préfixes ne considérerons que le premier préfixe vis-à-vis des règles précédentes (ex: `feature/icicle/refacto` => ok feature ; `icicle/feature/refacto` => ko)
   - Exception faite pour les branches `*/e2e/*` (ex: `feature/e2e/icicle`, `hotfix/e2e/bug-chargement-empreinte`) qui adoptent cette nomenclature afin de déclencher les tests e2e en plus dans la CI
 - 🤖 Les branches préfixées `renovate/` sont réservées et ne doivent pas être utilisées
 
@@ -60,7 +60,7 @@ Les fonctionnalités suivent le processus de développement suivant :
 - Cette idée est évaluée, travaillée, puis transformée ticket pour le [backlog global](https://github.com/orgs/SocialGouv/projects/9) (accès interne) avec le label "archimail"
 - Ce ticket est une nouvelle fois travaillé pour être soit transformé en EPIC soit rattaché à une EPIC existante
   - Si il devient une EPIC, il acquiert le label "EPIC" et reste dans le même tableau
-  - Si il est rattaché à une EPIC, il est raffiné puis transféré vers le [tableau de sprint d'Archimail](https://github.com/SocialGouv/archimail/projects/4) (accès publique)
+  - Si il est rattaché à une EPIC, il est raffiné puis transféré vers le [tableau de sprint d'Archimail](https://github.com/SocialGouv/archimail/projects/4) (accès public)
 
 Une ticket est toujours estimé avec une valeur business et une complexité, mesurés en **T-shirt sizing** (*S*, *M*, *L*, *XL*).
 ![Qualification des tickets](docs/img/ticket-grooming.png)
@@ -78,7 +78,7 @@ Un ticket est considéré comme terminé (DoD) lorsque les conditions suivantes 
 Trois types de tests sont mis en place dans l'application : composants, intégration, et end-to-end (E2E).
 Les tests de composants sont comme des tests unitaires, à écrire autant que possible pour limiter au maximum les potentiels régressions graphiques.  
 Les tests d'intégration sont peuvent être liés aux critères d'acceptances (ou à une partie) afin de tester une fonctionnalité dans son ensemble.  
-Les tests E2E sont fortement et souvent liés aux critères d'acceptances en plus d'être "scénarisés" pour pendant les phases de recette.
+Les tests E2E sont fortement et souvent liés aux critères d'acceptances en plus d'être "scénarisés" pendant les phases de recette.
 
 ## CI: QA + tests classiques
 Les tests se situent dans le dossier [`./tests/`](./tests/) et peuvent être exécutés avec la commande `yarn test`.  
@@ -94,7 +94,7 @@ Les tests e2e s'exécuteront automatique dans la CI suivant l'une de ces conditi
 - à chaque pull request en direction de la branche `main`
 - à chaque push sur les branches `ci-e2e/*` ou `*/e2e/*`
 
-Les tests e2e seront automatiquement lancé sur les trois systèmes d'opération ciblé à savoir Linux Ubuntu, Windows, et MacOS.  
+Les tests e2e seront automatiquement lancés sur les trois systèmes d'exploitation ciblés à savoir Linux Ubuntu, Windows, et MacOS.  
 Il est donc important dans le cas de code spécifique à l'un des OS de bien définir une non exécution pour les autres.
 
 # Déploiement continu + sortie de version
