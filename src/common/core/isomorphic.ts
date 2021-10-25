@@ -1,3 +1,5 @@
+import { PstExtractorModule } from "@common/modules/PstExtractorModule";
+
 import { loadModules } from "../lib/ModuleManager";
 import type { ServiceKeys, ServicesConfig } from "../modules/container/type";
 import { containerModule } from "../modules/ContainerModule";
@@ -17,9 +19,11 @@ export const loadIsomorphicModules = async <
 ): Promise<void> => {
     const userConfigModule =
         IsomorphicModuleFactory.getInstance(UserConfigModule);
-    containerModule.registerService(
-        "userConfigService",
-        userConfigModule.service
+    const pstExtractorModule =
+        IsomorphicModuleFactory.getInstance(PstExtractorModule);
+    containerModule.registerServices(
+        ["userConfigService", userConfigModule.service],
+        ["pstExtractorService", pstExtractorModule.service]
     );
 
     containerModule.registerServices(...additionalServices);

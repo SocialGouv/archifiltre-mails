@@ -1,4 +1,5 @@
 import type { UnknownMapping } from "../../utils/type";
+import type { PstExtractorService } from "../PstExtractorModule";
 import type { UserConfigService } from "../UserConfigModule";
 
 /**
@@ -8,6 +9,7 @@ import type { UserConfigService } from "../UserConfigModule";
  */
 export interface ServicesKeyType {
     userConfigService: UserConfigService;
+    pstExtractorService: PstExtractorService;
 }
 export type ServiceKeys = keyof ServicesKeyType;
 

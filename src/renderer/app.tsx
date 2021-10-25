@@ -10,6 +10,7 @@ export const App: React.FC = () => {
     const [title, setTitle] = useState("toto");
 
     const userConfigService = useService("userConfigService");
+    const pstExtractorService = useService("pstExtractorService");
 
     useEffect(() => {
         setTimeout(() => {
@@ -17,7 +18,7 @@ export const App: React.FC = () => {
         }, 2000);
     });
 
-    if (!userConfigService) {
+    if (!userConfigService || !pstExtractorService) {
         return <>Chargement...</>;
     }
 
@@ -25,12 +26,9 @@ export const App: React.FC = () => {
         <div>
             Hello {title}
             <Button
-                onClick={() => {
-                    console.log(
-                        userConfigService.get("collectData"),
-                        userConfigService.get("locale"),
-                        userConfigService
-                    );
+                onClick={async () => {
+                    console.info("GOOOOOOO");
+                    console.log(await pstExtractorService.extract());
                 }}
             >
                 Coucou BUTTON
