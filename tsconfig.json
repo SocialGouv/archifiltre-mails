@@ -6,7 +6,13 @@
       "DOM"
     ],
     "jsx": "react",
-    "target": "ES2016"
+    "target": "ES2016",
+    "baseUrl": ".",
+    "paths": {
+      "@common/*": [
+        "src/common/*"
+      ]
+    }
   },
   "include": [
     "global.d.ts",

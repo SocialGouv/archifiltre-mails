@@ -22,5 +22,9 @@ module.exports =
             }
         });
 
+        if (config.resolve) {
+            config.resolve.alias["@common"] = config.resolve.alias["common"];
+        }
+
         return config;
     };

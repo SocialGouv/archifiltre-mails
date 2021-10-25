@@ -1,83 +1,56 @@
-import { app, BrowserWindow, session } from "electron";
-import fs from "fs";
+import { IS_DEV, IS_E2E } from "@common/config";
+import { loadIsomorphicModules } from "@common/core/isomorphic";
+import { loadModules } from "@common/lib/ModuleManager";
+import { app, BrowserWindow } from "electron";
 import path from "path";
+import { URL } from "url";
 
-const isTest = process.env.NODE_ENV?.startsWith("test");
-const isDevelopment = process.env.NODE_ENV !== "production" && !isTest;
+import { DevToolsModule } from "./modules/DevToolsModule";
 
-const isE2E = !!process.env.E2E;
-
-const REACT_DEVTOOLS_PATH = path.join(
-    process.cwd(),
-    "scripts",
-    "out",
-    "react-devtools-extension"
-);
-
-// global reference to mainWindow (necessary to prevent window from being garbage collected)
-let mainWindow: BrowserWindow | null = null;
-
+// enable hot reload when needed
 if (module.hot) {
     module.hot.accept();
 }
 
-async function createMainWindow() {
-    console.log("process.env.HEADLESS", process.env.HEADLESS);
-    const window = new BrowserWindow({
-        show: !process.env.HEADLESS,
+/**
+ * Stub index.html url for main window. As E2E is not packaged, it needs a direct access to generated file. In dev mode, calling localhost let the dev server handling the file.
+ */
+const INDEX_URL = new URL(
+    IS_E2E
+        ? `file://${path.join(__dirname, "/../renderer/index.html")}`
+        : IS_DEV
+        ? `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`
+        : `file://${path.join(__dirname, "index.html")}/`
+).toString();
+
+/**
+ * Global reference.
+ *
+ * Prevent mainWindow from being garbage collected.
+ */
+let mainWindow: BrowserWindow | null = null;
+/**
+ * Create the main {@link BrowserWindow}.
+ */
+const createMainWindow = async () => {
+    mainWindow = new BrowserWindow({
         webPreferences: {
             contextIsolation: false,
-            // enableRemoteModule: true,
-            nativeWindowOpen: false,
             nodeIntegration: true,
             nodeIntegrationInWorker: true,
         },
     });
 
-    if (isDevelopment) {
-        if (fs.existsSync(REACT_DEVTOOLS_PATH))
-            await session.defaultSession.loadExtension(REACT_DEVTOOLS_PATH, {
-                allowFileAccess: true,
-            });
-        else
-            window.once("focus", () => {
-                window.webContents.send(
-                    "log",
-                    `React devtools not found (${REACT_DEVTOOLS_PATH})`
-                );
-            });
-        window.webContents.openDevTools();
-    }
+    if (IS_DEV) mainWindow.webContents.openDevTools();
 
-    let indexUrl = new URL(
-        `file://${path.join(__dirname, "index.html")}/`
-        // `file://${path.join(__dirname, "/../renderer/index.html")}`
-    ).toString();
-    if (isE2E) {
-        indexUrl = new URL(
-            `file://${path.join(__dirname, "/../renderer/index.html")}`
-        ).toString();
-    } else if (isDevelopment) {
-        indexUrl = `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`;
-    }
-    console.log("===========INDEX URL", indexUrl);
-    await window.loadURL(indexUrl);
-    window.webContents.send("log-e2e", process.env);
-    window.webContents.send("log-e2e", indexUrl);
+    await mainWindow.loadURL(INDEX_URL);
 
-    window.on("closed", () => {
+    mainWindow.on("closed", () => {
         mainWindow = null;
     });
+};
 
-    window.webContents.on("devtools-opened", () => {
-        window.focus();
-        setImmediate(() => {
-            window.focus();
-        });
-    });
-
-    return window;
-}
+// ----------------------------[EVENTS]----------------------------
 
 // quit application when all windows are closed
 app.on("window-all-closed", () => {
@@ -90,17 +63,16 @@ app.on("window-all-closed", () => {
 app.on("activate", async () => {
     // on macOS it is common to re-create a window even after all windows have been closed
     if (!mainWindow) {
-        mainWindow = await createMainWindow();
+        await createMainWindow();
     }
 });
 
-// create main BrowserWindow when electron is ready
+// when electron is ready
 app.on("ready", async () => {
-    mainWindow = await createMainWindow();
+    // load shared/common modules
+    await loadIsomorphicModules();
+    // load "main-process" modules
+    await loadModules(new DevToolsModule());
+    // create actual main BrowserWindow
+    await createMainWindow();
 });
-
-// (() => {
-//     throw new Error(
-//         `NODE_ENV=${process.env.NODE_ENV} ; E2E=${process.env.E2E}`
-//     );
-// })();

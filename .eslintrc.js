@@ -70,6 +70,19 @@ const defaultConfig = {
                 __static: true,
             },
         },
+        {
+            files: "scripts/**/*.ts",
+            parserOptions: {
+                project: "./scripts/tsconfig.json",
+            },
+            settings: {
+                "import/resolver": {
+                    typescript: {
+                        project: "./scripts/tsconfig.json",
+                    },
+                },
+            },
+        },
     ],
     plugins: ["unused-imports"],
     reportUnusedDisableDirectives: true,
