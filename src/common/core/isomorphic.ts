@@ -27,5 +27,5 @@ export const loadIsomorphicModules = async <
     );
 
     containerModule.registerServices(...additionalServices);
-    await loadModules(containerModule, userConfigModule);
+    await loadModules(containerModule, userConfigModule, pstExtractorModule);
 };

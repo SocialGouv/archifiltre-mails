@@ -27,8 +27,14 @@ export const App: React.FC = () => {
             Hello {title}
             <Button
                 onClick={async () => {
-                    console.info("GOOOOOOO");
-                    console.log(await pstExtractorService.extract());
+                    console.time("PST EXTRACT");
+                    console.log(
+                        await pstExtractorService.extract(
+                            "/Users/lsagetlethias/Downloads/PST/archive.pst"
+                            // "/Users/lsagetlethias/Downloads/test-archimail.pst"
+                        )
+                    );
+                    console.timeEnd("PST EXTRACT");
                 }}
             >
                 Coucou BUTTON

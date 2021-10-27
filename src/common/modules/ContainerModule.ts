@@ -61,7 +61,7 @@ class ContainerModule extends IsomorphicModule {
     private inited = false;
 
     public async init(): Promise<void> {
-        console.log("IS_DEV", IS_DEV);
+        console.log("CONTAINER IS_DEV", IS_DEV);
         if (this.inited && !IS_DEV) {
             throw new Error("ContainerModule has already been inited.");
         }
@@ -69,8 +69,13 @@ class ContainerModule extends IsomorphicModule {
         await Promise.all(
             [...isomorphicServiceMap.values(), ...serviceMap.values()]
                 .map((service) => {
+                    console.log(
+                        `[ContainerModule] ${
+                            (service as Service).constructor.name
+                        } loading !`
+                    );
                     if (isService(service)) {
-                        return service.init;
+                        return service.init();
                     }
                 })
                 .filter((promise) => promise)
@@ -92,9 +97,14 @@ class ContainerModule extends IsomorphicModule {
         service?: ServiceConfigType<T>
     ): this {
         if (this.inited) {
-            throw new Error(
-                "Cannot register a service when the container is already inited."
-            );
+            if (IS_DEV) {
+                isomorphicServiceMap.clear();
+                serviceMap.clear();
+            } else {
+                throw new Error(
+                    "Cannot register a service when the container is already inited."
+                );
+            }
         }
         if (service) {
             if (service instanceof IsomorphicService) {
