@@ -1,34 +1,25 @@
 import React from "react";
 
-import {
-    CARD_DOUBLE,
-    CARD_FULL,
-    CARD_SIMPLE,
-} from "../../../../common/constants";
-import { useWorkspaceRouteContext } from "../../../context/WorkspaceRouter";
+import { CARD_DOUBLE, CARD_FULL, CARD_SIMPLE } from "../../../utils/constants";
 import { CardDouble } from "./CardDouble";
 import { CardFull } from "./CardFull";
 import { CardSimple } from "./CardSimple";
 
-export const Card: React.FC<{ type: string; route: string }> = ({
-    type,
-    route,
-}) => {
-    const { changeWorkspaceRoute, backHome } = useWorkspaceRouteContext();
+interface CardProps {
+    type: string;
+    opener?: () => void;
+}
 
-    const changeRoute = () => {
-        changeWorkspaceRoute(route);
-    };
-
+export const Card: React.FC<CardProps> = ({ type, opener }) => {
     switch (type) {
         case CARD_SIMPLE:
-            return <CardSimple changeRoute={changeRoute} />;
+            return <CardSimple opener={opener} />;
         case CARD_DOUBLE:
-            return <CardDouble changeRoute={backHome} />;
+            return <CardDouble opener={opener} />;
         case CARD_FULL:
-            return <CardFull changeRoute={backHome} />;
+            return <CardFull opener={opener} />;
 
         default:
-            throw new Error("you need to choose one type!");
+            throw new Error("You need to choose one type!");
     }
 };
