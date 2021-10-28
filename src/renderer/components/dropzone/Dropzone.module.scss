@@ -1,57 +1,58 @@
 .dropzone {
-    width: 400px;
-    height: 400px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 20px;
-    box-shadow: rgb(17 12 46 / 15%) 0px 48px 100px 0px;
-    background: #fff;
-    p {
-        margin: 0;
-        line-height: 1.15rem;
-    }
+  width: 400px;
+  height: 400px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 20px;
+  box-shadow: rgb(17 12 46 / 15%) 0px 48px 100px 0px;
+  background: #fff;
+  p {
+    margin: 0;
+    line-height: 1.15rem;
+  }
 }
 
 .dropzone-title {
-    width: 75%;
-    margin: 2.5rem auto 0;
-    text-align: center;
-    h1 {
-        margin: .5rem 0;
-        font-size: 1.25rem;
-    }
-    span {
-        font-size: 0.75rem;
-        color: #aaa;
-        font-weight: bold;
-    }
+  width: 75%;
+  margin: 2.5rem auto 0;
+  text-align: center;
+  h1 {
+    margin: 0.5rem 0;
+    font-size: 1.25rem;
+  }
+  span {
+    font-size: 0.75rem;
+    color: #aaa;
+    font-weight: bold;
+  }
 }
 
 .dropzone-area {
-    width: 75%;
-    height: 200px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    top: 60%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border: dashed 1px #b3c7eb;
-    // background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='20' ry='20' stroke='%23333' stroke-width='1' stroke-dasharray='10' stroke-dashoffset='14' stroke-linecap='square'/%3e%3c/svg%3e");
-    border-radius: 20px;
-    background: #fbfcfe;
+  width: 75%;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: dashed 1px #b3c7eb;
+  // background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='20' ry='20' stroke='%23333' stroke-width='1' stroke-dasharray='10' stroke-dashoffset='14' stroke-linecap='square'/%3e%3c/svg%3e");
+  border-radius: 20px;
+  background: #fbfcfe;
+  cursor: pointer;
 
-    &.dropzone-area--active {
-        background: #dfe6f5;
-    }
+  &.dropzone-area--active {
+    background: #dfe6f5;
+  }
 
-    .dropzone-text {
-        width: 60%;
-        font-size: 0.8rem;
-        text-align: center;
-        color: #aaa;
-    }
+  .dropzone-text {
+    width: 60%;
+    font-size: 0.8rem;
+    text-align: center;
+    color: #aaa;
+  }
 }
