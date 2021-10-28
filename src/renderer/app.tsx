@@ -2,12 +2,14 @@ import "normalize.css/normalize.css";
 import "./styles/global.scss";
 
 import { useService } from "@common/modules/ContainerModule";
+import type { PstProgressState } from "@common/modules/pst-extractor/worker";
 import React, { useEffect, useState } from "react";
 
 import { Button } from "./components/Button";
 
 export const App: React.FC = () => {
     const [title, setTitle] = useState("toto");
+    const [progress, setProgress] = useState<PstProgressState>();
 
     const userConfigService = useService("userConfigService");
     const pstExtractorService = useService("pstExtractorService");
@@ -24,10 +26,12 @@ export const App: React.FC = () => {
 
     return (
         <div>
-            Hello {title}
+            Hello {title} {userConfigService.get("locale")}
+            <pre>{JSON.stringify(progress)}</pre>
             <Button
                 onClick={async () => {
                     console.time("PST EXTRACT");
+                    pstExtractorService.onProgress(setProgress);
                     console.log(
                         await pstExtractorService.extract(
                             "/Users/lsagetlethias/Downloads/PST/archive.pst"

@@ -1,15 +1,31 @@
 import { IS_MAIN } from "@common/config";
 import { ipcMain, ipcRenderer } from "electron";
 import path from "path";
-import type { PSTFolder } from "pst-extractor";
-import { PSTFile } from "pst-extractor";
+import { Worker } from "worker_threads";
 
 import { IsomorphicService } from "./ContainerModule";
 import { IsomorphicModule } from "./Module";
-import type { PstContent, PSTExtractorEmail } from "./pst-extractor/type";
+import type { PstContent } from "./pst-extractor/type";
+import type { PstProgressState } from "./pst-extractor/worker";
+import {
+    PST_DONE_WORKER_EVENT,
+    PST_PROGRESS_WORKER_EVENT,
+} from "./pst-extractor/worker";
 
 const REGEXP_PST = /\.pst$/i;
 const PST_EXTRACT_EVENT = "pstExtractorService.extract";
+const PST_PROGRESS_EVENT = "pstExtractorService.progress";
+const PST_PROGRESS_SUBSCRIBE_EVENT = "pstExtractorService.progressSuscribe";
+
+export type PstWorkerMessage =
+    | {
+          event: typeof PST_DONE_WORKER_EVENT;
+          data: { content: PstContent; progressState: PstProgressState };
+      }
+    | {
+          event: typeof PST_PROGRESS_WORKER_EVENT;
+          data: PstProgressState;
+      };
 
 export class PstExtractorModule extends IsomorphicModule {
     public service = new InnerPstExtractorService();
@@ -31,11 +47,19 @@ export type PstExtractorService = InnerPstExtractorService;
 class InnerPstExtractorService extends IsomorphicService {
     public inited = false;
 
+    private progressReply?: (
+        channel: typeof PST_PROGRESS_EVENT,
+        progressState: PstProgressState
+    ) => void;
+
     public async init(): Promise<void> {
         if (this.inited) {
             return;
         }
         if (IS_MAIN) {
+            ipcMain.on(PST_PROGRESS_SUBSCRIBE_EVENT, (event) => {
+                this.progressReply = event.reply as typeof this.progressReply;
+            });
             ipcMain.handle(
                 PST_EXTRACT_EVENT,
                 async (_event, ...args: unknown[]) =>
@@ -54,14 +78,42 @@ class InnerPstExtractorService extends IsomorphicService {
         }
 
         if (IS_MAIN) {
-            const pstFile = new PSTFile(path.resolve(pstFilePath));
-            const rootFolder = pstFile.getRootFolder();
-            // eslint-disable-next-line prefer-const
-            let count = { all: 0 };
-            const content = this.processFolder(rootFolder, count);
-            console.log("countAll", count.all);
-            content.size = count.all;
-            return content;
+            const workerRunnerPath = path.resolve(__dirname, "../../worker.js");
+            const workerPath = path.resolve(
+                __dirname,
+                "pst-extractor",
+                "worker.ts"
+            );
+            const pstWorker = new Worker(workerRunnerPath, {
+                workerData: {
+                    _workerPath: workerPath,
+                    pstFilePath,
+                },
+            });
+            return new Promise<PstContent>((resolve) => {
+                pstWorker.on("message", (message: PstWorkerMessage) => {
+                    switch (message.event) {
+                        case PST_PROGRESS_WORKER_EVENT:
+                            this.progressReply?.(
+                                PST_PROGRESS_EVENT,
+                                message.data
+                            );
+                            break;
+                        case PST_DONE_WORKER_EVENT:
+                            this.progressReply?.(PST_PROGRESS_EVENT, {
+                                ...message.data.progressState,
+                                progress: false,
+                            });
+
+                            void pstWorker.terminate().then(() => {
+                                resolve(message.data.content);
+                            });
+                            break;
+                        default:
+                            break;
+                    }
+                });
+            });
         }
 
         return (await ipcRenderer.invoke(
@@ -70,64 +122,13 @@ class InnerPstExtractorService extends IsomorphicService {
         )) as PstContent;
     }
 
-    private processFolder(
-        folder: PSTFolder,
-        count: { all: number }
-    ): PstContent {
-        const content: PstContent = {
-            contentSize: folder.contentCount,
-            name: folder.displayName,
-            size: folder.emailCount,
-        };
-
-        if (folder.hasSubfolders) {
-            for (const childFolder of folder.getSubFolders()) {
-                if (!content.children) {
-                    content.children = [];
-                }
-                content.children.push(this.processFolder(childFolder, count));
+    public onProgress(callback: (progressState: PstProgressState) => void) {
+        ipcRenderer.on(
+            PST_PROGRESS_EVENT,
+            (_event, ...[progressState]: [PstProgressState]) => {
+                callback(progressState);
             }
-        }
-
-        if (folder.contentCount) {
-            for (const email of folderMailIterator(folder)) {
-                if (!content.children) {
-                    content.children = [];
-                }
-
-                const emailContent: PstContent = {
-                    name: `${email.senderName} <${email.emailAddress}> ${email.originalSubject}`,
-                };
-                if (email.hasAttachments) {
-                    emailContent.children = [];
-                    for (let i = 0; i < email.numberOfAttachments; i++) {
-                        const attachement = email.getAttachment(i);
-                        console.log(
-                            "Found attachement for",
-                            folder.displayName,
-                            emailContent.name,
-                            `Attachement: ${attachement.displayName} - ${attachement.pathname}`
-                        );
-                        emailContent.children.push({
-                            name: `Attachement: ${attachement.displayName} - ${attachement.pathname}`,
-                        });
-                    }
-                }
-                content.children.push(emailContent);
-                count.all++;
-            }
-        }
-
-        return content;
-    }
-}
-
-function* folderMailIterator(folder: PSTFolder) {
-    if (folder.contentCount) {
-        let email = folder.getNextChild() as PSTExtractorEmail | null;
-        while (email) {
-            yield email;
-            email = folder.getNextChild();
-        }
+        );
+        ipcRenderer.send(PST_PROGRESS_SUBSCRIBE_EVENT);
     }
 }
