@@ -6,7 +6,7 @@ import React, {
     useState,
 } from "react";
 
-import { DASHBOARD } from "../../common/constants";
+import { DASHBOARD } from "../utils/constants";
 
 interface RouteContextInterface {
     route: string;
@@ -26,10 +26,6 @@ const RouteContextProvider: React.FC = ({ children }) => {
     const changeRoute = useCallback((nextRoute: string) => {
         setRoute(nextRoute);
     }, []);
-
-    // useEffect(() => {
-    //     //maybe add some logic to retrieve state here, using local storage or electron Store
-    // }, []);
 
     const contextValue = useMemo(
         () => ({

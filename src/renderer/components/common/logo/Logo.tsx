@@ -1,7 +1,7 @@
 import React from "react";
 
-import { DASHBOARD } from "../../../../common/constants";
 import { useRouteContext } from "../../../context/RouterContext";
+import { DASHBOARD } from "../../../utils/constants";
 import style from "./Logo.module.scss";
 
 export const Logo: React.FC = () => {

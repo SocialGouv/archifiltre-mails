@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
-import { DASHBOARD, ECOLOGY, HISTORY } from "../../../common/constants";
 import { useRouteContext } from "../../context/RouterContext";
+import { DASHBOARD, ECOLOGY, HISTORY } from "../../utils/constants";
 import { EarthPicto, HistoryPicto, HomePicto } from "../common/pictos/picto";
 import { MenuLinkItem } from "./MenuLinkItem";
 
