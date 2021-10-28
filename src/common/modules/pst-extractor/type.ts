@@ -1,12 +1,26 @@
 import type { long } from "@common/utils/type";
 import type { PSTAttachment, PSTRecipient } from "pst-extractor";
 
+/**
+ * Main content of a PST extract.
+ */
 export interface PstContent {
     name: string;
     email?: PSTExtractorEmail;
     size?: number;
     contentSize?: number;
     children?: PstContent[];
+}
+
+/**
+ * State object on each progress tick (one tick per extracted email).
+ */
+export interface PstProgressState {
+    progress: boolean;
+    countTotal: number;
+    countEmail: number;
+    countFolder: number;
+    countAttachement: number;
 }
 
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -30,6 +44,9 @@ export namespace Outlook {
 }
 /* eslint-enable @typescript-eslint/naming-convention */
 
+/**
+ * Raw content of an email item.
+ */
 export interface PSTExtractorEmail {
     /**
      * Get specific recipient.

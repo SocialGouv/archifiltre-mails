@@ -1,20 +1,27 @@
+import type {
+    PstContent,
+    PstProgressState,
+} from "@common/modules/pst-extractor/type";
 import path from "path";
 import type { PSTFolder } from "pst-extractor";
 import { PSTFile } from "pst-extractor";
 import { parentPort, workerData } from "worker_threads";
 
-import type { PstContent, PSTExtractorEmail } from "./type";
-
 export const PST_PROGRESS_WORKER_EVENT = "pstExtractorService.worker.progress";
 export const PST_DONE_WORKER_EVENT = "pstExtractorService.worker.done";
 
-export interface PstProgressState {
-    progress: boolean;
-    countTotal: number;
-    countEmail: number;
-    countFolder: number;
-    countAttachement: number;
-}
+/**
+ * Possible message types comming from the worker.
+ */
+export type PstWorkerMessage =
+    | {
+          event: typeof PST_DONE_WORKER_EVENT;
+          data: { content: PstContent; progressState: PstProgressState };
+      }
+    | {
+          event: typeof PST_PROGRESS_WORKER_EVENT;
+          data: PstProgressState;
+      };
 
 if (parentPort) {
     const { pstFilePath } = workerData as { pstFilePath: string };
@@ -29,17 +36,27 @@ if (parentPort) {
     const rootFolder = pstFile.getRootFolder();
     const content = processFolder(rootFolder, progressState);
 
-    parentPort.postMessage({
+    const message: PstWorkerMessage = {
         data: {
             content,
             progressState,
         },
         event: PST_DONE_WORKER_EVENT,
-    });
+    };
+    parentPort.postMessage(message);
 }
 
 // ---
 
+/**
+ * Process a "raw" folder from the PST and extract sub folders, emails, and attachements.
+ *
+ * The progress state is updated for every item found and sent to any listener on every emails.
+ *
+ * @param folder The folder to process
+ * @param progressState The current progress state to update
+ * @returns The extracted content
+ */
 function processFolder(
     folder: PSTFolder,
     progressState: PstProgressState
@@ -68,6 +85,7 @@ function processFolder(
             }
 
             const emailContent: PstContent = {
+                // TODO: change name
                 name: `${email.senderName} ${email.originalSubject}`,
             };
             if (email.hasAttachments) {
@@ -77,6 +95,7 @@ function processFolder(
                     progressState.countAttachement++;
                     progressState.countTotal++;
                     emailContent.children.push({
+                        // TODO: change name
                         name: `Attachement: ${attachement.displayName} - ${attachement.pathname}`,
                     });
                 }
@@ -84,10 +103,11 @@ function processFolder(
             progressState.countEmail++;
             progressState.countTotal++;
             content.children.push(emailContent);
-            parentPort?.postMessage({
+            const message: PstWorkerMessage = {
                 data: progressState,
                 event: PST_PROGRESS_WORKER_EVENT,
-            });
+            };
+            parentPort?.postMessage(message);
         }
     }
 
@@ -96,7 +116,7 @@ function processFolder(
 
 function* folderMailIterator(folder: PSTFolder) {
     if (folder.contentCount) {
-        let email = folder.getNextChild() as PSTExtractorEmail | null;
+        let email = folder.getNextChild();
         while (email) {
             yield email;
             email = folder.getNextChild();

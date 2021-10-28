@@ -2,7 +2,7 @@ import "normalize.css/normalize.css";
 import "./styles/global.scss";
 
 import { useService } from "@common/modules/ContainerModule";
-import type { PstProgressState } from "@common/modules/pst-extractor/worker";
+import type { PstProgressState } from "@common/modules/pst-extractor/type";
 import React, { useEffect, useState } from "react";
 
 import { Button } from "./components/Button";

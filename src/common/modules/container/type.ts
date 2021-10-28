@@ -1,5 +1,4 @@
 import type { UnknownMapping } from "../../utils/type";
-import type { PstExtractorService } from "../PstExtractorModule";
 import type { UserConfigService } from "../UserConfigModule";
 
 /**
@@ -9,8 +8,8 @@ import type { UserConfigService } from "../UserConfigModule";
  */
 export interface ServicesKeyType {
     userConfigService: UserConfigService;
-    pstExtractorService: PstExtractorService;
 }
+
 export type ServiceKeys = keyof ServicesKeyType;
 
 /**
@@ -29,7 +28,7 @@ export interface Service {
      *
      * If needed, a private `inited` property flag can be used to ensure this method is called once.
      */
-    init: () => Promise<void>;
+    init?: () => Promise<void>;
 }
 
 /**

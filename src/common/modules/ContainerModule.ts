@@ -30,7 +30,7 @@ export abstract class IsomorphicService implements Service {
 
     public readonly name = this.constructor.name;
 
-    abstract init(): Promise<void>;
+    abstract init?(): Promise<void>;
 }
 
 /**
@@ -54,14 +54,13 @@ const serviceMap = new Map<string, unknown>();
 /**
  * Isomorphic module responsible of storing and loading services for the entire application.
  *
- * A "main" container can be different from a "renderer" container as the will not need the same services. (e.g. DevTools)
+ * A "main" container can be different from a "renderer" container as they will not need the same services. (e.g. DevTools)
  * but they need to both load an isomorphic service for it to works.
  */
 class ContainerModule extends IsomorphicModule {
     private inited = false;
 
     public async init(): Promise<void> {
-        console.log("CONTAINER IS_DEV", IS_DEV);
         if (this.inited && !IS_DEV) {
             throw new Error("ContainerModule has already been inited.");
         }
@@ -75,7 +74,7 @@ class ContainerModule extends IsomorphicModule {
                         } loading !`
                     );
                     if (isService(service)) {
-                        return service.init();
+                        return service.init?.();
                     }
                 })
                 .filter((promise) => promise)
