@@ -1,15 +1,8 @@
 import React from "react";
 
-import {
-    AUDIT,
-    ENRICHMENT,
-    GENERAL,
-    REDUNDANCE,
-} from "../../../common/constants";
-import { DashboardAudit } from "./DashboardAudit";
-import { DashboardEnrichment } from "./DashboardEnrichment";
+import { GENERAL, VIZUALISATION } from "../../utils/constants";
 import { DashboardGeneral } from "./DashboardGeneral";
-import { DashboardRedundance } from "./DashboardRedundance";
+import { DashboardVizualisation } from "./DashboardVizualisation";
 
 interface DashboardSwitcherProps {
     tab: string;
@@ -21,12 +14,9 @@ export const DashboardSwitcher: React.FC<DashboardSwitcherProps> = ({
     switch (tab) {
         case GENERAL:
             return <DashboardGeneral />;
-        case ENRICHMENT:
-            return <DashboardEnrichment />;
-        case AUDIT:
-            return <DashboardAudit />;
-        case REDUNDANCE:
-            return <DashboardRedundance />;
+        case VIZUALISATION:
+            return <DashboardVizualisation />;
+
         default:
             return <DashboardGeneral />;
     }

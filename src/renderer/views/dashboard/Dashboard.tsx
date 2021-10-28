@@ -1,10 +1,10 @@
 import React, { useCallback, useState } from "react";
 
-import { GENERAL } from "../../../common/constants";
 import { Layout } from "../../components/common/layout/Layout";
+import { GENERAL } from "../../utils/constants";
 import style from "./Dashboard.module.scss";
 import { DashboardSwitcher } from "./DashboardSwitcher";
-import { DashboardTabsNavigation } from "./DashboardTabsNavigation";
+import { DashboardTabsNav } from "./DashboardTabsNav";
 
 export const Dashboard: React.FC = () => {
     const [tab, setTab] = useState(GENERAL);
@@ -15,7 +15,7 @@ export const Dashboard: React.FC = () => {
 
     return (
         <Layout classname={style.dashboard}>
-            <DashboardTabsNavigation changeTab={changeTab} />
+            <DashboardTabsNav changeTab={changeTab} />
             <DashboardSwitcher tab={tab} />
         </Layout>
     );
