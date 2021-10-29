@@ -87,6 +87,7 @@ function processFolder(
             const emailContent: PstContent = {
                 // TODO: change name
                 name: `${email.senderName} ${email.originalSubject}`,
+                size: 0,
             };
             if (email.hasAttachments) {
                 emailContent.children = [];
@@ -97,6 +98,7 @@ function processFolder(
                     emailContent.children.push({
                         // TODO: change name
                         name: `Attachement: ${attachement.displayName} - ${attachement.pathname}`,
+                        size: 0,
                     });
                 }
             }
