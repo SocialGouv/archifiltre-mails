@@ -21,6 +21,7 @@ Les modules communs (présents dans common) sont par définition isomorphiques.
 
 **Main** :
 - [DevToolsModule](../src/main/modules/DevToolsModule.ts) : récupère et injecte les extensions de dev tools
+- [PstExtractorModule](../src/main/modules/PstExtractorModule.ts) : prépare un worker pour extraire le contenu d'un PST
 
 ## ContainerModule et Services
 Le `ContainerModule` est responsable de regrouper, charger, et distribuer les services dans l'application. Il peut être considéré comme étant une `Map` où les clés sont les noms des services, et les valeurs les services eux mêmes. Au début de l'application, le container va essayer de d"*init* tous les services en parallèle (seulement si la méthode `init` est disponible ; un service pouvant aussi par exemple être une simple constante/valeur), une fois ce chargement effectué, il n'est plus possible d'ajouter de nouveaux services dans le container.  

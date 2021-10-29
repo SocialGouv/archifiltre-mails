@@ -9,6 +9,7 @@ import type { UserConfigService } from "../UserConfigModule";
 export interface ServicesKeyType {
     userConfigService: UserConfigService;
 }
+
 export type ServiceKeys = keyof ServicesKeyType;
 
 /**
@@ -27,7 +28,7 @@ export interface Service {
      *
      * If needed, a private `inited` property flag can be used to ensure this method is called once.
      */
-    init: () => Promise<void>;
+    init?: () => Promise<void>;
 }
 
 /**

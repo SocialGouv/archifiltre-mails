@@ -17,10 +17,10 @@ export const loadIsomorphicModules = async <
 ): Promise<void> => {
     const userConfigModule =
         IsomorphicModuleFactory.getInstance(UserConfigModule);
-    containerModule.registerService(
+    containerModule.registerServices([
         "userConfigService",
-        userConfigModule.service
-    );
+        userConfigModule.service,
+    ]);
 
     containerModule.registerServices(...additionalServices);
     await loadModules(containerModule, userConfigModule);

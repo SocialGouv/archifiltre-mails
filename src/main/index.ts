@@ -6,6 +6,7 @@ import path from "path";
 import { URL } from "url";
 
 import { DevToolsModule } from "./modules/DevToolsModule";
+import { PstExtractorModule } from "./modules/PstExtractorModule";
 
 // enable hot reload when needed
 if (module.hot) {
@@ -72,7 +73,7 @@ app.on("ready", async () => {
     // load shared/common modules
     await loadIsomorphicModules();
     // load "main-process" modules
-    await loadModules(new DevToolsModule());
+    await loadModules(new DevToolsModule(), new PstExtractorModule());
     // create actual main BrowserWindow
     await createMainWindow();
 });
