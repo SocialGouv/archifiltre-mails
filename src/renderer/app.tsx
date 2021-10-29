@@ -18,23 +18,21 @@ export const App: React.FC = () => {
         setTimeout(() => {
             setTitle("JEANMI");
         }, 2000);
-    });
-
-    if (!userConfigService || !pstExtractorService) {
-        return <>Chargement...</>;
-    }
+    }, []);
 
     return (
         <div>
-            Hello {title} {userConfigService.get("locale")}
+            Hello {title} {userConfigService?.get("locale")}
             <pre>{JSON.stringify(progress)}</pre>
             <Button
                 onClick={async () => {
                     console.time("PST EXTRACT");
-                    pstExtractorService.onProgress(setProgress);
+                    pstExtractorService?.onProgress(setProgress);
                     console.log(
-                        await pstExtractorService.extract(
+                        await pstExtractorService?.extract(
                             "/Users/lsagetlethias/Downloads/PST/archive.pst"
+                            // "/Users/lsagetlethias/Downloads/test.pst"
+                            // "/Users/lsagetlethias/Downloads/sample.pst"
                             // "/Users/lsagetlethias/Downloads/test-archimail.pst"
                         )
                     );

@@ -70,7 +70,7 @@ class ContainerModule extends IsomorphicModule {
                 .map((service) => {
                     console.log(
                         `[ContainerModule] ${
-                            (service as Service).constructor.name
+                            (service as Service).name
                         } loading !`
                     );
                     if (isService(service)) {
@@ -172,7 +172,7 @@ export const useService = <T extends ServiceKeys | UnknownMapping>(
 
     useEffect(() => {
         setService(containerModule.get(name));
-    });
+    }, []);
 
     return service;
 };
