@@ -9,9 +9,13 @@ const WORKER_BRIDGE_PATH = path.resolve(__dirname, "_worker.js");
  * Worker thread wrapper for typescript workers.
  */
 export class TSWorker extends BaseWorker {
-    constructor(absoluteWorkerPath: URL | string, options?: WorkerOptions) {
+    constructor(
+        absoluteWorkerPath: URL | string,
+        options?: Omit<WorkerOptions, "eval">
+    ) {
         super(WORKER_BRIDGE_PATH, {
             ...options,
+            eval: false,
             workerData: {
                 ...options?.workerData,
                 _workerPath: absoluteWorkerPath,

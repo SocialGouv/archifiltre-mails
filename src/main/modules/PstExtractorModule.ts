@@ -12,7 +12,7 @@ import { ipcMain } from "electron";
 import path from "path";
 
 import { TSWorker } from "../worker";
-import type { PstWorkerMessage } from "./pst-extractor/worker";
+import type { PstWorkerData, PstWorkerMessage } from "./pst-extractor/worker";
 import {
     PST_DONE_WORKER_EVENT,
     PST_PROGRESS_WORKER_EVENT,
@@ -56,16 +56,20 @@ export class PstExtractorModule implements Module {
             );
         }
 
+        console.info("Start extracting...");
         const pstWorker = new TSWorker(
             path.resolve(__dirname, "pst-extractor", "worker.ts"),
             {
+                stderr: true,
+                trackUnmanagedFds: true,
                 workerData: {
+                    progressInterval: 1500,
                     pstFilePath,
-                },
+                } as PstWorkerData,
             }
         );
         return new Promise<PstContent>((resolve) => {
-            pstWorker.on("message", async (message: PstWorkerMessage) => {
+            pstWorker.on("message", (message: PstWorkerMessage) => {
                 switch (message.event) {
                     case PST_PROGRESS_WORKER_EVENT:
                         this.progressReply?.(PST_PROGRESS_EVENT, message.data);
@@ -77,7 +81,7 @@ export class PstExtractorModule implements Module {
                         });
 
                         resolve(message.data.content);
-                        await pstWorker.terminate();
+                        console.info("Extract done.");
                         break;
                 }
             });

@@ -21,6 +21,7 @@ export interface PstProgressState {
     countEmail: number;
     countFolder: number;
     countAttachement: number;
+    elapsed: number;
 }
 
 /* eslint-disable @typescript-eslint/naming-convention */

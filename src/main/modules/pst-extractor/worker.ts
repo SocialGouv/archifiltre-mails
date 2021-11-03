@@ -23,27 +23,43 @@ export type PstWorkerMessage =
           data: PstProgressState;
       };
 
+export interface PstWorkerData {
+    pstFilePath: string;
+    progressInterval?: number;
+}
+
+const START_TIME = Date.now();
+let progressInterval = 1000;
+let nextTimeTick = START_TIME;
+
 if (parentPort) {
-    const { pstFilePath } = workerData as { pstFilePath: string };
+    const { pstFilePath, progressInterval: pi } = workerData as PstWorkerData;
+    progressInterval = Math.abs(pi ?? progressInterval);
     const progressState: PstProgressState = {
         countAttachement: 0,
         countEmail: 0,
         countFolder: 0,
         countTotal: 0,
+        elapsed: 0,
         progress: true,
     };
+
+    parentPort.postMessage({
+        data: progressState,
+        event: PST_PROGRESS_WORKER_EVENT,
+    } as PstWorkerMessage);
     const pstFile = new PSTFile(path.resolve(pstFilePath));
     const rootFolder = pstFile.getRootFolder();
     const content = processFolder(rootFolder, progressState);
 
-    const message: PstWorkerMessage = {
+    progressState.elapsed = Date.now() - START_TIME;
+    parentPort.postMessage({
         data: {
             content,
             progressState,
         },
         event: PST_DONE_WORKER_EVENT,
-    };
-    parentPort.postMessage(message);
+    } as PstWorkerMessage);
 }
 
 // ---
@@ -103,11 +119,18 @@ function processFolder(
             progressState.countEmail++;
             progressState.countTotal++;
             content.children.push(emailContent);
-            const message: PstWorkerMessage = {
-                data: progressState,
-                event: PST_PROGRESS_WORKER_EVENT,
-            };
-            parentPort?.postMessage(message);
+
+            // update progress only when interval ms is reached
+            const now = Date.now();
+            const elapsed = now - nextTimeTick;
+            if (elapsed >= progressInterval) {
+                progressState.elapsed = now - START_TIME;
+                parentPort?.postMessage({
+                    data: progressState,
+                    event: PST_PROGRESS_WORKER_EVENT,
+                } as PstWorkerMessage);
+                nextTimeTick = now;
+            }
         }
     }
 
