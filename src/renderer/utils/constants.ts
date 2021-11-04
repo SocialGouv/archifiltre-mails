@@ -25,3 +25,8 @@ export const HOME = "home";
 
 // extractor
 export const ACCEPTED_EXTENSION = ".pst";
+
+// bubble visualisation
+export const NAME = "name";
+export const CONTENT_SIZE = "contentSize";
+export const SLOW = "slow";
