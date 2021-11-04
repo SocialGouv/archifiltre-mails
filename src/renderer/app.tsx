@@ -28,19 +28,32 @@ export const App: React.FC = () => {
                 onClick={async () => {
                     console.time("PST EXTRACT");
                     pstExtractorService?.onProgress(setProgress);
-                    console.log(
-                        await pstExtractorService?.extract(
-                            "/Users/lsagetlethias/Downloads/PST/archive.pst"
-                            // "/Users/lsagetlethias/Downloads/liamihcra.pst"
-                            // "/Users/lsagetlethias/Downloads/test.pst"
-                            // "/Users/lsagetlethias/Downloads/sample.pst"
-                            // "/Users/lsagetlethias/Downloads/test-archimail.pst"
-                        )
-                    );
+                    try {
+                        console.log(
+                            await pstExtractorService?.extract(
+                                // "/Users/lsagetlethias/Downloads/PST/archive.pst"
+                                // "/Users/lsagetlethias/Downloads/liamihcra.pst"
+                                // "/Users/lsagetlethias/Downloads/test.pst"
+                                // "/Users/lsagetlethias/Downloads/sample.pst"
+                                "/Users/lsagetlethias/Downloads/test-archimail.pst"
+                            )
+                        );
+                    } catch (e: unknown) {
+                        console.error("Interupted", e);
+                    }
                     console.timeEnd("PST EXTRACT");
                 }}
             >
                 Coucou BUTTON
+            </Button>
+            <Button
+                onClick={() => {
+                    console.log("Stop asked");
+                    pstExtractorService?.stop();
+                    console.log("Stop done !");
+                }}
+            >
+                Stop ?
             </Button>
         </div>
     );

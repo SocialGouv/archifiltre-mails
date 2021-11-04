@@ -14,3 +14,5 @@ export interface long {
     low: number;
     unsigned: boolean;
 }
+
+export type Nothing = never | 0 | null | undefined;

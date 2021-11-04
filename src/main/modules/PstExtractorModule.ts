@@ -2,6 +2,7 @@ import {
     PST_EXTRACT_EVENT,
     PST_PROGRESS_EVENT,
     PST_PROGRESS_SUBSCRIBE_EVENT,
+    PST_STOP_EXTRACT_EVENT,
 } from "@common/constant/event";
 import type { Module } from "@common/modules/Module";
 import type {
@@ -12,9 +13,14 @@ import { ipcMain } from "electron";
 import path from "path";
 
 import { TSWorker } from "../worker";
-import type { PstWorkerData, PstWorkerMessage } from "./pst-extractor/worker";
+import type {
+    PstWorkerCommandType,
+    PstWorkerData,
+    PstWorkerMessageType,
+} from "./pst-extractor/worker";
 import {
     PST_DONE_WORKER_EVENT,
+    PST_INTERUPTED_WORKER_EVENT,
     PST_PROGRESS_WORKER_EVENT,
 } from "./pst-extractor/worker";
 
@@ -27,6 +33,10 @@ const REGEXP_PST = /\.pst$/i;
  */
 export class PstExtractorModule implements Module {
     private inited = false;
+
+    private pstWorker?: TSWorker<PstWorkerCommandType>;
+
+    private lastProgressState!: PstProgressState;
 
     private progressReply?: (
         channel: typeof PST_PROGRESS_EVENT,
@@ -44,6 +54,10 @@ export class PstExtractorModule implements Module {
         ipcMain.handle(PST_EXTRACT_EVENT, async (_event, ...args: unknown[]) =>
             this.extract(args[0] as string)
         );
+        ipcMain.handle(PST_STOP_EXTRACT_EVENT, async () => {
+            console.log("STOP RECEIVED");
+            await this.stop();
+        });
 
         this.inited = true;
         await Promise.resolve();
@@ -57,7 +71,7 @@ export class PstExtractorModule implements Module {
         }
 
         console.info("Start extracting...");
-        const pstWorker = new TSWorker(
+        this.pstWorker = new TSWorker(
             path.resolve(__dirname, "pst-extractor", "worker.ts"),
             {
                 stderr: true,
@@ -68,23 +82,58 @@ export class PstExtractorModule implements Module {
                 } as PstWorkerData,
             }
         );
-        return new Promise<PstContent>((resolve) => {
-            pstWorker.on("message", (message: PstWorkerMessage) => {
+        return new Promise<PstContent>((resolve, reject) => {
+            this.pstWorker?.on("message", (message: PstWorkerMessageType) => {
                 switch (message.event) {
                     case PST_PROGRESS_WORKER_EVENT:
-                        this.progressReply?.(PST_PROGRESS_EVENT, message.data);
+                        this.progressReply?.(
+                            PST_PROGRESS_EVENT,
+                            (this.lastProgressState = message.data)
+                        );
                         break;
                     case PST_DONE_WORKER_EVENT:
-                        this.progressReply?.(PST_PROGRESS_EVENT, {
-                            ...message.data.progressState,
-                            progress: false,
-                        });
+                        this.progressReply?.(
+                            PST_PROGRESS_EVENT,
+                            (this.lastProgressState = {
+                                ...message.data.progressState,
+                                progress: false,
+                            })
+                        );
 
                         resolve(message.data.content);
                         console.info("Extract done.");
                         break;
+                    case PST_INTERUPTED_WORKER_EVENT:
+                        console.log("WORKER INTERUPTED");
+                        reject(message.data.reason);
+                        break;
+                }
+            });
+
+            this.pstWorker?.on("error", (error) => {
+                reject(error);
+            });
+
+            this.pstWorker?.on("exit", (exitCode) => {
+                if (exitCode === 1) {
+                    reject("EXIT CODE 1");
                 }
             });
         });
+    }
+
+    private async stop(): Promise<void> {
+        this.progressReply?.(
+            PST_PROGRESS_EVENT,
+            (this.lastProgressState = {
+                ...this.lastProgressState,
+                progress: false,
+            })
+        );
+        await this.pstWorker?.terminate();
+        // this.pstWorker?.postMessage({
+        //     command: PST_STOP_EXTRACT_COMMAND,
+        // });
+        // return Promise.resolve();
     }
 }

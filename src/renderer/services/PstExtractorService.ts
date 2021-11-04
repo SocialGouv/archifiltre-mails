@@ -2,6 +2,7 @@ import {
     PST_EXTRACT_EVENT,
     PST_PROGRESS_EVENT,
     PST_PROGRESS_SUBSCRIBE_EVENT,
+    PST_STOP_EXTRACT_EVENT,
 } from "@common/constant/event";
 import type { Service } from "@common/modules/container/type";
 import type {
@@ -15,6 +16,7 @@ type ProgressCallback = (progressState: PstProgressState) => void;
 export interface PstExtractorService extends Service {
     extract: (pstFilePath?: string) => Promise<PstContent>;
     onProgress: (callback: ProgressCallback) => void;
+    stop: () => Promise<void>;
 }
 
 /**
@@ -51,5 +53,10 @@ export const pstExtractorService: PstExtractorService = {
             }
         );
         ipcRenderer.send(PST_PROGRESS_SUBSCRIBE_EVENT);
+    },
+
+    async stop(): Promise<void> {
+        console.log("SEND STOP");
+        return ipcRenderer.invoke(PST_STOP_EXTRACT_EVENT) as Promise<void>;
     },
 };

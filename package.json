@@ -88,6 +88,7 @@
     "electron-webpack": "^2.8.2",
     "electron-webpack-ts": "^4.0.1",
     "eslint": "^8.1.0",
+    "eslint-plugin-jest": "^25.2.2",
     "eslint-plugin-playwright": "^0.6.0",
     "eslint-plugin-unused-imports": "^1.1.5",
     "husky": "^7.0.4",
