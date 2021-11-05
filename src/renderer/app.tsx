@@ -39,7 +39,7 @@ export const App: React.FC = () => {
                             )
                         );
                     } catch (e: unknown) {
-                        console.error("Interupted", e);
+                        console.info("Interupted", (e as Error).message ?? e);
                     }
                     console.timeEnd("PST EXTRACT");
                 }}

@@ -14,13 +14,11 @@ import path from "path";
 
 import { TSWorker } from "../worker";
 import type {
-    PstWorkerCommandType,
     PstWorkerData,
     PstWorkerMessageType,
 } from "./pst-extractor/worker";
 import {
     PST_DONE_WORKER_EVENT,
-    PST_INTERUPTED_WORKER_EVENT,
     PST_PROGRESS_WORKER_EVENT,
 } from "./pst-extractor/worker";
 
@@ -33,10 +31,13 @@ const REGEXP_PST = /\.pst$/i;
  */
 export class PstExtractorModule implements Module {
     private inited = false;
+    private working = false;
 
-    private pstWorker?: TSWorker<PstWorkerCommandType>;
+    private pstWorker?: TSWorker;
 
     private lastProgressState!: PstProgressState;
+
+    private manuallyStoped = false;
 
     private progressReply?: (
         channel: typeof PST_PROGRESS_EVENT,
@@ -55,7 +56,6 @@ export class PstExtractorModule implements Module {
             this.extract(args[0] as string)
         );
         ipcMain.handle(PST_STOP_EXTRACT_EVENT, async () => {
-            console.log("STOP RECEIVED");
             await this.stop();
         });
 
@@ -64,11 +64,15 @@ export class PstExtractorModule implements Module {
     }
 
     private async extract(pstFilePath?: string): Promise<PstContent> {
+        if (this.working) {
+            throw new Error("[PstExtractorService] Extractor already working.");
+        }
         if (!pstFilePath || !REGEXP_PST.test(pstFilePath)) {
             throw new Error(
                 `[PstExtractorService] Cannot extract PST from an unknown path or file. Got "${pstFilePath}"`
             );
         }
+        this.working = true;
 
         console.info("Start extracting...");
         this.pstWorker = new TSWorker(
@@ -100,29 +104,32 @@ export class PstExtractorModule implements Module {
                             })
                         );
 
+                        this.working = false;
                         resolve(message.data.content);
                         console.info("Extract done.");
-                        break;
-                    case PST_INTERUPTED_WORKER_EVENT:
-                        console.log("WORKER INTERUPTED");
-                        reject(message.data.reason);
                         break;
                 }
             });
 
             this.pstWorker?.on("error", (error) => {
+                this.working = false;
                 reject(error);
             });
 
             this.pstWorker?.on("exit", (exitCode) => {
+                this.working = false;
                 if (exitCode === 1) {
-                    reject("EXIT CODE 1");
+                    if (this.manuallyStoped) {
+                        this.manuallyStoped = false;
+                        reject(new Error("Manually stoped by user."))
+                    } else reject("Worker stoped for unknown reason.");
                 }
             });
         });
     }
 
     private async stop(): Promise<void> {
+        this.manuallyStoped = true;
         this.progressReply?.(
             PST_PROGRESS_EVENT,
             (this.lastProgressState = {
@@ -131,9 +138,5 @@ export class PstExtractorModule implements Module {
             })
         );
         await this.pstWorker?.terminate();
-        // this.pstWorker?.postMessage({
-        //     command: PST_STOP_EXTRACT_COMMAND,
-        // });
-        // return Promise.resolve();
     }
 }

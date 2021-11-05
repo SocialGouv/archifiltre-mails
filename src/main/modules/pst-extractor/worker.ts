@@ -8,20 +8,15 @@ import type { PSTFolder } from "pst-extractor";
 import { PSTFile } from "pst-extractor";
 import { parentPort, threadId, workerData } from "worker_threads";
 
-class PstWorkerInteruptError extends Error {}
-
 // Events - Worker => Parent
 export const PST_PROGRESS_WORKER_EVENT = "pstExtractor.worker.event.progress";
 export const PST_DONE_WORKER_EVENT = "pstExtractor.worker.event.done";
-export const PST_INTERUPTED_WORKER_EVENT =
-    "pstExtractor.worker.event.interupted";
 
 interface EventDataMapping {
     [PST_DONE_WORKER_EVENT]: {
         content: PstContent;
         progressState: PstProgressState;
     };
-    [PST_INTERUPTED_WORKER_EVENT]: { reason: string };
     [PST_PROGRESS_WORKER_EVENT]: PstProgressState;
 }
 
@@ -49,32 +44,6 @@ function postMessage<TEvent extends PstWorkerEvent>(
     parentPort?.postMessage({ data, event } as PstWorkerMessageType);
 }
 
-// Commands - Parent => Worker
-export const PST_STOP_EXTRACT_COMMAND =
-    "pstExtractor.worker.command.stopExtact";
-
-interface CommandArgMapping {
-    [PST_STOP_EXTRACT_COMMAND]: Nothing;
-}
-
-export type PstWorkerCommand = keyof CommandArgMapping;
-
-/**
- * Possible command types comming from the parent.
- */
-export type PstWorkerCommandType<
-    TCommand extends PstWorkerCommand = PstWorkerCommand
-> = TCommand extends PstWorkerCommand
-    ? CommandArgMapping[TCommand] extends Nothing
-        ? {
-              command: TCommand;
-          }
-        : {
-              command: TCommand;
-              args: CommandArgMapping[TCommand];
-          }
-    : never;
-
 /**
  * WorkerData - Initial worker arguments
  */
@@ -86,10 +55,8 @@ export interface PstWorkerData {
 const START_TIME = Date.now();
 let progressInterval = 1000;
 let nextTimeTick = START_TIME;
-let stop = false;
 
 if (parentPort) {
-    handleIncomingCommands();
     const { pstFilePath, progressInterval: pi } = workerData as PstWorkerData;
     progressInterval = Math.abs(pi ?? progressInterval);
     const progressState: PstProgressState = {
@@ -116,21 +83,6 @@ if (parentPort) {
 
 // ---
 
-function handleIncomingCommands(): void {
-    parentPort?.on("message", (commandType: PstWorkerCommandType) => {
-        switch (commandType.command) {
-            case PST_STOP_EXTRACT_COMMAND:
-                console.info("[WORKER] Stop received");
-                stop = true;
-                break;
-            default:
-                throw new Error(
-                    `PstExtractor worker ${threadId} - Unknown command from parent (${commandType.command}).`
-                );
-        }
-    });
-}
-
 /**
  * Process a "raw" folder from the PST and extract sub folders, emails, and attachements.
  *
@@ -144,9 +96,6 @@ function processFolder(
     folder: PSTFolder,
     progressState: PstProgressState
 ): PstContent {
-    if (stop) {
-        throw new PstWorkerInteruptError("Interupted by user.");
-    }
 
     const content: PstContent = {
         contentSize: folder.contentCount,
