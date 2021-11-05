@@ -9,6 +9,7 @@ import type {
     PstContent,
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
+import type { UserConfigService } from "@common/modules/UserConfigModule";
 import { ipcMain } from "electron";
 import path from "path";
 
@@ -44,6 +45,8 @@ export class PstExtractorModule implements Module {
         channel: typeof PST_PROGRESS_EVENT,
         progressState: PstProgressState
     ) => void;
+
+    constructor(private readonly userConfigService: UserConfigService) {}
 
     public async init(): Promise<void> {
         if (this.inited) {
@@ -82,7 +85,9 @@ export class PstExtractorModule implements Module {
                 stderr: true,
                 trackUnmanagedFds: true,
                 workerData: {
-                    progressInterval: 1500,
+                    progressInterval: this.userConfigService.get(
+                        "extractProgressDelay"
+                    ),
                     pstFilePath,
                 } as PstWorkerData,
             }

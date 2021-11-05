@@ -1,6 +1,7 @@
 import { IS_DEV, IS_E2E } from "@common/config";
 import { loadIsomorphicModules } from "@common/core/isomorphic";
 import { loadModules } from "@common/lib/ModuleManager";
+import { containerModule } from "@common/modules/ContainerModule";
 import { app, BrowserWindow } from "electron";
 import path from "path";
 import { URL } from "url";
@@ -73,7 +74,10 @@ app.on("ready", async () => {
     // load shared/common modules
     await loadIsomorphicModules();
     // load "main-process" modules
-    await loadModules(new DevToolsModule(), new PstExtractorModule());
+    await loadModules(
+        new DevToolsModule(),
+        new PstExtractorModule(containerModule.get("userConfigService"))
+    );
     // create actual main BrowserWindow
     await createMainWindow();
 });

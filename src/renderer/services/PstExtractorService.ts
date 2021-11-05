@@ -55,8 +55,10 @@ export const pstExtractorService: PstExtractorService = {
         ipcRenderer.send(PST_PROGRESS_SUBSCRIBE_EVENT);
     },
 
+    /**
+     * Stop the extract.
+     */
     async stop(): Promise<void> {
-        console.log("SEND STOP");
         return ipcRenderer.invoke(PST_STOP_EXTRACT_EVENT) as Promise<void>;
     },
 };

@@ -46,15 +46,7 @@ export const App: React.FC = () => {
             >
                 Coucou BUTTON
             </Button>
-            <Button
-                onClick={() => {
-                    console.log("Stop asked");
-                    pstExtractorService?.stop();
-                    console.log("Stop done !");
-                }}
-            >
-                Stop ?
-            </Button>
+            <Button onClick={() => pstExtractorService?.stop()}>Stop ?</Button>
         </div>
     );
 };
