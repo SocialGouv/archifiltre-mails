@@ -31,6 +31,7 @@ const REGEXP_PST = /\.pst$/i;
  */
 export class PstExtractorModule implements Module {
     private inited = false;
+
     private working = false;
 
     private pstWorker?: TSWorker;
@@ -121,7 +122,7 @@ export class PstExtractorModule implements Module {
                 if (exitCode === 1) {
                     if (this.manuallyStoped) {
                         this.manuallyStoped = false;
-                        reject(new Error("Manually stoped by user."))
+                        reject(new Error("Manually stoped by user."));
                     } else reject("Worker stoped for unknown reason.");
                 }
             });

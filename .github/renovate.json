@@ -30,6 +30,12 @@
         "@types/node"
       ],
       "allowedVersions": "<15"
+    },
+    {
+      "matchPackageNames": [
+        "eslint"
+      ],
+      "allowedVersions": "<8"
     }
   ]
 }

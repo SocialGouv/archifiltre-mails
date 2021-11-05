@@ -2,11 +2,10 @@ import type {
     PstContent,
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
-import type { Nothing } from "@common/utils/type";
 import path from "path";
 import type { PSTFolder } from "pst-extractor";
 import { PSTFile } from "pst-extractor";
-import { parentPort, threadId, workerData } from "worker_threads";
+import { parentPort, workerData } from "worker_threads";
 
 // Events - Worker => Parent
 export const PST_PROGRESS_WORKER_EVENT = "pstExtractor.worker.event.progress";
@@ -96,7 +95,6 @@ function processFolder(
     folder: PSTFolder,
     progressState: PstProgressState
 ): PstContent {
-
     const content: PstContent = {
         contentSize: folder.contentCount,
         name: folder.displayName,
