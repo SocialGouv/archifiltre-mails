@@ -30,13 +30,15 @@ export const App: React.FC = () => {
                     pstExtractorService?.onProgress(setProgress);
                     try {
                         console.log(
-                            await pstExtractorService?.extract(
-                                // "/Users/lsagetlethias/Downloads/PST/archive.pst"
-                                // "/Users/lsagetlethias/Downloads/liamihcra.pst"
-                                // "/Users/lsagetlethias/Downloads/test.pst"
-                                // "/Users/lsagetlethias/Downloads/sample.pst"
-                                "/Users/lsagetlethias/Downloads/test-archimail.pst"
-                            )
+                            await pstExtractorService?.extract({
+                                depth: 2,
+                                pstFilePath:
+                                    // "/Users/lsagetlethias/Downloads/PST/archive.pst"
+                                    // "/Users/lsagetlethias/Downloads/liamihcra.pst"
+                                    // "/Users/lsagetlethias/Downloads/test.pst"
+                                    // "/Users/lsagetlethias/Downloads/sample.pst"
+                                    "/Users/lsagetlethias/Downloads/test-archimail.pst",
+                            })
                         );
                     } catch (e: unknown) {
                         console.info("Interupted", (e as Error).message || e);

@@ -14,8 +14,29 @@ import { ipcRenderer } from "electron";
 type ProgressCallback = (progressState: PstProgressState) => void;
 
 export interface PstExtractorService extends Service {
-    extract: (pstFilePath?: string) => Promise<PstContent>;
+    /**
+     * Extract the content of a PST.
+     *
+     * The work is done in a worker thread in the main process.
+     *
+     * @param options List of extract options
+     * @param options.pstFilePath The pst file path. Must be absolute!
+     * @param options.depth The folder depth where the extract should stop
+     * @returns The content of the PST
+     */
+    extract: (options: {
+        pstFilePath: string;
+        depth?: number;
+    }) => Promise<PstContent>;
+    /**
+     * Trigger a callback on each progress tick. (a tick is based on the progress interval)
+     *
+     * @param callback The callback to trigger
+     */
     onProgress: (callback: ProgressCallback) => void;
+    /**
+     * Stop the extract.
+     */
     stop: () => Promise<void>;
 }
 
@@ -23,28 +44,16 @@ export interface PstExtractorService extends Service {
  * Simple front service that communicate with the PstExtractor "main-process" module to extract a given PST file.
  */
 export const pstExtractorService: PstExtractorService = {
-    /**
-     * Extract the content of a PST.
-     *
-     * The work is done in a worker thread in the main process.
-     *
-     * @param pstFilePath The pst file path. Must be absolute!
-     * @returns The content of the PST
-     */
-    async extract(pstFilePath?: string): Promise<PstContent> {
+    async extract({ pstFilePath, depth }): Promise<PstContent> {
         return ipcRenderer.invoke(
             PST_EXTRACT_EVENT,
-            pstFilePath
+            pstFilePath,
+            depth
         ) as Promise<PstContent>;
     },
 
     name: "PstExtractorService",
 
-    /**
-     * Trigger a callback on each progress tick. (a tick is when an email is extracted)
-     *
-     * @param callback The callback to trigger
-     */
     onProgress(callback: ProgressCallback) {
         ipcRenderer.on(
             PST_PROGRESS_EVENT,
@@ -55,9 +64,6 @@ export const pstExtractorService: PstExtractorService = {
         ipcRenderer.send(PST_PROGRESS_SUBSCRIBE_EVENT);
     },
 
-    /**
-     * Stop the extract.
-     */
     async stop(): Promise<void> {
         return ipcRenderer.invoke(PST_STOP_EXTRACT_EVENT) as Promise<void>;
     },

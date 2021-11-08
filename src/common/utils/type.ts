@@ -16,3 +16,9 @@ export interface long {
 }
 
 export type Nothing = never | 0 | null | undefined;
+/**
+ * Stub to trick eslint.
+ * @deprecated
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Any = any;

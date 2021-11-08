@@ -25,6 +25,11 @@ import {
 
 const REGEXP_PST = /\.pst$/i;
 
+interface ExtractOptions {
+    pstFilePath: string;
+    depth?: number;
+}
+
 /**
  * Module responsible of handling and extracting datas from given PST files.
  *
@@ -56,8 +61,9 @@ export class PstExtractorModule implements Module {
         ipcMain.on(PST_PROGRESS_SUBSCRIBE_EVENT, (event) => {
             this.progressReply = event.reply as typeof this.progressReply;
         });
-        ipcMain.handle(PST_EXTRACT_EVENT, async (_event, ...args: unknown[]) =>
-            this.extract(args[0] as string)
+        ipcMain.handle(
+            PST_EXTRACT_EVENT,
+            async (_event, ...args: [ExtractOptions]) => this.extract(args[0])
         );
         ipcMain.handle(PST_STOP_EXTRACT_EVENT, async () => {
             await this.stop();
@@ -67,13 +73,13 @@ export class PstExtractorModule implements Module {
         await Promise.resolve();
     }
 
-    private async extract(pstFilePath?: string): Promise<PstContent> {
+    private async extract(options: ExtractOptions): Promise<PstContent> {
         if (this.working) {
             throw new Error("[PstExtractorService] Extractor already working.");
         }
-        if (!pstFilePath || !REGEXP_PST.test(pstFilePath)) {
+        if (!REGEXP_PST.test(options.pstFilePath)) {
             throw new Error(
-                `[PstExtractorService] Cannot extract PST from an unknown path or file. Got "${pstFilePath}"`
+                `[PstExtractorService] Cannot extract PST from an unknown path or file. Got "${options.pstFilePath}"`
             );
         }
         this.working = true;
@@ -85,10 +91,10 @@ export class PstExtractorModule implements Module {
                 stderr: true,
                 trackUnmanagedFds: true,
                 workerData: {
+                    ...options,
                     progressInterval: this.userConfigService.get(
                         "extractProgressDelay"
                     ),
-                    pstFilePath,
                 } as PstWorkerData,
             }
         );

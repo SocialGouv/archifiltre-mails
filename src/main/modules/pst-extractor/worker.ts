@@ -3,7 +3,7 @@ import type {
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
 import path from "path";
-import type { PSTFolder } from "pst-extractor";
+import type { PSTAttachment, PSTFolder } from "pst-extractor";
 import { PSTFile } from "pst-extractor";
 import { parentPort, workerData } from "worker_threads";
 
@@ -49,15 +49,24 @@ function postMessage<TEvent extends PstWorkerEvent>(
 export interface PstWorkerData {
     pstFilePath: string;
     progressInterval?: number;
+    depth?: number;
 }
 
 const START_TIME = Date.now();
 let progressInterval = 1000;
 let nextTimeTick = START_TIME;
+let definedDepth = Infinity;
+let root = true;
+let currentDepth = 0;
 
 if (parentPort) {
-    const { pstFilePath, progressInterval: pi } = workerData as PstWorkerData;
+    const {
+        pstFilePath,
+        progressInterval: pi,
+        depth,
+    } = workerData as PstWorkerData;
     progressInterval = Math.abs(pi ?? progressInterval);
+    definedDepth = Math.abs(depth ?? definedDepth);
     const progressState: PstProgressState = {
         countAttachement: 0,
         countEmail: 0,
@@ -72,6 +81,7 @@ if (parentPort) {
     const rootFolder = pstFile.getRootFolder();
 
     const content = processFolder(rootFolder, progressState);
+    content.name = pstFile.getMessageStore().displayName;
 
     progressState.elapsed = Date.now() - START_TIME;
     postMessage(PST_DONE_WORKER_EVENT, {
@@ -101,7 +111,13 @@ function processFolder(
         size: folder.emailCount,
     };
 
-    if (folder.hasSubfolders) {
+    if (root) {
+        root = false;
+    } else {
+        currentDepth++;
+    }
+
+    if (currentDepth <= definedDepth && folder.hasSubfolders) {
         for (const childFolder of folder.getSubFolders()) {
             if (!content.children) {
                 content.children = [];
@@ -125,12 +141,12 @@ function processFolder(
             if (email.hasAttachments) {
                 emailContent.children = [];
                 for (let i = 0; i < email.numberOfAttachments; i++) {
-                    const attachement = email.getAttachment(i);
+                    const attachement: PSTAttachment = email.getAttachment(i);
                     progressState.countAttachement++;
                     progressState.countTotal++;
                     emailContent.children.push({
                         // TODO: change name
-                        name: `Attachement: ${attachement.displayName} - ${attachement.pathname}`,
+                        name: `Attachement: ${attachement.displayName}`,
                     });
                 }
             }
