@@ -14,6 +14,12 @@
   "packageRules": [
     {
       "matchPackageNames": [
+        "@types/node"
+      ],
+      "allowedVersions": "<15"
+    },
+    {
+      "matchPackageNames": [
         "webpack",
         "@types/webpack"
       ],
@@ -24,6 +30,12 @@
         "sass-loader"
       ],
       "allowedVersions": "<11"
+    },
+    {
+      "matchPackageNames": [
+        "@types/node"
+      ],
+      "allowedVersions": "<15"
     }
   ]
 }
