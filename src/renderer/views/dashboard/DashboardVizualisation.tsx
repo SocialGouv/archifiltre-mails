@@ -4,7 +4,7 @@ import { Card } from "../../components/common/cards/Card";
 import { CardSection } from "../../components/common/cards/CardSection";
 import { TitleSectionH1 } from "../../components/common/title/TitleSection";
 import { Bubble } from "../../components/vizualisation/Bubble";
-import { BUBBLE, CARD_SIMPLE } from "../../utils/constants";
+import { BUBBLE, CARD_DOUBLE, CARD_SIMPLE } from "../../utils/constants";
 import style from "./Dashboard.module.scss";
 
 export const DashboardVizualisation: React.FC = () => {
@@ -21,10 +21,10 @@ export const DashboardVizualisation: React.FC = () => {
 
     return (
         <div className={style.general}>
-            <TitleSectionH1 title="Visualisation" />
-            <CardSection title="Visualisation">
+            <TitleSectionH1 title="Visualiser mon archive" />
+            <CardSection title="Sélectionner une visualisation">
                 <Card type={CARD_SIMPLE} opener={openBubbleVizualisation} />
-                <Card type={CARD_SIMPLE} />
+                <Card type={CARD_DOUBLE} />
             </CardSection>
             {IS_BUBBLE && <Bubble closer={closeVizualisation} />}
         </div>

@@ -1,9 +1,13 @@
 import { useService } from "@common/modules/ContainerModule";
-import type { PstContent } from "@common/modules/pst-extractor/type";
+import type {
+    PstContent,
+    PstProgressState,
+} from "@common/modules/pst-extractor/type";
 import { ResponsiveCirclePacking } from "@nivo/circle-packing";
 import React, { useCallback, useEffect, useState } from "react";
 
 import { CONTENT_SIZE, NAME, SLOW } from "../../../renderer/utils/constants";
+import { usePathContext } from "../../context/TestContext";
 import { LayoutWorkspace } from "../common/layout/LayoutWorkspace";
 import { ClosePicto } from "../common/pictos/picto";
 import style from "./Bubble.module.scss";
@@ -54,16 +58,22 @@ const data = {
 export const Bubble: React.FC<BubbleProps> = ({ closer }) => {
     const [zoomedId, setZoomedId] = useState<string | null>(null);
     const [extractedFile, setExtractedFile] = useState<PstContent>();
+    const [infos, setInfos] = useState<PstProgressState>();
+    const { path } = usePathContext();
     const pstExtractorService = useService("pstExtractorService");
 
     useEffect(() => {
         void (async () => {
             const pstExtractedFile = await pstExtractorService?.extract(
-                "/Users/mehdi/Downloads/archive.pst" // arbitrary path
+                // "/Users/mehdi/Downloads/test.pst" // arbitrary path
+                // "/Users/mehdi/Downloads/sample.pst" // arbitrary path
+                path
             );
             setExtractedFile(pstExtractedFile);
         })();
-    }, [pstExtractorService]);
+    }, [pstExtractorService, path]);
+
+    pstExtractorService?.onProgress(setInfos);
 
     const zoom = useCallback<ZoomFunction>(
         (node: Node) => {
@@ -84,6 +94,31 @@ export const Bubble: React.FC<BubbleProps> = ({ closer }) => {
 
     return (
         <LayoutWorkspace classname={style.bubble}>
+            {!extractedFile && (
+                <>
+                    <div className={style.spinner} />
+                    <div
+                        style={{
+                            left: "51%",
+                            position: "absolute",
+                            textAlign: "center",
+                            top: "64%",
+                            transform: "translate(-50%, -50%)",
+                        }}
+                    >
+                        <ul>
+                            <li>nombre d emails : </li>
+                            <li>{infos?.countEmail}</li>
+                            <li>nombre de dossiers parcourus : </li>
+                            <li>{infos?.countFolder}</li>
+                            <li>nombre de pj : </li>
+                            <li>{infos?.countAttachement}</li>
+                            <li>nombre d éléments : </li>
+                            <li>{infos?.countTotal}</li>
+                        </ul>
+                    </div>
+                </>
+            )}
             {extractedFile && (
                 <ResponsiveCirclePacking
                     {...commonProperties}

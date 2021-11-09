@@ -1,37 +1,76 @@
 .node {
-    cursor: pointer;
+  cursor: pointer;
 }
-  
+
 .node:hover {
-    stroke: #000;
-    stroke-width: 1.5px;
+  stroke: #000;
+  stroke-width: 1.5px;
 }
 
 .node--leaf {
-    fill: white;
+  fill: white;
 }
 
 .label {
-    font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
-    text-anchor: middle;
-    text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
+  font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  text-anchor: middle;
+  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
 }
 
 .label,
 .node--root,
 .node--leaf {
-    pointer-events: none;
+  pointer-events: none;
 }
 
 .close {
-    position: absolute;
-    top: 2rem;
-    right: 2rem;
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
 }
 
 .bubble-element {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.spinner {
+  border: solid 4px #2051a3;
+  border-radius: 50%;
+  height: 30px;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  &:after {
+    content: "";
+    background: white;
+    width: 7px;
+    height: 7px;
+    position: absolute;
+    left: 0;
+    top: -3px;
+    border-radius: 50%;
+  }
+  animation: loading 2s linear infinite;
+}
+
+.bubble {
+  svg {
+    transform: translate(-50%, 50%);
     position: absolute;
     left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+  }
+}
+
+@keyframes loading {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

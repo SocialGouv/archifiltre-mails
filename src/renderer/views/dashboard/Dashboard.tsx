@@ -1,13 +1,13 @@
 import React, { useCallback, useState } from "react";
 
 import { Layout } from "../../components/common/layout/Layout";
-import { GENERAL } from "../../utils/constants";
+import { VIZUALISATION } from "../../utils/constants";
 import style from "./Dashboard.module.scss";
 import { DashboardSwitcher } from "./DashboardSwitcher";
 import { DashboardTabsNav } from "./DashboardTabsNav";
 
 export const Dashboard: React.FC = () => {
-    const [tab, setTab] = useState(GENERAL);
+    const [tab, setTab] = useState(VIZUALISATION);
 
     const changeTab = useCallback((nextTab: string) => {
         setTab(nextTab);

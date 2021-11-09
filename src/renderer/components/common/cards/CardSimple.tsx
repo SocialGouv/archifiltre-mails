@@ -8,7 +8,7 @@ import style from "./Card.module.scss";
 export const CardSimple: React.FC<CardItemSimpleProps> = ({ opener }) => {
     return (
         <div className={style["card-simple"]} onClick={opener}>
-            Card Simple
+            Bubble vizualisation
         </div>
     );
 };

@@ -13,16 +13,14 @@ export const Dropzone: React.FC<DropzoneProps> = ({ accept, onDrop }) => {
         accept,
         onDrop,
     });
-
     const getClassName = (className: string, isActive: boolean) => {
         if (!isActive) return className;
         return `${style["dropzone-area"]} ${style["dropzone-area--active"]}`;
     };
-
     return (
         <div className={style.dropzone}>
             <div className={style["dropzone-title"]}>
-                <h1>Téléverser votre fichier ici</h1>
+                <h1>Téléchargez votre fichier ici</h1>
                 <span>Votre fichier doit être un .pst</span>
             </div>
             <div
