@@ -63,7 +63,10 @@ export class PstExtractorModule implements Module {
         });
         ipcMain.handle(
             PST_EXTRACT_EVENT,
-            async (_event, ...args: [ExtractOptions]) => this.extract(args[0])
+            async (_event, ...args: [ExtractOptions]) => {
+                console.log("ARGS", args);
+                return this.extract(args[0]);
+            }
         );
         ipcMain.handle(PST_STOP_EXTRACT_EVENT, async () => {
             await this.stop();

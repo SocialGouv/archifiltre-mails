@@ -1,15 +1,56 @@
 import type { long } from "@common/utils/type";
 import type { PSTAttachment, PSTRecipient } from "pst-extractor";
 
-/**
- * Main content of a PST extract.
- */
-export interface PstContent {
+export type PstElementType =
+    | "attachement"
+    | "calendar"
+    | "contact"
+    | "email"
+    | "folder"
+    | "rootFolder";
+export interface PstElement {
+    type: PstElementType;
+    children?: PstElement[];
+    size: number;
     name: string;
-    email?: PSTExtractorEmail;
-    size?: number;
-    contentSize?: number;
-    children?: PstContent[];
+}
+
+export interface PstFolder extends PstElement {
+    type: "folder" | "rootFolder";
+}
+
+export interface PstContent extends PstFolder {
+    type: "rootFolder";
+    children: PstFolder[];
+}
+
+export interface PstContact extends PstElement {
+    type: "contact";
+    name: string;
+    firstname: string;
+    lastname: string;
+    email: string;
+}
+
+export interface PstEmail extends PstElement {
+    type: "email";
+    children: PstAttachement[];
+    size: 0;
+    sentTime: Date | null;
+    receivedDate: Date | null;
+    from: PstContact;
+    to: PstContact[];
+    cc: PstContact[];
+    subject: string;
+    contentText: string;
+    contentHTML: string;
+    contentRTF: string;
+}
+
+export interface PstAttachement extends PstElement {
+    type: "attachement";
+    raw: PSTAttachment;
+    size: 0;
 }
 
 /**

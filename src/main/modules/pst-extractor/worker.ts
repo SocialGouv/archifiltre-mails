@@ -1,7 +1,11 @@
 import type {
     PstContent,
+    PstEmail,
+    PSTExtractorEmail,
+    PstFolder,
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
+import type { Any } from "@common/utils/type";
 import path from "path";
 import type { PSTAttachment, PSTFolder } from "pst-extractor";
 import { PSTFile } from "pst-extractor";
@@ -52,12 +56,17 @@ export interface PstWorkerData {
     depth?: number;
 }
 
-const START_TIME = Date.now();
+let starTime = Date.now();
 let progressInterval = 1000;
-let nextTimeTick = START_TIME;
+let nextTimeTick = starTime;
 let definedDepth = Infinity;
 let root = true;
 let currentDepth = 0;
+
+// ---
+// eslint-disable-next-line prefer-const
+let DEBUG = true;
+// ---
 
 if (parentPort) {
     const {
@@ -80,10 +89,27 @@ if (parentPort) {
     const pstFile = new PSTFile(path.resolve(pstFilePath));
     const rootFolder = pstFile.getRootFolder();
 
-    const content = processFolder(rootFolder, progressState);
+    // reset vars
+    root = true;
+    currentDepth = 0;
+    starTime = Date.now();
+    nextTimeTick = starTime;
+    //
+
+    const content = {
+        ...processFolder(rootFolder, progressState),
+        type: "rootFolder",
+    } as PstContent;
     content.name = pstFile.getMessageStore().displayName;
 
-    progressState.elapsed = Date.now() - START_TIME;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (DEBUG) {
+        (content as Any)._rawJson = rootFolder.toJSON();
+    }
+
+    // TODO: postProcess(content); // real email count, ...
+
+    progressState.elapsed = Date.now() - starTime;
     postMessage(PST_DONE_WORKER_EVENT, {
         content,
         progressState,
@@ -104,12 +130,20 @@ if (parentPort) {
 function processFolder(
     folder: PSTFolder,
     progressState: PstProgressState
-): PstContent {
-    const content: PstContent = {
-        contentSize: folder.contentCount,
+): PstFolder {
+    const content: PstFolder = {
         name: folder.displayName,
         size: folder.emailCount,
+        type: "folder",
     };
+
+    if (DEBUG) {
+        try {
+            (content as Any)._rawJson = folder.toJSON();
+        } catch (error: unknown) {
+            (content as Any)._rawJson = { error };
+        }
+    }
 
     if (root) {
         root = false;
@@ -134,10 +168,48 @@ function processFolder(
                 content.children = [];
             }
 
-            const emailContent: PstContent = {
+            const emailContent: PstEmail = {
+                cc: email.displayCC.split(";").map((cc) => ({
+                    email: "",
+                    firstname: "",
+                    lastname: "",
+                    name: cc,
+                    size: 0,
+                    type: "contact",
+                })),
+                children: [],
+                contentHTML: email.bodyHTML,
+                contentRTF: email.bodyRTF,
+                contentText: email.body,
+                from: {
+                    email: email.senderEmailAddress,
+                    firstname: "",
+                    lastname: "",
+                    name: email.senderEmailAddress,
+                    size: 0,
+                    type: "contact",
+                },
                 // TODO: change name
                 name: `${email.senderName} ${email.originalSubject}`,
+                receivedDate: email.messageDeliveryTime,
+                sentTime: email.clientSubmitTime,
+                size: 0,
+                subject: email.subject,
+                to: email.displayTo.split(";").map((to) => ({
+                    email: "",
+                    firstname: "",
+                    lastname: "",
+                    name: to,
+                    size: 0,
+                    type: "contact",
+                })),
+                type: "email",
             };
+
+            if (DEBUG) {
+                (emailContent as Any)._rawJson = (email as Any).toJSON();
+            }
+
             if (email.hasAttachments) {
                 emailContent.children = [];
                 for (let i = 0; i < email.numberOfAttachments; i++) {
@@ -146,7 +218,15 @@ function processFolder(
                     progressState.countTotal++;
                     emailContent.children.push({
                         // TODO: change name
-                        name: `Attachement: ${attachement.displayName}`,
+                        name: attachement.displayName,
+                        raw: attachement,
+                        size: 0,
+                        type: "attachement",
+                        ...(DEBUG
+                            ? {
+                                  _rawJson: attachement.toJSON(),
+                              }
+                            : {}),
                     });
                 }
             }
@@ -158,7 +238,7 @@ function processFolder(
             const now = Date.now();
             const elapsed = now - nextTimeTick;
             if (elapsed >= progressInterval) {
-                progressState.elapsed = now - START_TIME;
+                progressState.elapsed = now - starTime;
                 postMessage(PST_PROGRESS_WORKER_EVENT, progressState);
                 nextTimeTick = now;
             }
@@ -170,7 +250,7 @@ function processFolder(
 
 function* folderMailIterator(folder: PSTFolder) {
     if (folder.contentCount) {
-        let email = folder.getNextChild();
+        let email: PSTExtractorEmail | undefined = folder.getNextChild();
         while (email) {
             yield email;
             email = folder.getNextChild();

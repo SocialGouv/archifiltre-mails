@@ -44,11 +44,10 @@ export interface PstExtractorService extends Service {
  * Simple front service that communicate with the PstExtractor "main-process" module to extract a given PST file.
  */
 export const pstExtractorService: PstExtractorService = {
-    async extract({ pstFilePath, depth }): Promise<PstContent> {
+    async extract(options): Promise<PstContent> {
         return ipcRenderer.invoke(
             PST_EXTRACT_EVENT,
-            pstFilePath,
-            depth
+            options
         ) as Promise<PstContent>;
     },
 
