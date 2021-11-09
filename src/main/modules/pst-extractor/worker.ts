@@ -2,6 +2,7 @@ import type {
     PstContent,
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
+import { randomUUID } from "crypto";
 import path from "path";
 import type { PSTFolder } from "pst-extractor";
 import { PSTFile } from "pst-extractor";
@@ -62,7 +63,7 @@ function processFolder(
     progressState: PstProgressState
 ): PstContent {
     const content: PstContent = {
-        contentSize: folder.contentCount,
+        contentSize: Math.abs(folder.contentCount) || 1,
         name: folder.displayName,
         size: folder.emailCount,
     };
@@ -86,8 +87,9 @@ function processFolder(
 
             const emailContent: PstContent = {
                 // TODO: change name
-                name: `${email.senderName} ${email.originalSubject}`,
-                size: 0,
+                name: `${email.senderName} ${
+                    email.originalSubject
+                } ${randomUUID()}`,
             };
             if (email.hasAttachments) {
                 emailContent.children = [];
@@ -97,8 +99,9 @@ function processFolder(
                     progressState.countTotal++;
                     emailContent.children.push({
                         // TODO: change name
-                        name: `Attachement: ${attachement.displayName} - ${attachement.pathname}`,
-                        size: 0,
+                        name: `Attachement: ${attachement.displayName} - ${
+                            attachement.pathname
+                        } ${randomUUID()}`,
                     });
                 }
             }

@@ -6,7 +6,7 @@ import React, {
     useState,
 } from "react";
 
-import { DASHBOARD } from "../utils/constants";
+import { DASHBOARD, START_SCREEN } from "../utils/constants";
 
 interface RouteContextInterface {
     route: string;
@@ -21,7 +21,7 @@ const initialRouteState: RouteContextInterface = {
 const RouteContext = createContext<RouteContextInterface>(initialRouteState);
 
 const RouteContextProvider: React.FC = ({ children }) => {
-    const [route, setRoute] = useState(DASHBOARD);
+    const [route, setRoute] = useState(START_SCREEN);
 
     const changeRoute = useCallback((nextRoute: string) => {
         setRoute(nextRoute);

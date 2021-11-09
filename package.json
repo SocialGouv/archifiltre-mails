@@ -37,7 +37,10 @@
     },
     "whiteListedModules": [
       "react-dropzone",
-      "d3"
+      "d3",
+      "@nivo/circle-packing",
+      "@nivo/generators",
+      "@nivo/core"
     ]
   },
   "build": {
@@ -113,6 +116,9 @@
     "webpack": "4"
   },
   "dependencies": {
+    "@nivo/circle-packing": "^0.74.0",
+    "@nivo/core": "^0.74.0",
+    "@nivo/generators": "^0.74.0",
     "d3": "^7.1.1",
     "electron-store": "^8.0.1",
     "normalize.css": "^8.0.1",
