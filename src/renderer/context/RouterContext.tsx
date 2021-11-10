@@ -6,24 +6,24 @@ import React, {
     useState,
 } from "react";
 
-import { DASHBOARD, START_SCREEN } from "../utils/constants";
+import type { RouteName } from "../views";
 
 interface RouteContextInterface {
-    route: string;
-    changeRoute: (nextRoute: string) => void;
+    route: RouteName;
+    changeRoute: (nextRoute: RouteName) => void;
 }
 
 const initialRouteState: RouteContextInterface = {
-    changeRoute: () => DASHBOARD,
-    route: DASHBOARD,
+    changeRoute: () => "START_SCREEN",
+    route: "START_SCREEN",
 };
 
 const RouteContext = createContext<RouteContextInterface>(initialRouteState);
 
 const RouteContextProvider: React.FC = ({ children }) => {
-    const [route, setRoute] = useState(START_SCREEN);
+    const [route, setRoute] = useState<RouteName>("START_SCREEN");
 
-    const changeRoute = useCallback((nextRoute: string) => {
+    const changeRoute = useCallback((nextRoute: RouteName) => {
         setRoute(nextRoute);
     }, []);
 
@@ -42,7 +42,10 @@ const RouteContextProvider: React.FC = ({ children }) => {
     );
 };
 
-// context consumer hook
+/**
+ * Simple hook to consume router context easily with only one import and assignment.
+ */
+
 export const useRouteContext = (): RouteContextInterface =>
     useContext(RouteContext);
 

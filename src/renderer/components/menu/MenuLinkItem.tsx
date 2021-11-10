@@ -1,17 +1,19 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import type { FC, ReactNode } from "react";
+import type { FC } from "react";
 import React from "react";
+import type { RouteName } from "src/renderer/views";
 
 import style from "./MenuLink.module.scss";
+import type { SetIsActiveType } from "./MenuLinks";
 
 interface MenuLinkItemProps {
-    label: string;
-    picto: ReactNode;
+    label: RouteName;
+    picto: React.FC;
     active: string;
-    nextRoute: string;
-    setIsActive: (label: string) => void;
-    changeRoute: (nextRoute: string) => void;
+    nextRoute: RouteName;
+    setIsActive: SetIsActiveType;
+    changeRoute: (nextRoute: RouteName) => void;
 }
 
 export const MenuLinkItem: FC<MenuLinkItemProps> = ({
@@ -22,7 +24,7 @@ export const MenuLinkItem: FC<MenuLinkItemProps> = ({
     setIsActive,
     changeRoute,
 }) => {
-    const classname =
+    const className =
         label === active
             ? `${style["menu-link-item"]} ${style["is-active"]}`
             : style["menu-link-item"];
@@ -32,9 +34,9 @@ export const MenuLinkItem: FC<MenuLinkItemProps> = ({
         changeRoute(nextRoute);
     };
     return (
-        <div className={classname} onClick={handleClick}>
+        <div className={className} onClick={handleClick}>
             {picto}
-            <button>{label}</button>
+            <button>{label.toLowerCase()}</button>
         </div>
     );
 };

@@ -2,11 +2,11 @@ import React from "react";
 
 import style from "./Layout.module.scss";
 
-export const Layout: React.FC<{ classname: string }> = ({
+export const Layout: React.FC<{ className: string }> = ({
     children,
-    classname,
+    className,
 }) => (
-    <section id={style.container} className={classname}>
+    <section id={style.container} className={className}>
         {children}
     </section>
 );

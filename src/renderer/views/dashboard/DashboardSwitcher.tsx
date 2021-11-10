@@ -1,23 +1,10 @@
 import React from "react";
 
-import { GENERAL, VIZUALISATION } from "../../utils/constants";
-import { DashboardGeneral } from "./DashboardGeneral";
-import { DashboardVizualisation } from "./DashboardVizualisation";
-
 interface DashboardSwitcherProps {
     tab: string;
 }
 
+// TODO: Add routing for dashboard views. (To keep for future navigation between dashboard views)
 export const DashboardSwitcher: React.FC<DashboardSwitcherProps> = ({
     tab,
-}) => {
-    switch (tab) {
-        case GENERAL:
-            return <DashboardGeneral />;
-        case VIZUALISATION:
-            return <DashboardVizualisation />;
-
-        default:
-            return <DashboardGeneral />;
-    }
-};
+}) => <div>{tab}</div>;

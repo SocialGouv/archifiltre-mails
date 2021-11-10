@@ -1,32 +1,32 @@
 import React, { useCallback, useState } from "react";
 
-import { Card } from "../../components/common/cards/Card";
-import { CardSection } from "../../components/common/cards/CardSection";
-import { TitleSectionH1 } from "../../components/common/title/TitleSection";
-import { Bubble } from "../../components/vizualisation/Bubble";
-import { BUBBLE, CARD_DOUBLE, CARD_SIMPLE } from "../../utils/constants";
+import type { VIZUALISATION } from "../../../renderer/utils/constants";
+import { TitleH1 } from "../../components/common/title/Title";
+import { CirclePacking } from "../../components/vizualisation/CirclePacking";
 import style from "./Dashboard.module.scss";
 
 export const DashboardVizualisation: React.FC = () => {
-    const [vizualisation, setVizualisation] = useState<string | null>(null);
-    const IS_BUBBLE = vizualisation === BUBBLE;
+    const [vizualisation, setVizualisation] = useState<
+        VIZUALISATION | undefined
+    >(undefined);
+    const IS_CIRCLE_PACKING = vizualisation === "vizualisation.circle-packing";
 
-    const openBubbleVizualisation = useCallback(() => {
-        setVizualisation(BUBBLE);
+    const openCirclePackingVizualisation = useCallback(() => {
+        setVizualisation("vizualisation.circle-packing");
     }, []);
 
     const closeVizualisation = useCallback(() => {
-        setVizualisation(null);
+        setVizualisation(undefined);
     }, []);
 
     return (
         <div className={style.general}>
-            <TitleSectionH1 title="Visualiser mon archive" />
-            <CardSection title="Sélectionner une visualisation">
-                <Card type={CARD_SIMPLE} opener={openBubbleVizualisation} />
-                <Card type={CARD_DOUBLE} />
-            </CardSection>
-            {IS_BUBBLE && <Bubble closer={closeVizualisation} />}
+            <TitleH1 title="Visualiser mon archive" />
+            {/* TODO: Add card or button to open data-viz. Next PR */}
+            <button onClick={openCirclePackingVizualisation}>
+                Open Circle Packing Vizualisation
+            </button>{" "}
+            {IS_CIRCLE_PACKING && <CirclePacking closer={closeVizualisation} />}
         </div>
     );
 };

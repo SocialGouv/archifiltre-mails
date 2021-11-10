@@ -6,5 +6,5 @@ import style from "./Ecology.module.scss";
 // interface DashboardProps {}
 
 export const Ecology: React.FC = () => (
-    <Layout classname={style.ecology}>ecology</Layout>
+    <Layout className={style.ecology}>ecology</Layout>
 );
