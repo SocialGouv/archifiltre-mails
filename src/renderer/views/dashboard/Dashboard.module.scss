@@ -1,5 +1,123 @@
 .dashboard {
-    .general {
-        height: auto;
+  .general {
+    height: auto;
+  }
+
+  h2 {
+    margin: 0 0 2rem;
+  }
+}
+
+.dashboard__analytics {
+  margin: 0 0 3rem;
+
+  .dashboard__analytics__label {
+    display: flex;
+    max-width: 950px;
+    font-size: 0.75rem;
+    padding: 1rem;
+    color: #aaa;
+    div:first-child {
+      flex: 1;
     }
+    div {
+      flex: 2;
+    }
+  }
+  .dashboard__analytics__item {
+    box-shadow: rgb(17 12 46 / 5%) 0px 3px 160px 0px;
+    padding: 1rem;
+    border-radius: 10px;
+    background: #fff;
+    max-width: 950px;
+
+    .dashboard__analytics__item__detail {
+      height: 75px;
+      display: flex;
+      align-items: center;
+      div:first-child {
+        flex: 1;
+        width: 40px;
+        div {
+          width: 45px;
+          height: 45px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex: none;
+          background: #0000ff1f;
+          border-radius: 50%;
+          svg {
+            stroke: blue;
+          }
+        }
+      }
+      div {
+        flex: 2;
+      }
+    }
+  }
+}
+
+.dashboard__global {
+  display: flex;
+  margin: 0 0 4rem;
+}
+
+.dashboard__global__card {
+  width: 150px;
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-right: 2rem;
+  border-radius: 15px;
+  box-shadow: rgb(17 12 46 / 4%) 0px 3px 20px 0px;
+
+  span {
+    display: table;
+    &:first-child {
+      color: red;
+    }
+  }
+
+  svg {
+    margin: 1rem;
+  }
+}
+
+.dashboard__global__card:nth-child(1) {
+  svg {
+    stroke: #d4a448;
+  }
+  background: #fdf4e2;
+}
+
+.dashboard__global__card:nth-child(2) {
+  svg {
+    stroke: #557c2b;
+  }
+  background: #edf2e9;
+}
+
+.dashboard__global__card:nth-child(3) {
+  svg {
+    stroke: #5349b7;
+  }
+  background: #e3e3f7;
+}
+
+.dashboard__global__card:nth-child(4) {
+  svg {
+    stroke: #e96935;
+  }
+  background: #fcf0e9;
+}
+
+.dashboard__global__card:nth-child(5) {
+  svg {
+    stroke: #e19a45;
+  }
+  background: #f6f3ed;
 }

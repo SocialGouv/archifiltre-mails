@@ -17,5 +17,5 @@ export type RouteName = keyof typeof ROUTES;
 
 export const Views: React.FC = () => {
     const { route } = useRouteContext();
-    return ROUTES[route] ?? ROUTES.START_SCREEN;
+    return ROUTES[route];
 };

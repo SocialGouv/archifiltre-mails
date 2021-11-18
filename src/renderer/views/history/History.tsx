@@ -6,5 +6,7 @@ import style from "./History.module.scss";
 // interface DashboardProps {}
 
 export const History: React.FC = () => (
-    <Layout className={style.history}>history</Layout>
+    <Layout className={style.history} title="Historique">
+        history
+    </Layout>
 );
