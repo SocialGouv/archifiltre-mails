@@ -1,0 +1,115 @@
+.menu {
+  width: 300px;
+  height: 100%;
+  position: relative;
+  border-right: solid 1px #e7e7e7;
+  padding: 2rem;
+
+  .menu-link-item {
+    display: flex;
+    align-items: center;
+    padding: 0.85rem 1rem;
+    border-radius: 1rem;
+
+    &:not(:last-child) {
+      margin: 0 0 0.5rem;
+    }
+
+    svg {
+      width: 22.5px;
+      margin-right: 1rem;
+      stroke: #2e2a46;
+      path,
+      line,
+      polyline {
+        stroke: #2e2a46;
+      }
+    }
+
+    a,
+    button {
+      color: #2e2a46;
+      font-weight: 600;
+    }
+
+    &.is-active {
+      background: #eff1fe;
+      a,
+      button {
+        color: #695df0;
+      }
+      svg {
+        stroke: #695df0;
+        path,
+        line,
+        polyline {
+          stroke: #695df0;
+        }
+      }
+      &:hover {
+        background: #eff1fe;
+        a,
+        button {
+          color: #695df0;
+        }
+        svg {
+          stroke: #695df0;
+          path,
+          line,
+          polyline {
+            stroke: #695df0;
+          }
+        }
+      }
+    }
+
+    &:hover {
+      background: #e7e7e7;
+      cursor: pointer;
+      a,
+      button {
+        color: #eff1fe;
+      }
+      svg {
+        stroke: #eff1fe;
+        path,
+        line,
+        polyline {
+          stroke: #eff1fe;
+        }
+      }
+    }
+  }
+
+  &.is-collapsed {
+    @extend .menu;
+    width: 120px;
+    .menu-link-item {
+      svg {
+        margin: 0;
+      }
+    }
+  }
+}
+
+.arrow {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  right: -15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  transform: rotate(180deg);
+
+  &.is-collapsed {
+    transform: rotate(0);
+  }
+  svg {
+    width: 15px;
+    height: 15px;
+  }
+}

@@ -1,25 +1,14 @@
 {
   "extends": "@tsconfig/node14/tsconfig.json",
   "compilerOptions": {
-    "lib": [
-      "ES2021",
-      "DOM"
-    ],
+    "lib": ["ES2021", "DOM"],
     "jsx": "react",
     "target": "ES2016",
     "baseUrl": ".",
     "paths": {
-      "@common/*": [
-        "src/common/*"
-      ]
+      "@common/*": ["src/common/*"]
     }
   },
-  "include": [
-    "global.d.ts",
-    "src/**/*",
-  ],
-  "exclude": [
-    "tests",
-    "./node_modules/"
-  ]
+  "include": ["global.d.ts", "src/**/*"],
+  "exclude": ["tests", "./node_modules/"]
 }

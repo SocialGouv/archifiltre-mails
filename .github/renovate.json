@@ -1,35 +1,29 @@
 {
   "enabled": true,
-  "extends": [
-    "github>SocialGouv/renovate-config:light"
-  ],
-  "baseBranches": [
-    "dev"
-  ],
-  "dependencyDashboardLabels": [
-    "bot",
-    "dependencies"
-  ],
+  "extends": ["github>SocialGouv/renovate-config:light"],
+  "baseBranches": ["dev"],
+  "dependencyDashboardLabels": ["bot", "dependencies"],
   "updatePinnedDependencies": false,
   "packageRules": [
     {
-      "matchPackageNames": [
-        "webpack",
-        "@types/webpack"
-      ],
+      "matchPackageNames": ["@types/node"],
+      "allowedVersions": "<15"
+    },
+    {
+      "matchPackageNames": ["webpack", "@types/webpack"],
       "allowedVersions": "<5"
     },
     {
-      "matchPackageNames": [
-        "sass-loader"
-      ],
+      "matchPackageNames": ["sass-loader"],
       "allowedVersions": "<11"
     },
     {
-      "matchPackageNames": [
-        "@types/node"
-      ],
+      "matchPackageNames": ["@types/node"],
       "allowedVersions": "<15"
+    },
+    {
+      "matchPackageNames": ["eslint"],
+      "allowedVersions": "<8"
     }
   ]
 }
