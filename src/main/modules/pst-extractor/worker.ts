@@ -1,19 +1,28 @@
+/* eslint-disable @typescript-eslint/dot-notation */
 import type {
     PstContent,
     PstEmail,
-    PSTExtractorEmail,
     PstFolder,
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
 import type { Any } from "@common/utils/type";
+import type {
+    PSTAttachment,
+    PSTFolder,
+    PSTMessage,
+    PSTObject,
+} from "@socialgouv/archimail-pst-extractor";
+import { PSTFile } from "@socialgouv/archimail-pst-extractor";
 import path from "path";
-import type { PSTAttachment, PSTFolder } from "pst-extractor";
-import { PSTFile } from "pst-extractor";
 import { parentPort, workerData } from "worker_threads";
 
 // Events - Worker => Parent
 export const PST_PROGRESS_WORKER_EVENT = "pstExtractor.worker.event.progress";
 export const PST_DONE_WORKER_EVENT = "pstExtractor.worker.event.done";
+
+function getRawItem(pstObject: PSTObject, identifier: number) {
+    return pstObject["pstTableItems"]?.get(identifier);
+}
 
 interface EventDataMapping {
     [PST_DONE_WORKER_EVENT]: {
@@ -104,7 +113,12 @@ if (parentPort) {
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (DEBUG) {
-        (content as Any)._rawJson = rootFolder.toJSON();
+        (content as Any)._rawJson = {
+            ...(rootFolder as Any).toJSON(),
+            emailsTable: void 0,
+            pstTableBC: void 0,
+            subfoldersTable: void 0,
+        };
     }
 
     // TODO: postProcess(content); // real email count, ...
@@ -139,7 +153,12 @@ function processFolder(
 
     if (DEBUG) {
         try {
-            (content as Any)._rawJson = folder.toJSON();
+            (content as Any)._rawJson = {
+                ...(folder as Any).toJSON(),
+                emailsTable: void 0,
+                pstTableBC: void 0,
+                subfoldersTable: void 0,
+            };
         } catch (error: unknown) {
             (content as Any)._rawJson = { error };
         }
@@ -167,6 +186,10 @@ function processFolder(
             if (!content.children) {
                 content.children = [];
             }
+
+            // if (email.messageClass !== "IPM.Note") {
+            //     continue;
+            // }
 
             const emailContent: PstEmail = {
                 cc: email.displayCC.split(";").map((cc) => ({
@@ -207,7 +230,58 @@ function processFolder(
             };
 
             if (DEBUG) {
-                (emailContent as Any)._rawJson = (email as Any).toJSON();
+                (emailContent as Any)._rawJson = {
+                    ...(email as Any).toJSON(),
+                    attachmentTable: void 0,
+                    pidTagReadReceiptSmtpAddress: (email as Any)[
+                        "getStringItem"
+                    ](0x5d05),
+                    pstTableBC: void 0,
+                    recipientTable: void 0,
+                    recurrenceStructure: void 0,
+                    timezone: void 0,
+                };
+                (emailContent as Any)._recipients = new Array(
+                    email.numberOfRecipients
+                )
+                    .fill(void 0)
+                    .map((_value, index) => {
+                        const recip = email.getRecipient(index);
+                        if (!recip) {
+                            return;
+                        }
+
+                        return {
+                            CUSTOM: {
+                                PR_RECIPIENT_DISPLAY_NAME:
+                                    recip.getStringItem(0x5ff6),
+                                PR_RECIPIENT_STATUS: recip.getIntItem(
+                                    0x0e15,
+                                    999
+                                ),
+                                PR_RECIPIENT_TRACKSTATUS:
+                                    recip.getIntItem(0x5fff),
+                                PR_RECIPIENT_TYPE: recip.getIntItem(
+                                    0x0c15,
+                                    998
+                                ),
+                                PR_RECIPIENT_TYPE_RAW:
+                                    getRawItem(recip, 0x0c15) ?? "yolo",
+                                PR_SMTP_ADDRESS_1:
+                                    recip.getStringItem(0x39fe001e),
+                                pidTagReadReceiptSmtpAddress:
+                                    recip.getStringItem(0x5d05),
+                            },
+                            addrType: recip.addrType,
+                            displayName:
+                                recip.recipientDisplayName || recip.displayName,
+                            emailAddress: recip.emailAddress,
+                            recipientFlags: recip.recipientFlags,
+                            recipientOrder: recip.recipientOrder,
+                            recipientType: recip.recipientType,
+                            smtpAddress: recip.smtpAddress,
+                        };
+                    });
             }
 
             if (email.hasAttachments) {
@@ -219,12 +293,14 @@ function processFolder(
                     emailContent.children.push({
                         // TODO: change name
                         name: attachement.displayName,
-                        raw: attachement,
                         size: 0,
                         type: "attachement",
                         ...(DEBUG
                             ? {
-                                  _rawJson: attachement.toJSON(),
+                                  _rawJson: {
+                                      ...(attachement as Any).toJSON(),
+                                      pstTableBC: void 0,
+                                  },
                               }
                             : {}),
                     });
@@ -250,7 +326,7 @@ function processFolder(
 
 function* folderMailIterator(folder: PSTFolder) {
     if (folder.contentCount) {
-        let email: PSTExtractorEmail | undefined = folder.getNextChild();
+        let email: PSTMessage | null = folder.getNextChild();
         while (email) {
             yield email;
             email = folder.getNextChild();

@@ -89,7 +89,11 @@ export class PstExtractorModule implements Module {
 
         console.info("Start extracting...");
         this.pstWorker = new TSWorker(
-            path.resolve(__dirname, "pst-extractor", "worker.ts"),
+            path.resolve(
+                __dirname,
+                "@socialgouv/archimail-pst-extractor",
+                "worker.ts"
+            ),
             {
                 stderr: true,
                 trackUnmanagedFds: true,

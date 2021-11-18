@@ -1,5 +1,8 @@
 import type { long } from "@common/utils/type";
-import type { PSTAttachment, PSTRecipient } from "pst-extractor";
+import type {
+    PSTAttachment,
+    PSTRecipient,
+} from "@socialgouv/archimail-pst-extractor";
 
 export type PstElementType =
     | "attachement"
@@ -8,6 +11,7 @@ export type PstElementType =
     | "email"
     | "folder"
     | "rootFolder";
+
 export interface PstElement {
     type: PstElementType;
     children?: PstElement[];
@@ -49,7 +53,6 @@ export interface PstEmail extends PstElement {
 
 export interface PstAttachement extends PstElement {
     type: "attachement";
-    raw: PSTAttachment;
     size: 0;
 }
 

@@ -33,11 +33,12 @@ export const App: React.FC = () => {
                             await pstExtractorService?.extract({
                                 // depth: 2,
                                 pstFilePath:
-                                    // "/Users/lsagetlethias/Downloads/PST/archive.pst",
-                                    "/Users/lsagetlethias/Downloads/liamihcra.pst",
+                                    "/Users/lsagetlethias/Downloads/PST/archive.pst", // 1Go
+                                // "/Users/lsagetlethias/Downloads/liamihcra.pst",
+                                // "/Users/lsagetlethias/Downloads/liamihcraV2.pst",
                                 // "/Users/lsagetlethias/Downloads/test.pst",
                                 // "/Users/lsagetlethias/Downloads/sample.pst",
-                                // "/Users/lsagetlethias/Downloads/test-archimail.pst",
+                                // "/Users/lsagetlethias/Downloads/test-archimail.pst", // 15Go
                             })
                         );
                     } catch (e: unknown) {
