@@ -1,20 +1,33 @@
-@use './font';
-@use './column';
+@use "./font";
+@use "./column";
+// TODO: Mettre scss files dans un dossier styles pour gérer les mixins et variables. (à check ensemble @lsagetlethias)
+@import "./colors";
 
 * {
   box-sizing: border-box;
   font-family: Inter, Arial, sans-serif;
 }
 
+html {
+  background: #f6f7fb;
+  color: #2e2a46;
+}
+
 main {
   width: 100vw;
   height: 100vh;
   display: flex;
+  overflow: hidden;
 }
 
+h1,
+h2,
+h3 {
+  margin: 0;
+}
 
 a {
-  color: #000;
+  color: #2e2a46;
   text-decoration: none;
 }
 
@@ -22,6 +35,7 @@ button {
   border: 0;
   background: none;
   cursor: pointer;
+  color: #2e2a46;
 }
 
 ul {
@@ -34,7 +48,7 @@ li {
 }
 
 .node {
-  cursor: pointer;  
+  cursor: pointer;
 }
 
 .node:hover {
