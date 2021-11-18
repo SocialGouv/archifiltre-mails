@@ -1,6 +1,73 @@
-@use './font';
+@use "./font";
+@use "./column";
+// TODO: Mettre scss files dans un dossier styles pour gérer les mixins et variables. (à check ensemble @lsagetlethias)
+@import "./colors";
 
 * {
   box-sizing: border-box;
-  font-family: Quicksand, Arial, sans-serif;
+  font-family: Inter, Arial, sans-serif;
+}
+
+html {
+  background: #f6f7fb;
+  color: #2e2a46;
+}
+
+main {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+a {
+  color: #2e2a46;
+  text-decoration: none;
+}
+
+button {
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: #2e2a46;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  list-style-type: none;
+}
+
+.node {
+  cursor: pointer;
+}
+
+.node:hover {
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+.node--leaf {
+  fill: white;
+}
+
+.label {
+  font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  text-anchor: middle;
+  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
+}
+
+.label,
+.node--root,
+.node--leaf {
+  pointer-events: none;
 }

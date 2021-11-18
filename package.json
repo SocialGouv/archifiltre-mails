@@ -34,7 +34,14 @@
     },
     "renderer": {
       "webpackConfig": "webpack.renderer.config.js"
-    }
+    },
+    "whiteListedModules": [
+      "react-dropzone",
+      "d3",
+      "@nivo/circle-packing",
+      "@nivo/generators",
+      "@nivo/core"
+    ]
   },
   "build": {
     "appId": "fr.gouv.social.fabrique.archimail",
@@ -73,6 +80,7 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.1.2",
     "@tsconfig/node14": "^1.0.1",
+    "@types/d3": "^7.1.0",
     "@types/jest": "^27.0.2",
     "@types/node": "14",
     "@types/react": "^17.0.33",
@@ -108,10 +116,15 @@
   },
   "dependencies": {
     "@socialgouv/archimail-pst-extractor": "^0.0.1",
+    "@nivo/circle-packing": "^0.74.0",
+    "@nivo/core": "^0.74.0",
+    "@nivo/generators": "^0.74.0",
+    "d3": "^7.1.1",
     "electron-store": "^8.0.1",
     "normalize.css": "^8.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-dropzone": "^11.4.2",
     "source-map-support": "^0.5.20",
     "ts-node": "^10.2.1",
     "uuid": "^8.3.2"

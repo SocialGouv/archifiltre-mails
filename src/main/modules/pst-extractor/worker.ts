@@ -13,6 +13,7 @@ import type {
     PSTObject,
 } from "@socialgouv/archimail-pst-extractor";
 import { PSTFile } from "@socialgouv/archimail-pst-extractor";
+import { randomUUID } from "crypto";
 import path from "path";
 import { parentPort, workerData } from "worker_threads";
 
@@ -147,7 +148,7 @@ function processFolder(
 ): PstFolder {
     const content: PstFolder = {
         name: folder.displayName,
-        size: folder.emailCount,
+        size: Math.abs(folder.emailCount) || 1,
         type: "folder",
     };
 
@@ -213,7 +214,9 @@ function processFolder(
                     type: "contact",
                 },
                 // TODO: change name
-                name: `${email.senderName} ${email.originalSubject}`,
+                name: `${email.senderName} ${
+                    email.originalSubject
+                } ${randomUUID()}`,
                 receivedDate: email.messageDeliveryTime,
                 sentTime: email.clientSubmitTime,
                 size: 0,
@@ -292,7 +295,7 @@ function processFolder(
                     progressState.countTotal++;
                     emailContent.children.push({
                         // TODO: change name
-                        name: attachement.displayName,
+                        name: `${attachement.displayName} ${randomUUID()}`,
                         size: 0,
                         type: "attachement",
                         ...(DEBUG
