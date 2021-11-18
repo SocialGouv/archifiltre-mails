@@ -1,7 +1,12 @@
 #logo {
-    margin: 0;
-    padding: 2rem 1rem 5rem;
-    font-size: 1.5rem;
-    font-family: 'InterBold';
-    text-align: center;
+  height: 75px;
+  margin: 0 -2rem 3rem;
+  border-bottom: solid 1px #e7e7e7;
+}
+
+.logo__title {
+  margin: 0 auto;
+  font-size: 1.5rem;
+  font-family: "InterBold";
+  text-align: center;
 }

@@ -4,7 +4,7 @@ import type { FC } from "react";
 import React from "react";
 import type { RouteName } from "src/renderer/views";
 
-import style from "./MenuLink.module.scss";
+import style from "./Menu.module.scss";
 import type { SetIsActiveType } from "./MenuLinks";
 
 interface MenuLinkItemProps {
@@ -14,6 +14,7 @@ interface MenuLinkItemProps {
     nextRoute: RouteName;
     setIsActive: SetIsActiveType;
     changeRoute: (nextRoute: RouteName) => void;
+    isCollapsed: boolean;
 }
 
 export const MenuLinkItem: FC<MenuLinkItemProps> = ({
@@ -21,6 +22,7 @@ export const MenuLinkItem: FC<MenuLinkItemProps> = ({
     picto,
     active,
     nextRoute,
+    isCollapsed,
     setIsActive,
     changeRoute,
 }) => {
@@ -36,7 +38,7 @@ export const MenuLinkItem: FC<MenuLinkItemProps> = ({
     return (
         <div className={className} onClick={handleClick}>
             {picto}
-            <button>{label.toLowerCase()}</button>
+            {isCollapsed ? null : <button>{label.toLowerCase()}</button>}
         </div>
     );
 };

@@ -16,9 +16,10 @@ interface LinksType {
     nextRoute: RouteName;
     picto: React.FC;
     setIsActive: SetIsActiveType;
+    isCollapsed: boolean;
 }
 
-const MenuLinks: React.FC = () => {
+const MenuLinks: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
     const [active, setIsActive] = useState<RouteName>("DASHBOARD");
     const { changeRoute } = useRouteContext();
 
@@ -26,6 +27,7 @@ const MenuLinks: React.FC = () => {
         {
             active,
             changeRoute,
+            isCollapsed,
             label: "DASHBOARD",
             nextRoute: "DASHBOARD",
             picto: <HomePicto />,
@@ -34,6 +36,7 @@ const MenuLinks: React.FC = () => {
         {
             active,
             changeRoute,
+            isCollapsed,
             label: "HISTORY",
             nextRoute: "HISTORY",
             picto: <HistoryPicto />,
@@ -42,6 +45,7 @@ const MenuLinks: React.FC = () => {
         {
             active,
             changeRoute,
+            isCollapsed,
             label: "ECOLOGY",
             nextRoute: "ECOLOGY",
             picto: <EarthPicto />,

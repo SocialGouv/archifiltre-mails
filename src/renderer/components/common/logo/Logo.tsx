@@ -4,8 +4,10 @@ import style from "./Logo.module.scss";
 
 export const Logo: React.FC = () => {
     return (
-        <h1 id={style.logo}>
-            <button>archimail</button>
-        </h1>
+        <div id={style.logo}>
+            <h1 className={style.logo__title}>
+                <button>A</button>
+            </h1>
+        </div>
     );
 };
