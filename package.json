@@ -1,5 +1,6 @@
 {
   "name": "archimail",
+  "productName": "Archimail",
   "version": "0.0.1",
   "private": true,
   "description": "Visualisez, triez, et améliorez votre boite mail !",
@@ -46,6 +47,7 @@
   "build": {
     "appId": "fr.gouv.social.fabrique.archimail",
     "artifactName": "archimail-${version}.${ext}",
+    "productName": "Archimail",
     "files": [
       "electron/dist",
       "electron/build/icon.*",

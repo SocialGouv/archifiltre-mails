@@ -14,7 +14,7 @@ interface LinksType {
     changeRoute: (nextRoute: RouteName) => void;
     label: RouteName;
     nextRoute: RouteName;
-    picto: React.FC;
+    picto: React.ReactElement;
     setIsActive: SetIsActiveType;
     isCollapsed: boolean;
 }

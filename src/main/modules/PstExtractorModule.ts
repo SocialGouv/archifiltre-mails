@@ -4,6 +4,8 @@ import {
     PST_PROGRESS_SUBSCRIBE_EVENT,
     PST_STOP_EXTRACT_EVENT,
 } from "@common/constant/event";
+import type { Service } from "@common/modules/container/type";
+import { containerModule } from "@common/modules/ContainerModule";
 import type { Module } from "@common/modules/Module";
 import type {
     PstContent,
@@ -28,6 +30,7 @@ const REGEXP_PST = /\.pst$/i;
 interface ExtractOptions {
     pstFilePath: string;
     depth?: number;
+    noProgress?: boolean;
 }
 
 /**
@@ -51,7 +54,12 @@ export class PstExtractorModule implements Module {
         progressState: PstProgressState
     ) => void;
 
-    constructor(private readonly userConfigService: UserConfigService) {}
+    constructor(private readonly userConfigService: UserConfigService) {
+        containerModule.registerService(
+            "pstExtractorMainService",
+            this.service
+        );
+    }
 
     public async init(): Promise<void> {
         if (this.inited) {
@@ -64,7 +72,6 @@ export class PstExtractorModule implements Module {
         ipcMain.handle(
             PST_EXTRACT_EVENT,
             async (_event, ...args: [ExtractOptions]) => {
-                console.log("ARGS", args);
                 return this.extract(args[0]);
             }
         );
@@ -73,7 +80,7 @@ export class PstExtractorModule implements Module {
         });
 
         this.inited = true;
-        await Promise.resolve();
+        return Promise.resolve();
     }
 
     private async extract(options: ExtractOptions): Promise<PstContent> {
@@ -87,13 +94,11 @@ export class PstExtractorModule implements Module {
         }
         this.working = true;
 
+        const progressReply = options.noProgress ? void 0 : this.progressReply;
+
         console.info("Start extracting...");
         this.pstWorker = new TSWorker(
-            path.resolve(
-                __dirname,
-                "@socialgouv/archimail-pst-extractor",
-                "worker.ts"
-            ),
+            path.resolve(__dirname, "pst-extractor", "worker.ts"),
             {
                 stderr: true,
                 trackUnmanagedFds: true,
@@ -109,13 +114,13 @@ export class PstExtractorModule implements Module {
             this.pstWorker?.on("message", (message: PstWorkerMessageType) => {
                 switch (message.event) {
                     case PST_PROGRESS_WORKER_EVENT:
-                        this.progressReply?.(
+                        progressReply?.(
                             PST_PROGRESS_EVENT,
                             (this.lastProgressState = message.data)
                         );
                         break;
                     case PST_DONE_WORKER_EVENT:
-                        this.progressReply?.(
+                        progressReply?.(
                             PST_PROGRESS_EVENT,
                             (this.lastProgressState = {
                                 ...message.data.progressState,
@@ -158,4 +163,15 @@ export class PstExtractorModule implements Module {
         );
         await this.pstWorker?.terminate();
     }
+
+    public get service(): PstExtractorMainService {
+        return {
+            extract: this.extract.bind(this),
+            name: "PstExtractorMainService",
+        };
+    }
+}
+
+export interface PstExtractorMainService extends Service {
+    extract: typeof PstExtractorModule.prototype["extract"];
 }

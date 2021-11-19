@@ -17,6 +17,7 @@ export interface PstElement {
     children?: PstElement[];
     size: number;
     name: string;
+    id?: string;
 }
 
 export interface PstFolder extends PstElement {

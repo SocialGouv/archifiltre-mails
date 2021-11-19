@@ -1,4 +1,4 @@
-import { IS_DEV, IS_E2E } from "@common/config";
+import { IS_DEV, IS_E2E, IS_MAC } from "@common/config";
 import { loadIsomorphicModules } from "@common/core/isomorphic";
 import { loadModules } from "@common/lib/ModuleManager";
 import { containerModule } from "@common/modules/ContainerModule";
@@ -7,7 +7,9 @@ import path from "path";
 import { URL } from "url";
 
 import { DevToolsModule } from "./modules/DevToolsModule";
+import { MenuModule } from "./modules/MenuModule";
 import { PstExtractorModule } from "./modules/PstExtractorModule";
+import { consoleToRenderService } from "./services/ConsoleToRenderService";
 
 // enable hot reload when needed
 if (module.hot) {
@@ -57,7 +59,7 @@ const createMainWindow = async () => {
 // quit application when all windows are closed
 app.on("window-all-closed", () => {
     // on macOS it is common for applications to stay open until the user explicitly quits
-    if (process.platform !== "darwin") {
+    if (IS_MAC) {
         app.quit();
     }
 });
@@ -72,11 +74,18 @@ app.on("activate", async () => {
 // when electron is ready
 app.on("ready", async () => {
     // load shared/common modules
-    await loadIsomorphicModules();
+    await loadIsomorphicModules([
+        "consoleToRenderService",
+        consoleToRenderService,
+    ]);
     // load "main-process" modules
     await loadModules(
         new DevToolsModule(),
-        new PstExtractorModule(containerModule.get("userConfigService"))
+        new PstExtractorModule(containerModule.get("userConfigService")),
+        new MenuModule(
+            consoleToRenderService,
+            containerModule.get("pstExtractorMainService")
+        )
     );
     // create actual main BrowserWindow
     await createMainWindow();

@@ -147,6 +147,7 @@ function processFolder(
     progressState: PstProgressState
 ): PstFolder {
     const content: PstFolder = {
+        id: randomUUID(),
         name: folder.displayName,
         size: Math.abs(folder.emailCount) || 1,
         type: "folder",
@@ -213,10 +214,10 @@ function processFolder(
                     size: 0,
                     type: "contact",
                 },
+
+                id: randomUUID(),
                 // TODO: change name
-                name: `${email.senderName} ${
-                    email.originalSubject
-                } ${randomUUID()}`,
+                name: `${email.senderName} ${email.originalSubject}`,
                 receivedDate: email.messageDeliveryTime,
                 sentTime: email.clientSubmitTime,
                 size: 0,
@@ -255,26 +256,6 @@ function processFolder(
                         }
 
                         return {
-                            CUSTOM: {
-                                PR_RECIPIENT_DISPLAY_NAME:
-                                    recip.getStringItem(0x5ff6),
-                                PR_RECIPIENT_STATUS: recip.getIntItem(
-                                    0x0e15,
-                                    999
-                                ),
-                                PR_RECIPIENT_TRACKSTATUS:
-                                    recip.getIntItem(0x5fff),
-                                PR_RECIPIENT_TYPE: recip.getIntItem(
-                                    0x0c15,
-                                    998
-                                ),
-                                PR_RECIPIENT_TYPE_RAW:
-                                    getRawItem(recip, 0x0c15) ?? "yolo",
-                                PR_SMTP_ADDRESS_1:
-                                    recip.getStringItem(0x39fe001e),
-                                pidTagReadReceiptSmtpAddress:
-                                    recip.getStringItem(0x5d05),
-                            },
                             addrType: recip.addrType,
                             displayName:
                                 recip.recipientDisplayName || recip.displayName,
@@ -294,8 +275,9 @@ function processFolder(
                     progressState.countAttachement++;
                     progressState.countTotal++;
                     emailContent.children.push({
+                        id: randomUUID(),
                         // TODO: change name
-                        name: `${attachement.displayName} ${randomUUID()}`,
+                        name: attachement.displayName,
                         size: 0,
                         type: "attachement",
                         ...(DEBUG
