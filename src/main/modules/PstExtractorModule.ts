@@ -9,6 +9,7 @@ import { containerModule } from "@common/modules/ContainerModule";
 import type { Module } from "@common/modules/Module";
 import type {
     PstContent,
+    PstExtractTables,
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
 import type { UserConfigService } from "@common/modules/UserConfigModule";
@@ -49,6 +50,12 @@ export class PstExtractorModule implements Module {
 
     private manuallyStoped = false;
 
+    private lastPstExtractTables?: PstExtractTables;
+
+    private lastContent?: PstContent;
+
+    private lastPath = "";
+
     private progressReply?: (
         channel: typeof PST_PROGRESS_EVENT,
         progressState: PstProgressState
@@ -83,7 +90,9 @@ export class PstExtractorModule implements Module {
         return Promise.resolve();
     }
 
-    private async extract(options: ExtractOptions): Promise<PstContent> {
+    private async extract(
+        options: ExtractOptions
+    ): Promise<[PstContent, PstExtractTables]> {
         if (this.working) {
             throw new Error("[PstExtractorService] Extractor already working.");
         }
@@ -92,7 +101,20 @@ export class PstExtractorModule implements Module {
                 `[PstExtractorService] Cannot extract PST from an unknown path or file. Got "${options.pstFilePath}"`
             );
         }
+
+        if (
+            // TODO: change with hash (xxhash or md5, in stream mode)
+            options.pstFilePath === this.lastPath &&
+            this.lastContent &&
+            this.lastPstExtractTables
+        ) {
+            return [this.lastContent, this.lastPstExtractTables];
+        }
+
         this.working = true;
+
+        delete this.lastPstExtractTables;
+        this.lastPath = options.pstFilePath;
 
         const progressReply = options.noProgress ? void 0 : this.progressReply;
 
@@ -110,46 +132,59 @@ export class PstExtractorModule implements Module {
                 } as PstWorkerData,
             }
         );
-        return new Promise<PstContent>((resolve, reject) => {
-            this.pstWorker?.on("message", (message: PstWorkerMessageType) => {
-                switch (message.event) {
-                    case PST_PROGRESS_WORKER_EVENT:
-                        progressReply?.(
-                            PST_PROGRESS_EVENT,
-                            (this.lastProgressState = message.data)
-                        );
-                        break;
-                    case PST_DONE_WORKER_EVENT:
-                        progressReply?.(
-                            PST_PROGRESS_EVENT,
-                            (this.lastProgressState = {
-                                ...message.data.progressState,
-                                progress: false,
-                            })
-                        );
+        return new Promise<[PstContent, PstExtractTables]>(
+            (resolve, reject) => {
+                this.pstWorker?.on(
+                    "message",
+                    (message: PstWorkerMessageType) => {
+                        switch (message.event) {
+                            case PST_PROGRESS_WORKER_EVENT:
+                                progressReply?.(
+                                    PST_PROGRESS_EVENT,
+                                    (this.lastProgressState = message.data)
+                                );
+                                break;
+                            case PST_DONE_WORKER_EVENT:
+                                progressReply?.(
+                                    PST_PROGRESS_EVENT,
+                                    (this.lastProgressState = {
+                                        ...message.data.progressState,
+                                        progress: false,
+                                    })
+                                );
 
-                        this.working = false;
-                        resolve(message.data.content);
-                        console.info("Extract done.");
-                        break;
-                }
-            });
+                                this.working = false;
+                                [this.lastContent, this.lastPstExtractTables] =
+                                    [
+                                        message.data.content,
+                                        message.data.pstExtractTables,
+                                    ];
+                                resolve([
+                                    this.lastContent,
+                                    this.lastPstExtractTables,
+                                ]);
+                                console.info("Extract done.");
+                                break;
+                        }
+                    }
+                );
 
-            this.pstWorker?.on("error", (error) => {
-                this.working = false;
-                reject(error);
-            });
+                this.pstWorker?.on("error", (error) => {
+                    this.working = false;
+                    reject(error);
+                });
 
-            this.pstWorker?.on("exit", (exitCode) => {
-                this.working = false;
-                if (exitCode === 1) {
-                    if (this.manuallyStoped) {
-                        this.manuallyStoped = false;
-                        reject(new Error("Manually stoped by user."));
-                    } else reject("Worker stoped for unknown reason.");
-                }
-            });
-        });
+                this.pstWorker?.on("exit", (exitCode) => {
+                    this.working = false;
+                    if (exitCode === 1) {
+                        if (this.manuallyStoped) {
+                            this.manuallyStoped = false;
+                            reject(new Error("Manually stoped by user."));
+                        } else reject("Worker stoped for unknown reason.");
+                    }
+                });
+            }
+        );
     }
 
     private async stop(): Promise<void> {

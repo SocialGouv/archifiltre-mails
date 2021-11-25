@@ -90,3 +90,5 @@ app.on("ready", async () => {
     // create actual main BrowserWindow
     await createMainWindow();
 });
+
+type Test = Parameters<typeof app["getPath"]>[0];
