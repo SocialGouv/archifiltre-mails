@@ -9,14 +9,13 @@ import { join } from "path";
  */
 export class DevToolsModule implements Module {
     async init(): Promise<void> {
-        const REACT_DEVTOOLS_PATH = join(
-            process.cwd(),
-            "scripts",
-            "out",
-            "react-devtools-extension"
-        );
-
         if (IS_DEV) {
+            const REACT_DEVTOOLS_PATH = join(
+                process.cwd(),
+                "scripts",
+                "out",
+                "react-devtools-extension"
+            );
             if (existsSync(REACT_DEVTOOLS_PATH))
                 await session.defaultSession.loadExtension(
                     REACT_DEVTOOLS_PATH,

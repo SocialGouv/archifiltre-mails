@@ -18,6 +18,7 @@
     "dist:mac": "electron-builder --mac dmg",
     "dist:mac-local": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
     "dist:linux": "electron-builder --linux AppImage",
+    "start": "electron dist/main/main.js",
     "start:mac": "open -n dist/mac-x64/mac/archimail.app",
     "lint": "eslint src/",
     "lint:test": "eslint -c tests/.eslintrc.json 'tests/**/*.ts*'",

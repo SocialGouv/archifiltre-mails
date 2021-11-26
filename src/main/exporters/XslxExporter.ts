@@ -4,6 +4,9 @@ import { utils, writeFile } from "xlsx";
 
 import type { Exporter } from "./Exporter";
 
+/**
+ * Export JSON to Excel .xslx file.
+ */
 export const xlsxExporter: Exporter = {
     async export<T>(obj: T[], path: string) {
         console.log("Generate XLSX");

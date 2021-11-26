@@ -58,11 +58,47 @@ const defaultConfig = {
             files: ["src/renderer/**/*.ts*", "src/common/**/*.ts*"],
         },
         {
+            files: ["src/renderer/**/*.ts"],
+            parserOptions: {
+                project: "./src/renderer/tsconfig.json",
+            },
+            settings: {
+                "import/resolver": {
+                    typescript: {
+                        project: "./src/renderer/tsconfig.json",
+                    },
+                },
+            },
+        },
+        {
+            files: ["src/common/**/*.ts"],
+            parserOptions: {
+                project: "./src/common/tsconfig.json",
+            },
+            settings: {
+                "import/resolver": {
+                    typescript: {
+                        project: "./src/common/tsconfig.json",
+                    },
+                },
+            },
+        },
+        {
             env: {
                 browser: false,
                 node: true,
             },
             files: ["src/main/**/*.ts"],
+            parserOptions: {
+                project: "./src/main/tsconfig.json",
+            },
+            settings: {
+                "import/resolver": {
+                    typescript: {
+                        project: "./src/main/tsconfig.json",
+                    },
+                },
+            },
         },
         {
             files: "src/**/*.ts*",
