@@ -50,3 +50,5 @@ export class MenuModule implements Module {
         return Promise.resolve();
     }
 }
+
+// TODO: reload menu
