@@ -129,8 +129,6 @@ if (parentPort) {
     } as PstContent;
     content.name = pstFile.getMessageStore().displayName;
 
-    // TODO: postProcess(content); // real email count, ...
-
     progressState.elapsed = Date.now() - starTime;
     postMessage(PST_DONE_WORKER_EVENT, {
         content,
@@ -157,7 +155,8 @@ function processFolder(
 ): PstFolder {
     const content: PstFolder = {
         emailCount: folder.emailCount,
-        folderType: ["Generic", "Root", "Search"][folder.folderType],
+        folderType:
+            ["Generic", "Root", "Search"][folder.folderType] ?? "Generic",
         id: randomUUID(),
         name: folder.displayName,
         size: Math.abs(folder.emailCount) || 1,

@@ -8,6 +8,7 @@ import type { Service } from "@common/modules/container/type";
 import { containerModule } from "@common/modules/ContainerModule";
 import type { Module } from "@common/modules/Module";
 import type {
+    ExtractOptions,
     PstContent,
     PstExtractTables,
     PstProgressState,
@@ -27,12 +28,6 @@ import {
 } from "./pst-extractor/worker";
 
 const REGEXP_PST = /\.pst$/i;
-
-interface ExtractOptions {
-    pstFilePath: string;
-    depth?: number;
-    noProgress?: boolean;
-}
 
 /**
  * Module responsible of handling and extracting datas from given PST files.

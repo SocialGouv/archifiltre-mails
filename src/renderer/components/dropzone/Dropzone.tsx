@@ -27,7 +27,7 @@ export const Dropzone: React.FC<DropzoneProps> = ({ accept, onDrop }) => {
                 <span todo-i18n="true">Votre fichier doit être un .pst</span>
             </div>
             <div
-                className={getClassName(style["dropzone-area"], isDragActive)}
+                className={getClassName(style["dropzone-area"]!, isDragActive)}
                 {...getRootProps()}
             >
                 <input

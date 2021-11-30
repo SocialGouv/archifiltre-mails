@@ -68,3 +68,5 @@ export type DirectOrUnpackedChainedSubKeyOf<T> = {
 }[keyof T];
 
 export type KeyAndSubKeyOf<T> = DirectOrUnpackedChainedSubKeyOf<T> | keyof T;
+
+export type SimpleObject = Record<string, unknown>;

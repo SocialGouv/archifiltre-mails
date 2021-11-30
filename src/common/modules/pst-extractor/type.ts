@@ -1,3 +1,9 @@
+export interface ExtractOptions {
+    pstFilePath: string;
+    depth?: number;
+    noProgress?: boolean;
+}
+
 export type PstElementType =
     | "attachement"
     | "calendar"
@@ -91,23 +97,3 @@ export interface PstExtractTables {
      */
     emails: Map<string, PstEmail[]>;
 }
-/* eslint-disable @typescript-eslint/naming-convention */
-// eslint-disable-next-line @typescript-eslint/no-namespace -- All outlook sub types grouped
-export namespace Outlook {
-    export const enum AcknowledgementMode {
-        MANUAL = 0,
-        AUTOMATIC = 1,
-    }
-
-    export const enum Importance {
-        LOW = 0,
-        NORMAL = 1,
-        HIGH = 2,
-    }
-
-    export const enum RecipientType {
-        TO = 1,
-        CC = 2,
-    }
-}
-/* eslint-enable @typescript-eslint/naming-convention */

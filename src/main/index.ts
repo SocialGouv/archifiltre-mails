@@ -11,7 +11,7 @@ import { AppModule } from "./modules/AppModule";
 import { DevToolsModule } from "./modules/DevToolsModule";
 import { MenuModule } from "./modules/MenuModule";
 import { PstExtractorModule } from "./modules/PstExtractorModule";
-import { consoleToRenderService } from "./services/ConsoleToRendererService";
+import { consoleToRendererService } from "./services/ConsoleToRendererService";
 
 export type MainWindowRetriever = () => Promise<BrowserWindow>;
 
@@ -68,7 +68,6 @@ const mainWindowRetriever: MainWindowRetriever = async () =>
     new Promise<BrowserWindow>((ok) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- Because custom event
         app.on(MAIN_WINDOW_CREATED_EVENT as Any, () => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Window is definitly defined at this step
             ok(mainWindow!);
         });
     });
@@ -77,7 +76,7 @@ const mainWindowRetriever: MainWindowRetriever = async () =>
 app.on("ready", async () => {
     // load shared/common modules
     const isomorphicModules = getIsomorphicModules(
-        ["consoleToRenderService", consoleToRenderService],
+        ["consoleToRendererService", consoleToRendererService],
         ["mainWindowRetriever", mainWindowRetriever]
     );
     // load "main-process" modules
@@ -87,7 +86,7 @@ app.on("ready", async () => {
         new DevToolsModule(),
         new PstExtractorModule(containerModule.get("userConfigService")),
         new MenuModule(
-            consoleToRenderService,
+            consoleToRendererService,
             containerModule.get("pstExtractorMainService")
         )
     );

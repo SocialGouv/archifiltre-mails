@@ -31,7 +31,7 @@ const commonProperties: CirclePackingCommonProps = {
     // height: CIRCLE_PACKING_VALUES_HEIGHT, // not used in responsive mode
     // width: CIRCLE_PACKING_VALUES_WIDTH, // not used in responsive mode
     enableLabels: true,
-    id: "name",
+    id: "id",
     labelsSkipRadius: CIRCLE_PACKING_VALUES_LABELSSKIPRADIUS,
     motionConfig: CIRCLE_PACKING_VALUES_MOTIONCONFIG,
     padding: CIRCLE_PACKING_VALUES_PADDING,
@@ -85,7 +85,7 @@ export const CirclePacking: React.FC<CirclePackingProps> = ({ closer }) => {
     );
 
     return (
-        <LayoutWorkspace className={style["circle-packing"]}>
+        <LayoutWorkspace className={style["circle-packing"]!}>
             {/* TODO: Extract views from this logic component, do ResponsiveCirclePacking outside comp */}
             {!extractedFile && (
                 <>

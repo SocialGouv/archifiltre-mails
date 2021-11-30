@@ -12,9 +12,9 @@ export interface ConsoleToRendererService extends Service {
 /**
  * Simple back service that send console.log's to renderer.
  */
-export const consoleToRenderService: ConsoleToRendererService = {
+export const consoleToRendererService: ConsoleToRendererService = {
     log(browserWindow: BrowserWindow, ...args) {
         browserWindow.webContents.send(CONSOLE_LOG_EVENT, ...args);
     },
-    name: "ConsoleToRenderService",
+    name: "ConsoleToRendererService",
 };

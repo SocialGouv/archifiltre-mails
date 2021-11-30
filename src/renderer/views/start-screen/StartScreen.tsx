@@ -13,13 +13,15 @@ export const StartScreen: React.FC = () => {
 
     const onDrop = useCallback(
         (acceptedFiles: File[]) => {
-            changePath(acceptedFiles[0].path);
-            changeRoute("DASHBOARD");
+            if (acceptedFiles[0]) {
+                changePath(acceptedFiles[0].path);
+                changeRoute("DASHBOARD");
+            }
         },
         [changePath, changeRoute]
     );
     return (
-        <LayoutWorkspace className={style["start-screen"]}>
+        <LayoutWorkspace className={style["start-screen"]!}>
             <Dropzone onDrop={onDrop} accept={ACCEPTED_EXTENSION} />
         </LayoutWorkspace>
     );

@@ -53,20 +53,25 @@ export class DebugMenu implements ArchimailMenu {
                             properties: ["openFile", "showHiddenFiles"],
                         });
 
+                        if (!dialogReturn.filePaths[0]) {
+                            return;
+                        }
+
                         const pstFilePath = (this.lastPstFilePath =
                             dialogReturn.filePaths[0]);
 
                         if (pstFilePath) {
+                            disableMenus(this.id);
                             await this.extractAndLogPst(
                                 browserWindow,
                                 pstFilePath
                             );
+                            enableMenus(
+                                this.id,
+                                EXPORT_LAST_PST_MENU_ID,
+                                OPEN_AND_CONSOLE_LAST_PST_MENU_ID
+                            );
                         }
-
-                        enableMenus(
-                            OPEN_AND_CONSOLE_LAST_PST_MENU_ID,
-                            EXPORT_LAST_PST_MENU_ID
-                        );
                     },
                     label: "Open and console log PST file...",
                 },
@@ -89,6 +94,7 @@ export class DebugMenu implements ArchimailMenu {
                     label: `Open and console log last PST file`,
                 },
                 {
+                    id: EXPORT_LAST_PST_MENU_ID,
                     label: `Export last file...`,
                     submenu: exporterType.map((exportType) => ({
                         click: async (_menuItem, browserWindow, _event) => {
@@ -99,8 +105,8 @@ export class DebugMenu implements ArchimailMenu {
                                 );
                             }
                         },
-                        enabled: false,
-                        id: EXPORT_LAST_PST_MENU_ID,
+                        enabled: true,
+                        id: `${EXPORT_LAST_PST_MENU_ID}_${exportType.toUpperCase()}`,
                         label: exportType.toUpperCase(),
                     })),
                 },
@@ -113,14 +119,12 @@ export class DebugMenu implements ArchimailMenu {
         browserWindow: BrowserWindow,
         pstFilePath: string
     ): Promise<void> {
-        disableMenus(this.id);
         const [content, tables] = await this.pstExtractorMainService.extract({
             noProgress: true,
             pstFilePath,
         });
         this.consoleToRendererService.log(browserWindow, content);
         this.consoleToRendererService.log(browserWindow, tables);
-        enableMenus(this.id);
     }
 
     private async exportLast(

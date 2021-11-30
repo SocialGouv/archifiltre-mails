@@ -6,6 +6,7 @@ import {
 } from "@common/constant/event";
 import type { Service } from "@common/modules/container/type";
 import type {
+    ExtractOptions,
     PstContent,
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
@@ -18,16 +19,8 @@ export interface PstExtractorService extends Service {
      * Extract the content of a PST.
      *
      * The work is done in a worker thread in the main process.
-     *
-     * @param options List of extract options
-     * @param options.pstFilePath The pst file path. Must be absolute!
-     * @param options.depth The folder depth where the extract should stop
-     * @returns The content of the PST
      */
-    extract: (options: {
-        pstFilePath: string;
-        depth?: number;
-    }) => Promise<PstContent>;
+    extract: (options: ExtractOptions) => Promise<PstContent>;
     /**
      * Trigger a callback on each progress tick. (a tick is based on the progress interval)
      *

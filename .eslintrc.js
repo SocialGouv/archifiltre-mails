@@ -13,6 +13,7 @@ const typescriptConfig = {
     rules: {
         "@typescript-eslint/consistent-type-imports": "error",
         "@typescript-eslint/no-misused-promises": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-unused-vars": "off",
         "import/default": "off",
         "no-unused-vars": "off",

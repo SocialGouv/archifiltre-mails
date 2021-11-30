@@ -5,6 +5,7 @@
       "ES2021",
       "DOM"
     ],
+    "noUncheckedIndexedAccess": true,
     "jsx": "react",
     "target": "ES2016",
     "baseUrl": ".",
