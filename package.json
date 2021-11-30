@@ -122,7 +122,7 @@
     "@nivo/circle-packing": "^0.74.0",
     "@nivo/core": "^0.74.0",
     "@nivo/generators": "^0.74.0",
-    "@socialgouv/archimail-pst-extractor": "^0.0.1",
+    "@socialgouv/archimail-pst-extractor": "^0.0.2",
     "d3": "^7.1.1",
     "electron-store": "^8.0.1",
     "json2csv": "^5.0.6",
