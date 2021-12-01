@@ -14,6 +14,7 @@ import { IsomorphicModule } from "./Module";
 interface UserConfigV1 {
     collectData: boolean;
     locale: Locale;
+    extractProgressDelay: number;
 }
 
 /**
@@ -39,9 +40,9 @@ declare global {
     var _configId: string | undefined;
 }
 
-const CONFIG_INIT_EVENT = "config.init";
-const CONFIG_UPDATE_EVENT = "config.update";
-const CONFIG_ASK_UPDATE_EVENT = "config.askUpdate";
+const CONFIG_INIT_EVENT = "config.event.init";
+const CONFIG_UPDATE_EVENT = "config.event.update";
+const CONFIG_ASK_UPDATE_EVENT = "config.event.askUpdate";
 
 /**
  * Isomorphic module handling user config. Use `electron-store` under the hood on main side.
@@ -70,6 +71,7 @@ export class UserConfigModule extends IsomorphicModule {
                 clearInvalidConfig: true,
                 defaults: {
                     collectData: true,
+                    extractProgressDelay: 1500,
                     locale: validLocale(app.getLocale()),
                 },
                 name:
@@ -80,6 +82,11 @@ export class UserConfigModule extends IsomorphicModule {
                     collectData: {
                         default: true,
                         type: "boolean",
+                    },
+                    extractProgressDelay: {
+                        default: 1500,
+                        minimum: 500,
+                        type: "integer",
                     },
                     locale: {
                         default: DEFAULT_LOCALE,

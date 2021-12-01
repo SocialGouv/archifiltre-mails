@@ -4,7 +4,10 @@
 
 import "@testing-library/jest-dom";
 
+// import { counter } from "@common/counter";
 // import { Button } from "@renderer/components/Button";
+// import { render, screen } from "@testing-library/react";
+// import React from "react";
 
 describe("App can count", () => {
     it.skip("should count", async () => {

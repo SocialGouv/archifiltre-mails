@@ -68,7 +68,7 @@ class ContainerModule extends IsomorphicModule {
         await Promise.all(
             [...isomorphicServiceMap.values(), ...serviceMap.values()]
                 .map((service) => {
-                    console.log(
+                    console.info(
                         `[ContainerModule] ${
                             (service as Service).name
                         } loading !`

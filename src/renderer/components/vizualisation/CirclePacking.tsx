@@ -14,32 +14,28 @@ import style from "./CirclePacking.module.scss";
 interface CirclePackingProps {
     closer: () => void;
 }
-interface CirclePackingCommonProps {
-    height: number;
+type CirclePackingCommonProps = Partial<
+    Parameters<typeof ResponsiveCirclePacking>[0]
+> & {
     id: keyof PstContent;
-    labelsSkipRadius: number;
-    padding: number;
     value: keyof PstContent;
-    width: number;
-    enableLabels: boolean;
-    motionConfig: string;
-}
+};
 
-const CIRCLE_PACKING_VALUES_HEIGHT = 500;
+// const CIRCLE_PACKING_VALUES_HEIGHT = 500;
 const CIRCLE_PACKING_VALUES_LABELSSKIPRADIUS = 16;
 const CIRCLE_PACKING_VALUES_PADDING = 2;
-const CIRCLE_PACKING_VALUES_WIDTH = 900;
+// const CIRCLE_PACKING_VALUES_WIDTH = 900;
 const CIRCLE_PACKING_VALUES_MOTIONCONFIG = "slow";
 
 const commonProperties: CirclePackingCommonProps = {
+    // height: CIRCLE_PACKING_VALUES_HEIGHT, // not used in responsive mode
+    // width: CIRCLE_PACKING_VALUES_WIDTH, // not used in responsive mode
     enableLabels: true,
-    height: CIRCLE_PACKING_VALUES_HEIGHT,
-    id: "name",
+    id: "id",
     labelsSkipRadius: CIRCLE_PACKING_VALUES_LABELSSKIPRADIUS,
     motionConfig: CIRCLE_PACKING_VALUES_MOTIONCONFIG,
     padding: CIRCLE_PACKING_VALUES_PADDING,
-    value: "contentSize",
-    width: CIRCLE_PACKING_VALUES_WIDTH,
+    value: "size",
 };
 
 interface Node {
@@ -51,7 +47,7 @@ export const CirclePacking: React.FC<CirclePackingProps> = ({ closer }) => {
     const [zoomedId, setZoomedId] = useState<string>("");
     const [extractedFile, setExtractedFile] = useState<PstContent>();
     const [infos, setInfos] = useState<PstProgressState>();
-    const { path } = usePathContext();
+    const { path: pstFilePath } = usePathContext();
     const pstExtractorService = useService("pstExtractorService");
 
     // TODO: Create a hook for Escape key handler to closer overlay
@@ -69,11 +65,15 @@ export const CirclePacking: React.FC<CirclePackingProps> = ({ closer }) => {
     }, [closer]);
 
     useEffect(() => {
-        void (async () => {
-            const pstExtractedFile = await pstExtractorService?.extract(path);
-            setExtractedFile(pstExtractedFile);
-        })();
-    }, [pstExtractorService, path]);
+        if (pstFilePath) {
+            void (async () => {
+                const pstExtractedFile = await pstExtractorService?.extract({
+                    pstFilePath,
+                });
+                setExtractedFile(pstExtractedFile);
+            })();
+        }
+    }, [pstExtractorService, pstFilePath]);
 
     pstExtractorService?.onProgress(setInfos);
 
@@ -85,7 +85,7 @@ export const CirclePacking: React.FC<CirclePackingProps> = ({ closer }) => {
     );
 
     return (
-        <LayoutWorkspace className={style["circle-packing"]}>
+        <LayoutWorkspace className={style["circle-packing"]!}>
             {/* TODO: Extract views from this logic component, do ResponsiveCirclePacking outside comp */}
             {!extractedFile && (
                 <>

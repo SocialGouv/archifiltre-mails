@@ -18,6 +18,7 @@
     "dist:mac": "electron-builder --mac dmg",
     "dist:mac-local": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
     "dist:linux": "electron-builder --linux AppImage",
+    "start": "electron dist/main/main.js",
     "start:mac": "open -n dist/mac-x64/mac/archimail.app",
     "lint": "eslint src/",
     "lint:test": "eslint -c tests/.eslintrc.json 'tests/**/*.ts*'",
@@ -29,6 +30,7 @@
     "test:e2e": "playwright test"
   },
   "electronWebpack": {
+    "title": true,
     "main": {
       "webpackConfig": "webpack.main.config.js"
     },
@@ -46,6 +48,7 @@
   "build": {
     "appId": "fr.gouv.social.fabrique.archimail",
     "artifactName": "archimail-${version}.${ext}",
+    "productName": "Archimail",
     "files": [
       "electron/dist",
       "electron/build/icon.*",
@@ -82,6 +85,7 @@
     "@tsconfig/node14": "^1.0.1",
     "@types/d3": "^7.1.0",
     "@types/jest": "^27.0.3",
+    "@types/json2csv": "^5.0.3",
     "@types/node": "14",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
@@ -90,7 +94,7 @@
     "@types/webpack": "4",
     "axios": "^0.24.0",
     "cross-env": "^7.0.3",
-    "electron": "^15.3.2",
+    "electron": "^16.0.2",
     "electron-builder": "^22.13.1",
     "electron-notarize": "^1.1.1",
     "electron-webpack": "^2.8.2",
@@ -108,7 +112,7 @@
     "sass-loader": "10",
     "stylelint": "^14.0.1",
     "stylelint-config-sass-guidelines": "^9.0.1",
-    "stylelint-config-standard": "^23.0.0",
+    "stylelint-config-standard": "^24.0.0",
     "ts-jest": "^27.0.7",
     "typescript": "^4.4.4",
     "unzip-crx-3": "^0.2.0",
@@ -118,15 +122,17 @@
     "@nivo/circle-packing": "^0.74.0",
     "@nivo/core": "^0.74.0",
     "@nivo/generators": "^0.74.0",
+    "@socialgouv/archimail-pst-extractor": "^0.0.2",
     "d3": "^7.1.1",
     "electron-store": "^8.0.1",
+    "json2csv": "^5.0.6",
     "normalize.css": "^8.0.1",
-    "pst-extractor": "^1.8.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-dropzone": "^11.4.2",
     "source-map-support": "^0.5.21",
     "ts-node": "^10.4.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "xlsx": "^0.17.4"
   }
 }

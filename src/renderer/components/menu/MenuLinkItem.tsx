@@ -9,7 +9,7 @@ import type { SetIsActiveType } from "./MenuLinks";
 
 interface MenuLinkItemProps {
     label: RouteName;
-    picto: React.FC;
+    picto: React.ReactElement;
     active: string;
     nextRoute: RouteName;
     setIsActive: SetIsActiveType;

@@ -50,14 +50,14 @@ const PSTAnalyticsDatas: DashboardAnalyticsInfosProps[] = [
 
 export const Dashboard: React.FC = () => {
     return (
-        <Layout className={style.dashboard} title="Dashboard">
+        <Layout className={style.dashboard!} title="Dashboard">
             <h2>Global</h2>
             <DashboardGlobalInfos />
 
             <h2>Informations</h2>
-            <DashboardAnalyticsInfos {...PSTAnalyticsDatas[0]} />
-            <DashboardAnalyticsInfos {...PSTAnalyticsDatas[1]} />
-            <DashboardAnalyticsInfos {...PSTAnalyticsDatas[2]} />
+            <DashboardAnalyticsInfos {...PSTAnalyticsDatas[0]!} />
+            <DashboardAnalyticsInfos {...PSTAnalyticsDatas[1]!} />
+            <DashboardAnalyticsInfos {...PSTAnalyticsDatas[2]!} />
         </Layout>
     );
 };
