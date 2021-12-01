@@ -49,10 +49,17 @@ export const CirclePacking: React.FC = () => {
     useEffect(() => {
         if (pstFilePath) {
             void (async () => {
-                const pstExtractedFile = await pstExtractorService?.extract({
-                    pstFilePath,
-                });
-                setExtractedFile(pstExtractedFile);
+                if (pstExtractorService) {
+                    const [pstExtractedFile, _extractTables] =
+                        await pstExtractorService.extract({
+                            pstFilePath,
+                        });
+                    // const total = [...extractTables..values()].reduce(
+                    //     (pcount, cemails) => cemails.length + pcount,
+                    //     0
+                    // );
+                    setExtractedFile(pstExtractedFile);
+                }
             })();
         }
     }, [pstExtractorService, pstFilePath]);
