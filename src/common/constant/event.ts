@@ -1,4 +1,7 @@
-export const PST_EXTRACT_EVENT = "pstExtractorService.extract";
-export const PST_PROGRESS_EVENT = "pstExtractorService.progress";
+export const PST_EXTRACT_EVENT = "pstExtractor.event.extract";
+export const PST_PROGRESS_EVENT = "pstExtractor.event.progress";
 export const PST_PROGRESS_SUBSCRIBE_EVENT =
-    "pstExtractorService.progressSuscribe";
+    "pstExtractor.event.progressSuscribe";
+export const PST_STOP_EXTRACT_EVENT = "pstExtractor.event.stopExtract";
+
+export const CONSOLE_LOG_EVENT = "archimail-console.event.log";

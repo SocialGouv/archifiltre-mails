@@ -23,11 +23,11 @@ export const Dropzone: React.FC<DropzoneProps> = ({ accept, onDrop }) => {
     return (
         <div className={style.dropzone}>
             <div className={style["dropzone-title"]}>
-                <h1 todo-i18n>Téléchargez votre fichier ici</h1>
-                <span todo-i18n>Votre fichier doit être un .pst</span>
+                <h1 todo-i18n="true">Téléchargez votre fichier ici</h1>
+                <span todo-i18n="true">Votre fichier doit être un .pst</span>
             </div>
             <div
-                className={getClassName(style["dropzone-area"], isDragActive)}
+                className={getClassName(style["dropzone-area"]!, isDragActive)}
                 {...getRootProps()}
             >
                 <input
@@ -36,11 +36,11 @@ export const Dropzone: React.FC<DropzoneProps> = ({ accept, onDrop }) => {
                 />
                 <div className={style["dropzone-text"]}>
                     {isDragActive ? (
-                        <p className="dropzone-text-item" todo-i18n>
+                        <p className="dropzone-text-item" todo-i18n="true">
                             Lâchez pour téléverser les fichiers
                         </p>
                     ) : (
-                        <p className="dropzone-text-item" todo-i18n>
+                        <p className="dropzone-text-item" todo-i18n="true">
                             Cliquez ou glissez-déposez vos fichiers ici
                         </p>
                     )}

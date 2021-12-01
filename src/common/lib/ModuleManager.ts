@@ -8,6 +8,7 @@ import type { Module } from "../modules/Module";
 export const loadModules = async (...mods: Module[]): Promise<void> => {
     await Promise.all(
         mods.map(async (mod) => {
+            console.log(`<MODULE_LOADER> ${mod.constructor.name} loading !`);
             await mod.init().catch((error) => {
                 throw new Error(
                     `<MODULE_ERROR> ${mod.constructor.name} failed init.\n${error}`

@@ -1,6 +1,6 @@
-import { loadModules } from "../lib/ModuleManager";
 import type { ServiceKeys, ServicesConfig } from "../modules/container/type";
 import { containerModule } from "../modules/ContainerModule";
+import type { Module } from "../modules/Module";
 import { IsomorphicModuleFactory } from "../modules/Module";
 import { UserConfigModule } from "../modules/UserConfigModule";
 import type { UnknownMapping } from "../utils/type";
@@ -10,11 +10,11 @@ import type { UnknownMapping } from "../utils/type";
  *
  * @param additionalServices Optional additional services to register before loading modules
  */
-export const loadIsomorphicModules = async <
+export const getIsomorphicModules = <
     TNames extends (ServiceKeys | UnknownMapping)[]
 >(
     ...additionalServices: ServicesConfig<TNames>
-): Promise<void> => {
+): Module[] => {
     const userConfigModule =
         IsomorphicModuleFactory.getInstance(UserConfigModule);
     containerModule.registerServices([
@@ -23,5 +23,5 @@ export const loadIsomorphicModules = async <
     ]);
 
     containerModule.registerServices(...additionalServices);
-    await loadModules(containerModule, userConfigModule);
+    return [containerModule, userConfigModule];
 };

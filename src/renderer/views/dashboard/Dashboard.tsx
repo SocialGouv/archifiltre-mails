@@ -3,6 +3,7 @@ import React from "react";
 
 import { ImportPicto } from "../../../renderer/components/common/pictos/picto";
 import { CirclePacking } from "../../../renderer/components/vizualisation/CirclePacking";
+import { StaticImage } from "../../components/common/staticImage/StaticImage";
 import style from "./Dashboard.module.scss";
 
 interface CardProps {
@@ -84,7 +85,7 @@ export const DashboardInformations: FC = () => {
 export const DashboardImpactItem: FC = () => (
     <div className="dashboard__impact__item">
         <div className="dashboard__impact__item__picto">
-            <img src={globe} alt="globe" />
+            <StaticImage src="pictos/globe.png" alt="globe" />
         </div>
         <div className="dashboard__impact__item__infos">
             <span>25go</span>

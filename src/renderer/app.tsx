@@ -8,15 +8,13 @@ import { PathContextProvider } from "./context/PathContext";
 import { RouteContextProvider } from "./context/RouterContext";
 import { Views } from "./views";
 
-export const App: React.FC = () => {
-    return (
-        <main>
-            <PathContextProvider>
-                <RouteContextProvider>
-                    <Menu />
-                    <Views />
-                </RouteContextProvider>
-            </PathContextProvider>
-        </main>
-    );
-};
+export const App: React.FC = () => (
+    <main>
+        <PathContextProvider>
+            <RouteContextProvider>
+                <Menu />
+                <Views />
+            </RouteContextProvider>
+        </PathContextProvider>
+    </main>
+);

@@ -9,32 +9,29 @@ import React, { useCallback, useEffect, useState } from "react";
 import { usePathContext } from "../../context/PathContext";
 import style from "./CirclePacking.module.scss";
 
-interface CirclePackingCommonProps {
-    height: number;
+type CirclePackingCommonProps = Partial<
+    Parameters<typeof ResponsiveCirclePacking>[0]
+> & {
     id: keyof PstContent;
-    labelsSkipRadius: number;
-    padding: number;
     value: keyof PstContent;
-    width: number;
-    enableLabels: boolean;
-    motionConfig: string;
-}
+};
 
-const CIRCLE_PACKING_VALUES_HEIGHT = 500;
+// const CIRCLE_PACKING_VALUES_HEIGHT = 500;
 const CIRCLE_PACKING_VALUES_LABELSSKIPRADIUS = 16;
 const CIRCLE_PACKING_VALUES_PADDING = 2;
 const CIRCLE_PACKING_VALUES_WIDTH = window.innerWidth / 3;
+// const CIRCLE_PACKING_VALUES_WIDTH = 900;
 const CIRCLE_PACKING_VALUES_MOTIONCONFIG = "slow";
 
 const commonProperties: CirclePackingCommonProps = {
+    // height: CIRCLE_PACKING_VALUES_HEIGHT, // not used in responsive mode
+    // width: CIRCLE_PACKING_VALUES_WIDTH, // not used in responsive mode
     enableLabels: true,
-    height: CIRCLE_PACKING_VALUES_HEIGHT,
-    id: "name",
+    id: "id",
     labelsSkipRadius: CIRCLE_PACKING_VALUES_LABELSSKIPRADIUS,
     motionConfig: CIRCLE_PACKING_VALUES_MOTIONCONFIG,
     padding: CIRCLE_PACKING_VALUES_PADDING,
-    value: "contentSize",
-    width: CIRCLE_PACKING_VALUES_WIDTH,
+    value: "size",
 };
 
 interface Node {
@@ -46,15 +43,19 @@ export const CirclePacking: React.FC = () => {
     const [zoomedId, setZoomedId] = useState<string>("");
     const [extractedFile, setExtractedFile] = useState<PstContent>();
     const [infos, setInfos] = useState<PstProgressState>();
-    const { path, changePath } = usePathContext();
+    const { path: pstFilePath, changePath } = usePathContext();
     const pstExtractorService = useService("pstExtractorService");
 
     useEffect(() => {
-        void (async () => {
-            const pstExtractedFile = await pstExtractorService?.extract(path);
-            setExtractedFile(pstExtractedFile);
-        })();
-    }, [pstExtractorService, path]);
+        if (pstFilePath) {
+            void (async () => {
+                const pstExtractedFile = await pstExtractorService?.extract({
+                    pstFilePath,
+                });
+                setExtractedFile(pstExtractedFile);
+            })();
+        }
+    }, [pstExtractorService, pstFilePath]);
 
     pstExtractorService?.onProgress(setInfos);
 
