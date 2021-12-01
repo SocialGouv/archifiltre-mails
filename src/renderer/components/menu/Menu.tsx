@@ -6,7 +6,7 @@ import { Arrow } from "./MenuArrow";
 import MenuLinks from "./MenuLinks";
 
 export const Menu: React.FC = () => {
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(true);
     const collapseMenu = () => {
         setIsCollapsed((state) => !state);
     };

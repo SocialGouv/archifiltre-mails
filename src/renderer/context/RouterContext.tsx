@@ -21,7 +21,7 @@ const initialRouteState: RouteContextInterface = {
 const RouteContext = createContext<RouteContextInterface>(initialRouteState);
 
 const RouteContextProvider: React.FC = ({ children }) => {
-    const [route, setRoute] = useState<RouteName>("START_SCREEN");
+    const [route, setRoute] = useState<RouteName>("DASHBOARD");
 
     const changeRoute = useCallback((nextRoute: RouteName) => {
         setRoute(nextRoute);

@@ -23,28 +23,12 @@
   pointer-events: none;
 }
 
-.close {
-  position: absolute;
-  top: 2rem;
-  right: 2rem;
-}
-
-// .bubble-element {
-//   position: absolute;
-//   left: 50%;
-//   top: 50%;
-//   transform: translate(-50%, -50%);
-// }
-
 .spinner {
-  width: 30px;
-  height: 30px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
   border: solid 4px #2051a3;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  transform: translate(-50%, -50%);
+
   &:after {
     content: "";
     width: 7px;
@@ -52,28 +36,22 @@
     position: absolute;
     top: -3px;
     left: 0;
-    background: white;
     border-radius: 50%;
+    background: #d1dbec;
   }
-  animation: loading 2s linear infinite;
+  animation: spin 2s linear infinite;
 }
 
 .circle-packing {
-  svg {
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%, 50%);
-  }
+  width: calc(100% - 300px);
+  height: 500px;
+
   .circle-packing-pst-infos {
-    position: absolute;
-    top: 64%;
-    left: 51%;
     text-align: center;
-    transform: translate(-50%, -50%);
   }
 }
 
-@keyframes loading {
+@keyframes spin {
   from {
     transform: rotate(0deg);
   }

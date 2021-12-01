@@ -7,13 +7,8 @@ import { ResponsiveCirclePacking } from "@nivo/circle-packing";
 import React, { useCallback, useEffect, useState } from "react";
 
 import { usePathContext } from "../../context/PathContext";
-import { LayoutWorkspace } from "../common/layout/LayoutWorkspace";
-import { ClosePicto } from "../common/pictos/picto";
 import style from "./CirclePacking.module.scss";
 
-interface CirclePackingProps {
-    closer: () => void;
-}
 interface CirclePackingCommonProps {
     height: number;
     id: keyof PstContent;
@@ -28,7 +23,7 @@ interface CirclePackingCommonProps {
 const CIRCLE_PACKING_VALUES_HEIGHT = 500;
 const CIRCLE_PACKING_VALUES_LABELSSKIPRADIUS = 16;
 const CIRCLE_PACKING_VALUES_PADDING = 2;
-const CIRCLE_PACKING_VALUES_WIDTH = 900;
+const CIRCLE_PACKING_VALUES_WIDTH = window.innerWidth / 3;
 const CIRCLE_PACKING_VALUES_MOTIONCONFIG = "slow";
 
 const commonProperties: CirclePackingCommonProps = {
@@ -47,26 +42,12 @@ interface Node {
 }
 type ZoomFunction = (node: Node) => void;
 
-export const CirclePacking: React.FC<CirclePackingProps> = ({ closer }) => {
+export const CirclePacking: React.FC = () => {
     const [zoomedId, setZoomedId] = useState<string>("");
     const [extractedFile, setExtractedFile] = useState<PstContent>();
     const [infos, setInfos] = useState<PstProgressState>();
-    const { path } = usePathContext();
+    const { path, changePath } = usePathContext();
     const pstExtractorService = useService("pstExtractorService");
-
-    // TODO: Create a hook for Escape key handler to closer overlay
-    useEffect(() => {
-        const handleCloser = (event: KeyboardEvent) => {
-            if (event.code === "Escape") {
-                closer();
-            }
-        };
-        window.addEventListener("keydown", handleCloser);
-
-        return () => {
-            window.removeEventListener("keydown", handleCloser);
-        };
-    }, [closer]);
 
     useEffect(() => {
         void (async () => {
@@ -84,8 +65,14 @@ export const CirclePacking: React.FC<CirclePackingProps> = ({ closer }) => {
         [zoomedId]
     );
 
+    // testing purpose
+    const updatePath = () => {
+        changePath("/Users/mehdi/Documents/PST/sample-s.pst");
+    };
+    //
+
     return (
-        <LayoutWorkspace className={style["circle-packing"]}>
+        <div className={style["circle-packing"]}>
             {/* TODO: Extract views from this logic component, do ResponsiveCirclePacking outside comp */}
             {!extractedFile && (
                 <>
@@ -113,9 +100,27 @@ export const CirclePacking: React.FC<CirclePackingProps> = ({ closer }) => {
                     {...commonProperties}
                 />
             )}
-            <button className={style.close} onClick={closer}>
-                <ClosePicto />
+
+            <button
+                style={{ position: "absolute", right: 0, top: 0 }}
+                onClick={updatePath}
+            >
+                Update path
             </button>
-        </LayoutWorkspace>
+        </div>
     );
 };
+
+// TODO: Create a hook for Escape key handler to closer overlay
+// useEffect(() => {
+//     const handleCloser = (event: KeyboardEvent) => {
+//         if (event.code === "Escape") {
+//             closer();
+//         }
+//     };
+//     window.addEventListener("keydown", handleCloser);
+
+//     return () => {
+//         window.removeEventListener("keydown", handleCloser);
+//     };
+// }, [closer]);

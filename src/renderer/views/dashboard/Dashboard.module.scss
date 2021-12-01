@@ -1,123 +1,215 @@
+$background-color-white: #fcfbfb;
+
+$dashboard-actions-bar: calc(75px + 2rem);
+$dashboard-breadcrumb-height: 30px;
+$dashboard-card-padding: 2rem 3rem;
+
 .dashboard {
-  .general {
-    height: auto;
+  width: 100%;
+}
+
+.dashboard__cards {
+  height: 100%;
+  display: flex;
+}
+
+.card {
+  margin: 10px;
+  padding: $dashboard-card-padding;
+  border-radius: 10px;
+  background: $background-color-white;
+  min-width: 625px;
+
+  .card__title {
+    margin: 0 0 2rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    position: relative;
   }
 
-  h2 {
-    margin: 0 0 2rem;
+  .card__title__color {
+    width: 12px;
+    height: 28px;
+    position: absolute;
+    top: -0.25rem;
+    left: -1.55rem;
+    border-radius: 3px;
+
+    &.purple {
+      background: #cec6fb;
+    }
+    &.green {
+      background: #c6e6d2;
+    }
+
+    &.orange {
+      background: #fadda1;
+    }
+
+    &.blue {
+      background: #e2defc;
+    }
+
+    &.grey {
+      background: #f7d7d7;
+    }
   }
 }
 
-.dashboard__analytics {
-  margin: 0 0 3rem;
+.dashboard__recap {
+  display: flex;
+  flex-wrap: wrap;
 
-  .dashboard__analytics__label {
+  .dashboard__recap__item {
     display: flex;
-    max-width: 950px;
-    font-size: 0.75rem;
-    padding: 1rem;
-    color: #aaa;
-    div:first-child {
-      flex: 1;
-    }
-    div {
-      flex: 2;
-    }
-  }
-  .dashboard__analytics__item {
-    box-shadow: rgb(17 12 46 / 5%) 0px 3px 160px 0px;
-    padding: 1rem;
-    border-radius: 10px;
-    background: #fff;
-    max-width: 950px;
+    margin: 0 2rem 2rem 0;
 
-    .dashboard__analytics__item__detail {
-      height: 75px;
+    .dashboard__recap__picto {
+      width: 50px;
+      height: 50px;
       display: flex;
+      justify-content: center;
       align-items: center;
-      div:first-child {
-        flex: 1;
-        width: 40px;
-        div {
-          width: 45px;
-          height: 45px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex: none;
-          background: #0000ff1f;
-          border-radius: 50%;
-          svg {
-            stroke: blue;
-          }
+      margin-right: 1rem;
+      border: solid 1px black;
+      border-radius: 50%;
+      svg {
+        fill: #000;
+      }
+    }
+
+    .dashboard__recap__informations {
+      span {
+        display: table;
+        font-size: 0.8rem;
+        &:first-child {
+          font-weight: 600;
         }
       }
-      div {
-        flex: 2;
+    }
+  }
+}
+
+.dashboard__actions__bar {
+  width: 100%;
+  height: $dashboard-actions-bar;
+  background: $background-color-white;
+  border-bottom: solid 1px #e7e7e7;
+}
+
+.dashboard__vizualisation {
+  min-width: 700px;
+
+  .dashboard__vizualisation__breadcrumb {
+    height: $dashboard-breadcrumb-height;
+    display: flex;
+    align-items: center;
+    margin: 0 0 2rem;
+    font-size: 0.8rem;
+    .dashboard__vizualisation__breadcrumb__item {
+      position: relative;
+      margin-right: 22.5px;
+
+      &:not(:last-child) {
+        color: #aaa;
+
+        &::after {
+          content: ">";
+          position: absolute;
+          top: 1px;
+          right: -12.5px;
+          font-size: 10px;
+        }
       }
     }
   }
 }
 
-.dashboard__global {
-  display: flex;
-  margin: 0 0 4rem;
+.dashboard__informations {
+  flex: 0;
 }
 
-.dashboard__global__card {
-  width: 150px;
-  height: 150px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  margin-right: 2rem;
-  border-radius: 15px;
-  box-shadow: rgb(17 12 46 / 4%) 0px 3px 20px 0px;
+// $container-padding-x: 5rem;
+// $container-padding-y: 2rem;
+// $dashboard-actions-height: 75px;
+// $dashboard-panel-width: 300px;
+// $dashboard-panel-top: calc($container-padding-y + $dashboard-actions-height);
+// $dashboard-panel-height: calc(
+//   100% - $dashboard-panel-top - $container-padding-y
+// );
+// $dashboard-panel-section-title: 30px;
+// $dashboard-vizualisation-height: calc(
+//   100vh - $dashboard-breadcrumb-height - $dashboard-actions-height -
+//     $container-padding-y * 2
+// );
 
-  span {
-    display: table;
-    &:first-child {
-      color: red;
-    }
-  }
+// .dashboard__actions {
+//   display: flex;
+//   .dashboard__actions__item {
+//     flex: 1;
+//     max-width: 150px;
+//     height: $dashboard-actions-height;
+//     display: flex;
+//     align-items: center;
+//     button {
+//       padding: 0;
+//       font-weight: 600;
+//     }
+//   }
+// }
 
-  svg {
-    margin: 1rem;
-  }
-}
+// .dashboard__interactive {
+//   width: calc(100% - $dashboard-panel-width);
 
-.dashboard__global__card:nth-child(1) {
-  svg {
-    stroke: #d4a448;
-  }
-  background: #fdf4e2;
-}
+//   .dashboard__breadcrumb {
+//     height: $dashboard-breadcrumb-height;
+//     display: flex;
+//     align-items: center;
+//     font-size: 0.8rem;
+//     .dashboard__breadcrumb__item {
+//       position: relative;
+//       margin-right: 22.5px;
 
-.dashboard__global__card:nth-child(2) {
-  svg {
-    stroke: #557c2b;
-  }
-  background: #edf2e9;
-}
+//       &:not(:last-child) {
+//         color: #aaa;
 
-.dashboard__global__card:nth-child(3) {
-  svg {
-    stroke: #5349b7;
-  }
-  background: #e3e3f7;
-}
+//         &::after {
+//           content: ">";
+//           position: absolute;
+//           top: 1px;
+//           right: -12.5px;
+//           font-size: 10px;
+//         }
+//       }
+//     }
+//   }
 
-.dashboard__global__card:nth-child(4) {
-  svg {
-    stroke: #e96935;
-  }
-  background: #fcf0e9;
-}
+//   .dashboard__vizualisation {
+//     width: 100%;
+//     height: $dashboard-vizualisation-height;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//   }
+// }
 
-.dashboard__global__card:nth-child(5) {
-  svg {
-    stroke: #e19a45;
-  }
-  background: #f6f3ed;
-}
+// .dashboard__panel {
+//   width: $dashboard-panel-width;
+//   height: $dashboard-panel-height;
+//   position: absolute;
+//   top: calc($container-padding-y + $dashboard-actions-height);
+//   right: 5rem;
+//   border: solid 1px #ccc;
+
+//   .dashboard__panel__section {
+//     &.isExpand {
+//       height: calc(100% - 3 * 30px);
+//     }
+//     .dashboard__panel__section__title {
+//       width: 100%;
+//       height: $dashboard-panel-section-title;
+//       display: inline-block;
+//       background: #002fe91f;
+//     }
+//   }
+// }

@@ -4,8 +4,14 @@ import style from "./Layout.module.scss";
 
 interface LayoutProps {
     className: string;
-    title: string;
+    title?: string;
 }
+
+const LayoutTitle: React.FC<{ title: string | undefined }> = ({ title }) => (
+    <div className={style.container__title}>
+        <h1>{title}</h1>
+    </div>
+);
 
 export const Layout: React.FC<LayoutProps> = ({
     children,
@@ -13,9 +19,7 @@ export const Layout: React.FC<LayoutProps> = ({
     title,
 }) => (
     <section id={style.container} className={className}>
-        <div className={style.container__title}>
-            <h1>{title}</h1>
-        </div>
+        {title ? <LayoutTitle title={title} /> : null}
         {children}
     </section>
 );
