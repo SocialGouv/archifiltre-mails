@@ -1,11 +1,10 @@
-import { IS_DEV, IS_E2E } from "@common/config";
+import { IS_DEV, IS_DIST_MODE, IS_E2E, IS_PACKAGED } from "@common/config";
 import { getIsomorphicModules } from "@common/core/isomorphic";
 import { loadModules } from "@common/lib/ModuleManager";
 import { containerModule } from "@common/modules/ContainerModule";
 import type { Any } from "@common/utils/type";
 import { app, BrowserWindow, Menu } from "electron";
 import path from "path";
-import { URL } from "url";
 
 import { AppModule } from "./modules/AppModule";
 import { DevToolsModule } from "./modules/DevToolsModule";
@@ -25,13 +24,11 @@ Menu.setApplicationMenu(null);
 /**
  * Stub index.html url for main window. As E2E is not packaged, it needs a direct access to generated file. In dev mode, calling localhost let the dev server handling the file.
  */
-const INDEX_URL = new URL(
-    IS_E2E || !IS_DEV
-        ? `file://${path.join(__dirname, "/../renderer/index.html")}`
-        : `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`
-    // : `file://${path.join(__dirname, "index.html")}/` // Should work but doesn't for some reasons...
-).toString();
-
+const INDEX_URL = IS_PACKAGED()
+    ? `file://${path.join(__dirname, "index.html")}`
+    : IS_E2E || IS_DIST_MODE
+    ? `file://${path.join(__dirname, "/../renderer/index.html")}`
+    : `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`;
 /**
  * Global reference.
  *
