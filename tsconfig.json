@@ -8,8 +8,6 @@
     "noUncheckedIndexedAccess": true,
     "jsx": "react",
     "target": "ES2017",
-    "module": "ESNext",
-    "moduleResolution": "Node",
     "baseUrl": ".",
     "paths": {
       "@common/*": [
