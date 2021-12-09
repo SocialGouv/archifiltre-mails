@@ -1,0 +1,48 @@
+$background-color-white: #fcfbfb;
+
+$dashboard-actions-bar: calc(75px + 2rem);
+$dashboard-breadcrumb-height: 30px;
+$dashboard-card-padding: 2rem 3rem;
+
+.card {
+  margin: 10px;
+  padding: $dashboard-card-padding;
+  border-radius: 10px;
+  background: $background-color-white;
+  min-width: 625px;
+
+  .card__title {
+    margin: 0 0 2rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    position: relative;
+  }
+
+  .card__title__color {
+    width: 12px;
+    height: 28px;
+    position: absolute;
+    top: -0.25rem;
+    left: -1.55rem;
+    border-radius: 3px;
+
+    &.purple {
+      background: #cec6fb;
+    }
+    &.green {
+      background: #c6e6d2;
+    }
+
+    &.orange {
+      background: #fadda1;
+    }
+
+    &.blue {
+      background: #e2defc;
+    }
+
+    &.grey {
+      background: #f7d7d7;
+    }
+  }
+}

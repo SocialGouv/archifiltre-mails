@@ -28,6 +28,9 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
+  position: absolute;
+  top: 41%;
+  left: 410px;
 
   &:after {
     content: "";
@@ -43,11 +46,14 @@
 }
 
 .circle-packing {
-  width: calc(100% - 300px);
+  width: 100%;
   height: 500px;
 
   .circle-packing-pst-infos {
     text-align: center;
+    position: absolute;
+    top: 45%;
+    left: 300px;
   }
 }
 

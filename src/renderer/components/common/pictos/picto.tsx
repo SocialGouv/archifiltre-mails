@@ -135,30 +135,79 @@ export const KeepPicto: React.FC = () => (
         <polyline points="23 3 12 14 9 11" />
     </svg>
 );
-export const FilterPicto: React.FC = () => (
-    <svg
-        fill="none"
-        height="24"
-        stroke="#000"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        viewBox="0 0 24 24"
-        width="24"
-        xmlns="http://www.w3.org/2000/svg"
-    >
-        <circle cx="12" cy="12" r="10" />
-        <circle cx="12" cy="12" r="6" />
-        <circle cx="12" cy="12" r="2" />
-    </svg>
-);
 export const ImportPicto: React.FC = () => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
+        width="25"
+        height="25"
+        viewBox="0 0 25 25"
+        fill="none"
+    >
+        <path
+            d="M12.25 10C6.037 10 1 7.985 1 5.5C1 3.015 6.037 1 12.25 1C18.463 1 23.5 3.014 23.5 5.5C23.5 6.827 22.065 8.019 19.781 8.843"
+            stroke="white"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+        <path
+            d="M23.5 10V5.5"
+            stroke="white"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+        <path
+            d="M1 5.5V11.5C1 13.458 4.129 15.125 8.5 15.743"
+            stroke="white"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+        <path
+            d="M1 11.5V17.5C1 19.568 4.487 21.31 9.237 21.836"
+            stroke="white"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+        <path
+            d="M11.5 17.5C11.5 19.0913 12.1321 20.6174 13.2574 21.7426C14.3826 22.8679 15.9087 23.5 17.5 23.5C19.0913 23.5 20.6174 22.8679 21.7426 21.7426C22.8679 20.6174 23.5 19.0913 23.5 17.5C23.5 15.9087 22.8679 14.3826 21.7426 13.2574C20.6174 12.1321 19.0913 11.5 17.5 11.5C15.9087 11.5 14.3826 12.1321 13.2574 13.2574C12.1321 14.3826 11.5 15.9087 11.5 17.5V17.5Z"
+            stroke="white"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+        <path
+            d="M17.5 14.5V20.5"
+            stroke="white"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+        <path
+            d="M17.5 20.5L15.25 18.25"
+            stroke="white"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+        <path
+            d="M17.5 20.5L19.75 18.25"
+            stroke="white"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+    </svg>
+);
+export const FilterPicto: React.FC = () => (
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
         width="24"
         height="24"
         viewBox="0 0 24 24"
-        fill="none"
+        fill="#fff"
         role="img"
         className="icon filter-icon icon-14"
     >
@@ -179,7 +228,7 @@ export const ExportPicto: React.FC = () => (
         <path
             d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"
             fill="none"
-            stroke="#000"
+            stroke="#fff"
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth="2"
@@ -187,14 +236,14 @@ export const ExportPicto: React.FC = () => (
         <polyline
             fill="none"
             points="16 6 12 2 8 6"
-            stroke="#000"
+            stroke="#fff"
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth="2"
         />
         <line
             fill="none"
-            stroke="#000"
+            stroke="#fff"
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth="2"
@@ -203,5 +252,17 @@ export const ExportPicto: React.FC = () => (
             y1="2"
             y2="15"
         />
+    </svg>
+);
+
+export const SearchPicto: React.FC = () => (
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="#ccc"
+    >
+        <path d="M23.809 21.646l-6.205-6.205c1.167-1.605 1.857-3.579 1.857-5.711 0-5.365-4.365-9.73-9.731-9.73-5.365 0-9.73 4.365-9.73 9.73 0 5.366 4.365 9.73 9.73 9.73 2.034 0 3.923-.627 5.487-1.698l6.238 6.238 2.354-2.354zm-20.955-11.916c0-3.792 3.085-6.877 6.877-6.877s6.877 3.085 6.877 6.877-3.085 6.877-6.877 6.877c-3.793 0-6.877-3.085-6.877-6.877z" />
     </svg>
 );

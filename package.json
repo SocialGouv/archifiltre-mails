@@ -125,6 +125,7 @@
     "@socialgouv/archimail-pst-extractor": "^0.0.2",
     "d3": "^7.1.1",
     "electron-store": "^8.0.1",
+    "jotai": "^1.4.6",
     "json2csv": "^5.0.6",
     "normalize.css": "^8.0.1",
     "react": "^17.0.2",
@@ -133,6 +134,7 @@
     "source-map-support": "^0.5.21",
     "ts-node": "^10.4.0",
     "uuid": "^8.3.2",
-    "xlsx": "^0.17.4"
+    "xlsx": "^0.17.4",
+    "zustand": "^3.6.7"
   }
 }

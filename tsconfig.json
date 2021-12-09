@@ -1,28 +1,17 @@
 {
   "extends": "@tsconfig/node14/tsconfig.json",
   "compilerOptions": {
-    "lib": [
-      "ES2021",
-      "DOM"
-    ],
+    "lib": ["ES2021", "DOM"],
     "noUncheckedIndexedAccess": true,
     "jsx": "react",
     "target": "ES2017",
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    // "module": "ESNext",
+    // "moduleResolution": "Node",
     "baseUrl": ".",
     "paths": {
-      "@common/*": [
-        "src/common/*"
-      ]
-    },
+      "@common/*": ["src/common/*"]
+    }
   },
-  "include": [
-    "global.d.ts",
-    "src/**/*"
-  ],
-  "exclude": [
-    "tests",
-    "./node_modules/"
-  ]
+  "include": ["global.d.ts", "src/**/*"],
+  "exclude": ["tests", "./node_modules/"]
 }

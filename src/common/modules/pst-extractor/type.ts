@@ -60,6 +60,7 @@ export interface PstEmail extends PstElement {
     contentHTML: string;
     contentRTF: string;
     attachementCount: number;
+    isFromMe: boolean;
 }
 
 export interface PstAttachement {
