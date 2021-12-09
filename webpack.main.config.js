@@ -22,8 +22,6 @@ module.exports =
                 return acc;
             }, {});
 
-        console.log(workers);
-
         if (config.entry) {
             config.entry = {
                 ...config.entry,

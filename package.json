@@ -19,7 +19,7 @@
     "dist:mac-local": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
     "dist:linux": "electron-builder --linux AppImage",
     "start": "electron dist/main/main.js",
-    "start:mac": "open -n dist/mac-x64/mac/archimail.app",
+    "start:mac": "open -n electron/dist/mac-x64/mac/archimail.app",
     "lint": "eslint src/",
     "lint:test": "eslint -c tests/.eslintrc.json 'tests/**/*.ts*'",
     "lint:fix": "yarn lint --fix && yarn lint:test --fix",
@@ -32,10 +32,7 @@
   "electronWebpack": {
     "title": true,
     "main": {
-      "webpackConfig": "webpack.main.config.js",
-      "extraEntries": [
-        "@/_worker.js"
-      ]
+      "webpackConfig": "webpack.main.config.js"
     },
     "renderer": {
       "webpackConfig": "webpack.renderer.config.js"
@@ -48,17 +45,32 @@
       "@nivo/core"
     ]
   },
+  "//build.extraResources": "Static should be set again because it is overwritten",
   "build": {
     "appId": "fr.gouv.social.fabrique.archimail",
     "artifactName": "archimail-${version}.${ext}",
     "productName": "Archimail",
     "files": [
-      "electron/dist",
-      "electron/build/icon.*",
-      "package.json"
+      "electron/build/icon.*"
+    ],
+    "extraResources": [
+      {
+        "from": "dist/main/",
+        "to": "workers/",
+        "filter": [
+          "**/*.worker.js*"
+        ]
+      },
+      {
+        "from": "static",
+        "to": "static",
+        "filter": [
+          "**/*"
+        ]
+      }
     ],
     "directories": {
-      "output": "dist/${os}-${arch}"
+      "output": "electron/dist/${os}-${arch}"
     },
     "mac": {
       "category": "public.app-category.productivity",
@@ -121,8 +133,7 @@
     "ts-jest": "^27.1.0",
     "typescript": "^4.5.2",
     "unzip-crx-3": "^0.2.0",
-    "webpack": "4",
-    "worker-plugin": "^5.0.1"
+    "webpack": "4"
   },
   "dependencies": {
     "@nivo/circle-packing": "^0.74.0",

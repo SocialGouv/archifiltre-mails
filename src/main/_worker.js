@@ -8,4 +8,4 @@ require("ts-node").register({
     project: path.resolve(__dirname, "tsconfig.json"),
 });
 
-require(`${workerData._workerPath}`);
+require(workerData._workerPath);

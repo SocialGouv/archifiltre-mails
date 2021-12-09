@@ -113,25 +113,19 @@ export class PstExtractorModule implements Module {
         const progressReply = options.noProgress ? void 0 : this.progressReply;
 
         console.info("Start extracting...");
-        try {
-            this.pstWorker = new TSWorker(
-                "modules/pst-extractor/pst-extractor.worker.ts",
-                {
-                    stderr: true,
-                    trackUnmanagedFds: true,
-                    workerData: {
-                        ...options,
-                        progressInterval: this.userConfigService.get(
-                            "extractProgressDelay"
-                        ),
-                    } as PstWorkerData,
-                }
-            );
-        } catch (error: unknown) {
-            console.error("AH !!");
-            console.log(error);
-            throw new Error("Canno't load worker.");
-        }
+        this.pstWorker = new TSWorker(
+            "modules/pst-extractor/pst-extractor.worker.ts",
+            {
+                stderr: true,
+                trackUnmanagedFds: true,
+                workerData: {
+                    ...options,
+                    progressInterval: this.userConfigService.get(
+                        "extractProgressDelay"
+                    ),
+                } as PstWorkerData,
+            }
+        );
         return new Promise<[PstContent, PstExtractTables]>(
             (resolve, reject) => {
                 this.pstWorker?.on(

@@ -1,3 +1,4 @@
+import { IS_DEV } from "@common/config";
 import type { BrowserWindow } from "electron";
 import { dialog, MenuItem } from "electron";
 
@@ -28,7 +29,7 @@ export class DebugMenu implements ArchimailMenu {
 
     public get item(): MenuItem {
         return new MenuItem({
-            // enabled: IS_DEV,
+            enabled: IS_DEV,
             id: this.id,
             label: "Debug",
             sublabel: "Custom debugging",
@@ -110,7 +111,7 @@ export class DebugMenu implements ArchimailMenu {
                     })),
                 },
             ],
-            // visible: IS_DEV,
+            visible: IS_DEV,
         });
     }
 
