@@ -19,7 +19,7 @@
     "dist:mac-local": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
     "dist:linux": "electron-builder --linux AppImage",
     "start": "electron dist/main/main.js",
-    "start:mac": "open -n dist/mac-x64/mac/archimail.app",
+    "start:mac": "open -n electron/dist/mac-x64/mac/archimail.app",
     "lint": "eslint src/",
     "lint:test": "eslint -c tests/.eslintrc.json 'tests/**/*.ts*'",
     "lint:fix": "yarn lint --fix && yarn lint:test --fix",
@@ -45,17 +45,32 @@
       "@nivo/core"
     ]
   },
+  "//build.extraResources": "Static should be set again because it is overwritten",
   "build": {
     "appId": "fr.gouv.social.fabrique.archimail",
     "artifactName": "archimail-${version}.${ext}",
     "productName": "Archimail",
     "files": [
-      "electron/dist",
-      "electron/build/icon.*",
-      "package.json"
+      "electron/build/icon.*"
+    ],
+    "extraResources": [
+      {
+        "from": "dist/main/",
+        "to": "workers/",
+        "filter": [
+          "**/*.worker.js*"
+        ]
+      },
+      {
+        "from": "static",
+        "to": "static",
+        "filter": [
+          "**/*"
+        ]
+      }
     ],
     "directories": {
-      "output": "dist/${os}-${arch}"
+      "output": "electron/dist/${os}-${arch}"
     },
     "mac": {
       "category": "public.app-category.productivity",
@@ -84,6 +99,7 @@
     "@testing-library/react": "^12.1.2",
     "@tsconfig/node14": "^1.0.1",
     "@types/d3": "^7.1.0",
+    "@types/glob": "^7.2.0",
     "@types/jest": "^27.0.3",
     "@types/json2csv": "^5.0.3",
     "@types/node": "14",
@@ -102,6 +118,7 @@
     "eslint": "^7",
     "eslint-plugin-playwright": "^0.6.0",
     "eslint-plugin-unused-imports": "^1",
+    "glob": "^7.2.0",
     "husky": "^7.0.4",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^27.4.4",
