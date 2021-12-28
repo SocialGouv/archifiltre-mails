@@ -27,7 +27,7 @@ if (releaseMode === "normal") {
         [
             "@semantic-release/github",
             {
-                assets: ["electron/dist/**/${nextRelease.name}.${nextRelease.version}.*"],
+                assets: ["bin/*/archimail.@(exe|dmg|AppImage)?(.sha512)"],
             },
         ]
     );

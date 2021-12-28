@@ -48,7 +48,7 @@
   "//build.extraResources": "Static should be set again because it is overwritten",
   "build": {
     "appId": "fr.gouv.social.fabrique.archimail",
-    "artifactName": "archimail-${version}.${ext}",
+    "artifactName": "archimail.${ext}",
     "productName": "Archimail",
     "files": [
       "electron/build/icon.*"
