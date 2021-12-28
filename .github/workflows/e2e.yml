@@ -11,7 +11,7 @@ env:
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
 
 jobs:
-  compile:
+  Compile:
     name: Compile application
     runs-on: ubuntu-latest
     steps:
@@ -26,29 +26,28 @@ jobs:
       - name: Archive dist
         uses: actions/upload-artifact@v2
         with:
-          name: electron-dist
+          name: compile-dist
           path: dist/
 
 
-  e2e:
+  E2E:
     env:
       ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
     name: Run E2E test on ${{ matrix.os }}
-    needs: compile
+    needs: Compile
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
       - name: Setup Node
         uses: ./.github/actions/setup-node
       - name: Download dist
         uses: actions/download-artifact@v2
         with:
-          name: electron-dist
+          name: compile-dist
           path: dist/
 
       - name: Test electron

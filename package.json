@@ -48,7 +48,7 @@
   "//build.extraResources": "Static should be set again because it is overwritten",
   "build": {
     "appId": "fr.gouv.social.fabrique.archimail",
-    "artifactName": "archimail-${version}.${ext}",
+    "artifactName": "archimail.${ext}",
     "productName": "Archimail",
     "files": [
       "electron/build/icon.*"
@@ -93,6 +93,9 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.17.1",
+    "@semantic-release/changelog": "^6.0.1",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
     "@socialgouv/eslint-config-react": "^1.100.0",
     "@socialgouv/eslint-config-typescript": "^1.100.0",
     "@testing-library/jest-dom": "^5.16.1",
@@ -110,6 +113,7 @@
     "@types/webpack": "4",
     "axios": "^0.24.0",
     "cross-env": "^7.0.3",
+    "dotenv": "^10.0.0",
     "electron": "^16.0.4",
     "electron-builder": "^22.14.5",
     "electron-notarize": "^1.1.1",
@@ -127,6 +131,7 @@
     "rimraf": "^3.0.2",
     "sass": "^1.44.0",
     "sass-loader": "10",
+    "semantic-release": "^18.0.1",
     "stylelint": "^14.1.0",
     "stylelint-config-sass-guidelines": "^9.0.1",
     "stylelint-config-standard": "^24.0.0",
