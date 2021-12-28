@@ -1,7 +1,7 @@
 name: CI
 on:
   push:
-    branches: [main, dev, beta, feature/release-ci]
+    branches: [main, dev, beta]
   pull_request:
     branches: [main, dev]
 
@@ -12,7 +12,7 @@ jobs:
   Quality:
     strategy:
       matrix:
-      # default mandatory matrix
+        # default mandatory matrix
         empty: [true]
       # Don't fast-fail on push main
       fail-fast: ${{ github.event_name == 'pull_request' || (github.ref != 'refs/heads/main') }}

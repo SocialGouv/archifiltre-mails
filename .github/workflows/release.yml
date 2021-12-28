@@ -3,7 +3,7 @@ on:
   workflow_run:
     workflows:
       - CI
-    branches: [main, dev, beta, feature/release-ci]
+    branches: [main, dev, beta]
     types:
       - completed
 
