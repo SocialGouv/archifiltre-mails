@@ -27,7 +27,9 @@ if (releaseMode === "normal") {
         [
             "@semantic-release/github",
             {
-                assets: ["bin/*/archimail.@(exe|dmg|AppImage)?(.sha512)"],
+                assets: ["bin/*/archimail.@(exe|dmg|AppImage|msi)?(.sha512)"],
+                releasedLabels: false,
+                successComment: false,
             },
         ]
     );
@@ -36,7 +38,7 @@ if (releaseMode === "normal") {
         "@semantic-release/exec",
         {
             publishCmd:
-                "git tag -d ${nextRelease.gitTag} && git push origin :${nextRelease.gitTag}",
+                "/usr/bin/git tag -d ${nextRelease.gitTag} && /usr/bin/git push origin :${nextRelease.gitTag}",
         },
     ]);
 } else {

@@ -3,15 +3,15 @@ on:
   workflow_run:
     workflows:
       - CI
-    branches: [main, dev, beta]
+    branches: [main, beta] #TODO: dev nightly scheduled
     types:
       - completed
 
 env:
-  GIT_AUTHOR_EMAIL: ${{ secrets.SOCIALGROOVYBOT_EMAIL }}
-  GIT_AUTHOR_NAME: ${{ secrets.SOCIALGROOVYBOT_NAME }}
-  GIT_COMMITTER_EMAIL: ${{ secrets.SOCIALGROOVYBOT_EMAIL }}
-  GIT_COMMITTER_NAME: ${{ secrets.SOCIALGROOVYBOT_NAME }}
+  GIT_AUTHOR_EMAIL: socialgroovybot@fabrique.social.gouv.fr
+  GIT_AUTHOR_NAME: SocialGroovyBot
+  GIT_COMMITTER_EMAIL: socialgroovybot@fabrique.social.gouv.fr
+  GIT_COMMITTER_NAME: SocialGroovyBot
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
@@ -24,17 +24,39 @@ jobs:
       - uses: actions/checkout@v2
       - name: Setup Node
         uses: ./.github/actions/setup-node
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.SOCIALGROOVYBOT_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SOCIALGROOVYBOT_GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_push_gpgsign: false
+          git_tag_gpgsign: true
+          git_config_global: true
+
+      - name: Stub gpg bin
+        run: |
+          echo '#! /bin/bash' > /tmp/gpg-with-passphrase
+          echo -n "$(which gpg) --pinentry-mode loopback --passphrase '$SOCIALGROOVYBOT_GPG_PASSPHRASE' --no-tty " >> /tmp/gpg-with-passphrase
+          echo '"$@"' >> /tmp/gpg-with-passphrase
+          chmod +x /tmp/gpg-with-passphrase
+          git config --global gpg.program /tmp/gpg-with-passphrase
+        env:
+          SOCIALGROOVYBOT_GPG_PASSPHRASE: ${{ secrets.SOCIALGROOVYBOT_GPG_PASSPHRASE }}
       - name: Bump version
-        run: yarn semantic-release
+        run: |
+          export PATH="$(pwd)/.github/bin/:$PATH"
+          yarn semantic-release
         env:
           ARCHIMAIL_RELEASE_MODE: version
-      - name: Compile
-        run: yarn compile
-      - name: Archive dist
-        uses: actions/upload-artifact@v2
-        with:
-          name: compile-dist
-          path: dist/
+      # - name: Compile
+      #   run: yarn compile
+      # - name: Archive dist
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: compile-dist
+      #     path: dist/
 
   Build:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -42,25 +64,26 @@ jobs:
     strategy:
       matrix:
         target:
-          - linux
+          # - linux
           - mac
-          - win32
-          - win32-msi
-          - win64
-          - win64-msi
+          # - win32
+          # - win32-msi
+          # - win64
+          # - win64-msi
         include:
-          - target: linux
-            os: ubuntu-latest
+          # - target: linux
+          #   os: ubuntu-latest
           - target: mac
             os: macos-latest
-          - target: win32
-            os: windows-latest
-          - target: win32-msi
-            os: windows-latest
-          - target: win64
-            os: windows-latest
-          - target: win64-msi
-            os: windows-latest
+            ext: dmg
+          # - target: win32
+          #   os: windows-latest
+          # - target: win32-msi
+          #   os: windows-latest
+          # - target: win64
+          #   os: windows-latest
+          # - target: win64-msi
+          #   os: windows-latest
 
     name: Build binary for ${{ matrix.target }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -74,20 +97,28 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Setup Node
-        uses: ./.github/actions/setup-node
-      - name: Download dist
-        uses: actions/download-artifact@v2
-        with:
-          name: compile-dist
-          path: dist/
+      # - name: Setup Node
+      #   uses: ./.github/actions/setup-node
+      # - name: Download dist
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: compile-dist
+      #     path: dist/
       - name: Build bin
-        run: yarn dist:${{ matrix.target }}
+        # run: yarn dist:${{ matrix.target }}
+        # Test mode
+        run: |
+          mkdir -p "electron/dist/${{ matrix.target }}/"
+          echo "${{ matrix.target }}.${{ matrix.os }}" > "electron/dist/${{ matrix.target }}/archimail.${{ matrix.ext }}"
       - name: Archive bin
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.target }}-bin
-          path: electron/dist/*/archifiltre.@(exe|dmg|AppImage)
+          path: |
+            electron/dist/*/archimail.exe
+            electron/dist/*/archimail.dmg
+            electron/dist/*/archimail.AppImage
+            electron/dist/*/archimail.msi
 
   Release:
     needs: Build
@@ -101,11 +132,55 @@ jobs:
           path: bin
       - name: Generate hashes
         run: >-
-          find -E .
-          -regex ".*/bin/.*/archimail\.(exe|AppImage|dmg)$"
+          find . -regextype posix-extended
+          -regex ".*/bin/.*/archimail\.(exe|AppImage|dmg|msi)$"
           -type f
           -exec bash -c "openssl dgst -sha512 {} > {}.sha512" \;
       - name: Setup Node
         uses: ./.github/actions/setup-node
+      # - name: Import GPG key
+      #   uses: crazy-max/ghaction-import-gpg@v4
+      #   with:
+      #     gpg_private_key: ${{ secrets.SOCIALGROOVYBOT_GPG_PRIVATE_KEY }}
+      #     passphrase: ${{ secrets.SOCIALGROOVYBOT_GPG_PASSPHRASE }}
+      #     git_user_signingkey: true
+      #     git_commit_gpgsign: true
+      #     git_push_gpgsign: false
+      #     git_tag_gpgsign: true
+      #     git_config_global: true
+      # - name: Override git config
+      #   run: |
+      #     git config --global user.name "${{ secrets.SOCIALGROOVYBOT_NAME }}"
+      #     git config --global user.email "${{ secrets.SOCIALGROOVYBOT_EMAIL }}"
+      #     git config --global user.signingKey "${{ secrets.SOCIALGROOVYBOT_GPG_KEY_ID }}"
+      #     git config --global commit.gpgSign true
+      #     git config --global tag.gpgSign true
+      #     git config --global push.gpgSign false
+      - name: Import GPG key
+        run: |
+          echo '${{ secrets.SOCIALGROOVYBOT_GPG_PUBLIC_KEY }}' > /tmp/git_gpg_keys.asc
+          echo '${{ secrets.SOCIALGROOVYBOT_GPG_PRIVATE_KEY }}' >> /tmp/git_gpg_keys.asc
+          chmod 600 /tmp/git_gpg_keys.asc
+          gpg --batch --yes --import /tmp/git_gpg_keys.asc
+          echo '#! /bin/bash' > /tmp/gpg-with-passphrase
+          echo -n "$(which gpg) --pinentry-mode loopback --passphrase '$SOCIALGROOVYBOT_GPG_PASSPHRASE' --no-tty " >> /tmp/gpg-with-passphrase
+          echo '"$@"' >> /tmp/gpg-with-passphrase
+          chmod +x /tmp/gpg-with-passphrase
+          git config --global user.signingKey "${{ secrets.SOCIALGROOVYBOT_GPG_KEY_ID }}"
+          git config --global commit.gpgSign true
+          git config --global tag.gpgSign true
+          git config --global push.gpgSign false
+          git config --global gpg.program /tmp/gpg-with-passphrase
+          cat /tmp/gpg-with-passphrase
+        env:
+          SOCIALGROOVYBOT_GPG_PASSPHRASE: ${{ secrets.SOCIALGROOVYBOT_GPG_PASSPHRASE }}
       - name: Semantic Release
-        run: yarn semantic-release
+        run: |
+          export PATH="$(pwd)/.github/bin/:$PATH"
+          git --version
+          yarn semantic-release --debug
+        env:
+          GIT_TRACE: 1
+          GIT_TRACE_SETUP: 1
+          GIT_TRACE_SHALLOW: 1
+          GIT_CURL_VERBOSE: 1
