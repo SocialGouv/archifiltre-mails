@@ -1,5 +1,9 @@
 /** @type {"normal" | "version"} */
 const releaseMode = process.env.ARCHIMAIL_RELEASE_MODE ?? "normal";
+console.info("Release script ----- Branch", process.env.GITHUB_REF);
+const isPreRealse = process.env.GITHUB_REF
+    ? ["refs/heads/dev", "refs/heads/beta"].includes(process.env.GITHUB_REF)
+    : true;
 
 /** @type {import("semantic-release").Options["plugins"]} */
 const plugins = [
@@ -13,26 +17,25 @@ const plugins = [
 ];
 
 if (releaseMode === "normal") {
-    plugins.push(
-        "@semantic-release/release-notes-generator",
-        "@semantic-release/changelog",
-        [
+    plugins.push("@semantic-release/release-notes-generator");
+    if (!isPreRealse) {
+        plugins.push("@semantic-release/changelog", [
             "@semantic-release/git",
             {
                 assets: ["CHANGELOG.md", "package.json"],
                 message:
                     "chore(${nextRelease.type}-release): ${nextRelease.gitTag} [skip ci]\n\n${nextRelease.notes}",
             },
-        ],
-        [
-            "@semantic-release/github",
-            {
-                assets: ["bin/*/archimail.@(exe|dmg|AppImage|msi)?(.sha512)"],
-                releasedLabels: false,
-                successComment: false,
-            },
-        ]
-    );
+        ]);
+    }
+    plugins.push([
+        "@semantic-release/github",
+        {
+            assets: ["bin/**/archimail.@(exe|dmg|AppImage|msi)?(.sha512)"],
+            releasedLabels: false,
+            successComment: false,
+        },
+    ]);
 } else if (releaseMode === "version") {
     plugins.push([
         "@semantic-release/exec",

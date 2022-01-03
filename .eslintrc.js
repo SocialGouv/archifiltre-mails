@@ -33,7 +33,7 @@ const typescriptConfig = {
 
 /** @type {import("eslint").Linter.Config} */
 const defaultConfig = {
-    ignorePatterns: "node_modules",
+    ignorePatterns: ["!**/.*.js*", "node_modules"],
     overrides: [
         {
             files: ["**/*.ts"],
@@ -49,7 +49,7 @@ const defaultConfig = {
         },
         {
             extends: "@socialgouv/eslint-config-react",
-            files: ["**/*.js"],
+            files: ["**/*.js*"],
         },
         {
             env: {

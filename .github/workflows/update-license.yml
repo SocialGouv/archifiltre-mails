@@ -18,6 +18,7 @@ jobs:
           passphrase: ${{ secrets.SOCIALGROOVYBOT_GPG_PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
+          git_push_gpgsign: false
 
       - name: Found last year date, replace, and push
         shell: bash
