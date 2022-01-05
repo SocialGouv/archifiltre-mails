@@ -10,6 +10,7 @@ $dashboard-card-padding: 2rem 3rem;
   border-radius: 10px;
   background: $background-color-white;
   min-width: 625px;
+  position: relative;
 
   .card__title {
     margin: 0 0 2rem;

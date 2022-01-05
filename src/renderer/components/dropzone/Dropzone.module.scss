@@ -8,6 +8,7 @@
   border-radius: 20px;
   box-shadow: rgb(17 12 46 / 15%) 0px 48px 100px 0px;
   background: #fff;
+  z-index: 2;
   p {
     margin: 0;
     line-height: 1.15rem;
@@ -41,7 +42,6 @@
   left: 50%;
   transform: translate(-50%, -50%);
   border: dashed 1px #b3c7eb;
-  // background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='20' ry='20' stroke='%23333' stroke-width='1' stroke-dasharray='10' stroke-dashoffset='14' stroke-linecap='square'/%3e%3c/svg%3e");
   border-radius: 20px;
   background: #fbfcfe;
   cursor: pointer;
@@ -55,5 +55,41 @@
     font-size: 0.8rem;
     text-align: center;
     color: #aaa;
+  }
+}
+
+.dropzone__progress {
+  width: 300px;
+  height: 100px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+
+  background-color: #6ecaff;
+  transform: translate(-50%, calc(-50% + 150px));
+  transition: transform 750ms linear;
+
+  ul {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    li {
+      font-size: 12px;
+      color: #fff;
+      span {
+        width: 120px;
+        display: inline-block;
+        font-weight: 600;
+      }
+    }
+  }
+
+  &.active {
+    transform: translate(-50%, calc(-50% + 250px));
   }
 }

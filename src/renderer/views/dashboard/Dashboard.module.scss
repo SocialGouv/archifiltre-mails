@@ -4,13 +4,29 @@ $dashboard-actions-bar: calc(75px + 2rem);
 $dashboard-breadcrumb-height: 30px;
 $dashboard-card-padding: 2rem 3rem;
 
+.dashboard__infos {
+  flex: 0;
+  font-size: 12px;
+}
+
 .dashboard__select {
-  position: absolute;
-  top: 0;
-  left: calc(50% - 250px);
-  width: 500px;
-  height: 75px;
-  background: wheat;
+  width: 100%;
+  height: 100%;
+  .dashboard__select__item  {
+    margin: 0 0 1rem;
+
+    select {
+      font-size: 0.75rem;
+    }
+  }
+  .dashboard__select__info  {
+    font-weight: 300;
+  }
+
+  button {
+    font-weight: 600;
+    margin: 1rem 0 0;
+  }
 }
 
 .dashboard {
@@ -102,18 +118,44 @@ $dashboard-card-padding: 2rem 3rem;
       }
     }
   }
+
+  .dashboard__actions__exporter {
+    position: absolute;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    margin: 0.3rem 0 0;
+    padding: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 999;
+    border-radius: 10px;
+    color: #fff;
+    background: #4991f7;
+
+    &.active {
+      display: flex;
+    }
+    li {
+      cursor: pointer;
+    }
+
+    li:not(:last-child) {
+      margin: 0 0 0.75rem;
+    }
+  }
 }
 
-.dashboard__vizualisation {
+.dashboard__viewer {
   min-width: 700px;
 
-  .dashboard__vizualisation__breadcrumb {
+  .dashboard__viewer__breadcrumb {
     height: $dashboard-breadcrumb-height;
     display: flex;
     align-items: center;
     margin: 0 0 2rem;
     font-size: 0.8rem;
-    .dashboard__vizualisation__breadcrumb__item {
+    .dashboard__viewer__breadcrumb__item {
       position: relative;
       margin-right: 22.5px;
 
@@ -133,7 +175,11 @@ $dashboard-card-padding: 2rem 3rem;
 }
 
 .dashboard__informations {
-  flex: 0;
+  min-height: 150px;
+  span {
+    font-weight: 600;
+    font-size: 14px;
+  }
 }
 
 .dashboard__impact {
