@@ -1,118 +1,84 @@
 import type { FC } from "react";
-import React from "react";
+import React, { useCallback, useState } from "react";
 
 import { Card } from "../../../renderer/components/common/card/Card";
-import { HomePicto } from "../../../renderer/components/common/pictos/picto";
-import { usePSTData } from "../../../renderer/hooks/usePSTData";
+import { usePSTStore } from "../../../renderer/store/PSTStore";
+import {
+    getPstMailsPercentage,
+    getPstTotalContacts,
+    getPstTotalDeletedMails,
+    getPstTotalReceivedAttachments,
+    getPstTotalReceivedMails,
+    getPstTotalSentAttachments,
+    getPstTotalSentMails,
+} from "../../../renderer/utils/pst-extractor";
 import style from "./Dashboard.module.scss";
+import { DashboardRecapItem } from "./DashboardRecapItem";
+import { DashboardRecapSelectFolder } from "./DashboardRecapSelectFolder";
 
-const DashboardUserSelectFolder: FC = () => {
-    const { pstData } = usePSTData();
-    console.log(pstData);
-
-    return (
-        <div className={style.dashboard__select}>
-            <div>
-                <label htmlFor="sent-item-select">Messages envoyés</label>
-                <select name="sent" id="sent-item-select">
-                    <option value="">--Please choose an option--</option>
-                    <option value="element">element</option>
-                    <option value="item">item</option>
-                </select>
-            </div>
-            <div>
-                <label htmlFor="sent-item-select">Messages reçus</label>
-                <select name="sent" id="sent-item-select">
-                    <option value="">--Please choose an option--</option>
-                    <option value="element">element</option>
-                    <option value="item">item</option>
-                </select>
-            </div>
-        </div>
-    );
-};
-
-export const DashboardRecapItem: FC<DashboardRecapItemProps> = ({
-    title,
-    percentage,
-    mails,
-    attachments,
-}) => (
-    <div className={style.dashboard__recap__item}>
-        <div className={style.dashboard__recap__picto}>
-            <HomePicto />
-        </div>
-        <div className={style.dashboard__recap__informations}>
-            <span className={style.dashboard__recap__informations__item}>
-                {title}
-            </span>
-            <span className={style.dashboard__recap__informations__item}>
-                {percentage}%
-            </span>
-            <span className={style.dashboard__recap__informations__item}>
-                {mails} mails
-            </span>
-            <span className={style.dashboard__recap__informations__item}>
-                {attachments} pj
-            </span>
-        </div>
-    </div>
-);
-
-interface DashboardRecapItemProps {
-    picto: React.ReactElement;
-    title: string;
-    percentage: number | string;
-    mails: number | string;
-    attachments: number | string;
-}
-
-const dashboardRecapData: DashboardRecapItemProps[] = [
-    {
-        attachments: "90",
-        mails: "1200",
-        percentage: "20",
-        picto: <HomePicto />,
-        title: "Messages reçus",
-    },
-    {
-        attachments: "90",
-        mails: "1200",
-        percentage: "20",
-        picto: <HomePicto />,
-        title: "Messages envoyés",
-    },
-    {
-        attachments: "90",
-        mails: "1200",
-        percentage: "20",
-        picto: <HomePicto />,
-        title: "Messages supprimés",
-    },
-    {
-        attachments: "90",
-        mails: "1200",
-        percentage: "20",
-        picto: <HomePicto />,
-        title: "Dossiers",
-    },
-    {
-        attachments: "90",
-        mails: "1200",
-        percentage: "20",
-        picto: <HomePicto />,
-        title: "Conctacts",
-    },
-];
-
+// TODO: pas toujours de dossiers "supprimés" ou "envoyés"
 export const DashboardRecap: FC = () => {
+    const [isRecapReady, setIsRecapReady] = useState(false);
+
+    const switchView = useCallback(() => {
+        setIsRecapReady(true);
+    }, []);
+    const { pstFile, deletedFolder, extractTables } = usePSTStore();
+
+    // mails received
+    const receivedMailsTotal = getPstTotalReceivedMails(extractTables);
+    const receivedAttachmentsTotal =
+        getPstTotalReceivedAttachments(extractTables);
+    const receivedPercentageMails = getPstMailsPercentage(
+        receivedMailsTotal,
+        extractTables?.emails
+    );
+
+    // mails sent
+    const sentMailsTotal = getPstTotalSentMails(extractTables);
+    const sentAttachmentsTotal = getPstTotalSentAttachments(extractTables);
+    const sentPercentageMails = getPstMailsPercentage(
+        sentMailsTotal,
+        extractTables?.emails
+    );
+
+    // mails deleted
+    const deletedMailsTotal =
+        pstFile && getPstTotalDeletedMails(pstFile, deletedFolder);
+
+    // contact
+    const contactTotal = getPstTotalContacts(extractTables?.contacts);
+
     return (
         <Card title="Synthèse" color="blue">
-            <div className={style.dashboard__recap}>
-                {dashboardRecapData.map((recap, index) => (
-                    <DashboardRecapItem key={index} {...recap} />
-                ))}
-            </div>
+            {isRecapReady ? (
+                <div className={style.dashboard__recap}>
+                    <DashboardRecapItem
+                        title="Messages reçus"
+                        mails={receivedMailsTotal}
+                        attachements={receivedAttachmentsTotal}
+                        percentage={receivedPercentageMails}
+                    />
+                    <DashboardRecapItem
+                        title="Messages envoyés"
+                        mails={sentMailsTotal}
+                        attachements={sentAttachmentsTotal}
+                        percentage={sentPercentageMails}
+                    />
+                    <DashboardRecapItem
+                        title="Messages supprimés"
+                        mails={deletedMailsTotal}
+                        attachements={0}
+                        percentage={"0"}
+                    />
+                    <DashboardRecapItem
+                        title="Contacts"
+                        contact={contactTotal}
+                    />
+                </div>
+            ) : (
+                <DashboardRecapSelectFolder switchView={switchView} />
+            )}
         </Card>
     );
 };

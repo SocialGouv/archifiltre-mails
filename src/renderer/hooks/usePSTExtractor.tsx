@@ -1,15 +1,13 @@
 import { useService } from "@common/modules/ContainerModule";
-import type {
-    PstContent,
-    PstProgressState,
-} from "@common/modules/pst-extractor/type";
+import type { PstProgressState } from "@common/modules/pst-extractor/type";
+import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 
-import { usePathContext } from "../context/PathContext";
+import { usePSTStore } from "../store/PSTStore";
 
 interface UsePSTExtractor {
-    extractedFile: PstContent | undefined;
     pstProgress: PstProgressState;
+    setPstFilePath: Dispatch<SetStateAction<string>>;
 }
 
 const pstProgressInitialState: PstProgressState = {
@@ -27,26 +25,35 @@ const pstProgressInitialState: PstProgressState = {
  * @returns extracted file and progress
  */
 export const usePSTExtractor = (): UsePSTExtractor => {
-    const [extractedFile, setExtractedFile] = useState<PstContent>();
+    const [pstFilePath, setPstFilePath] = useState<string>("");
     const [pstProgress, setPstProgress] = useState<PstProgressState>(
         pstProgressInitialState
     );
-    const { path: pstFilePath } = usePathContext();
     const pstExtractorService = useService("pstExtractorService");
+
+    const { setPstFile, setExtractTables, updateComputedPst } = usePSTStore();
 
     useEffect(() => {
         if (pstFilePath && pstExtractorService) {
             void (async () => {
-                const [pstExtractedFile, _extractTables] =
+                const [pstExtractedFile, extractTables] =
                     await pstExtractorService.extract({
                         pstFilePath,
                     });
-                setExtractedFile(pstExtractedFile);
+                setPstFile(pstExtractedFile);
+                updateComputedPst(pstExtractedFile);
+                setExtractTables(extractTables);
             })();
         }
-    }, [pstExtractorService, pstFilePath]);
+    }, [
+        pstExtractorService,
+        pstFilePath,
+        setExtractTables,
+        setPstFile,
+        updateComputedPst,
+    ]);
 
     pstExtractorService?.onProgress(setPstProgress);
 
-    return { extractedFile, pstProgress };
+    return { pstProgress, setPstFilePath };
 };
