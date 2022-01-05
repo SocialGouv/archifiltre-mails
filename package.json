@@ -84,6 +84,9 @@
     "win": {
       "icon": "./electron/build/icon.png"
     },
+    "nsis": {
+      "artifactName": "archimail.setup.${ext}"
+    },
     "linux": {
       "category": "Office",
       "icon": "./electron/build/icon.png"
