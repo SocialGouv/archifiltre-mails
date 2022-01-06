@@ -42,6 +42,12 @@
         "eslint"
       ],
       "allowedVersions": "<8"
+    },
+    {
+      "matchPackageNames": [
+        "eslint-plugin-unused-imports"
+      ],
+      "allowedVersions": "<2"
     }
   ]
 }
