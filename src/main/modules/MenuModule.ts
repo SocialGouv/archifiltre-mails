@@ -40,11 +40,16 @@ export class MenuModule implements Module {
             )
         );
 
-        const menu = Menu.buildFromTemplate([
-            IS_MAC ? { role: "appMenu" } : {},
+        const template: Parameters<typeof Menu.buildFromTemplate>[0] = [
             { role: "help", submenu: [{ role: "toggleDevTools" }] }, // TODO: Update with links and other helpful stuff
             ...this.customMenus.map((m) => m.item),
-        ]);
+        ];
+
+        if (IS_MAC) {
+            template.unshift({ role: "appMenu" });
+        }
+
+        const menu = Menu.buildFromTemplate(template);
 
         Menu.setApplicationMenu(menu);
         return Promise.resolve();

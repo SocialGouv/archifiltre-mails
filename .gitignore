@@ -4,6 +4,7 @@ dist/
 tmpws/
 coverage/
 chromedriverlog.txt
+bin/
 
 ##
 ## Should be global, but it's an open source project
