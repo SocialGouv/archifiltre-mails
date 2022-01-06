@@ -2,6 +2,12 @@ import type { FC } from "react";
 import React, { useCallback, useState } from "react";
 
 import { Card } from "../../../renderer/components/common/card/Card";
+import {
+    ContactPicto,
+    MailPicto,
+    MailSentPicto,
+    TrashPicto,
+} from "../../../renderer/components/common/pictos/picto";
 import { usePSTStore } from "../../../renderer/store/PSTStore";
 import {
     getPstMailsPercentage,
@@ -58,22 +64,26 @@ export const DashboardRecap: FC = () => {
                         mails={receivedMailsTotal}
                         attachements={receivedAttachmentsTotal}
                         percentage={receivedPercentageMails}
+                        picto={<MailPicto />}
                     />
                     <DashboardRecapItem
                         title="Messages envoyés"
                         mails={sentMailsTotal}
                         attachements={sentAttachmentsTotal}
                         percentage={sentPercentageMails}
+                        picto={<MailSentPicto />}
                     />
                     <DashboardRecapItem
                         title="Messages supprimés"
                         mails={deletedMailsTotal}
                         attachements={0}
                         percentage={"0"}
+                        picto={<TrashPicto />}
                     />
                     <DashboardRecapItem
                         title="Contacts"
                         contact={contactTotal}
+                        picto={<ContactPicto />}
                     />
                 </div>
             ) : (

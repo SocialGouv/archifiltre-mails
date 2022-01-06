@@ -50,7 +50,6 @@ export const CirclePackingViewer: React.FC<CirclePackingViewerProps> = ({
             if (node.id === "rootId") return;
 
             const child = findPstChildById(pstFile, node.id);
-            console.log("child", child);
             updateComputedPst(child);
             setDepth((depth: number) => depth + 1);
         },

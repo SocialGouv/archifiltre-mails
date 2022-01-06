@@ -57,7 +57,7 @@ $dashboard-card-padding: 2rem 3rem;
       border: solid 1px black;
       border-radius: 50%;
       svg {
-        fill: #000;
+        stroke-width: 1.5px;
       }
     }
 
@@ -120,8 +120,9 @@ $dashboard-card-padding: 2rem 3rem;
   }
 
   .dashboard__actions__exporter {
+    width: 110px;
     position: absolute;
-    display: none;
+    display: flex;
     justify-content: center;
     align-items: center;
     margin: 0.3rem 0 0;
@@ -132,12 +133,18 @@ $dashboard-card-padding: 2rem 3rem;
     border-radius: 10px;
     color: #fff;
     background: #4991f7;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 100ms ease;
 
     &.active {
       display: flex;
+      opacity: 1;
+      pointer-events: inherit;
     }
     li {
       cursor: pointer;
+      text-align: center;
     }
 
     li:not(:last-child) {

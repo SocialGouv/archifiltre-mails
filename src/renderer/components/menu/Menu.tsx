@@ -1,32 +1,55 @@
-import React, { useCallback, useState } from "react";
+import React, { Fragment } from "react";
 
-import { Logo } from "../common/logo/Logo";
+import { useContextMenu } from "../../../renderer/hooks/useContextMenu";
 import style from "./Menu.module.scss";
-import { Arrow } from "./MenuArrow";
-import MenuLinks from "./MenuLinks";
 
 export const Menu: React.FC = () => {
-    const [isCollapsed, setIsCollapsed] = useState(true);
-    const collapseMenu = () => {
-        setIsCollapsed((state) => !state);
-    };
+    const { anchorPoint, show } = useContextMenu();
 
-    const getCollapsedClassName = useCallback(
-        (className: string) =>
-            isCollapsed
-                ? `${style[className]} ${style["is-collapsed"]}`
-                : `${style[className]}`,
-        [isCollapsed]
-    );
+    // const _getChildrenId = (id?: any) => {
+    //     if (!pstFile) return null;
 
-    return (
-        <nav className={getCollapsedClassName("menu")}>
-            <Arrow
-                onClick={collapseMenu}
-                className={getCollapsedClassName("arrow")}
-            />
-            <Logo />
-            <MenuLinks isCollapsed={isCollapsed} />
-        </nav>
-    );
+    //     return (
+    //         main.children
+    //             .reduce((ids: any, child: any) => {
+    //                 // console.log({ child, ids });
+    //                 return [...ids, ..._getChildrenId(child.id), child.id];
+    //             }, [])
+    //             .flat() ?? []
+    //     );
+    // };
+    // const getChildrenId = (id?: any) => {
+    //     if (!main) return null;
+
+    //     return (
+    //         main.children
+    //             .find((root: any) => {
+    //                 return root.id === id;
+    //             })
+    //             ?.children.reduce(
+    //                 (ids: any, child: any) => [
+    //                     ...ids,
+    //                     ...getChildrenId(child.id),
+    //                     child.id,
+    //                 ],
+    //                 []
+    //             )
+    //             .flat() ?? []
+    //     );
+    // };
+
+    if (show) {
+        return (
+            <ul
+                id="menu"
+                className={style.menu}
+                style={{ left: anchorPoint.x, top: anchorPoint.y }}
+            >
+                <li id="to-delete-btn">Supprimé</li>
+                <li>Non marqué</li>
+                <li id="to-keep-btn">Conservé</li>
+            </ul>
+        );
+    }
+    return <Fragment />;
 };

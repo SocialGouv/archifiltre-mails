@@ -38,6 +38,7 @@ export const DashboardInformations: FC = () => {
                         <li>
                             <span>Adresse mail : </span>
                             {JSON.stringify(mainInfos.from, null, 1)}
+                            {/* {mainInfos.from.email ?? null} */}
                         </li>
                     </ul>
                 ) : (

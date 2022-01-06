@@ -1,7 +1,6 @@
 import type { FC } from "react";
 import React from "react";
 
-import { HomePicto } from "../../../renderer/components/common/pictos/picto";
 import style from "./Dashboard.module.scss";
 
 export interface DashboardRecapItemProps {
@@ -19,11 +18,13 @@ export const DashboardRecapItem: FC<DashboardRecapItemProps> = ({
     attachements,
     percentage,
     contact,
+    picto,
 }) => {
     return (
         <div className={style.dashboard__recap__item}>
             <div className={style.dashboard__recap__picto}>
-                <HomePicto />
+                {/* <HomePicto /> */}
+                {picto}
             </div>
             {contact ? (
                 <div className={style.dashboard__recap__informations}>

@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import React from "react";
+import React, { useCallback, useState } from "react";
 
 import {
     ExportPicto,
@@ -8,8 +8,15 @@ import {
     SearchPicto,
 } from "../../../renderer/components/common/pictos/picto";
 import style from "./Dashboard.module.scss";
+import { DashboardActionsExporter } from "./DashboardActionsExporter";
 
 export const DashboardActions: FC = () => {
+    const [exporter, setExporter] = useState(false);
+
+    const switchExporter = useCallback(() => {
+        setExporter((open) => !open);
+    }, [setExporter]);
+
     return (
         <div className={style.dashboard__actions__bar}>
             <div className={style.dashboard__actions__search}>
@@ -22,10 +29,11 @@ export const DashboardActions: FC = () => {
                 </button>
             </div>
             <div className={style.dashboard__actions__bar__btn}>
-                <button>
+                <button onClick={switchExporter}>
                     <ExportPicto />
                     Exporter
                 </button>
+                <DashboardActionsExporter isExporterOpen={exporter} />
             </div>
             <div className={style.dashboard__actions__bar__btn}>
                 <button>
