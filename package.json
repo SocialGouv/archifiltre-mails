@@ -19,7 +19,7 @@
     "dist:mac-local": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
     "dist:linux": "electron-builder --linux AppImage",
     "start": "electron dist/main/main.js",
-    "start:mac": "open -n dist/mac-x64/mac/archimail.app",
+    "start:mac": "open -n electron/dist/mac-x64/mac/archimail.app",
     "lint": "eslint src/",
     "lint:test": "eslint -c tests/.eslintrc.json 'tests/**/*.ts*'",
     "lint:fix": "yarn lint --fix && yarn lint:test --fix",
@@ -45,17 +45,33 @@
       "@nivo/core"
     ]
   },
+  "//build.extraResources": "Static should be set again because it is overwritten",
   "build": {
     "appId": "fr.gouv.social.fabrique.archimail",
-    "artifactName": "archimail-${version}.${ext}",
+    "artifactName": "archimail.${ext}",
     "productName": "Archimail",
+    "afterSign": "scripts/notarize.js",
     "files": [
-      "electron/dist",
-      "electron/build/icon.*",
-      "package.json"
+      "electron/build/icon.*"
+    ],
+    "extraResources": [
+      {
+        "from": "dist/main/",
+        "to": "workers/",
+        "filter": [
+          "**/*.worker.js*"
+        ]
+      },
+      {
+        "from": "static",
+        "to": "static",
+        "filter": [
+          "**/*"
+        ]
+      }
     ],
     "directories": {
-      "output": "dist/${os}-${arch}"
+      "output": "electron/dist/${os}-${arch}"
     },
     "mac": {
       "category": "public.app-category.productivity",
@@ -77,44 +93,51 @@
     "node": "14"
   },
   "devDependencies": {
-    "@playwright/test": "^1.16.3",
-    "@socialgouv/eslint-config-react": "^1.90.4",
-    "@socialgouv/eslint-config-typescript": "^1.90.4",
-    "@testing-library/jest-dom": "^5.15.1",
+    "@playwright/test": "^1.17.1",
+    "@semantic-release/changelog": "^6.0.1",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@socialgouv/eslint-config-react": "^1.101.0",
+    "@socialgouv/eslint-config-typescript": "^1.101.0",
+    "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
     "@tsconfig/node14": "^1.0.1",
     "@types/d3": "^7.1.0",
+    "@types/glob": "^7.2.0",
     "@types/jest": "^27.0.3",
     "@types/json2csv": "^5.0.3",
     "@types/node": "14",
-    "@types/react": "^17.0.37",
+    "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
     "@types/rimraf": "^3.0.2",
     "@types/uuid": "^8.3.3",
     "@types/webpack": "4",
     "axios": "^0.24.0",
     "cross-env": "^7.0.3",
-    "electron": "^16.0.2",
-    "electron-builder": "^22.13.1",
+    "dotenv": "^10.0.0",
+    "electron": "^16.0.5",
+    "electron-builder": "^22.14.5",
     "electron-notarize": "^1.1.1",
     "electron-webpack": "^2.8.2",
     "electron-webpack-ts": "^4.0.1",
     "eslint": "^7",
     "eslint-plugin-playwright": "^0.6.0",
-    "eslint-plugin-unused-imports": "^1.1.5",
+    "eslint-plugin-unused-imports": "^1",
+    "glob": "^7.2.0",
     "husky": "^7.0.4",
     "identity-obj-proxy": "^3.0.0",
-    "jest": "^27.3.1",
+    "jest": "^27.4.5",
     "jest-playwright-preset": "^1.7.0",
-    "prettier": "^2.4.1",
+    "prettier": "^2.5.1",
     "rimraf": "^3.0.2",
-    "sass": "^1.43.5",
+    "sass": "^1.44.0",
     "sass-loader": "10",
-    "stylelint": "^14.0.1",
+    "semantic-release": "^18.0.1",
+    "stylelint": "^14.2.0",
     "stylelint-config-sass-guidelines": "^9.0.1",
     "stylelint-config-standard": "^24.0.0",
-    "ts-jest": "^27.0.7",
-    "typescript": "^4.4.4",
+    "ts-jest": "^27.1.2",
+    "typescript": "^4.5.4",
     "unzip-crx-3": "^0.2.0",
     "webpack": "4"
   },
@@ -123,7 +146,7 @@
     "@nivo/core": "^0.74.0",
     "@nivo/generators": "^0.74.0",
     "@socialgouv/archimail-pst-extractor": "^0.0.2",
-    "d3": "^7.1.1",
+    "d3": "^7.2.1",
     "electron-store": "^8.0.1",
     "jotai": "^1.4.6",
     "json2csv": "^5.0.6",

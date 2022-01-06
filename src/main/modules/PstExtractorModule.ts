@@ -15,17 +15,16 @@ import type {
 } from "@common/modules/pst-extractor/type";
 import type { UserConfigService } from "@common/modules/UserConfigModule";
 import { ipcMain } from "electron";
-import path from "path";
 
 import { TSWorker } from "../worker";
 import type {
     PstWorkerData,
     PstWorkerMessageType,
-} from "./pst-extractor/worker";
+} from "./pst-extractor/pst-extractor.worker";
 import {
     PST_DONE_WORKER_EVENT,
     PST_PROGRESS_WORKER_EVENT,
-} from "./pst-extractor/worker";
+} from "./pst-extractor/pst-extractor.worker";
 
 const REGEXP_PST = /\.pst$/i;
 
@@ -115,7 +114,7 @@ export class PstExtractorModule implements Module {
 
         console.info("Start extracting...");
         this.pstWorker = new TSWorker(
-            path.resolve(__dirname, "pst-extractor", "worker.ts"),
+            "modules/pst-extractor/pst-extractor.worker.ts",
             {
                 stderr: true,
                 trackUnmanagedFds: true,
