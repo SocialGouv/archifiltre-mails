@@ -2,6 +2,7 @@ import type {
     PstContent,
     PstEmail,
     PstExtractTables,
+    PstFolder,
 } from "@common/modules/pst-extractor/type";
 import { atom, useAtom } from "jotai/index";
 import type { SetStateAction } from "react";
@@ -21,7 +22,7 @@ export interface UsePSTInterface {
     setPstFile: (update: SetStateAction<PstContent | undefined>) => void;
     computedPst: PstComputed | undefined;
     setComputedPst: (update: SetStateAction<PstComputed | undefined>) => void;
-    updateComputedPst: (pst: PstContent) => void;
+    updateComputedPst: (pst: PstFolder) => void;
     extractTables: PstExtractTables | undefined;
     setExtractTables: (
         update: SetStateAction<PstExtractTables | undefined>
@@ -41,8 +42,8 @@ const pstExtractTablesAtom = atom<PstExtractTables | undefined>(undefined);
 const pstMainInfosAtom = atom<PstEmail | undefined>(undefined);
 const pstDepthAtom = atom<number>(0);
 
-const getterAtom = atom((get) => get(pstDepthAtom));
-const setterAtom = atom((set) => set(pstDepthAtom));
+// const getterAtom = atom((get) => get(pstDepthAtom));
+// const setterAtom = atom((set) => set(pstDepthAtom));
 
 export const usePSTStore = (): UsePSTInterface => {
     const [sentFolder, setSentFolder] = useAtom(sentFolderAtom);
@@ -58,7 +59,7 @@ export const usePSTStore = (): UsePSTInterface => {
     // const [, setDepth] = useAtom(setterAtom);
 
     const updateComputedPst = useCallback(
-        (pst: PstContent): void => {
+        (pst: PstFolder): void => {
             const computed = computedRoot(pst);
             setComputedPst(computed);
         },

@@ -27,6 +27,10 @@ export interface PstFolder extends PstElement {
     folderType: string;
 }
 
+export const isPstFolder = (elt: PstElement): elt is PstFolder => {
+    return elt.type === "folder" || elt.type === "rootFolder";
+};
+
 export interface PstContent extends PstFolder {
     type: "rootFolder";
     children: PstFolder[];
@@ -62,6 +66,10 @@ export interface PstEmail extends PstElement {
     attachementCount: number;
     isFromMe: boolean;
 }
+
+export const isPstEmail = (elt: PstElement): elt is PstEmail => {
+    return elt.type === "email";
+};
 
 export interface PstAttachement {
     mimeType: string;

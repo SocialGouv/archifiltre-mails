@@ -1,22 +1,21 @@
 import type {
     PstContent,
+    PstElement,
     PstEmail,
     PstExtractTables,
     PstFolder,
 } from "./../../common/modules/pst-extractor/type";
+import { isPstEmail } from "./../../common/modules/pst-extractor/type";
 
 /**
  * Get the total received emails counts of a given PST.
- *
- * @param extractTables the extracted PST tables.
- *  @returns total number of received mails
  */
 export const getPstTotalReceivedMails = (
     extractTables: PstExtractTables | undefined
 ): number => {
     if (extractTables) {
-        return [...extractTables.emails]
-            .flat(9)
+        return [...extractTables.emails.values()]
+            .flat(9) // TODO magic
             .filter((mail) => !mail.isFromMe).length;
     }
     return 0;
@@ -24,16 +23,13 @@ export const getPstTotalReceivedMails = (
 
 /**
  * Get the total sent emails attachements counts of a given PST.
- *
- * @param extractTables the extracted PST tables.
- *  @returns total number of sent mails attachements
  */
 export const getPstTotalReceivedAttachments = (
     extractTables: PstExtractTables | undefined
 ): number => {
     if (extractTables) {
-        return [...extractTables.emails]
-            .flat(9) // magic number
+        return [...extractTables.emails.values()]
+            .flat(9) // TODO magic number
             .filter((mail) => !mail.isFromMe && typeof mail !== "string")
             .reduce((prev, current) => {
                 return prev + current.attachementCount;
@@ -52,24 +48,22 @@ export const getPstTotalSentMails = (
     extractTables: PstExtractTables | undefined
 ): number => {
     if (extractTables) {
-        return [...extractTables.emails].flat(9).filter((mail) => mail.isFromMe)
-            .length;
+        return [...extractTables.emails.values()]
+            .flat(9) // TODO magic number
+            .filter((mail) => mail.isFromMe).length;
     }
     return 0;
 };
 
 /**
  * Get the total sent emails attachements counts of a given PST.
- *
- * @param extractTables the extracted PST tables.
- *  @returns total number of sent mails attachements
  */
 export const getPstTotalSentAttachments = (
     extractTables: PstExtractTables | undefined
 ): number => {
     if (extractTables) {
-        return [...extractTables.emails]
-            .flat(9) // magic number
+        return [...extractTables.emails.values()]
+            .flat(9) // TODO magic number
             .filter((mail) => mail.isFromMe) // no needs to check if mail is type of string because we allow only objects in the verification
             .reduce((prev, current) => {
                 return prev + current.attachementCount;
@@ -80,9 +74,6 @@ export const getPstTotalSentAttachments = (
 
 /**
  * Get the total deleted emails counts of a given PST.
- *
- * @param pst the extracted PST.
- * @param deletedFolderName the folder name following user choice.
  */
 export const getPstTotalDeletedMails = (
     pst: PstContent,
@@ -98,41 +89,42 @@ export const getPstTotalDeletedMails = (
 
 /**
  * Get all folder name from a given PST.
- *
- * @param pst the extracted PST.
  */
 export const getPSTRootFolderList = (pst: PstContent): string[] =>
     pst.children[0]!.children!.map(({ name }) => name);
 
 // domaine > années > mails
 
-export type PstComputedChildren = {
+export interface PstComputedChild {
     id: string;
     name: string;
     size: number;
     attachementCount: number;
-}[];
+}
 
 export interface PstComputed {
     id: string;
     name: string;
     size: number;
     value: string;
-    children: PstComputedChildren;
+    children: PstComputedChild[];
 }
 
-export const computedRoot = (pst: PstContent): PstComputed => {
+//TODO: comment
+export const computedRoot = (pst: PstFolder): PstComputed => {
     const root = pst.children;
 
-    const children: PstComputedChildren = root.map((node) => ({
-        attachementCount: node.attachementCount,
-        from: node.from,
-        id: node.id,
-        name: node.name,
-        receivedDate: node.receivedDate,
-        sentTime: node.sentTime,
-        size: node.size,
-    }));
+    const children: PstComputedChild[] =
+        root?.map((node) =>
+            isPstEmail(node)
+                ? node
+                : ({
+                      attachementCount: 0,
+                      id: node.id,
+                      name: node.name,
+                      size: node.size,
+                  } as PstComputedChild)
+        ) ?? [];
 
     const newRoot: PstComputed = {
         children,
@@ -146,9 +138,9 @@ export const computedRoot = (pst: PstContent): PstComputed => {
 };
 
 const findDeeplyNestedElement = (
-    objects: PstFolder[] | undefined,
+    objects: PstElement[] | undefined,
     id: string | undefined
-): unknown => {
+): PstElement | undefined => {
     for (const obj of objects ?? []) {
         if (obj.id == id) return obj;
         const obj1 = findDeeplyNestedElement(obj.children, id);
@@ -158,14 +150,11 @@ const findDeeplyNestedElement = (
 
 /**
  * Get first child level for a parent with an id.
- *
- * @param pst the extracted PST.
- * @param id the id of the wanted child PST.
  */
 export const findPstChildById = (
     pst: PstContent | undefined,
     id: string | undefined
-): unknown => {
+): PstElement | undefined => {
     const foundChild = findDeeplyNestedElement(pst?.children, id);
 
     return foundChild;
