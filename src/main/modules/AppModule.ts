@@ -1,6 +1,7 @@
 import { IS_DEV, IS_E2E } from "@common/config";
 import type { Module } from "@common/modules/Module";
 import { dialog } from "electron";
+import { autoUpdater } from "electron-updater";
 
 import type { MainWindowRetriever } from "..";
 
@@ -12,7 +13,7 @@ export class AppModule implements Module {
 
     async init(): Promise<void> {
         // can't await because mainWindow is created after this init
-        void this.mainWindowRetriever().then((mainWindow) => {
+        void this.mainWindowRetriever().then(async (mainWindow) => {
             // prevent navigation
             mainWindow.webContents.on("will-navigate", (event) => {
                 event.preventDefault();
@@ -37,6 +38,8 @@ export class AppModule implements Module {
                         mainWindow.destroy();
                     }
                 });
+
+                await autoUpdater.checkForUpdatesAndNotify();
             }
         });
 
