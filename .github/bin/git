@@ -23,6 +23,8 @@ elif [[ "$1" == "tag" && "$@" != *" -s"* ]]; then
         else
             command /usr/bin/git tag -s "$@"
         fi
+    else
+        command /usr/bin/git "$@"
     fi
 else
     command /usr/bin/git "$@"

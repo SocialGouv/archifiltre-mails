@@ -27,6 +27,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Setup Node
         uses: ./.github/actions/setup-node
       - name: Import GPG key
@@ -41,7 +43,7 @@ jobs:
       - name: Bump version
         run: |
           export PATH="$(pwd)/.github/bin/:$PATH"
-          yarn semantic-release
+          yarn semantic-release --debug
         env:
           ARCHIMAIL_RELEASE_MODE: version
       - name: Compile
@@ -96,6 +98,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Setup Node
         uses: ./.github/actions/setup-node
       - name: Download dist
@@ -121,6 +125,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Download all dist form build jobs
         uses: actions/download-artifact@v2
         with:
