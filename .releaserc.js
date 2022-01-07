@@ -53,7 +53,6 @@ if (releaseMode === "normal") {
 /** @type {import("semantic-release").Options} */
 const config = {
     branches: [
-        "feature/release-ci",
         "main",
         {
             channel: "next",
