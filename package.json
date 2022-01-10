@@ -50,7 +50,6 @@
   "//build.extraResources": "Static should be set again because it is overwritten",
   "build": {
     "generateUpdatesFilesForAllChannels": true,
-    "allowDowngrade": false,
     "appId": "fr.gouv.social.fabrique.archimail",
     "artifactName": "archimail-${arch}.${ext}",
     "productName": "Archimail",

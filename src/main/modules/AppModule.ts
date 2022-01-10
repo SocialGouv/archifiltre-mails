@@ -95,6 +95,12 @@ export class AppModule implements Module {
                 info: log,
                 warn: log,
             };
+            this.consoleToRendererService.log(
+                mainWindow,
+                "Current version:",
+                autoUpdater.currentVersion
+            );
+            autoUpdater.allowDowngrade = false;
             await autoUpdater.checkForUpdatesAndNotify();
         });
 
