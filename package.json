@@ -81,7 +81,7 @@
     },
     "win": {
       "icon": "./electron/build/icon.png",
-      "artifactName": "archimail-standalone.${ext}"
+      "artifactName": "archimail-${os}-standalone.${ext}"
     },
     "msi": {
       "artifactName": "archimail-${os}.${ext}"
