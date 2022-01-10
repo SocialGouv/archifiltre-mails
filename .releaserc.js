@@ -31,7 +31,10 @@ if (releaseMode === "normal") {
     plugins.push([
         "@semantic-release/github",
         {
-            assets: ["bin/**/archimail.@(exe|dmg|AppImage|msi)?(.sha512)"],
+            assets: [
+                "bin/**/archimail*.@(exe|dmg|AppImage|msi|zip)?(.sha512|blockmap)",
+                "bin/**/latest*.yml",
+            ],
             releasedLabels: false,
             successComment: false,
         },
@@ -53,7 +56,6 @@ if (releaseMode === "normal") {
 /** @type {import("semantic-release").Options} */
 const config = {
     branches: [
-        "feature/release-ci",
         "main",
         {
             channel: "next",
