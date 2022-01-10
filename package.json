@@ -13,7 +13,7 @@
     "compile": "electron-webpack",
     "dist:win": "electron-builder --x64 --win portable msi nsis",
     "dist:mac": "electron-builder --mac dmg zip",
-    "dist:mac-local": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg ",
+    "dist:mac-local": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
     "dist:linux": "electron-builder --linux AppImage",
     "start": "electron dist/main/main.js",
     "start:mac": "open -n electron/dist/mac-x64/mac/archimail.app",
@@ -46,7 +46,7 @@
   "build": {
     "generateUpdatesFilesForAllChannels": true,
     "appId": "fr.gouv.social.fabrique.archimail",
-    "artifactName": "archimail-${os}-${arch}.${ext}",
+    "artifactName": "archimail-${os}.${ext}",
     "productName": "Archimail",
     "afterSign": "scripts/notarize.js",
     "files": [
@@ -81,13 +81,13 @@
     },
     "win": {
       "icon": "./electron/build/icon.png",
-      "artifactName": "archimail-${arch}-standalone.${ext}"
+      "artifactName": "archimail-standalone.${ext}"
     },
     "msi": {
-      "artifactName": "archimail-${os}-${arch}.${ext}"
+      "artifactName": "archimail-${os}.${ext}"
     },
     "nsis": {
-      "artifactName": "archimail-${os}-${arch}-setup.${ext}"
+      "artifactName": "archimail-${os}-setup.${ext}"
     },
     "linux": {
       "category": "Office",
