@@ -126,8 +126,7 @@ jobs:
         with:
           name: ${{ matrix.target }}-bin
           path: |
-            electron/dist/*/archimail*.${{ matrix.ext }}
-            electron/dist/*/archimail*.${{ matrix.ext }}.blockmap
+            electron/dist/*/archimail*.*
             electron/dist/*/latest*.yml
 
   Release:

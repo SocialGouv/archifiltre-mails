@@ -32,7 +32,8 @@ if (releaseMode === "normal") {
         "@semantic-release/github",
         {
             assets: [
-                "bin/**/archimail*.@(exe|dmg|AppImage|msi)?(.sha512|blockmap)",
+                "bin/**/archimail*.@(exe|dmg|AppImage|msi|zip)?(.sha512|blockmap)",
+                "bin/**/latest*.yml",
             ],
             releasedLabels: false,
             successComment: false,

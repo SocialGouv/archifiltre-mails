@@ -98,6 +98,7 @@ export class AppModule implements Module {
             this.consoleToRendererService.log(
                 mainWindow,
                 "Current version:",
+                autoUpdater.currentVersion.raw,
                 autoUpdater.currentVersion
             );
             autoUpdater.allowDowngrade = false;
