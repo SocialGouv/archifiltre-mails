@@ -31,7 +31,9 @@ if (releaseMode === "normal") {
     plugins.push([
         "@semantic-release/github",
         {
-            assets: ["bin/**/archimail.@(exe|dmg|AppImage|msi)?(.sha512)"],
+            assets: [
+                "bin/**/archimail*.@(exe|dmg|AppImage|msi)?(.sha512|blockmap)",
+            ],
             releasedLabels: false,
             successComment: false,
         },
@@ -53,12 +55,17 @@ if (releaseMode === "normal") {
 /** @type {import("semantic-release").Options} */
 const config = {
     branches: [
-        "main",
         {
             channel: "next",
-            name: "dev",
+            name: "feature/auto-update",
             prerelease: "next",
         },
+        "main",
+        // {
+        //     channel: "next",
+        //     name: "dev",
+        //     prerelease: "next",
+        // },
         {
             name: "beta",
             prerelease: true,

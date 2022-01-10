@@ -79,7 +79,7 @@ app.on("ready", async () => {
     // load "main-process" modules
     await loadModules(
         ...isomorphicModules,
-        new AppModule(mainWindowRetriever),
+        new AppModule(mainWindowRetriever, consoleToRendererService),
         new DevToolsModule(),
         new PstExtractorModule(containerModule.get("userConfigService")),
         new MenuModule(

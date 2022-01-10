@@ -13,8 +13,10 @@
     "compile": "electron-webpack",
     "dist:win32": "electron-builder --windows portable --ia32",
     "dist:win64": "electron-builder --windows portable --x64",
-    "dist:win32-msi": "electron-builder --windows portable --ia32 --windows=msi",
-    "dist:win64-msi": "electron-builder --windows portable --x64 --windows=msi",
+    "dist:win32-msi": "electron-builder --ia32 --windows=msi",
+    "dist:win64-msi": "electron-builder --x64 --windows=msi",
+    "dist:win32-nsis": "electron-builder --ia32 --windows=nsis",
+    "dist:win64-nsis": "electron-builder --x64 --windows=nsis",
     "dist:mac": "electron-builder --mac dmg",
     "dist:mac-local": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
     "dist:linux": "electron-builder --linux AppImage",
@@ -47,8 +49,10 @@
   },
   "//build.extraResources": "Static should be set again because it is overwritten",
   "build": {
+    "generateUpdatesFilesForAllChannels": true,
+    "allowDowngrade": false,
     "appId": "fr.gouv.social.fabrique.archimail",
-    "artifactName": "archimail.${ext}",
+    "artifactName": "archimail-${arch}.${ext}",
     "productName": "Archimail",
     "afterSign": "scripts/notarize.js",
     "files": [
@@ -71,7 +75,7 @@
       }
     ],
     "directories": {
-      "output": "electron/dist/${os}-${arch}"
+      "output": "electron/dist/${os}"
     },
     "mac": {
       "category": "public.app-category.productivity",
@@ -82,10 +86,14 @@
       "entitlementsInherit": "./electron/build/entitlements.mac.plist"
     },
     "win": {
-      "icon": "./electron/build/icon.png"
+      "icon": "./electron/build/icon.png",
+      "artifactName": "archimail-${arch}-standalone.${ext}"
+    },
+    "msi": {
+      "artifactName": "archimail-${arch}.${ext}"
     },
     "nsis": {
-      "artifactName": "archimail.setup.${ext}"
+      "artifactName": "archimail-${arch}.setup.${ext}"
     },
     "linux": {
       "category": "Office",
