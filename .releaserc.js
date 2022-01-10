@@ -56,17 +56,12 @@ if (releaseMode === "normal") {
 /** @type {import("semantic-release").Options} */
 const config = {
     branches: [
+        "main",
         {
             channel: "next",
-            name: "feature/auto-update",
+            name: "dev",
             prerelease: "next",
         },
-        "main",
-        // {
-        //     channel: "next",
-        //     name: "dev",
-        //     prerelease: "next",
-        // },
         {
             name: "beta",
             prerelease: true,

@@ -62,37 +62,14 @@ jobs:
         target:
           - linux
           - mac
-          - win32
-          - win32-msi
-          - win32-nsis
-          - win64
-          - win64-msi
-          - win64-nsis
+          - win
         include:
           - target: linux
             os: ubuntu-latest
-            ext: AppImage
           - target: mac
             os: macos-latest
-            ext: dmg
-          - target: win32
+          - target: win
             os: windows-latest
-            ext: exe
-          - target: win32-msi
-            os: windows-latest
-            ext: msi
-          - target: win32-nsis
-            os: windows-latest
-            ext: exe
-          - target: win64
-            os: windows-latest
-            ext: exe
-          - target: win64-msi
-            os: windows-latest
-            ext: msi
-          - target: win64-nsis
-            os: windows-latest
-            ext: exe
 
     name: Build binary for ${{ matrix.target }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -144,7 +121,7 @@ jobs:
       - name: Generate hashes
         run: >-
           find . -regextype posix-extended
-          -regex ".*/bin/.*/archimail\.(exe|AppImage|dmg|msi)$"
+          -regex ".*/bin/.*/archimail.*\.(exe|AppImage|dmg|msi|zip)$"
           -type f
           -exec bash -c "openssl dgst -sha512 {} > {}.sha512" \;
       - name: Setup Node
