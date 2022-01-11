@@ -111,7 +111,7 @@ export interface PstComputed {
 }
 
 //TODO: comment
-export const computedRoot = (pst: PstFolder): PstComputed => {
+export const computedRoot = (pst: PstFolder, nodeId: string): PstComputed => {
     const root = pst.children;
 
     const children: PstComputedChild[] =
@@ -128,7 +128,7 @@ export const computedRoot = (pst: PstFolder): PstComputed => {
 
     const newRoot: PstComputed = {
         children,
-        id: "rootId",
+        id: nodeId,
         name: "root",
         size: 0.0001,
         value: "size",
@@ -159,6 +159,9 @@ export const findPstChildById = (
 
     return foundChild;
 };
+
+export const isToDeleteFolder = (id: string, deleteIds: string[]): boolean =>
+    deleteIds.includes(id);
 
 export const getPstTotalContacts = (
     contactTable: Map<string, string[]> | undefined

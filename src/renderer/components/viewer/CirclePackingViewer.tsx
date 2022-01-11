@@ -8,7 +8,7 @@ import React, { useCallback } from "react";
 import { useTagManagerStore } from "../../../renderer/store/TagManagerStore";
 import { usePSTStore } from "../../store/PSTStore";
 import type { PstComputed } from "../../utils/pst-extractor";
-import { findPstChildById } from "../../utils/pst-extractor";
+import { findPstChildById, isToDeleteFolder } from "../../utils/pst-extractor";
 import { Menu } from "../menu/Menu";
 
 interface CirclePackingViewerProps {
@@ -52,7 +52,7 @@ export const CirclePackingViewer: React.FC<CirclePackingViewerProps> = ({
     const { computedPst, updateComputedPst, setMainInfos, setDepth } =
         usePSTStore();
 
-    const { setHoveredId } = useTagManagerStore();
+    const { setHoveredId, markedToDelete } = useTagManagerStore();
 
     const updatePstView = useCallback<UpdatePstViewInterface>(
         (node: Node) => {
@@ -60,7 +60,7 @@ export const CirclePackingViewer: React.FC<CirclePackingViewerProps> = ({
 
             const child = findPstChildById(pstFile, node.id);
             if (child && isPstFolder(child)) {
-                updateComputedPst(child);
+                updateComputedPst(child, node.id);
                 setDepth((depth: number) => depth + 1);
             }
         },
@@ -84,6 +84,10 @@ export const CirclePackingViewer: React.FC<CirclePackingViewerProps> = ({
 
     if (!computedPst) return null;
 
+    const borderColor = isToDeleteFolder(computedPst.id, markedToDelete)
+        ? "red"
+        : "transparent";
+
     return (
         <>
             <ResponsiveCirclePacking
@@ -91,6 +95,8 @@ export const CirclePackingViewer: React.FC<CirclePackingViewerProps> = ({
                 onClick={updatePstView}
                 onMouseEnter={updateMainInfos}
                 onMouseLeave={emptyMaininfos}
+                borderColor={borderColor}
+                borderWidth={3}
                 isInteractive={true}
                 {...commonProperties}
             />

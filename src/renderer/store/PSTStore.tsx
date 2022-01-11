@@ -22,7 +22,7 @@ export interface UsePSTInterface {
     setPstFile: (update: SetStateAction<PstContent | undefined>) => void;
     computedPst: PstComputed | undefined;
     setComputedPst: (update: SetStateAction<PstComputed | undefined>) => void;
-    updateComputedPst: (pst: PstFolder) => void;
+    updateComputedPst: (pst: PstFolder, nodeId: string) => void;
     extractTables: PstExtractTables | undefined;
     setExtractTables: (
         update: SetStateAction<PstExtractTables | undefined>
@@ -59,8 +59,8 @@ export const usePSTStore = (): UsePSTInterface => {
     // const [, setDepth] = useAtom(setterAtom);
 
     const updateComputedPst = useCallback(
-        (pst: PstFolder): void => {
-            const computed = computedRoot(pst);
+        (pst: PstFolder, nodeId: string): void => {
+            const computed = computedRoot(pst, nodeId);
             setComputedPst(computed);
         },
         [setComputedPst]
