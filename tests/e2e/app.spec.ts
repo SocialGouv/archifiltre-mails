@@ -47,6 +47,6 @@ test.describe("App e2e", () => {
     });
 
     test("should render the application", async () => {
-        expect((await win.content()).includes("#app")).toBeTruthy();
+        expect((await win.content()).includes(`<div id="app">`)).toBeTruthy();
     });
 });
