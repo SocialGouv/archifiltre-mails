@@ -41,7 +41,7 @@ export const usePSTExtractor = (): UsePSTExtractor => {
                         pstFilePath,
                     });
                 setPstFile(pstExtractedFile);
-                updateComputedPst(pstExtractedFile);
+                updateComputedPst(pstExtractedFile, "root");
                 setExtractTables(extractTables);
             })();
         }
