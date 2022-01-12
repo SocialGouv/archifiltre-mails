@@ -28,20 +28,31 @@ if (releaseMode === "normal") {
             },
         ]);
     }
-    plugins.push([
-        "@semantic-release/github",
-        {
-            assets: ["bin/**/archimail.@(exe|dmg|AppImage|msi)?(.sha512)"],
-            releasedLabels: false,
-            successComment: false,
-        },
-    ]);
+    plugins.push(
+        [
+            "@semantic-release/github",
+            {
+                assets: [
+                    "bin/**/archimail*.@(exe|dmg|AppImage|msi|zip)?(.sha512|blockmap)",
+                    "bin/**/latest*.yml",
+                ],
+                releasedLabels: false,
+                successComment: false,
+            },
+        ],
+        [
+            "@semantic-release/exec",
+            {
+                publishCmd: `git notes --ref semantic-release add -f -m '{"channels": [\${nextRelease.channel ? JSON.stringify(nextRelease.channel) : null}]}' \${nextRelease.gitTag} && git push --force origin refs/notes/semantic-release`,
+            },
+        ]
+    );
 } else if (releaseMode === "version") {
     plugins.push([
         "@semantic-release/exec",
         {
             publishCmd:
-                "/usr/bin/git tag -d ${nextRelease.gitTag} && /usr/bin/git push origin :${nextRelease.gitTag}",
+                'echo "{\\"deleteLog\\": \\"$(/usr/bin/git tag -d ${nextRelease.gitTag} && /usr/bin/git push origin :${nextRelease.gitTag})\\"}"',
         },
     ]);
 } else {
@@ -53,7 +64,6 @@ if (releaseMode === "normal") {
 /** @type {import("semantic-release").Options} */
 const config = {
     branches: [
-        "feature/release-ci",
         "main",
         {
             channel: "next",
