@@ -10,11 +10,12 @@ export interface UseTagManagerInterface {
     hoveredId: string;
     setHoveredId: (update: SetStateAction<string>) => void;
     addMarkedToDelete: () => void;
+    addChildrenMarkedToDelete: (idsToDelete: string[]) => void;
 }
 
-const markedToDeleteAtom = atom<string[]>([""]);
-const markedToKeepAtom = atom<string[]>([""]);
-const hoveredIdAtom = atom<string>("");
+export const markedToDeleteAtom = atom<string[]>([""]);
+export const markedToKeepAtom = atom<string[]>([""]);
+export const hoveredIdAtom = atom<string>("");
 
 export const useTagManagerStore = (): UseTagManagerInterface => {
     const [markedToDelete, setMarkedToDelete] = useAtom(markedToDeleteAtom);
@@ -28,7 +29,15 @@ export const useTagManagerStore = (): UseTagManagerInterface => {
         setMarkedToDelete(updatedMarkedToDelete);
     }, [hoveredId, markedToDelete, setMarkedToDelete]);
 
+    const addChildrenMarkedToDelete = (idsToDelete: string[]) => {
+        const updatedMarkedToDelete = [
+            ...new Set([...markedToDelete, ...idsToDelete]),
+        ];
+        setMarkedToDelete(updatedMarkedToDelete);
+    };
+
     return {
+        addChildrenMarkedToDelete,
         addMarkedToDelete,
         hoveredId,
         markedToDelete,

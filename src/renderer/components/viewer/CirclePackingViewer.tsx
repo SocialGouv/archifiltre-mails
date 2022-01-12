@@ -3,9 +3,11 @@ import { isPstFolder } from "@common/modules/pst-extractor/type";
 import type { Any } from "@common/utils/type";
 import type { CirclePackingSvgProps } from "@nivo/circle-packing";
 import { ResponsiveCirclePacking } from "@nivo/circle-packing";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 
 import { useTagManagerStore } from "../../../renderer/store/TagManagerStore";
+import { ROOT } from "../../../renderer/utils/constants";
+import { getPstComputeChildrenId } from "../../../renderer/utils/tag-manager";
 import { usePSTStore } from "../../store/PSTStore";
 import type { PstComputed } from "../../utils/pst-extractor";
 import { findPstChildById, isToDeleteFolder } from "../../utils/pst-extractor";
@@ -52,11 +54,12 @@ export const CirclePackingViewer: React.FC<CirclePackingViewerProps> = ({
     const { computedPst, updateComputedPst, setMainInfos, setDepth } =
         usePSTStore();
 
-    const { setHoveredId, markedToDelete } = useTagManagerStore();
+    const { setHoveredId, markedToDelete, addChildrenMarkedToDelete } =
+        useTagManagerStore();
 
     const updatePstView = useCallback<UpdatePstViewInterface>(
         (node: Node) => {
-            if (node.id === "rootId") return;
+            if (node.id === ROOT) return;
 
             const child = findPstChildById(pstFile, node.id);
             if (child && isPstFolder(child)) {
@@ -81,6 +84,15 @@ export const CirclePackingViewer: React.FC<CirclePackingViewerProps> = ({
     const emptyMaininfos = useCallback(() => {
         setMainInfos(undefined);
     }, [setMainInfos]);
+
+    useEffect(() => {
+        if (computedPst && isToDeleteFolder(computedPst.id, markedToDelete)) {
+            addChildrenMarkedToDelete(
+                getPstComputeChildrenId(computedPst.children)
+            );
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [computedPst]);
 
     if (!computedPst) return null;
 

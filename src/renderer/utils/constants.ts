@@ -18,3 +18,5 @@ export type VIZUALISATION =
 
 // extractor
 export const ACCEPTED_EXTENSION = ".pst";
+
+export const ROOT = "root";
