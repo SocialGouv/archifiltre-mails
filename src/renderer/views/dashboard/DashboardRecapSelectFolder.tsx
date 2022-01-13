@@ -1,18 +1,18 @@
 import type { FC } from "react";
 import React from "react";
 
-import { usePSTFolderList } from "../../hooks/usePSTFolderList";
+import { usePstFolderList } from "../../hooks/usePSTFolderList";
 import style from "./Dashboard.module.scss";
 import { DashboardRecapSelectFolderItem } from "./DashboardRecapSelectFolderItem";
 
-interface DashboardRecapSelectFolderProps {
+export interface DashboardRecapSelectFolderProps {
     switchView: () => void;
 }
 
 export const DashboardRecapSelectFolder: FC<
     DashboardRecapSelectFolderProps
 > = ({ switchView }) => {
-    const { folderList } = usePSTFolderList();
+    const { folderList } = usePstFolderList();
 
     return (
         <div className={style.dashboard__select}>

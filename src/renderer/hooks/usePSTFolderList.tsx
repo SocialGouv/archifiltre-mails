@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 
-import { usePSTStore } from "../store/PSTStore";
+import { usePstStore } from "../store/PSTStore";
 import { getPSTRootFolderList } from "../utils/pst-extractor";
 
-interface UsePSTExtractor {
+interface UsePstFolderList {
     folderList: string[];
 }
 
-export const usePSTFolderList = (): UsePSTExtractor => {
+export const usePstFolderList = (): UsePstFolderList => {
     const [folderList, setFolderList] = useState<string[]>([""]);
 
-    const { pstFile } = usePSTStore();
+    const { pstFile } = usePstStore();
 
     useEffect(() => {
         if (pstFile) {

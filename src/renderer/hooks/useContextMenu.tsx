@@ -1,18 +1,19 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { useTagManagerStore } from "../store/TagManagerStore";
+import { CIRCLE_PACKING_ID } from "../utils/constants";
 
 interface UseContextMenuType {
     anchorPoint: {
         x: number;
         y: number;
     };
-    show: boolean | null;
+    show?: boolean;
 }
 
 export const useContextMenu = (): UseContextMenuType => {
     const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
-    const [show, setShow] = useState<boolean | null>(false);
+    const [show, setShow] = useState<UseContextMenuType["show"]>(false);
     const { addMarkedToDelete } = useTagManagerStore();
 
     const handleMarkedToDelete = useCallback(() => {
@@ -32,10 +33,10 @@ export const useContextMenu = (): UseContextMenuType => {
         if (show) {
             setShow(false);
         }
-        setShow(null);
+        setShow(void 0);
     }, [show]);
 
-    const menu = document.querySelector("#circle-packing");
+    const menu = document.querySelector(CIRCLE_PACKING_ID);
     const markedToDeleteBtn = document.querySelector("#to-delete-btn");
     const markedToKeepBtn = document.querySelector("#to-keep-btn");
 

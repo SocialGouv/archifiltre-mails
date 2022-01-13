@@ -6,6 +6,7 @@ import type {
     PstFolder,
 } from "./../../common/modules/pst-extractor/type";
 import { isPstEmail } from "./../../common/modules/pst-extractor/type";
+import { ARBITRARY_FLAT_LEVEL } from "./constants";
 
 /**
  * Get the total received emails counts of a given PST.
@@ -15,7 +16,7 @@ export const getPstTotalReceivedMails = (
 ): number => {
     if (extractTables) {
         return [...extractTables.emails.values()]
-            .flat(9) // TODO magic
+            .flat(ARBITRARY_FLAT_LEVEL) // TODO magic
             .filter((mail) => !mail.isFromMe).length;
     }
     return 0;
@@ -29,7 +30,7 @@ export const getPstTotalReceivedAttachments = (
 ): number => {
     if (extractTables) {
         return [...extractTables.emails.values()]
-            .flat(9) // TODO magic number
+            .flat(ARBITRARY_FLAT_LEVEL) // TODO no magic number, should be a parameter
             .filter((mail) => !mail.isFromMe && typeof mail !== "string")
             .reduce((prev, current) => {
                 return prev + current.attachementCount;
@@ -38,32 +39,23 @@ export const getPstTotalReceivedAttachments = (
     return 0;
 };
 
-/**
- * Get the total sent emails counts of a given PST.
- *
- * @param extractTables the extracted PST tables.
- *  @returns total number of sent mails
- */
 export const getPstTotalSentMails = (
     extractTables: PstExtractTables | undefined
 ): number => {
     if (extractTables) {
         return [...extractTables.emails.values()]
-            .flat(9) // TODO magic number
+            .flat(ARBITRARY_FLAT_LEVEL) // TODO no magic number, should be a parameter
             .filter((mail) => mail.isFromMe).length;
     }
     return 0;
 };
 
-/**
- * Get the total sent emails attachements counts of a given PST.
- */
 export const getPstTotalSentAttachments = (
     extractTables: PstExtractTables | undefined
 ): number => {
     if (extractTables) {
         return [...extractTables.emails.values()]
-            .flat(9) // TODO magic number
+            .flat(ARBITRARY_FLAT_LEVEL) // TODO no magic number, should be a parameter
             .filter((mail) => mail.isFromMe) // no needs to check if mail is type of string because we allow only objects in the verification
             .reduce((prev, current) => {
                 return prev + current.attachementCount;
@@ -93,8 +85,6 @@ export const getPstTotalDeletedMails = (
 export const getPSTRootFolderList = (pst: PstContent): string[] =>
     pst.children[0]!.children!.map(({ name }) => name);
 
-// domaine > années > mails
-
 export interface PstComputedChild {
     id: string;
     name: string;
@@ -111,6 +101,12 @@ export interface PstComputed {
 }
 
 //TODO: comment
+/**
+ * Get the next PST child level when navigates through the archive viewer.
+ * @param pst the pst archive
+ * @param nodeId the current clicked node id
+ * @returns
+ */
 export const computedRoot = (pst: PstFolder, nodeId: string): PstComputed => {
     const root = pst.children;
 
@@ -167,14 +163,14 @@ export const getPstTotalContacts = (
     contactTable: Map<string, string[]> | undefined
 ): number | undefined => {
     if (contactTable) {
-        return [...contactTable].flat(9).length;
+        return [...contactTable].flat(ARBITRARY_FLAT_LEVEL).length;
     }
 };
 export const getPstTotalMails = (
     mailsTable: Map<string, PstEmail[]> | undefined
 ): number | undefined => {
     if (mailsTable) {
-        return [...mailsTable].flat(9).length;
+        return [...mailsTable].flat(ARBITRARY_FLAT_LEVEL).length;
     }
 };
 

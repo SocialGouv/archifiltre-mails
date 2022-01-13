@@ -6,7 +6,7 @@ import {
     FilterPicto,
     ImportPicto,
     SearchPicto,
-} from "../../../renderer/components/common/pictos/picto";
+} from "../../components/common/pictos/picto";
 import style from "./Dashboard.module.scss";
 import { DashboardActionsExporter } from "./DashboardActionsExporter";
 

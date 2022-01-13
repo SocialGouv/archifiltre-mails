@@ -3,9 +3,9 @@ import type { PstProgressState } from "@common/modules/pst-extractor/type";
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 
-import { usePSTStore } from "../store/PSTStore";
+import { usePstStore } from "../store/PSTStore";
 
-interface UsePSTExtractor {
+interface UsePstExtractor {
     pstProgress: PstProgressState;
     setPstFilePath: Dispatch<SetStateAction<string>>;
 }
@@ -24,14 +24,14 @@ const pstProgressInitialState: PstProgressState = {
  *
  * @returns extracted file and progress
  */
-export const usePSTExtractor = (): UsePSTExtractor => {
+export const usePstExtractor = (): UsePstExtractor => {
     const [pstFilePath, setPstFilePath] = useState<string>("");
     const [pstProgress, setPstProgress] = useState<PstProgressState>(
         pstProgressInitialState
     );
     const pstExtractorService = useService("pstExtractorService");
 
-    const { setPstFile, setExtractTables, updateComputedPst } = usePSTStore();
+    const { setPstFile, setExtractTables, updateComputedPst } = usePstStore();
 
     useEffect(() => {
         if (pstFilePath && pstExtractorService) {

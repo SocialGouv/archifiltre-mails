@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { ExporterType } from "../exporters/Exporter";
 import { exporters } from "../exporters/Exporter";
 import { openDialogService } from "../services/OpenDialogService";
-import { usePSTStore } from "../store/PSTStore";
+import { usePstStore } from "../store/PSTStore";
 import { formatEmailTable } from "../utils/exporter";
 
 interface UseExporter {
@@ -13,7 +13,7 @@ interface UseExporter {
 export const useExporter = (): UseExporter => {
     const [path, setPath] = useState("");
     const [exportType, setExportType] = useState<ExporterType>("json");
-    const { extractTables } = usePSTStore();
+    const { extractTables } = usePstStore();
 
     const openSaveDialog = useCallback((type: ExporterType) => {
         openDialogService.openSaveDestinationWindow(type);

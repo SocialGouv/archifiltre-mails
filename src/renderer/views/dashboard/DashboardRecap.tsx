@@ -1,14 +1,14 @@
 import type { FC } from "react";
 import React, { useCallback, useState } from "react";
 
-import { Card } from "../../../renderer/components/common/card/Card";
+import { Card } from "../../components/common/card/Card";
 import {
     ContactPicto,
     MailPicto,
     MailSentPicto,
     TrashPicto,
-} from "../../../renderer/components/common/pictos/picto";
-import { usePSTStore } from "../../../renderer/store/PSTStore";
+} from "../../components/common/pictos/picto";
+import { usePstStore } from "../../store/PSTStore";
 import {
     getPstMailsPercentage,
     getPstTotalContacts,
@@ -17,7 +17,7 @@ import {
     getPstTotalReceivedMails,
     getPstTotalSentAttachments,
     getPstTotalSentMails,
-} from "../../../renderer/utils/pst-extractor";
+} from "../../utils/pst-extractor";
 import style from "./Dashboard.module.scss";
 import { DashboardRecapItem } from "./DashboardRecapItem";
 import { DashboardRecapSelectFolder } from "./DashboardRecapSelectFolder";
@@ -29,7 +29,7 @@ export const DashboardRecap: FC = () => {
     const switchView = useCallback(() => {
         setIsRecapReady(true);
     }, []);
-    const { pstFile, deletedFolder, extractTables } = usePSTStore();
+    const { pstFile, deletedFolder, extractTables } = usePstStore();
 
     // mails received
     const receivedMailsTotal = getPstTotalReceivedMails(extractTables);

@@ -2,12 +2,12 @@
 import type { FC } from "react";
 import React from "react";
 
-import { Card } from "../../../renderer/components/common/card/Card";
-import { usePSTStore } from "../../../renderer/store/PSTStore";
+import { Card } from "../../components/common/card/Card";
+import { usePstStore } from "../../store/PSTStore";
 import style from "./Dashboard.module.scss";
 
 export const DashboardInformations: FC = () => {
-    const { mainInfos } = usePSTStore();
+    const { mainInfos } = usePstStore();
 
     return (
         <Card title="Informations" color="green">
@@ -24,7 +24,6 @@ export const DashboardInformations: FC = () => {
                         </li>
                         <li>
                             <span>Nombre de mails : </span>
-                            {/* {mainInfos.attachementCount} */}
                         </li>
 
                         <li>
@@ -38,7 +37,6 @@ export const DashboardInformations: FC = () => {
                         <li>
                             <span>Adresse mail : </span>
                             {JSON.stringify(mainInfos.from, null, 1)}
-                            {/* {mainInfos.from.email ?? null} */}
                         </li>
                     </ul>
                 ) : (

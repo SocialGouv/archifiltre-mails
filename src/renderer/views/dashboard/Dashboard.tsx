@@ -1,4 +1,3 @@
-import type { FC } from "react";
 import React from "react";
 
 import style from "./Dashboard.module.scss";
@@ -8,7 +7,7 @@ import { DashboardInformations } from "./DashboardInformations";
 import { DashboardRecap } from "./DashboardRecap";
 import { DashboardViewer } from "./DashboardViewer";
 
-export const Dashboard: FC = () => {
+export const Dashboard: React.FC = () => {
     return (
         <div className={style.dashboard}>
             <DashboardActions />
