@@ -6,6 +6,7 @@
       "DOM"
     ],
     "resolveJsonModule": true,
+    "experimentalDecorators": true,
     "noUncheckedIndexedAccess": true,
     "jsx": "react",
     "target": "ES2017",

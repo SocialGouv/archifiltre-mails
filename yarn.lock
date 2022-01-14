@@ -1252,6 +1252,11 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
+"@lsagetlethias/tstrait@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@lsagetlethias/tstrait/-/tstrait-2.0.2.tgz#47f8a6e19975976f9a976dfa31f4dd1476a336f3"
+  integrity sha512-RJ/XwFi7IF4ldZO81+nsH+0gw423smWFU6X96m9WlMTgmOU8T+qouqPfrL59U2z1ZegFjLFaR7ekzWqzGfWr1w==
+
 "@malept/cross-spawn-promise@^1.1.0":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@malept/cross-spawn-promise/-/cross-spawn-promise-1.1.1.tgz#504af200af6b98e198bce768bc1730c6936ae01d"

@@ -27,14 +27,9 @@
   "i18n-ally.localesPaths": [
     "static/locales"
   ],
-  "i18n-ally.localeCountryMap": {
-    "en": "en-US",
-    "fr": "fr-FR"
-  },
   "i18n-ally.enabledFrameworks": [
     "react",
-    "i18next",
-    "general"
+    "i18next"
   ],
   "i18n-ally.enabledParsers": [
     "json"
@@ -44,5 +39,5 @@
   "i18n-ally.sortKeys": true,
   "i18n-ally.keepFulfilled": true,
   "i18n-ally.displayLanguage": "fr-FR",
-  "i18n-ally.keystyle": "nested"
+  "i18n-ally.keystyle": "flat",
 }

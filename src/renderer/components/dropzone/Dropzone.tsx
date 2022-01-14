@@ -25,8 +25,8 @@ export const Dropzone: React.FC<DropzoneProps> = ({ accept, onDrop }) => {
     return (
         <div className={style.dropzone}>
             <div className={style["dropzone-title"]}>
-                <h1 todo-i18n="true">{t("dropzone.download-here")}</h1>
-                <span todo-i18n="true">{t("dropzone.pst-limitation")}</span>
+                <h1>{t("dropzone.download-here")}</h1>
+                <span>{t("dropzone.pst-limitation")}</span>
             </div>
             <div
                 className={getClassName(style["dropzone-area"]!, isDragActive)}
@@ -38,11 +38,11 @@ export const Dropzone: React.FC<DropzoneProps> = ({ accept, onDrop }) => {
                 />
                 <div className={style["dropzone-text"]}>
                     {isDragActive ? (
-                        <p className="dropzone-text-item" todo-i18n="true">
+                        <p className="dropzone-text-item">
                             {t("dropzone.drop")}
                         </p>
                     ) : (
-                        <p className="dropzone-text-item" todo-i18n="true">
+                        <p className="dropzone-text-item">
                             {t("dropzone.click-or-drag")}
                         </p>
                     )}

@@ -1,3 +1,5 @@
+import { WaitableTrait } from "@common/utils/WaitableTrait";
+import { Use } from "@lsagetlethias/tstrait";
 import { app, ipcMain, ipcRenderer } from "electron";
 import Store from "electron-store";
 
@@ -57,6 +59,11 @@ export class UserConfigModule extends IsomorphicModule {
     // bang because only used on main process
     private store!: Store<UserConfigV1>;
 
+    // bang because only used on renderer process
+    private localConfigCopy!: UserConfigV1;
+
+    private _service?: UserConfigService;
+
     private readonly configId = IS_MAIN
         ? "main"
         : (globalThis._configId = globalThis._configId ?? randomString());
@@ -115,44 +122,28 @@ export class UserConfigModule extends IsomorphicModule {
             });
         } else {
             // ask main for initial config
-            let localConfigCopy: UserConfigV1 = await ipcRenderer.invoke(
-                CONFIG_INIT_EVENT
-            );
+            this.localConfigCopy = await ipcRenderer.invoke(CONFIG_INIT_EVENT);
             // subscribe to any udpate
             ipcRenderer.on(CONFIG_UPDATE_EVENT, (_event, arg) => {
-                localConfigCopy = arg;
+                this.localConfigCopy = arg;
             });
             ipcRenderer.send(CONFIG_ASK_UPDATE_EVENT, this.configId);
-            this.get = (key) => localConfigCopy[key];
-            Object.seal(this);
         }
         this.inited = true;
+        this.service.resolve();
     }
 
     /**
      * The linked service used to access config accross the application.
      */
     public get service(): UserConfigService {
-        return new (class InnerUserConfigService
-            extends IsomorphicService
-            implements UserConfigService
-        {
-            readonly name = "UserConfigService";
-
-            set = this.userConfigModule.set;
-
-            constructor(private readonly userConfigModule: UserConfigModule) {
-                super();
-            }
-
-            get: UserConfigGetter = (key) => {
-                return this.userConfigModule.get(key);
-            };
-
-            async init() {
-                return Promise.resolve();
-            }
-        })(this);
+        return (
+            this._service ??
+            (this._service = new InnerUserConfigService(
+                this.get,
+                this.set
+            ) as UserConfigService)
+        );
     }
 
     /**
@@ -161,31 +152,55 @@ export class UserConfigModule extends IsomorphicModule {
      * @param key The config key
      * @returns The config value
      */
-    private get: UserConfigGetter = (key) => {
+    private readonly get: UserConfigGetter = (key) => {
+        if (!this.inited) {
+            throw new Error(
+                "[UserConfigModule] Can't get config outside if not inited."
+            );
+        }
         if (IS_MAIN) return this.store.get(key);
-        else throw new Error("Can't direct access config outside of main."); // TODO: proper ERROR management
+        else return this.localConfigCopy[key];
     };
 
     /**
      * Set a value associated with the provided key. Only works from main. Setting undefined will delete the key.
      *
+     * @todo set from renderer
+     *
      * @param key The config key
      * @param value The set value
      */
     private readonly set: UserConfigSetter = (key, value) => {
+        if (!this.inited) {
+            throw new Error(
+                "[UserConfigModule] Can't set config outside if not inited."
+            );
+        }
         if (IS_MAIN) {
             this.store.set(key, value);
-        } else throw new Error("Can't direct access config outside of main."); // TODO: proper ERROR management
+        } else
+            throw new Error(
+                "[UserConfigModule] Can't direct set config outside of main."
+            ); // TODO: proper ERROR management
     };
 }
 
-export interface UserConfigService extends IsomorphicService {
-    /**
-     * Get a config by its name.
-     */
-    readonly get: UserConfigGetter;
-    /**
-     * Set a config by its name and value.
-     */
-    readonly set: UserConfigSetter;
+@Use(WaitableTrait)
+class InnerUserConfigService extends IsomorphicService {
+    readonly name = "UserConfigService";
+
+    constructor(
+        /**
+         * Get a config by its name.
+         */
+        public readonly get: UserConfigGetter,
+        /**
+         * Set a config by its name and value.
+         */
+        public readonly set: UserConfigSetter
+    ) {
+        super();
+    }
 }
+
+export type UserConfigService = InnerUserConfigService & WaitableTrait;
