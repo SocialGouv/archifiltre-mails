@@ -81,22 +81,22 @@ Sous license [Apache-2.0](LICENSE)
   - [x] jest integration tests
   - [x] playwright e2e tests
   - [x] coverage + push result (https://dev.to/penx/combining-storybook-cypress-and-jest-code-coverage-4pa5)
-- [ ] Sign + notarize + build + deploy
-  - [ ] Release channels (stable, beta, canary)
-- [ ] Auto update (electron-builder code pusher)
-- [ ] CI
+- [x] Sign + notarize + build + deploy
+  - [x] Release channels (stable, beta, canary)
+- [x] Auto update (electron-builder code pusher)
+- [x] CI
   - [x] tests
   - [x] coverage
-  - [ ] generate build
+  - [x] generate build
 ### Services
 - [ ] Logger (winston + sentry + console + "renderer transport to main")
 - [ ] Tracker (matomo) (le casse 🍒)
 - [x] global and user config (shared over ipc)
-- [ ] i18n (i18next + react-i18next (start [here](./src/common/i18n/)))
+- [x] i18n (i18next + react-i18next (start [here](./src/common/i18n/)))
 
 ### Doc
 - [ ] Tech doc tool (docusaurus? next? jekyll?) + github pages
-- [ ] CONTRIBUTING
+- [x] CONTRIBUTING
 - [ ] README
-- [ ] CHANGELOG tech (https://keepachangelog.com/en/1.0.0/)
+- [x] CHANGELOG tech (https://keepachangelog.com/en/1.0.0/)
 - [ ] UPGRADE

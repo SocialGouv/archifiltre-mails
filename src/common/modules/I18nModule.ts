@@ -13,6 +13,11 @@ import type { UserConfigService } from "./UserConfigModule";
 
 const I18N_REQUEST_EVENT = "i18n.event.request";
 
+/**
+ * Isomorphic module responsible for loading all i18n resources.
+ *
+ * Because of ismorphisme, locale files are available in main AND renderer.
+ */
 export class I18nModule extends IsomorphicModule {
     private readonly mainCache = new Map<Locale, Map<Namespace, ResourceKey>>();
 

@@ -29,7 +29,8 @@
   ],
   "i18n-ally.enabledFrameworks": [
     "react",
-    "i18next"
+    "i18next",
+    "general"
   ],
   "i18n-ally.enabledParsers": [
     "json"
@@ -40,4 +41,7 @@
   "i18n-ally.keepFulfilled": true,
   "i18n-ally.displayLanguage": "fr-FR",
   "i18n-ally.keystyle": "flat",
+  "i18n-ally.extract.keygenStrategy": "empty",
+  "i18n-ally.extract.autoDetect": false,
+  "editor.suggest.showWords": false
 }
