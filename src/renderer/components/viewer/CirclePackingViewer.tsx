@@ -4,11 +4,11 @@ import type { Any } from "@common/utils/type";
 import type { CirclePackingSvgProps } from "@nivo/circle-packing";
 import { ResponsiveCirclePacking } from "@nivo/circle-packing";
 import React, { useCallback, useEffect } from "react";
+import { getPstComputeChildrenId } from "src/renderer/utils/tag-manager";
 
-import { useTagManagerStore } from "../../../renderer/store/TagManagerStore";
-import { ROOT } from "../../../renderer/utils/constants";
-import { getPstComputeChildrenId } from "../../../renderer/utils/tag-manager";
-import { usePSTStore } from "../../store/PSTStore";
+import { usePstStore } from "../../store/PSTStore";
+import { useTagManagerStore } from "../../store/TagManagerStore";
+import { RED, ROOT, TRANSPARENT } from "../../utils/constants";
 import type { PstComputed } from "../../utils/pst-extractor";
 import { findPstChildById, isToDeleteFolder } from "../../utils/pst-extractor";
 import { Menu } from "../menu/Menu";
@@ -52,7 +52,7 @@ export const CirclePackingViewer: React.FC<CirclePackingViewerProps> = ({
     pstFile,
 }) => {
     const { computedPst, updateComputedPst, setMainInfos, setDepth } =
-        usePSTStore();
+        usePstStore();
 
     const { setHoveredId, markedToDelete, addChildrenMarkedToDelete } =
         useTagManagerStore();
@@ -97,8 +97,8 @@ export const CirclePackingViewer: React.FC<CirclePackingViewerProps> = ({
     if (!computedPst) return null;
 
     const borderColor = isToDeleteFolder(computedPst.id, markedToDelete)
-        ? "red"
-        : "transparent";
+        ? RED
+        : TRANSPARENT;
 
     return (
         <>

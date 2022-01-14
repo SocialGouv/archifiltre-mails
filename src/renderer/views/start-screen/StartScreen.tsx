@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect } from "react";
 
-import { useRouteContext } from "../../../renderer/context/RouterContext";
-import { usePSTExtractor } from "../../../renderer/hooks/usePSTExtractor";
 import { Dropzone } from "../../components/dropzone/Dropzone";
-import { usePSTStore } from "../../store/PSTStore";
+import { useRouteContext } from "../../context/RouterContext";
+import { usePstExtractor } from "../../hooks/usePSTExtractor";
+import { usePstStore } from "../../store/PSTStore";
 import { ACCEPTED_EXTENSION } from "../../utils/constants";
 import style from "./StartScreen.module.scss";
 
 export const StartScreen: React.FC = () => {
-    const { pstProgress, setPstFilePath } = usePSTExtractor();
-    const { pstFile } = usePSTStore();
+    const { pstProgress, setPstFilePath } = usePstExtractor();
+    const { pstFile } = usePstStore();
 
     const { changeRoute } = useRouteContext();
 
@@ -27,8 +27,6 @@ export const StartScreen: React.FC = () => {
             changeRoute("DASHBOARD");
         }
     }, [pstFile, changeRoute]);
-
-    console.log(pstProgress);
 
     const progressClassName = pstProgress.elapsed
         ? `${style.startscreen__progress} ${style.active}`

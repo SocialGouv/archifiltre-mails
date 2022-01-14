@@ -4,8 +4,8 @@
 import type { FC } from "react";
 import React from "react";
 
-import type { ExporterType } from "../../../renderer/exporters/Exporter";
-import { useExporter } from "../../../renderer/hooks/useExporter";
+import type { ExporterType } from "../../exporters/Exporter";
+import { useExporter } from "../../hooks/useExporter";
 import style from "./Dashboard.module.scss";
 
 const exporterTypeData: ExporterType[] = ["csv", "json", "xlsx"];

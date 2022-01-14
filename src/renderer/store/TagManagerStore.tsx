@@ -2,7 +2,7 @@ import { atom, useAtom } from "jotai/index";
 import type { SetStateAction } from "react";
 import { useCallback } from "react";
 
-export interface UseTagManagerInterface {
+export interface UseTagManagerStore {
     markedToDelete: string[];
     setMarkedToDelete: (update: SetStateAction<string[]>) => void;
     markedToKeep: string[];
@@ -13,11 +13,11 @@ export interface UseTagManagerInterface {
     addChildrenMarkedToDelete: (idsToDelete: string[]) => void;
 }
 
-export const markedToDeleteAtom = atom<string[]>([""]);
-export const markedToKeepAtom = atom<string[]>([""]);
-export const hoveredIdAtom = atom<string>("");
+const markedToDeleteAtom = atom<string[]>([""]);
+const markedToKeepAtom = atom<string[]>([""]);
+const hoveredIdAtom = atom<string>("");
 
-export const useTagManagerStore = (): UseTagManagerInterface => {
+export const useTagManagerStore = (): UseTagManagerStore => {
     const [markedToDelete, setMarkedToDelete] = useAtom(markedToDeleteAtom);
     const [markedToKeep, setMarkedToKeep] = useAtom(markedToKeepAtom);
     const [hoveredId, setHoveredId] = useAtom(hoveredIdAtom);

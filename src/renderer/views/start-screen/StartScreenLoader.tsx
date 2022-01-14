@@ -3,7 +3,7 @@ import React from "react";
 
 import style from "./StartScreen.module.scss";
 
-type StartScreenLoaderProps = Pick<
+export type StartScreenLoaderProps = Pick<
     PstProgressState,
     "countAttachement" | "countEmail" | "countFolder" | "countTotal"
 >;
@@ -16,7 +16,7 @@ export const StartScreenLoader: React.FC<StartScreenLoaderProps> = ({
 }) => (
     <>
         <div className={style.spinner} />
-        <div className={style["circle-packing-pst-infos"]}>
+        <div className={style.circlePackingPstInfos}>
             <ul>
                 <li>nombre d emails : </li>
                 <li>{countEmail}</li>

@@ -11,7 +11,7 @@ import { useCallback } from "react";
 import type { PstComputed } from "../utils/pst-extractor";
 import { computedRoot } from "../utils/pst-extractor";
 
-export interface UsePSTInterface {
+export interface UsePstStore {
     sentFolder: string;
     setSentFolder: (update: SetStateAction<string>) => void;
     deletedFolder: string;
@@ -36,16 +36,13 @@ export interface UsePSTInterface {
 const sentFolderAtom = atom("");
 const deletedFolderAtom = atom("");
 const rootPathAtom = atom("");
-const pstFileAtom = atom<PstContent | undefined>(undefined);
+const pstFileAtom = atom<PstContent | undefined>(void 0);
 const computedPstAtom = atom<PstComputed | undefined>(undefined);
 const pstExtractTablesAtom = atom<PstExtractTables | undefined>(undefined);
 const pstMainInfosAtom = atom<PstEmail | undefined>(undefined);
 const pstDepthAtom = atom<number>(0);
 
-// const getterAtom = atom((get) => get(pstDepthAtom));
-// const setterAtom = atom((set) => set(pstDepthAtom));
-
-export const usePSTStore = (): UsePSTInterface => {
+export const usePstStore = (): UsePstStore => {
     const [sentFolder, setSentFolder] = useAtom(sentFolderAtom);
     const [deletedFolder, setDeletedFolder] = useAtom(deletedFolderAtom);
     const [rootPath, setRootPath] = useAtom(rootPathAtom);
@@ -54,9 +51,6 @@ export const usePSTStore = (): UsePSTInterface => {
     const [extractTables, setExtractTables] = useAtom(pstExtractTablesAtom);
     const [mainInfos, setMainInfos] = useAtom(pstMainInfosAtom);
     const [depth, setDepth] = useAtom(pstDepthAtom);
-
-    // const [depth] = useAtom(getterAtom);
-    // const [, setDepth] = useAtom(setterAtom);
 
     const updateComputedPst = useCallback(
         (pst: PstFolder, nodeId: string): void => {

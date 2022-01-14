@@ -18,5 +18,13 @@ export type VIZUALISATION =
 
 // extractor
 export const ACCEPTED_EXTENSION = ".pst";
+export const ARBITRARY_FLAT_LEVEL = 12;
 
 export const ROOT = "root";
+
+// colors
+export const RED = "red";
+export const TRANSPARENT = "transparent";
+
+// html id and classname
+export const CIRCLE_PACKING_ID = "#circle-packing";

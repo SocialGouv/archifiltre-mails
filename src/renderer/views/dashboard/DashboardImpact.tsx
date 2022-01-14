@@ -1,8 +1,8 @@
 import type { FC } from "react";
 import React from "react";
 
-import { Card } from "../../../renderer/components/common/card/Card";
-import { StaticImage } from "../../../renderer/components/common/staticImage/StaticImage";
+import { Card } from "../../components/common/card/Card";
+import { StaticImage } from "../../components/common/staticImage/StaticImage";
 import style from "./Dashboard.module.scss";
 
 const dashboardImpactData: DashboardImpactItemProps[] = [

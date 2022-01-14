@@ -1,10 +1,10 @@
 import type { FC } from "react";
 import React from "react";
 
-import { usePSTStore } from "../../../renderer/store/PSTStore";
+import { usePstStore } from "../../store/PSTStore";
 import style from "./Dashboard.module.scss";
 
-interface DashboardRecapSelectFolderItemProps {
+export interface DashboardRecapSelectFolderItemProps {
     pstFolderList: string[];
     type: "deleted" | "sent";
 }
@@ -12,7 +12,7 @@ interface DashboardRecapSelectFolderItemProps {
 export const DashboardRecapSelectFolderItem: FC<
     DashboardRecapSelectFolderItemProps
 > = ({ pstFolderList, type }) => {
-    const { setDeletedFolder, setSentFolder } = usePSTStore();
+    const { setDeletedFolder, setSentFolder } = usePstStore();
 
     const handleChange = (folderName: string) => {
         if (type === "sent") {

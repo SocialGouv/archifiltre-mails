@@ -7,7 +7,7 @@ interface LayoutProps {
     title?: string;
 }
 
-const LayoutTitle: React.FC<{ title: string | undefined }> = ({ title }) => (
+const LayoutTitle: React.FC<{ title?: string }> = ({ title }) => (
     <div className={style.container__title}>
         <h1>{title}</h1>
     </div>
