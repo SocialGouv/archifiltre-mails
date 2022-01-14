@@ -5,6 +5,7 @@
       "ES2021",
       "DOM"
     ],
+    "resolveJsonModule": true,
     "noUncheckedIndexedAccess": true,
     "jsx": "react",
     "target": "ES2017",

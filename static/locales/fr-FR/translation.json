@@ -1,0 +1,10 @@
+{
+  "dropzone": {
+    "click-or-drag": "Cliquez ou glissez-déposez vos fichiers ici",
+    "download-here": "Téléchargez votre fichier ici",
+    "drop": "Lâchez pour téléverser les fichiers",
+    "hello-all": "Bonjour tout le monde",
+    "pst-limitation": "Votre fichier doit être un .pst"
+  },
+  "hello": "bonjour"
+}

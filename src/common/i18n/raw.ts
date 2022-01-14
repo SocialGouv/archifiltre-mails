@@ -1,6 +1,10 @@
 export const SupportedLocales = ["de-DE", "en-GB", "fr-FR"] as const;
 export type Locale = typeof SupportedLocales[number];
 export const DEFAULT_LOCALE: Locale = "fr-FR";
+export const KnownNamespaces = ["translation"] as const;
+export type Namespace = typeof KnownNamespaces[number];
+
+export type { default as translation } from "../../../static/locales/fr-FR/translation.json";
 
 /**
  * Valid a given locale or return the default.
