@@ -1,20 +1,4 @@
 @font-face {
-  font-family: "Quicksand";
-  font-style: normal;
-  font-weight: 400;
-  src: url("../../../static/fonts/Quicksand/Quicksand-Regular.ttf")
-    format("opentype");
-}
-
-@font-face {
-  font-family: "QuicksandBold";
-  font-style: normal;
-  font-weight: 400;
-  src: url("../../../static/fonts/Quicksand/Quicksand-Bold.ttf")
-    format("opentype");
-}
-
-@font-face {
   font-family: "Inter";
   font-style: normal;
   font-weight: 400;
@@ -22,10 +6,16 @@
 }
 
 @font-face {
-  font-family: "InterBold";
+  font-family: "Inter";
   font-style: normal;
   font-weight: 600;
   src: url("../../../static/fonts/Inter/Inter-Bold.ttf") format("opentype");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 900;
+  src: url("../../../static/fonts/Inter/Inter-Black.ttf") format("opentype");
 }
 
 @font-face {

@@ -212,6 +212,7 @@ function processFolder(
 
                 id: randomUUID(),
                 // TODO: change name
+                isFromMe: email.isFromMe,
                 name: `${email.senderName} ${email.originalSubject}`,
                 receivedDate: email.messageDeliveryTime,
                 sentTime: email.clientSubmitTime,
