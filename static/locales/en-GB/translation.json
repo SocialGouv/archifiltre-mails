@@ -3,5 +3,8 @@
   "dropzone.download-here": "Download your file here",
   "dropzone.drop": "Drop to upload files",
   "dropzone.pst-limitation": "You file must be a .pst",
-  "hello": "hello"
+  "hello": "hello",
+  "app.quit.detail": "Data not saved!",
+  "app.quit.leave": "Leave?",
+  "app.quit.title": "Quit app"
 }

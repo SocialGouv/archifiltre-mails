@@ -1,4 +1,5 @@
-import { IS_DEV, IS_E2E } from "@common/config";
+import { IS_E2E } from "@common/config";
+import type { I18nService } from "@common/modules/I18nModule";
 import type { Module } from "@common/modules/Module";
 import { dialog } from "electron";
 import type { ProgressInfo, UpdateInfo } from "electron-updater";
@@ -13,7 +14,8 @@ import type { ConsoleToRendererService } from "../services/ConsoleToRendererServ
 export class AppModule implements Module {
     constructor(
         private readonly mainWindowRetriever: MainWindowRetriever,
-        private readonly consoleToRendererService: ConsoleToRendererService
+        private readonly consoleToRendererService: ConsoleToRendererService,
+        private readonly i18nService: I18nService
     ) {}
 
     async init(): Promise<void> {
@@ -24,18 +26,22 @@ export class AppModule implements Module {
                 event.preventDefault();
             });
 
-            if (!IS_DEV && !IS_E2E) {
+            if (!IS_E2E) {
+                await this.i18nService.wait();
+                const { t } = this.i18nService.i18next;
                 // ask before leaving
                 mainWindow.on("close", async (event) => {
                     event.preventDefault();
                     const answer = await dialog.showMessageBox(mainWindow, {
-                        buttons: ["No", "Yes"],
-                        //TODO: i18n
+                        buttons: [
+                            t("common:button.no"),
+                            t("common:button.yes"),
+                        ],
                         cancelId: 0,
                         defaultId: 0,
-                        detail: "Data not saved",
-                        message: "Leave ?",
-                        title: "Quit app",
+                        detail: t("app.quit.detail"),
+                        message: t("app.quit.leave"),
+                        title: t("app.quit.title"),
                         type: "warning",
                     });
 

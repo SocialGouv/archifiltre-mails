@@ -3,5 +3,8 @@
   "dropzone.download-here": "Téléchargez votre fichier ici",
   "dropzone.drop": "Lâchez pour téléverser les fichiers",
   "dropzone.pst-limitation": "Votre fichier doit être un .pst",
-  "hello": "bonjour"
+  "hello": "bonjour",
+  "app.quit.detail": "Données non sauvegardées !",
+  "app.quit.leave": "Quitter ?",
+  "app.quit.title": "Quitter l'application"
 }

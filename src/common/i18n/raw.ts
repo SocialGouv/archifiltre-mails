@@ -9,6 +9,7 @@ export interface LocaleFileResources {
 }
 /* eslint-enable @typescript-eslint/consistent-type-imports */
 export type Namespace = keyof LocaleFileResources;
+export const KnownNamespaces: Namespace[] = ["translation", "common"];
 
 /**
  * Valid a given locale or return the default.
