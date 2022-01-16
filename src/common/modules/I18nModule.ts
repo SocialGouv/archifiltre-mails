@@ -102,6 +102,7 @@ export class I18nModule extends IsomorphicModule {
      */
     public callChangeLanguageRendererCallback(lng: Locale): void {
         this.changeLanguageRendererCallback?.(lng);
+        this.userConfigService.set("locale", lng);
     }
 
     private prepareChangeLanguage() {
@@ -110,6 +111,7 @@ export class I18nModule extends IsomorphicModule {
                 I18N_CHANGE_LANGUAGE_EVENT,
                 async (_evt, lng: Locale) => {
                     await i18next.changeLanguage(lng);
+                    this.userConfigService.set("locale", lng);
                 }
             );
 
@@ -162,6 +164,8 @@ class InnerI18nService extends IsomorphicService {
 
     /**
      * Change i18next language for current side and use ipc to change language for the other side.
+     *
+     * The module will also ensure that the user config is updated with the chosen locale.
      */
     public async changeLanguage(lng: Locale) {
         const validLng = validLocale(lng);
