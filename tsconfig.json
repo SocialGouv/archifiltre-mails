@@ -15,7 +15,7 @@
       "@common/*": [
         "src/common/*"
       ]
-    },
+    }
   },
   "include": [
     "global.d.ts",

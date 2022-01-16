@@ -23,28 +23,15 @@
   pointer-events: none;
 }
 
-.close {
-  position: absolute;
-  top: 2rem;
-  right: 2rem;
-}
-
-// .bubble-element {
-//   position: absolute;
-//   left: 50%;
-//   top: 50%;
-//   transform: translate(-50%, -50%);
-// }
-
 .spinner {
-  width: 30px;
-  height: 30px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
   border: solid 4px #2051a3;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  transform: translate(-50%, -50%);
+  position: absolute;
+  top: 41%;
+  left: 410px;
+
   &:after {
     content: "";
     width: 7px;
@@ -52,28 +39,41 @@
     position: absolute;
     top: -3px;
     left: 0;
-    background: white;
     border-radius: 50%;
+    background: #d1dbec;
   }
-  animation: loading 2s linear infinite;
+  animation: spin 2s linear infinite;
 }
 
 .circle-packing {
-  svg {
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%, 50%);
-  }
+  width: 100%;
+  height: 500px;
+
   .circle-packing-pst-infos {
-    position: absolute;
-    top: 64%;
-    left: 51%;
     text-align: center;
-    transform: translate(-50%, -50%);
+    position: absolute;
+    top: 45%;
+    left: 300px;
+  }
+
+  button {
+    height: 45px;
+    display: flex;
+    align-items: center;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #4991f7;
+    border-radius: 10px;
+    padding: 1rem;
+    position: absolute;
+    right: calc(3rem + 10px);
+    bottom: 2rem;
+    z-index: 999;
   }
 }
 
-@keyframes loading {
+@keyframes spin {
   from {
     transform: rotate(0deg);
   }

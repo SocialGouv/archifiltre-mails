@@ -9,8 +9,8 @@
 }
 
 html {
-  background: #f6f7fb;
-  color: #2e2a46;
+  background: $color-background;
+  color: $color-text;
 }
 
 main {
@@ -27,7 +27,7 @@ h3 {
 }
 
 a {
-  color: #2e2a46;
+  color: $color-text;
   text-decoration: none;
 }
 
@@ -35,7 +35,7 @@ button {
   border: 0;
   background: none;
   cursor: pointer;
-  color: #2e2a46;
+  color: $color-text;
 }
 
 ul {

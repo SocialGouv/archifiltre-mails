@@ -8,6 +8,7 @@ import type { Service } from "@common/modules/container/type";
 import type {
     ExtractOptions,
     PstContent,
+    PstExtractTables,
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
 import { ipcRenderer } from "electron";
@@ -20,7 +21,9 @@ export interface PstExtractorService extends Service {
      *
      * The work is done in a worker thread in the main process.
      */
-    extract: (options: ExtractOptions) => Promise<PstContent>;
+    extract: (
+        options: ExtractOptions
+    ) => Promise<[PstContent, PstExtractTables]>;
     /**
      * Trigger a callback on each progress tick. (a tick is based on the progress interval)
      *
@@ -37,11 +40,10 @@ export interface PstExtractorService extends Service {
  * Simple front service that communicate with the PstExtractor "main-process" module to extract a given PST file.
  */
 export const pstExtractorService: PstExtractorService = {
-    async extract(options): Promise<PstContent> {
-        return ipcRenderer.invoke(
-            PST_EXTRACT_EVENT,
-            options
-        ) as Promise<PstContent>;
+    async extract(options) {
+        return ipcRenderer.invoke(PST_EXTRACT_EVENT, options) as Promise<
+            [PstContent, PstExtractTables]
+        >;
     },
 
     name: "PstExtractorService",

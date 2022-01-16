@@ -9,6 +9,7 @@ import path from "path";
 import { AppModule } from "./modules/AppModule";
 import { DevToolsModule } from "./modules/DevToolsModule";
 import { MenuModule } from "./modules/MenuModule";
+import { OpenDialogModule } from "./modules/OpenDialogModule";
 import { PstExtractorModule } from "./modules/PstExtractorModule";
 import { consoleToRendererService } from "./services/ConsoleToRendererService";
 
@@ -85,6 +86,7 @@ app.on("ready", async () => {
             containerModule.get("i18nService")
         ),
         new DevToolsModule(),
+        new OpenDialogModule(),
         new PstExtractorModule(containerModule.get("userConfigService")),
         new MenuModule(
             consoleToRendererService,
