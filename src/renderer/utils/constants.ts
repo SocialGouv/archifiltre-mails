@@ -25,6 +25,11 @@ export const ROOT = "root";
 // colors
 export const RED = "red";
 export const TRANSPARENT = "transparent";
+export const KEEP_COLOR = "#62bc6f";
+export const DELETE_COLOR = "#f75e42";
+export const BASE_COLOR = "rgb(31, 120, 180)";
+export const BASE_COLOR_LIGHT = "#eaf0fd";
+// export const KEEP_COLOR = "#71c377";
 
 // html id and classname
 export const CIRCLE_PACKING_ID = "#circle-packing";
