@@ -42,7 +42,11 @@ export class I18nModule extends IsomorphicModule {
     }
 
     public async init(): Promise<void> {
+        // wait for userconfig to be usable
         await this.userConfigService.wait();
+
+        // use custom i18next backend to load files only from main THEN return it from ipc
+        // use a basic local cache associated to the main version of the module
         i18next.use({
             init: () => {
                 if (IS_MAIN) {
@@ -52,7 +56,6 @@ export class I18nModule extends IsomorphicModule {
                             this.requestFile(language, namespace)
                     );
                 }
-                return;
             },
             read: (
                 language: Locale,
@@ -74,7 +77,6 @@ export class I18nModule extends IsomorphicModule {
                         callback(err, null);
                     });
             },
-
             type: "backend",
         });
 
@@ -85,10 +87,10 @@ export class I18nModule extends IsomorphicModule {
         await i18next.init({
             fallbackLng: DEFAULT_LOCALE,
             interpolation: {
-                escapeValue: IS_MAIN,
+                escapeValue: IS_MAIN, // https://react.i18next.com/latest/i18next-instance said "not needed for react!!"
             },
             lng: this.userConfigService.get("locale"),
-            load: "currentOnly",
+            load: "currentOnly", // lazy load other locales
             ns: KnownNamespaces,
             supportedLngs: SupportedLocales,
         });
@@ -107,6 +109,8 @@ export class I18nModule extends IsomorphicModule {
 
     private prepareChangeLanguage() {
         if (IS_MAIN) {
+            // when renderer asks for changing language, do it in main
+            // and update user config
             ipcMain.handle(
                 I18N_CHANGE_LANGUAGE_EVENT,
                 async (_evt, lng: Locale) => {
@@ -115,11 +119,15 @@ export class I18nModule extends IsomorphicModule {
                 }
             );
 
+            // get the "reply" function and store it for latter uses
+            // when changing the language is asked first from main
             ipcMain.on(I18N_PREPARE_CHANGE_LANGUAGE_EVENT, (event) => {
                 this.changeLanguageRendererCallback = event.reply;
             });
         } else {
+            // send renderer callback when changing the language is asked first from main
             ipcRenderer.send(I18N_PREPARE_CHANGE_LANGUAGE_EVENT);
+            // when main asks for changing language, do it in renderer
             ipcRenderer.on(
                 I18N_CHANGE_LANGUAGE_CALLBACK_EVENT,
                 async (_evt, lng: Locale) => {
