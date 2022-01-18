@@ -1,4 +1,5 @@
 import { IS_MAC } from "@common/config";
+import type { I18nService } from "@common/modules/I18nModule";
 import type { Module } from "@common/modules/Module";
 import type { MenuItem } from "electron";
 import { Menu } from "electron";
@@ -29,14 +30,16 @@ export class MenuModule implements Module {
 
     constructor(
         private readonly consoleToRendererService: ConsoleToRendererService,
-        private readonly pstExtractorMainService: PstExtractorMainService
+        private readonly pstExtractorMainService: PstExtractorMainService,
+        private readonly i18nService: I18nService
     ) {}
 
     public async init(): Promise<void> {
         this.customMenus.push(
             new DebugMenu(
                 this.consoleToRendererService,
-                this.pstExtractorMainService
+                this.pstExtractorMainService,
+                this.i18nService
             )
         );
 

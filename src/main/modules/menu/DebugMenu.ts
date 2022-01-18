@@ -1,4 +1,6 @@
 import { IS_DEV } from "@common/config";
+import { SupportedLocales } from "@common/i18n/raw";
+import type { I18nService } from "@common/modules/I18nModule";
 import type { BrowserWindow } from "electron";
 import { dialog, MenuItem } from "electron";
 
@@ -13,6 +15,7 @@ import { disableMenus, enableMenus } from "./utils";
 
 const OPEN_AND_CONSOLE_LAST_PST_MENU_ID = "OPEN_AND_CONSOLE_LAST_PST_MENU_ID";
 const EXPORT_LAST_PST_MENU_ID = "EXPORT_LAST_PST_MENU_ID";
+const CHANGE_LANGUAGE_MENU_ID = "CHANGE_LANGUAGE_MENU_ID";
 
 /**
  * Loaded in {@link MenuModule}, the debug menu is only shown on demand or by default in dev mode.
@@ -24,7 +27,8 @@ export class DebugMenu implements ArchimailMenu {
 
     constructor(
         private readonly consoleToRendererService: ConsoleToRendererService,
-        private readonly pstExtractorMainService: PstExtractorMainService
+        private readonly pstExtractorMainService: PstExtractorMainService,
+        private readonly i18nService: I18nService
     ) {}
 
     public get item(): MenuItem {
@@ -108,6 +112,16 @@ export class DebugMenu implements ArchimailMenu {
                         enabled: true,
                         id: `${EXPORT_LAST_PST_MENU_ID}_${exportType.toUpperCase()}`,
                         label: exportType.toUpperCase(),
+                    })),
+                },
+                {
+                    id: CHANGE_LANGUAGE_MENU_ID,
+                    label: "Change language...",
+                    submenu: SupportedLocales.map((lng) => ({
+                        click: async () => this.i18nService.changeLanguage(lng),
+                        enabled: true,
+                        id: `${CHANGE_LANGUAGE_MENU_ID}_${lng}`,
+                        label: lng,
                     })),
                 },
             ],

@@ -103,7 +103,10 @@ export class I18nModule extends IsomorphicModule {
      * Change the language in renderer by calling the prepared callback.
      */
     public callChangeLanguageRendererCallback(lng: Locale): void {
-        this.changeLanguageRendererCallback?.(lng);
+        this.changeLanguageRendererCallback?.(
+            I18N_CHANGE_LANGUAGE_CALLBACK_EVENT,
+            lng
+        );
         this.userConfigService.set("locale", lng);
     }
 

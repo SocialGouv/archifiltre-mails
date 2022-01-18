@@ -90,7 +90,8 @@ app.on("ready", async () => {
         new PstExtractorModule(containerModule.get("userConfigService")),
         new MenuModule(
             consoleToRendererService,
-            containerModule.get("pstExtractorMainService")
+            containerModule.get("pstExtractorMainService"),
+            containerModule.get("i18nService")
         )
     );
     // create actual main BrowserWindow

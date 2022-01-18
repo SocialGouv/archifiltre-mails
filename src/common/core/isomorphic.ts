@@ -25,7 +25,7 @@ export const getIsomorphicModules = <
     );
     containerModule.registerServices(
         ["userConfigService", userConfigModule.service],
-        ["i18nRetrieverService", i18nModule.service]
+        ["i18nService", i18nModule.service]
     );
 
     containerModule.registerServices(...additionalServices);
