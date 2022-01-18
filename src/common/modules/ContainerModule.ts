@@ -29,8 +29,6 @@ export abstract class IsomorphicService implements Service {
     public readonly ISOMORPHIC = true;
 
     public readonly name = this.constructor.name;
-
-    abstract init?(): Promise<void>;
 }
 
 /**

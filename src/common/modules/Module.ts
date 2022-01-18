@@ -30,6 +30,8 @@ export abstract class IsomorphicModule implements Module {
      */
     public readonly ISOMORPHIC = true;
 
+    // eslint-disable-next-line @typescript-eslint/no-useless-constructor, @typescript-eslint/no-empty-function -- abstract constructor signature
+    constructor(..._args: unknown[]) {}
     public abstract init(): Promise<void>;
 }
 
@@ -45,11 +47,11 @@ export const IsomorphicModuleFactory = {
      * @returns The single instance of the given class
      */
     // eslint-disable-next-line prettier/prettier -- Because colors are messed up when multilined
-    getInstance<TClass extends typeof IsomorphicModule, T extends InstanceType<TClass>>(klass: TClass): T {
+    getInstance<TClass extends typeof IsomorphicModule, T extends InstanceType<TClass>>(klass: TClass, ...deps: ConstructorParameters<TClass>): T {
         let instance = factory.get(klass.name);
         if (!instance) {
             try {
-                instance = Reflect.construct(klass, []);
+                instance = Reflect.construct(klass, deps);
                 if (!instance) {
                     throw new Error(
                         `${klass.name} instanciation returned nothing.`
