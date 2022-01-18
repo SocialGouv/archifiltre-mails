@@ -4,8 +4,9 @@ import type {
     PstEmail,
     PstExtractTables,
     PstFolder,
-} from "./../../common/modules/pst-extractor/type";
-import { isPstEmail } from "./../../common/modules/pst-extractor/type";
+} from "@common/modules/pst-extractor/type";
+import { isPstEmail, isPstFolder } from "@common/modules/pst-extractor/type";
+
 import { ARBITRARY_FLAT_LEVEL } from "./constants";
 
 /**
@@ -183,4 +184,46 @@ export const getPstMailsPercentage = (
         return ((current / totalMails) * 100).toFixed(1);
     }
     return "0";
+};
+
+// ################################################################################
+// ################################################################################
+// ################################################################################
+// ################################################################################
+// ################################################################################
+// ################################################################################
+// ##########################     TESTING PURPOSE     #############################
+// ################################################################################
+// ################################################################################
+// ################################################################################
+// ################################################################################
+// ################################################################################
+// ################################################################################
+
+export const getDomain = (element: string): string =>
+    element.substring(element.indexOf("@"));
+
+export const findAllMailAddresses = (pst: PstElement): string[] => {
+    const result: string[] = [];
+    const recursivelyFindProp = (_pst: PstElement) => {
+        if (isPstFolder(_pst)) {
+            _pst.children?.forEach((child) => {
+                recursivelyFindProp(child);
+            });
+        } else if (isPstEmail(_pst) && _pst.from.email) {
+            result.push(
+                _pst.from.email,
+                ...(["to", "cc", "bcc"] as const)
+                    .map(
+                        (theKey) =>
+                            _pst[theKey]
+                                .map((value) => value.email)
+                                .filter(Boolean) as string[]
+                    )
+                    .flat()
+            );
+        }
+    };
+    recursivelyFindProp(pst);
+    return result;
 };

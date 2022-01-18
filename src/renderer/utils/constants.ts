@@ -26,3 +26,9 @@ export const TRANSPARENT = "transparent";
 
 // html id and classname
 export const CIRCLE_PACKING_ID = "#circle-packing";
+
+export const MAX_TRESHOLD = 15;
+export const RATIO_FROM_MAX = 10;
+
+export const ORG_UNIT_PST = "/OU=";
+export const COMMON_NAME_PST = "/CN=";
