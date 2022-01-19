@@ -16,7 +16,7 @@
       "matchPackageNames": [
         "@types/node"
       ],
-      "allowedVersions": "<15"
+      "allowedVersions": "<17"
     },
     {
       "matchPackageNames": [
@@ -30,12 +30,6 @@
         "sass-loader"
       ],
       "allowedVersions": "<11"
-    },
-    {
-      "matchPackageNames": [
-        "@types/node"
-      ],
-      "allowedVersions": "<15"
     },
     {
       "matchPackageNames": [
