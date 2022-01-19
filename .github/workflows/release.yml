@@ -52,7 +52,7 @@ jobs:
           echo ::set-output name=next-version::$(node -e "console.log(require('./package.json').version)")
           yarn compile
         env:
-          ARCHIMAIL_RELEASE_MODE: version
+          ARCHIFILTRE_RELEASE_MODE: version
       - name: Archive dist
         uses: actions/upload-artifact@v2
         with:
@@ -107,13 +107,13 @@ jobs:
         # Test mode
         # run: |
         #   mkdir -p "electron/dist/${{ matrix.target }}/"
-        #   echo "${{ matrix.target }}.${{ matrix.os }}" > "electron/dist/${{ matrix.target }}/archimail.${{ matrix.ext }}"
+        #   echo "${{ matrix.target }}.${{ matrix.os }}" > "electron/dist/${{ matrix.target }}/archifiltre-mails.${{ matrix.ext }}"
       - name: Archive bin
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.target }}-bin
           path: |
-            electron/dist/*/archimail*.*
+            electron/dist/*/archifiltre-mails*.*
             electron/dist/*/latest*.yml
 
   release:
@@ -131,7 +131,7 @@ jobs:
       - name: Generate hashes
         run: >-
           find . -regextype posix-extended
-          -regex ".*/bin/.*/archimail.*\.(exe|AppImage|dmg|msi|zip)$"
+          -regex ".*/bin/.*/archifiltre-mails.*\.(exe|AppImage|dmg|msi|zip)$"
           -type f
           -exec bash -c "openssl dgst -sha512 {} > {}.sha512" \;
       - name: Setup Node

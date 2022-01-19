@@ -1,6 +1,6 @@
 # Modules et services
 
-Une partie de l'architecture d'Archimail se repose sur une mécanique de modules et de services. Ces paradigmes fonctionnent conjointement afin de délivrer des capabilités encapsulées à l'ensemble de l'application.  
+Une partie de l'architecture de `Mails` se repose sur une mécanique de modules et de services. Ces paradigmes fonctionnent conjointement afin de délivrer des capabilités encapsulées à l'ensemble de l'application.  
 Ces fonctionnalités peuvent être spécifiques à un domaine métier ou au contraire, être *standalone* et purement techniques (comme un système de log par exemple).  
 Ces modules et services peuvent être **isomorphiques** dans leur design ; c'est à dire qu'ils peuvent être exécutés ET sur le `main` process ET sur le ou les `renderer` processes.
 
@@ -35,4 +35,4 @@ Un service quand à lui est l'exposition de fonctionnalités, métier ou non, di
 
 ## Menu
 Le `MenuModule` est un wrapper autour du composant de gestion des menus d'electron. Sa principale utilité est de remplacer le menu d'origine par un menu personnalisé et de gérer les actions associés.  
-Pour ajouter un menu, il suffit d'implémenter l'interface `ArchimailMenu` et d'ajouter l'instance du nouveau menu au module. (cf. [`DebugMenu`](../src/main/modules/menu/DebugMenu.ts) pour un exemple d'implémentation).
+Pour ajouter un menu, il suffit d'implémenter l'interface `ArchifiltreMailsMenu` et d'ajouter l'instance du nouveau menu au module. (cf. [`DebugMenu`](../src/main/modules/menu/DebugMenu.ts) pour un exemple d'implémentation).

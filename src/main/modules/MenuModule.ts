@@ -11,7 +11,7 @@ import type { PstExtractorMainService } from "./PstExtractorModule";
 /**
  * A small wrapper around electron menu and menu items.
  */
-export interface ArchimailMenu {
+export interface ArchifiltreMailsMenu {
     /**
      * Retrieve the electron {@link MenuItem} representation
      */
@@ -26,7 +26,7 @@ export interface ArchimailMenu {
  * Module for the menu bar. Will load various menus each of them containing (or not) submenus.
  */
 export class MenuModule implements Module {
-    private readonly customMenus: ArchimailMenu[] = [];
+    private readonly customMenus: ArchifiltreMailsMenu[] = [];
 
     constructor(
         private readonly consoleToRendererService: ConsoleToRendererService,

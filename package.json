@@ -1,12 +1,12 @@
 {
-  "name": "archimail",
+  "name": "archifiltre-mails",
   "version": "0.0.1",
   "private": true,
   "description": "Visualisez, triez, et améliorez votre boite mail !",
   "author": "Fabrique des ministère sociaux",
   "license": "Apache-2.0",
   "main": "dist/main/main.js",
-  "repository": "git@github.com:SocialGouv/archimail.git",
+  "repository": "git@github.com:SocialGouv/archifiltre-mails.git",
   "scripts": {
     "dev": "electron-webpack dev",
     "debug": "cross-env 'ELECTRON_ARGS=[\"--inspect-brk=9229\"]' yarn dev",
@@ -16,7 +16,7 @@
     "dist:mac-local": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
     "dist:linux": "electron-builder --linux AppImage",
     "start": "electron dist/main/main.js",
-    "start:mac": "open -n electron/dist/mac-x64/mac/archimail.app",
+    "start:mac": "open -n electron/dist/mac-x64/mac/archifiltre-mails.app",
     "lint": "eslint src/",
     "lint:test": "eslint -c tests/.eslintrc.json 'tests/**/*.ts*'",
     "lint:fix": "yarn lint --fix && yarn lint:test --fix",
@@ -48,9 +48,9 @@
   "//build.extraResources": "Static should be set again because it is overwritten",
   "build": {
     "generateUpdatesFilesForAllChannels": true,
-    "appId": "fr.gouv.social.fabrique.archimail",
-    "artifactName": "archimail-${os}.${ext}",
-    "productName": "Archimail",
+    "appId": "fr.gouv.social.fabrique.archifiltre.mails",
+    "artifactName": "archifiltre-mails-${os}.${ext}",
+    "productName": "Mails par Archifiltre",
     "afterSign": "scripts/notarize.js",
     "files": [
       "electron/build/icon.*"
@@ -84,13 +84,13 @@
     },
     "win": {
       "icon": "./electron/build/icon.png",
-      "artifactName": "archimail-${os}-standalone.${ext}"
+      "artifactName": "archifiltre-mails-${os}-standalone.${ext}"
     },
     "msi": {
-      "artifactName": "archimail-${os}.${ext}"
+      "artifactName": "archifiltre-mails-${os}.${ext}"
     },
     "nsis": {
-      "artifactName": "archimail-${os}-setup.${ext}"
+      "artifactName": "archifiltre-mails-${os}-setup.${ext}"
     },
     "linux": {
       "category": "Office",

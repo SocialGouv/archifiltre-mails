@@ -1,5 +1,5 @@
-# archimail
-[![codecov](https://codecov.io/gh/SocialGouv/archimail/branch/main/graph/badge.svg?token=JPCHQWKTKZ)](https://codecov.io/gh/SocialGouv/archimail)
+# Mails par Archifiltre
+[![codecov](https://codecov.io/gh/SocialGouv/archifiltre-mails/branch/main/graph/badge.svg?token=JPCHQWKTKZ)](https://codecov.io/gh/SocialGouv/archifiltre-mails)
 
 ## Initialisation
 ```sh
