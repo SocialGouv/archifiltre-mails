@@ -6261,10 +6261,10 @@ eslint-plugin-jsx-a11y@~6.5.1:
     language-tags "^1.0.5"
     minimatch "^3.0.4"
 
-eslint-plugin-playwright@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-playwright/-/eslint-plugin-playwright-0.6.0.tgz#9b676c72ed543ae2a265cf4e4d981d6eb168257d"
-  integrity sha512-hccbDZcGcRAkfVa2omeTd/PCPjhjo8roZWVANYB8qBv2EGGjFNIGKkN3jzHjYQytgp5K4FKyBn/dgujPpFynjA==
+eslint-plugin-playwright@^0.7.1:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-playwright/-/eslint-plugin-playwright-0.7.1.tgz#342d8499466af7511911386500ef48d6d04ef6f6"
+  integrity sha512-BPwicI9ilexNiT3CgzSHZnWuxgAg59z4l7qhswqxzM+EdaDhpucM/atYcQCUbbB9lAmHVWCEdKBWZQPkplcW1w==
 
 eslint-plugin-prettier@~4.0.0:
   version "4.0.0"
