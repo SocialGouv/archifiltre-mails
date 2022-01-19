@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/require-array-sort-compare */
+/* eslint-disable @typescript-eslint/naming-convention */
 import type {
     PstContent,
     PstElement,
@@ -7,7 +9,12 @@ import type {
 } from "@common/modules/pst-extractor/type";
 import { isPstEmail, isPstFolder } from "@common/modules/pst-extractor/type";
 
-import { ARBITRARY_FLAT_LEVEL } from "./constants";
+import {
+    ARBITRARY_FLAT_LEVEL,
+    MAX_TRESHOLD,
+    ORG_UNIT_PST,
+    RATIO_FROM_MAX,
+} from "./constants";
 
 /**
  * Get the total received emails counts of a given PST.
@@ -186,22 +193,19 @@ export const getPstMailsPercentage = (
     return "0";
 };
 
-// ################################################################################
-// ################################################################################
-// ################################################################################
-// ################################################################################
-// ################################################################################
-// ################################################################################
-// ##########################     TESTING PURPOSE     #############################
-// ################################################################################
-// ################################################################################
-// ################################################################################
-// ################################################################################
-// ################################################################################
-// ################################################################################
-
+// TODO: move domains/year/mails utils in dedicated folder
+// TODO: respect DRY pattern on "domains/year/mails" utils
 export const getDomain = (element: string): string =>
     element.substring(element.indexOf("@"));
+
+export const getMailTreshold = (base: Record<string, number>): number => {
+    const maxMail = Object.values(base).reduce(
+        (acc, cur) => Math.max(acc, cur),
+        0
+    );
+
+    return Math.min(Math.ceil(maxMail * (RATIO_FROM_MAX / 100)), MAX_TRESHOLD);
+};
 
 export const findAllMailAddresses = (pst: PstElement): string[] => {
     const result: string[] = [];
@@ -227,3 +231,108 @@ export const findAllMailAddresses = (pst: PstElement): string[] => {
     recursivelyFindProp(pst);
     return result;
 };
+
+export const getAllUniqueMailAddresses = (pst: PstElement): string[] => [
+    ...new Set(findAllMailAddresses(pst)),
+];
+
+export const getAllDomainsByAddresses = (
+    uniqueAddresses: string[]
+): (string | undefined)[] =>
+    uniqueAddresses
+        .map((element) => {
+            if (element.includes(ORG_UNIT_PST)) {
+                // TODO: handle "/DC"
+                return "Same LDAP";
+            }
+            if (element.indexOf("@")) {
+                return getDomain(element);
+            }
+        })
+        .sort();
+
+export const getDuplicatedDomainsCount = (
+    domains: (string | undefined)[]
+): Record<string, number> => {
+    return (domains.filter(Boolean) as string[]).reduce<Record<string, number>>(
+        (acc, value) => ({
+            ...acc,
+            [value]: (acc[value] ?? 0) + 1,
+        }),
+        {}
+    );
+};
+
+export const getAggregatedDomainsCount = (
+    duplicatedDomainsCount: Record<string, number>
+): Record<string, number> => {
+    const treshold = getMailTreshold(duplicatedDomainsCount);
+
+    return Object.entries(duplicatedDomainsCount).reduce<
+        Record<string, number>
+    >(
+        (acc, [email, count]) => {
+            if (count > treshold) {
+                acc[email] = count;
+            } else acc.__others += count;
+            return acc;
+        },
+        { __others: 0 }
+    );
+};
+
+export const findYearByDomain = (pst: PstElement, domain: string): number[] => {
+    const result: number[] = [];
+    const recursivelyFindProp = (_pst: PstElement) => {
+        if (isPstFolder(_pst)) {
+            _pst.children?.forEach((child) => {
+                recursivelyFindProp(child);
+            });
+        } else if (
+            isPstEmail(_pst) &&
+            _pst.receivedDate &&
+            _pst.from.email &&
+            getDomain(_pst.from.email) === domain
+        ) {
+            result.push(_pst.receivedDate.getFullYear());
+        }
+    };
+    recursivelyFindProp(pst);
+    return result;
+};
+
+export const findMailsByYearAndDomain = (
+    pst: PstElement,
+    domain: string,
+    year: number
+): PstEmail[] => {
+    const result: PstEmail[] = [];
+    const recursivelyFindProp = (_pst: PstElement) => {
+        if (isPstFolder(_pst)) {
+            _pst.children?.forEach((child) => {
+                recursivelyFindProp(child);
+            });
+        } else if (
+            isPstEmail(_pst) &&
+            _pst.receivedDate &&
+            _pst.from.email &&
+            getDomain(_pst.from.email) === domain &&
+            _pst.receivedDate.getFullYear() === year
+        ) {
+            result.push(_pst);
+        }
+    };
+    recursivelyFindProp(pst);
+    return result;
+};
+
+export const getDuplicatedYearByDomainCount = (
+    yearByDomain: number[]
+): Record<string, number> =>
+    yearByDomain.reduce<Record<string, number>>(
+        (acc, value) => ({
+            ...acc,
+            [value]: (acc[value] ?? 0) + 1,
+        }),
+        {}
+    );
