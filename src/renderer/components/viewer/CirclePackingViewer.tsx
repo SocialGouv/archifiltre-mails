@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import type { PstContent } from "@common/modules/pst-extractor/type";
 import { isPstFolder } from "@common/modules/pst-extractor/type";
 import type { Any } from "@common/utils/type";
@@ -35,7 +36,7 @@ type CirclePackingCommonProps = Partial<
     value: keyof PstContent;
 };
 
-const commonProperties: CirclePackingCommonProps = {
+export const commonProperties: CirclePackingCommonProps = {
     colors: { scheme: "paired" },
     enableLabels: true,
     id: "id",

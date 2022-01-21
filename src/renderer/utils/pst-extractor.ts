@@ -8,6 +8,7 @@ import type {
     PstFolder,
 } from "@common/modules/pst-extractor/type";
 import { isPstEmail, isPstFolder } from "@common/modules/pst-extractor/type";
+import { randomUUID } from "crypto";
 
 import {
     ARBITRARY_FLAT_LEVEL,
@@ -193,8 +194,40 @@ export const getPstMailsPercentage = (
     return "0";
 };
 
+// ###########
 // TODO: move domains/year/mails utils in dedicated folder
 // TODO: respect DRY pattern on "domains/year/mails" utils
+// ###########
+
+export const createBase = () => ({
+    id: "root",
+    name: "root",
+    size: 0.0001,
+    value: "size",
+});
+
+export const createBaseMail = (): PstEmail => ({
+    attachementCount: 0,
+    attachements: [],
+    bcc: [],
+    cc: [],
+    contentHTML: "",
+    contentRTF: "",
+    contentText: "",
+    from: {
+        name: "",
+    },
+    id: "",
+    isFromMe: false,
+    name: "",
+    receivedDate: new Date(),
+    sentTime: new Date(),
+    size: 1,
+    subject: "",
+    to: [],
+    type: "email",
+});
+
 export const getDomain = (element: string): string =>
     element.substring(element.indexOf("@"));
 
@@ -281,7 +314,32 @@ export const getAggregatedDomainsCount = (
     );
 };
 
-export const findYearByDomain = (pst: PstElement, domain: string): number[] => {
+export const findUniqueCorrespondantsByDomain = (
+    pst: PstElement,
+    domain: string
+): string[] => {
+    const result: string[] = [];
+    const recursivelyFindProp = (_pst: PstElement) => {
+        if (isPstFolder(_pst)) {
+            _pst.children?.forEach((child) => {
+                recursivelyFindProp(child);
+            });
+        } else if (
+            isPstEmail(_pst) &&
+            _pst.from.email &&
+            getDomain(_pst.from.email) === domain
+        ) {
+            result.push(_pst.from.name); // TODO: est-ce bien ce que l'on veut
+        }
+    };
+    recursivelyFindProp(pst);
+    return [...new Set(result)].sort();
+};
+
+export const findYearByCorrespondants = (
+    pst: PstElement,
+    correspondant: string
+): number[] => {
     const result: number[] = [];
     const recursivelyFindProp = (_pst: PstElement) => {
         if (isPstFolder(_pst)) {
@@ -291,19 +349,20 @@ export const findYearByDomain = (pst: PstElement, domain: string): number[] => {
         } else if (
             isPstEmail(_pst) &&
             _pst.receivedDate &&
-            _pst.from.email &&
-            getDomain(_pst.from.email) === domain
+            _pst.from.name === correspondant
         ) {
             result.push(_pst.receivedDate.getFullYear());
         }
     };
     recursivelyFindProp(pst);
-    return result;
+
+    return [...new Set(result)];
 };
 
-export const findMailsByYearAndDomain = (
+export const findMailsByDomainCorrespondantAndYear = (
     pst: PstElement,
     domain: string,
+    correspondant: string,
     year: number
 ): PstEmail[] => {
     const result: PstEmail[] = [];
@@ -314,10 +373,11 @@ export const findMailsByYearAndDomain = (
             });
         } else if (
             isPstEmail(_pst) &&
-            _pst.receivedDate &&
             _pst.from.email &&
+            _pst.receivedDate &&
             getDomain(_pst.from.email) === domain &&
-            _pst.receivedDate.getFullYear() === year
+            _pst.receivedDate.getFullYear() === year &&
+            _pst.from.name === correspondant
         ) {
             result.push(_pst);
         }
@@ -326,13 +386,64 @@ export const findMailsByYearAndDomain = (
     return result;
 };
 
-export const getDuplicatedYearByDomainCount = (
-    yearByDomain: number[]
-): Record<string, number> =>
-    yearByDomain.reduce<Record<string, number>>(
-        (acc, value) => ({
-            ...acc,
-            [value]: (acc[value] ?? 0) + 1,
-        }),
-        {}
-    );
+export const createDomain = (domains: Record<string, number>) => {
+    const children = Object.entries(domains).map(([key, value]) => {
+        return {
+            id: randomUUID(),
+            [key]: value,
+            name: key,
+            size: value,
+        };
+    });
+
+    return {
+        children,
+        ...createBase(),
+    };
+};
+export const createCorrespondants = (correspondants: string[]) => {
+    const children = Object.entries(correspondants).map(([key, value]) => {
+        return {
+            id: randomUUID(),
+            [key]: value,
+            name: value,
+            size: 1, // TODO: check coherence : if we need the volume, 1 is not accurate
+        };
+    });
+
+    return {
+        children,
+        ...createBase(),
+    };
+};
+
+export const createYears = (years: number[]) => {
+    const children = Object.entries(years).map(([key, value]) => {
+        return {
+            id: randomUUID(),
+            [key]: value,
+            name: value,
+            size: 1, // TODO: pas logique
+        };
+    });
+    return {
+        children,
+        ...createBase(),
+    };
+};
+
+export const createMails = (mails: PstEmail[]) => {
+    const children = Object.entries(mails).map(([, value]) => {
+        return {
+            id: randomUUID(),
+            name: value.name,
+            size: value.size,
+            value: value.name,
+        };
+    });
+
+    return {
+        children,
+        ...createBase(),
+    };
+};
