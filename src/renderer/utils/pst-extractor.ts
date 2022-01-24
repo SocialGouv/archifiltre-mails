@@ -16,6 +16,7 @@ import {
     MAX_TRESHOLD,
     ORG_UNIT_PST,
     RATIO_FROM_MAX,
+    TRESHOLD_KEY,
 } from "./constants";
 
 /**
@@ -232,29 +233,52 @@ export const createBaseMail = (): PstEmail => ({
 export const getDomain = (element: string): string =>
     element.substring(element.indexOf("@"));
 
-export const getMailTreshold = (base: Record<string, number>): number => {
-    const maxMail = Object.values(base).reduce(
-        (acc, cur) => Math.max(acc, cur),
-        0
-    );
+export const getMailTreshold = (
+    base: Map<string, number> | Record<string, number>
+): number => {
+    const maxMail = (
+        base instanceof Map ? [...base.values()] : Object.values(base)
+    ).reduce((acc, cur) => Math.max(acc, cur), 0);
 
     return Math.min(Math.ceil(maxMail * (RATIO_FROM_MAX / 100)), MAX_TRESHOLD);
 };
 
-export const findAllMailAddresses = (pst: PstElement): string[] => {
+export const findAllMailAddresses = (
+    pst: PstElement
+): Record<string, number> => {
     const result: string[] = [];
-    const _result: Any = [];
+    const mailCountPerMail = new Map<string, number>();
+    const mailCountPerDomain = new Map<string, number>();
     const recursivelyFindProp = (_pst: PstElement) => {
         if (isPstFolder(_pst)) {
             _pst.children?.forEach((child) => {
                 recursivelyFindProp(child);
             });
         } else if (isPstEmail(_pst) && _pst.from.email) {
-            _result.push({
-                email: _pst.from.email.includes(ORG_UNIT_PST)
+            const emails = new Set([
+                _pst.from.email,
+                ...(["to", "cc", "bcc"] as const)
+                    .map(
+                        (theKey) =>
+                            _pst[theKey]
+                                .map((value) => value.email)
+                                .filter(Boolean) as string[]
+                    )
+                    .flat(),
+            ]);
+            emails.forEach((email) => {
+                const emailKey = email.includes(ORG_UNIT_PST)
                     ? "Same_LD"
-                    : _pst.from.email,
-                size: _pst.size,
+                    : email;
+                const currentMailCount = mailCountPerMail.get(emailKey) ?? 0;
+                mailCountPerMail.set(emailKey, currentMailCount + 1);
+
+                const domainKey = email.includes(ORG_UNIT_PST)
+                    ? "Same_LD"
+                    : getDomain(email);
+                const currentDomainCount =
+                    mailCountPerDomain.get(domainKey) ?? 0;
+                mailCountPerDomain.set(domainKey, currentDomainCount + 1);
             });
 
             result.push(
@@ -273,30 +297,40 @@ export const findAllMailAddresses = (pst: PstElement): string[] => {
 
     recursivelyFindProp(pst);
 
-    const output = _result.reduce((acc, current) => {
-        const id = acc[current.email];
+    const orderByValues = <K, V extends number>(m: Map<K, V>): Map<K, V> =>
+        new Map([...m.entries()].sort(([, va], [, vb]) => vb - va));
+    const orderByKeys = <K, V extends number>(m: Map<K, V>): Map<K, V> =>
+        new Map([...m.entries()].sort(([ka], [kb]) => (ka < kb ? 1 : -1)));
 
-        if (id) {
-            id.email = current.email;
-            id.size += current.size;
-        } else {
-            acc[current.email] = current;
+    const toRecord = <K extends string, V>(m: Map<K, V>): Record<K, V> =>
+        [...m.entries()].reduce(
+            (acc, [k, v]) => ({ ...acc, [k]: v }),
+            // eslint-disable-next-line @typescript-eslint/prefer-reduce-type-parameter
+            {} as Record<K, V>
+        );
+    // threshold
+    const threshold = getMailTreshold(mailCountPerDomain);
+    const thresholdify = (m: Map<string, number>): Map<string, number> => {
+        const out = new Map<string, number>();
+        for (const [k, v] of m) {
+            if (v < threshold) {
+                out.set(TRESHOLD_KEY, v + (out.get(TRESHOLD_KEY) ?? 0));
+            } else out.set(k, v);
         }
-        return acc;
-    }, {});
 
-    const sanitizedOutput = Object.keys(output)
-        .sort()
-        .map((k) => output[k]);
+        return out;
+    };
 
-    console.log({ result, sanitizedOutput });
+    const THERESULT = orderByValues(thresholdify(mailCountPerDomain));
 
-    return result;
+    console.log({ THERESULT });
+
+    return toRecord(THERESULT);
 };
 
-export const getAllUniqueMailAddresses = (pst: PstElement): string[] => [
-    ...new Set(findAllMailAddresses(pst)),
-];
+// export const getAllUniqueMailAddresses = (pst: PstElement): string[] => [
+//     ...new Set(findAllMailAddresses(pst)),
+// ];
 
 export const getAllDomainsByAddresses = (
     uniqueAddresses: string[]

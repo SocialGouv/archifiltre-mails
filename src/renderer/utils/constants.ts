@@ -27,7 +27,8 @@ export const TRANSPARENT = "transparent";
 // html id and classname
 export const CIRCLE_PACKING_ID = "#circle-packing";
 
-export const MAX_TRESHOLD = 2;
+export const MAX_TRESHOLD = 20;
+export const TRESHOLD_KEY = "_other";
 export const RATIO_FROM_MAX = 10;
 
 export const ORG_UNIT_PST = "/OU=";

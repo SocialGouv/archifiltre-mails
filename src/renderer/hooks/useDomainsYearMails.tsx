@@ -1,5 +1,4 @@
 import type { Any } from "@common/utils/type";
-import { compose } from "lodash/fp";
 import { useCallback, useEffect, useState } from "react";
 
 import { usePstStore } from "../store/PSTStore";
@@ -10,12 +9,9 @@ import {
     createCorrespondants,
     createDomain,
     createMails,
+    findAllMailAddresses,
     findMailsByDomainCorrespondantAndYear,
     findUniqueCorrespondantsByDomain,
-    getAggregatedDomainsCount,
-    getAllDomainsByAddresses,
-    getAllUniqueMailAddresses,
-    getDuplicatedDomainsCount,
 } from "../utils/pst-extractor";
 
 export interface UseDomainsYearMailsProps {
@@ -31,12 +27,13 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
     const [currentView, setCurrentView] = useState({ elements: {}, type: "" });
 
     const createInitialView = useCallback(() => {
-        const aggregatedDomainCount: Record<string, number> = compose(
-            getAggregatedDomainsCount,
-            getDuplicatedDomainsCount,
-            getAllDomainsByAddresses,
-            getAllUniqueMailAddresses
-        )(pstFile!);
+        // const aggregatedDomainCount: Record<string, number> = compose(
+        //     getAggregatedDomainsCount,
+        //     getDuplicatedDomainsCount,
+        //     getAllDomainsByAddresses,
+        //     getAllUniqueMailAddresses
+        // )(pstFile!);
+        const aggregatedDomainCount = findAllMailAddresses(pstFile!);
 
         setCurrentView({
             elements: createDomain(aggregatedDomainCount),
