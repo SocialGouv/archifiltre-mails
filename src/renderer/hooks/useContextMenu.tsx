@@ -14,11 +14,15 @@ interface UseContextMenuType {
 export const useContextMenu = (): UseContextMenuType => {
     const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
     const [show, setShow] = useState<UseContextMenuType["show"]>(false);
-    const { addMarkedToDelete } = useTagManagerStore();
+    const { addMarkedToDelete, addMarkedToKeep } = useTagManagerStore();
 
     const handleMarkedToDelete = useCallback(() => {
         addMarkedToDelete();
     }, [addMarkedToDelete]);
+
+    const handleMarkedToKeep = useCallback(() => {
+        addMarkedToKeep();
+    }, [addMarkedToKeep]);
 
     const handleContextMenu = useCallback(
         (event) => {
@@ -44,6 +48,7 @@ export const useContextMenu = (): UseContextMenuType => {
         menu?.addEventListener("click", handleClick);
         menu?.addEventListener("contextmenu", handleContextMenu);
         markedToDeleteBtn?.addEventListener("click", handleMarkedToDelete);
+        markedToKeepBtn?.addEventListener("click", handleMarkedToKeep);
 
         return () => {
             menu?.removeEventListener("click", handleClick);
@@ -52,14 +57,16 @@ export const useContextMenu = (): UseContextMenuType => {
                 "click",
                 handleMarkedToDelete
             );
+            markedToKeepBtn?.removeEventListener("click", handleMarkedToKeep);
         };
     }, [
-        handleClick,
-        handleContextMenu,
-        handleMarkedToDelete,
         menu,
         markedToKeepBtn,
         markedToDeleteBtn,
+        handleClick,
+        handleContextMenu,
+        handleMarkedToDelete,
+        handleMarkedToKeep,
     ]);
     return { anchorPoint, show };
 };

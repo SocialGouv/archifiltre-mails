@@ -3,13 +3,24 @@ import { isPstFolder } from "@common/modules/pst-extractor/type";
 import type { Any } from "@common/utils/type";
 import type { CirclePackingSvgProps } from "@nivo/circle-packing";
 import { ResponsiveCirclePacking } from "@nivo/circle-packing";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 
 import { usePstStore } from "../../store/PSTStore";
 import { useTagManagerStore } from "../../store/TagManagerStore";
-import { RED, TRANSPARENT } from "../../utils/constants";
+import {
+    BASE_COLOR,
+    BASE_COLOR_LIGHT,
+    DELETE_COLOR,
+    KEEP_COLOR,
+    ROOT,
+} from "../../utils/constants";
 import type { PstComputed } from "../../utils/pst-extractor";
-import { findPstChildById, isToDeleteFolder } from "../../utils/pst-extractor";
+import {
+    findPstChildById,
+    isToDeleteFolder,
+    isToKeepFolder,
+} from "../../utils/pst-extractor";
+import { getPstComputeChildrenId } from "../../utils/tag-manager";
 import { Menu } from "../menu/Menu";
 
 interface CirclePackingViewerProps {
@@ -36,9 +47,11 @@ type CirclePackingCommonProps = Partial<
 };
 
 const commonProperties: CirclePackingCommonProps = {
-    colors: { scheme: "paired" },
+    borderColor: BASE_COLOR_LIGHT,
+    borderWidth: 2,
     enableLabels: true,
     id: "id",
+    isInteractive: true,
     label: (node) => node.data.name,
     labelsFilter: (label) => label.node.height === 0,
     labelsSkipRadius: 16,
@@ -53,11 +66,17 @@ export const CirclePackingViewer: React.FC<CirclePackingViewerProps> = ({
     const { computedPst, updateComputedPst, setMainInfos, setDepth } =
         usePstStore();
 
-    const { setHoveredId, markedToDelete } = useTagManagerStore();
+    const {
+        setHoveredId,
+        markedToDelete,
+        markedToKeep,
+        addChildrenMarkedToKeep,
+        addChildrenMarkedToDelete,
+    } = useTagManagerStore();
 
     const updatePstView = useCallback<UpdatePstViewInterface>(
         (node: Node) => {
-            if (node.id === "rootId") return;
+            if (node.id === ROOT) return;
 
             const child = findPstChildById(pstFile, node.id);
             if (child && isPstFolder(child)) {
@@ -83,11 +102,21 @@ export const CirclePackingViewer: React.FC<CirclePackingViewerProps> = ({
         setMainInfos(undefined);
     }, [setMainInfos]);
 
-    if (!computedPst) return null;
+    useEffect(() => {
+        if (computedPst && isToDeleteFolder(computedPst.id, markedToDelete)) {
+            addChildrenMarkedToDelete(
+                getPstComputeChildrenId(computedPst.children)
+            );
+        }
+        if (computedPst && isToKeepFolder(computedPst.id, markedToKeep)) {
+            addChildrenMarkedToKeep(
+                getPstComputeChildrenId(computedPst.children)
+            );
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [computedPst]);
 
-    const borderColor = isToDeleteFolder(computedPst.id, markedToDelete)
-        ? RED
-        : TRANSPARENT;
+    if (!computedPst) return null;
 
     return (
         <>
@@ -96,9 +125,15 @@ export const CirclePackingViewer: React.FC<CirclePackingViewerProps> = ({
                 onClick={updatePstView}
                 onMouseEnter={updateMainInfos}
                 onMouseLeave={emptyMaininfos}
-                borderColor={borderColor}
-                borderWidth={3}
-                isInteractive={true}
+                colors={(node) => {
+                    if (isToDeleteFolder(node.id, markedToDelete)) {
+                        return DELETE_COLOR;
+                    }
+                    if (isToKeepFolder(node.id, markedToKeep)) {
+                        return KEEP_COLOR;
+                    }
+                    return BASE_COLOR;
+                }}
                 {...commonProperties}
             />
 
