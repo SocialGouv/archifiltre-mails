@@ -5,13 +5,13 @@ import { useCallback, useEffect, useState } from "react";
 import { usePstStore } from "../store/PSTStore";
 import { CORRESPONDANTS, DOMAIN, MAILS, YEAR } from "../utils/constants";
 import {
+    _createYears,
+    _findYearByCorrespondants,
     createCorrespondants,
     createDomain,
     createMails,
-    createYears,
     findMailsByDomainCorrespondantAndYear,
     findUniqueCorrespondantsByDomain,
-    findYearByCorrespondants,
     getAggregatedDomainsCount,
     getAllDomainsByAddresses,
     getAllUniqueMailAddresses,
@@ -71,13 +71,19 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
         if (currentView.type === CORRESPONDANTS) {
             setCurrentCorrespondant(data.data.name as string);
 
-            const yearByCorrespondants = findYearByCorrespondants(
+            // const yearByCorrespondants = findYearByCorrespondants(
+            //     pstFile!,
+            //     data.data.name as string
+            // );
+
+            const _yearByCorrespondants = _findYearByCorrespondants(
                 pstFile!,
                 data.data.name as string
             );
 
             setCurrentView({
-                elements: createYears(yearByCorrespondants),
+                // elements: createYears(yearByCorrespondants),
+                elements: _createYears(_yearByCorrespondants),
                 type: YEAR,
             });
         }

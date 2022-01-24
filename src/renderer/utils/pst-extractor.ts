@@ -8,6 +8,7 @@ import type {
     PstFolder,
 } from "@common/modules/pst-extractor/type";
 import { isPstEmail, isPstFolder } from "@common/modules/pst-extractor/type";
+import type { Any } from "@common/utils/type";
 import { randomUUID } from "crypto";
 
 import {
@@ -242,12 +243,20 @@ export const getMailTreshold = (base: Record<string, number>): number => {
 
 export const findAllMailAddresses = (pst: PstElement): string[] => {
     const result: string[] = [];
+    const _result: Any = [];
     const recursivelyFindProp = (_pst: PstElement) => {
         if (isPstFolder(_pst)) {
             _pst.children?.forEach((child) => {
                 recursivelyFindProp(child);
             });
         } else if (isPstEmail(_pst) && _pst.from.email) {
+            _result.push({
+                email: _pst.from.email.includes(ORG_UNIT_PST)
+                    ? "Same_LD"
+                    : _pst.from.email,
+                size: _pst.size,
+            });
+
             result.push(
                 _pst.from.email,
                 ...(["to", "cc", "bcc"] as const)
@@ -261,7 +270,27 @@ export const findAllMailAddresses = (pst: PstElement): string[] => {
             );
         }
     };
+
     recursivelyFindProp(pst);
+
+    const output = _result.reduce((acc, current) => {
+        const id = acc[current.email];
+
+        if (id) {
+            id.email = current.email;
+            id.size += current.size;
+        } else {
+            acc[current.email] = current;
+        }
+        return acc;
+    }, {});
+
+    const sanitizedOutput = Object.keys(output)
+        .sort()
+        .map((k) => output[k]);
+
+    console.log({ result, sanitizedOutput });
+
     return result;
 };
 
@@ -341,6 +370,7 @@ export const findYearByCorrespondants = (
     correspondant: string
 ): number[] => {
     const result: number[] = [];
+
     const recursivelyFindProp = (_pst: PstElement) => {
         if (isPstFolder(_pst)) {
             _pst.children?.forEach((child) => {
@@ -357,6 +387,40 @@ export const findYearByCorrespondants = (
     recursivelyFindProp(pst);
 
     return [...new Set(result)];
+};
+
+export const _findYearByCorrespondants = (
+    pst: PstElement,
+    correspondant: string
+): number[] => {
+    const _result: Any = [];
+
+    const recursivelyFindProp = (_pst: PstElement) => {
+        if (isPstFolder(_pst)) {
+            _pst.children?.forEach((child) => {
+                recursivelyFindProp(child);
+            });
+        } else if (
+            isPstEmail(_pst) &&
+            _pst.receivedDate &&
+            _pst.from.name === correspondant
+        ) {
+            _result.push({ date: _pst.receivedDate.getFullYear(), value: 1 });
+        }
+    };
+    recursivelyFindProp(pst);
+
+    const output = _result.reduce((acc, current) => {
+        const date = current.date;
+        const found = acc.find((elem) => {
+            return elem.date == date;
+        });
+        if (found) found.value += current.value;
+        else acc.push(current);
+        return acc;
+    }, []);
+
+    return output;
 };
 
 export const findMailsByDomainCorrespondantAndYear = (
@@ -383,6 +447,7 @@ export const findMailsByDomainCorrespondantAndYear = (
         }
     };
     recursivelyFindProp(pst);
+
     return result;
 };
 
@@ -426,6 +491,18 @@ export const createYears = (years: number[]) => {
             size: 1, // TODO: pas logique
         };
     });
+    return {
+        children,
+        ...createBase(),
+    };
+};
+export const _createYears = (years: number[]) => {
+    const children = years.map((year) => ({
+        id: randomUUID(),
+        name: year.date,
+        size: year.value,
+    }));
+
     return {
         children,
         ...createBase(),
