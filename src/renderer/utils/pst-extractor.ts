@@ -170,6 +170,9 @@ export const findPstChildById = (
 export const isToDeleteFolder = (id: string, deleteIds: string[]): boolean =>
     deleteIds.includes(id);
 
+export const isToKeepFolder = (id: string, keepIds: string[]): boolean =>
+    keepIds.includes(id);
+
 export const getPstTotalContacts = (
     contactTable: Map<string, string[]> | undefined
 ): number | undefined => {
