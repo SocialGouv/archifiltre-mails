@@ -1,0 +1,43 @@
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+  - package-ecosystem: npm
+    target-branch: dev
+    labels:
+      - bot
+      - dependencies
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "01:00"
+      timezone: Europe/Paris
+    versioning-strategy: increase-if-necessary
+    allow:
+      - dependency-type: direct
+    ignore:
+      - dependency-name: "@types/node"
+        versions:
+          - ">=17"
+      - dependency-name: "webpack"
+        versions:
+          - ">=5"
+      - dependency-name: "@types/webpack"
+        versions:
+          - ">=5"
+      - dependency-name: "sass-loader"
+        versions:
+          - ">=11"
+      - dependency-name: "eslint"
+        versions:
+          - ">=8"
+      - dependency-name: "eslint-plugin-unused-imports"
+        versions:
+          - ">=2"
+      - dependency-name: "eslint-plugin-playwright"
+        versions:
+          - ">=0.7.0"

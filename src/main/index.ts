@@ -80,13 +80,18 @@ app.on("ready", async () => {
     // load "main-process" modules
     await loadModules(
         ...isomorphicModules,
-        new AppModule(mainWindowRetriever, consoleToRendererService),
+        new AppModule(
+            mainWindowRetriever,
+            consoleToRendererService,
+            containerModule.get("i18nService")
+        ),
         new DevToolsModule(),
         new OpenDialogModule(),
         new PstExtractorModule(containerModule.get("userConfigService")),
         new MenuModule(
             consoleToRendererService,
-            containerModule.get("pstExtractorMainService")
+            containerModule.get("pstExtractorMainService"),
+            containerModule.get("i18nService")
         )
     );
     // create actual main BrowserWindow

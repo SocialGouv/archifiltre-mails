@@ -1,46 +1,52 @@
 import type { PstExtractTables } from "@common/modules/pst-extractor/type";
 import type { SimpleObject } from "@common/utils/type";
+import { t } from "i18next";
 
 /**
  * Format the given emails table into a "readable" JSON for exporters to use.
  */
 export const formatEmailTable = (
     emailsTable: PstExtractTables["emails"]
-): SimpleObject[] =>
-    [...emailsTable.values()].flat(1).map((email) => ({
-        // TODO: i18n keys
-        /* eslint-disable sort-keys-fix/sort-keys-fix */
-        /* eslint-disable @typescript-eslint/naming-convention */
-        "N° identifiant": email.id,
-        "Date et heure de la réception": email.receivedDate,
-        "Date et heure de l'envoie": email.sentTime,
-        "Nom de l'expéditeur": email.from.name,
-        "Adresse mail de l'expéditeur": email.from.email ?? "",
-        "Noms du ou des destinataire A": email.to
-            .map((to) => to.name)
-            .join(","),
-        "Adresses mails du ou des destinataire A": email.to
-            .map((to) => to.email)
-            .join(","),
-        "Noms du ou des destinataire CC": email.cc
-            .map((cc) => cc.name)
-            .join(","),
-        "Adresses mails du ou des destinataire CC": email.cc
-            .map((cc) => cc.email)
-            .join(","),
-        "Noms du ou des destinataire BCC": email.bcc
-            .map((bcc) => bcc.name)
-            .join(","),
-        "Adresses mails du ou des destinataire BCC": email.bcc
-            .map((bcc) => bcc.email)
-            .join(","),
-        "Objet du mail": email.subject,
-        "Nombre de pièces jointes": email.attachementCount,
-        "Taille des pièces joints (en octet)": email.attachements
+): SimpleObject[] => {
+    const tKeys = {
+        attachmentCount: t("exporter.table.attachment-count"),
+        attachmentsFilename: t("exporter.table.attachments.filename"),
+        attachmentsFilesize: t("exporter.table.attachments.filesize"),
+        bccEmail: t("exporter.table.bcc.email"),
+        bccName: t("exporter.table.bcc.name"),
+        ccEmail: t("exporter.table.cc.email"),
+        ccName: t("exporter.table.cc.name"),
+        contentText: t("exporter.table.content-text"),
+        fromEmail: t("exporter.table.from.email"),
+        fromName: t("exporter.table.from.name"),
+        id: t("exporter.table.id"),
+        receivedDate: t("exporter.table.received-date"),
+        sentTime: t("exporter.table.send-time"),
+        subject: t("exporter.table.subject"),
+        toEmail: t("exporter.table.to.email"),
+        toName: t("exporter.table.to.name"),
+    };
+
+    return [...emailsTable.values()].flat(1).map((email) => ({
+        [tKeys.id]: email.id,
+        [tKeys.receivedDate]: email.receivedDate,
+        [tKeys.sentTime]: email.sentTime,
+        [tKeys.fromName]: email.from.name,
+        [tKeys.fromEmail]: email.from.email ?? "",
+        [tKeys.toName]: email.to.map((to) => to.name).join(","),
+        [tKeys.toEmail]: email.to.map((to) => to.email).join(","),
+        [tKeys.ccName]: email.cc.map((cc) => cc.name).join(","),
+        [tKeys.ccEmail]: email.cc.map((cc) => cc.email).join(","),
+        [tKeys.bccName]: email.bcc.map((bcc) => bcc.name).join(","),
+        [tKeys.bccEmail]: email.bcc.map((bcc) => bcc.email).join(","),
+        [tKeys.subject]: email.subject,
+        [tKeys.attachmentCount]: email.attachementCount,
+        [tKeys.attachmentsFilesize]: email.attachements
             .map((attachement) => attachement.filesize)
             .join(","),
-        "Noms pièces jointes": email.attachements
+        [tKeys.attachmentsFilename]: email.attachements
             .map((attachement) => attachement.filename)
             .join(","),
-        "Contenu du message": email.contentText,
+        [tKeys.contentText]: email.contentText,
     }));
+};

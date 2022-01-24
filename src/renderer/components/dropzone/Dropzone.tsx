@@ -1,6 +1,7 @@
 import React from "react";
 import type { FileRejection } from "react-dropzone";
 import { useDropzone } from "react-dropzone";
+import { useTranslation } from "react-i18next";
 
 import style from "./Dropzone.module.scss";
 
@@ -10,6 +11,7 @@ interface DropzoneProps {
 }
 
 export const Dropzone: React.FC<DropzoneProps> = ({ accept, onDrop }) => {
+    const { t } = useTranslation();
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept,
         onDrop,
@@ -24,10 +26,8 @@ export const Dropzone: React.FC<DropzoneProps> = ({ accept, onDrop }) => {
         <>
             <div className={style.dropzone}>
                 <div className={style["dropzone-title"]}>
-                    <h1 todo-i18n="true">Téléchargez votre fichier ici</h1>
-                    <span todo-i18n="true">
-                        Votre fichier doit être un .pst
-                    </span>
+                    <h1>{t("dropzone.download-here")}</h1>
+                    <span>{t("dropzone.pst-limitation")}</span>
                 </div>
                 <div
                     className={getClassName(
@@ -42,12 +42,12 @@ export const Dropzone: React.FC<DropzoneProps> = ({ accept, onDrop }) => {
                     />
                     <div className={style["dropzone-text"]}>
                         {isDragActive ? (
-                            <p className="dropzone-text-item" todo-i18n="true">
-                                Lâchez pour téléverser les fichiers
+                            <p className="dropzone-text-item">
+                                {t("dropzone.drop")}
                             </p>
                         ) : (
-                            <p className="dropzone-text-item" todo-i18n="true">
-                                Cliquez ou glissez-déposez vos fichiers ici
+                            <p className="dropzone-text-item">
+                                {t("dropzone.click-or-drag")}
                             </p>
                         )}
                     </div>
