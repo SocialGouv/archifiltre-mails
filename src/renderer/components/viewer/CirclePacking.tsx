@@ -3,7 +3,7 @@ import React from "react";
 
 import { useDomainsYearsMails } from "../../hooks/useDomainsYearMails";
 import { useTagManagerStore } from "../../store/TagManagerStore";
-import { DELETE_COLOR } from "../../utils/constants";
+import { BASE_COLOR, DELETE_COLOR } from "../../utils/constants";
 import { isToDeleteFolder } from "../../utils/pst-extractor";
 import { Menu } from "../menu/Menu";
 import style from "./CirclePacking.module.scss";
@@ -33,11 +33,12 @@ export const CirclePacking: React.FC = () => {
                     }}
                     isInteractive={true}
                     colors={(node) => {
-                        console.log("ici");
                         if (isToDeleteFolder(node.id, markedToDelete)) {
+                            console.log("ici");
+
                             return DELETE_COLOR as string;
                         }
-                        return DELETE_COLOR;
+                        return BASE_COLOR;
                     }}
                     {...commonProperties}
                 />
