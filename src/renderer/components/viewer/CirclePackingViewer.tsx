@@ -47,7 +47,7 @@ type CirclePackingCommonProps = Partial<
 };
 
 export const commonProperties: CirclePackingCommonProps = {
-    colors: { scheme: "paired" },
+    // colors: { scheme: "paired" },
     enableLabels: true,
     id: "id",
     isInteractive: true,
