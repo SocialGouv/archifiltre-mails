@@ -1497,10 +1497,10 @@
     lodash "^4.17.21"
     resize-observer-polyfill "^1.5.1"
 
-"@nivo/generators@^0.74.0":
-  version "0.74.0"
-  resolved "https://registry.yarnpkg.com/@nivo/generators/-/generators-0.74.0.tgz#17fc8b8ec29a00cbd2c88048ab4157930eaf2be3"
-  integrity sha512-UYXMq8yg1hEO2cqMmwwQAUnK9DJoBfegACZFOrHtI28eERXFKEKHbz4iy20EJYBYmstHlHkFRyK7uvz24Hggmw==
+"@nivo/generators@^0.79.0":
+  version "0.79.0"
+  resolved "https://registry.yarnpkg.com/@nivo/generators/-/generators-0.79.0.tgz#2a9e6633fb677ff4411965584305481c72c0365c"
+  integrity sha512-Yic9svenLO1sw7A8gX42iAGgjX0j39wvJjvN0gcgIUWQzneDH8FPp6jkuUb/EzdLF2W53ZFXOtevd+TPGOFDyA==
   dependencies:
     d3-random "^1.1.2"
     d3-time "^1.0.10"
