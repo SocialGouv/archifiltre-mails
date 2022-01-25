@@ -39,8 +39,10 @@
       "@nivo/circle-packing",
       "@nivo/core",
       "@nivo/generators",
+      "@socialgouv/archimail-pst-extractor",
       "d3",
       "i18next",
+      "jotai",
       "react-dropzone",
       "react-i18next"
     ]
@@ -84,7 +86,7 @@
     },
     "win": {
       "icon": "./electron/build/icon.png",
-      "artifactName": "archimail-${os}-standalone.${ext}"
+      "artifactName": "archimail-${os}-portable.${ext}"
     },
     "msi": {
       "artifactName": "archimail-${os}.${ext}"

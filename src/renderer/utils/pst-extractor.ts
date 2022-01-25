@@ -4,8 +4,9 @@ import type {
     PstEmail,
     PstExtractTables,
     PstFolder,
-} from "./../../common/modules/pst-extractor/type";
-import { isPstEmail } from "./../../common/modules/pst-extractor/type";
+} from "@common/modules/pst-extractor/type";
+import { isPstEmail } from "@common/modules/pst-extractor/type";
+
 import { ARBITRARY_FLAT_LEVEL } from "./constants";
 
 /**
