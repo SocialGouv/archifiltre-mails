@@ -1,12 +1,10 @@
-import React, { Fragment, useRef } from "react";
+import React, { Fragment } from "react";
 
 import { useContextMenu } from "../../hooks/useContextMenu";
 import style from "./Menu.module.scss";
 
 export const Menu: React.FC = () => {
-    const { anchorPoint, show, handleMarkedToDelete } = useContextMenu();
-
-    const deleteBtn = useRef(null);
+    const { anchorPoint, show } = useContextMenu();
 
     if (show) {
         return (
@@ -15,11 +13,7 @@ export const Menu: React.FC = () => {
                 className={style.menu}
                 style={{ left: anchorPoint.x, top: anchorPoint.y }}
             >
-                <li
-                    onClick={handleMarkedToDelete}
-                    id="to-delete-btn"
-                    className="to-delete-btn"
-                >
+                <li id="to-delete-btn" className="to-delete-btn">
                     Supprimé
                 </li>
                 {/* <li>Non marqué</li> */}

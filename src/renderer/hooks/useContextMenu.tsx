@@ -17,8 +17,6 @@ export const useContextMenu = (): UseContextMenuType => {
     const { addMarkedToDelete, addMarkedToKeep } = useTagManagerStore();
 
     const handleMarkedToDelete = useCallback(() => {
-        console.log("handle");
-
         addMarkedToDelete();
     }, [addMarkedToDelete]);
 
@@ -70,5 +68,5 @@ export const useContextMenu = (): UseContextMenuType => {
         handleMarkedToDelete,
         handleMarkedToKeep,
     ]);
-    return { anchorPoint, handleMarkedToDelete, show };
+    return { anchorPoint, show };
 };
