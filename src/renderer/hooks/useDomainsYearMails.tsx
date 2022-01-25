@@ -27,12 +27,6 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
     const [currentView, setCurrentView] = useState({ elements: {}, type: "" });
 
     const createInitialView = useCallback(() => {
-        // const aggregatedDomainCount: Record<string, number> = compose(
-        //     getAggregatedDomainsCount,
-        //     getDuplicatedDomainsCount,
-        //     getAllDomainsByAddresses,
-        //     getAllUniqueMailAddresses
-        // )(pstFile!);
         const aggregatedDomainCount = findAllMailAddresses(pstFile!);
 
         setCurrentView({
@@ -68,18 +62,12 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
         if (currentView.type === CORRESPONDANTS) {
             setCurrentCorrespondant(data.data.name as string);
 
-            // const yearByCorrespondants = findYearByCorrespondants(
-            //     pstFile!,
-            //     data.data.name as string
-            // );
-
             const _yearByCorrespondants = _findYearByCorrespondants(
                 pstFile!,
                 data.data.name as string
             );
 
             setCurrentView({
-                // elements: createYears(yearByCorrespondants),
                 elements: _createYears(_yearByCorrespondants),
                 type: YEAR,
             });
