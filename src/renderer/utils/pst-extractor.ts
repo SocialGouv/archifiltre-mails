@@ -330,56 +330,57 @@ export const findAllMailAddresses = (
     return toRecord(THERESULT);
 };
 
-export const getAllDomainsByAddresses = (
-    uniqueAddresses: string[]
-): (string | undefined)[] =>
-    uniqueAddresses
-        .map((element) => {
-            if (element.includes(ORG_UNIT_PST)) {
-                // TODO: handle "/DC"
-                return "Same LDAP";
-            }
-            if (element.indexOf("@")) {
-                return getDomain(element);
-            }
-        })
-        .sort();
+// export const getAllDomainsByAddresses = (
+//     uniqueAddresses: string[]
+// ): (string | undefined)[] =>
+//     uniqueAddresses
+//         .map((element) => {
+//             if (element.includes(ORG_UNIT_PST)) {
+//                 // TODO: handle "/DC"
+//                 return "Same LDAP";
+//             }
+//             if (element.indexOf("@")) {
+//                 return getDomain(element);
+//             }
+//         })
+//         .sort();
 
-export const getDuplicatedDomainsCount = (
-    domains: (string | undefined)[]
-): Record<string, number> => {
-    return (domains.filter(Boolean) as string[]).reduce<Record<string, number>>(
-        (acc, value) => ({
-            ...acc,
-            [value]: (acc[value] ?? 0) + 1,
-        }),
-        {}
-    );
-};
+// export const getDuplicatedDomainsCount = (
+//     domains: (string | undefined)[]
+// ): Record<string, number> => {
+//     return (domains.filter(Boolean) as string[]).reduce<Record<string, number>>(
+//         (acc, value) => ({
+//             ...acc,
+//             [value]: (acc[value] ?? 0) + 1,
+//         }),
+//         {}
+//     );
+// };
 
-export const getAggregatedDomainsCount = (
-    duplicatedDomainsCount: Record<string, number>
-): Record<string, number> => {
-    const treshold = getMailTreshold(duplicatedDomainsCount);
+// export const getAggregatedDomainsCount = (
+//     duplicatedDomainsCount: Record<string, number>
+// ): Record<string, number> => {
+//     const treshold = getMailTreshold(duplicatedDomainsCount);
 
-    return Object.entries(duplicatedDomainsCount).reduce<
-        Record<string, number>
-    >(
-        (acc, [email, count]) => {
-            if (count > treshold) {
-                acc[email] = count;
-            } else acc.__others += count;
-            return acc;
-        },
-        { __others: 0 }
-    );
-};
+//     return Object.entries(duplicatedDomainsCount).reduce<
+//         Record<string, number>
+//     >(
+//         (acc, [email, count]) => {
+//             if (count > treshold) {
+//                 acc[email] = count;
+//             } else acc.__others += count;
+//             return acc;
+//         },
+//         { __others: 0 }
+//     );
+// };
 
 export const findUniqueCorrespondantsByDomain = (
     pst: PstElement,
     domain: string
 ): string[] => {
     const result: string[] = [];
+    const _result: Any = [];
     const recursivelyFindProp = (_pst: PstElement) => {
         if (isPstFolder(_pst)) {
             _pst.children?.forEach((child) => {
@@ -391,37 +392,26 @@ export const findUniqueCorrespondantsByDomain = (
             getDomain(_pst.from.email) === domain
         ) {
             result.push(_pst.from.name); // TODO: est-ce bien ce que l'on veut
+
+            _result.push({ name: _pst.from.name, value: 1 });
         }
     };
     recursivelyFindProp(pst);
-    return [...new Set(result)].sort();
+
+    const output = _result.reduce((acc, current) => {
+        const name = current.name;
+        const found = acc.find((elem) => {
+            return elem.name === name;
+        });
+        if (found) found.value += current.value;
+        else acc.push(current);
+        return acc;
+    }, []);
+
+    return output;
 };
 
 export const findYearByCorrespondants = (
-    pst: PstElement,
-    correspondant: string
-): number[] => {
-    const result: number[] = [];
-
-    const recursivelyFindProp = (_pst: PstElement) => {
-        if (isPstFolder(_pst)) {
-            _pst.children?.forEach((child) => {
-                recursivelyFindProp(child);
-            });
-        } else if (
-            isPstEmail(_pst) &&
-            _pst.receivedDate &&
-            _pst.from.name === correspondant
-        ) {
-            result.push(_pst.receivedDate.getFullYear());
-        }
-    };
-    recursivelyFindProp(pst);
-
-    return [...new Set(result)];
-};
-
-export const _findYearByCorrespondants = (
     pst: PstElement,
     correspondant: string
 ): number[] => {
@@ -445,7 +435,7 @@ export const _findYearByCorrespondants = (
     const output = _result.reduce((acc, current) => {
         const date = current.date;
         const found = acc.find((elem) => {
-            return elem.date == date;
+            return elem.date === date;
         });
         if (found) found.value += current.value;
         else acc.push(current);
@@ -501,14 +491,31 @@ export const createDomain = (domains: Record<string, number>, id: string) => {
 
 const correspondantCache = new Map<string, unknown>();
 
+// export const createCorrespondants = (correspondants: string[], id: string) => {
+//     if (!correspondantCache.has(id)) {
+//         const children = Object.entries(correspondants).map(([key, value]) => {
+//             return {
+//                 id: randomUUID(),
+//                 [key]: value,
+//                 name: value,
+//                 size: 1, // TODO: check coherence : if we need the volume, 1 is not accurate
+//             };
+//         });
+
+//         correspondantCache.set(id, {
+//             children,
+//             ...createBase(id),
+//         });
+//     }
+//     return correspondantCache.get(id);
+// };
 export const createCorrespondants = (correspondants: string[], id: string) => {
     if (!correspondantCache.has(id)) {
-        const children = Object.entries(correspondants).map(([key, value]) => {
+        const children = correspondants.map((correspondant) => {
             return {
                 id: randomUUID(),
-                [key]: value,
-                name: value,
-                size: 1, // TODO: check coherence : if we need the volume, 1 is not accurate
+                name: correspondant.name,
+                size: correspondant.value, // TODO: check coherence : if we need the volume, 1 is not accurate
             };
         });
 
@@ -522,7 +529,7 @@ export const createCorrespondants = (correspondants: string[], id: string) => {
 
 const yearsCache = new Map<string, unknown>();
 
-export const _createYears = (years: number[], id: string) => {
+export const createYears = (years: number[], id: string) => {
     if (!yearsCache.has(id)) {
         const children = years.map((year) => ({
             id: randomUUID(),
