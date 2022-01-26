@@ -1,5 +1,6 @@
 import type { ComputedDatum } from "@nivo/circle-packing";
 import { ResponsiveCirclePacking } from "@nivo/circle-packing";
+import { debounce } from "lodash";
 import React, { useEffect } from "react";
 
 import { useDomainsYearsMails } from "../../hooks/useDomainsYearMails";
@@ -63,6 +64,10 @@ export const CirclePacking: React.FC = () => {
         return BASE_COLOR;
     };
 
+    const debouncedHover = debounce((node: ComputedDatum<PstComputed>) => {
+        setHoveredId(node.id);
+    }, 500);
+
     return (
         <>
             <div id="circle-packing" className={style["circle-packing"]}>
@@ -70,9 +75,7 @@ export const CirclePacking: React.FC = () => {
                 <ResponsiveCirclePacking
                     data={currentView.elements}
                     onClick={computeNextView}
-                    onMouseEnter={(node) => {
-                        setHoveredId(node.id);
-                    }}
+                    onMouseEnter={debouncedHover}
                     colors={getTaggedFilesColor}
                     {...commonProperties}
                 />
