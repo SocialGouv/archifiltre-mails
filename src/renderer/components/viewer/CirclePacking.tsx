@@ -1,6 +1,6 @@
 import React from "react";
 
-import { ROOT } from "../../../renderer/utils/constants";
+import { PST_ROOT } from "../../../renderer/utils/constants";
 import { usePstStore } from "../../store/PSTStore";
 import style from "./CirclePacking.module.scss";
 import { CirclePackingViewer } from "./CirclePackingViewer";
@@ -11,7 +11,7 @@ export const CirclePacking: React.FC = () => {
 
     const restartViewer = () => {
         if (pstFile) {
-            updateComputedPst(pstFile, ROOT);
+            updateComputedPst(pstFile, PST_ROOT);
             setDepth(1);
         }
     };

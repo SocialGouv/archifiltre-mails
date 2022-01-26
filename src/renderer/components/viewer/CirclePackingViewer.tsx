@@ -7,13 +7,7 @@ import React, { useCallback, useEffect } from "react";
 
 import { usePstStore } from "../../store/PSTStore";
 import { useTagManagerStore } from "../../store/TagManagerStore";
-import {
-    BASE_COLOR,
-    BASE_COLOR_LIGHT,
-    DELETE_COLOR,
-    KEEP_COLOR,
-    ROOT,
-} from "../../utils/constants";
+import { COLORS, PST_ROOT } from "../../utils/constants";
 import type { PstComputed } from "../../utils/pst-extractor";
 import {
     findPstChildById,
@@ -46,6 +40,8 @@ type CirclePackingCommonProps = Partial<
     value: keyof PstContent;
 };
 
+const { BASE_COLOR, BASE_COLOR_LIGHT, DELETE_COLOR, KEEP_COLOR } = COLORS;
+
 const commonProperties: CirclePackingCommonProps = {
     borderColor: BASE_COLOR_LIGHT,
     borderWidth: 2,
@@ -76,7 +72,7 @@ export const CirclePackingViewer: React.FC<CirclePackingViewerProps> = ({
 
     const updatePstView = useCallback<UpdatePstViewInterface>(
         (node: Node) => {
-            if (node.id === ROOT) return;
+            if (node.id === PST_ROOT) return;
 
             const child = findPstChildById(pstFile, node.id);
             if (child && isPstFolder(child)) {

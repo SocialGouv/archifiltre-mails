@@ -24,7 +24,7 @@ export const useTagManagerStore = (): UseTagManagerStore => {
     const [markedToKeep, setMarkedToKeep] = useAtom(markedToKeepAtom);
     const [hoveredId, setHoveredId] = useAtom(hoveredIdAtom);
 
-    // DELETE LOGIC
+    // TAG ELEMENTS TO DELETE LOGIC
     const addMarkedToDelete = useCallback(() => {
         if (markedToKeep.includes(hoveredId)) {
             const removeCurrentFromKeep = markedToKeep.filter(
@@ -57,7 +57,7 @@ export const useTagManagerStore = (): UseTagManagerStore => {
         setMarkedToDelete(updatedMarkedToDelete);
     };
 
-    // KEEP LOGIC
+    // TAG ELEMENTS TO KEEP
     const addMarkedToKeep = useCallback(() => {
         if (markedToDelete.includes(hoveredId)) {
             const removeCurrentFromDelete = markedToDelete.filter(
