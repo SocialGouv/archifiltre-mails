@@ -10,7 +10,6 @@ import { usePstStore } from "../../store/PSTStore";
 import { useTagManagerStore } from "../../store/TagManagerStore";
 import {
     BASE_COLOR,
-    BASE_COLOR_LIGHT,
     DELETE_COLOR,
     KEEP_COLOR,
     ROOT,
@@ -48,9 +47,8 @@ type CirclePackingCommonProps = Partial<
 };
 
 export const commonProperties: CirclePackingCommonProps = {
-    // colors: { scheme: "paired" },
-    borderColor: BASE_COLOR_LIGHT,
-    borderWidth: 2,
+    // borderColor: BASE_COLOR_LIGHT,
+    // borderWidth: 2,
     enableLabels: true,
     id: "id",
     isInteractive: true,

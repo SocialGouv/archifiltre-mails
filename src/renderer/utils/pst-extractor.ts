@@ -302,6 +302,7 @@ export const findAllMailAddresses = (
 
     const orderByValues = <K, V extends number>(m: Map<K, V>): Map<K, V> =>
         new Map([...m.entries()].sort(([, va], [, vb]) => vb - va));
+
     const orderByKeys = <K, V extends number>(m: Map<K, V>): Map<K, V> =>
         new Map([...m.entries()].sort(([ka], [kb]) => (ka < kb ? 1 : -1)));
 
@@ -328,10 +329,6 @@ export const findAllMailAddresses = (
 
     return toRecord(THERESULT);
 };
-
-// export const getAllUniqueMailAddresses = (pst: PstElement): string[] => [
-//     ...new Set(findAllMailAddresses(pst)),
-// ];
 
 export const getAllDomainsByAddresses = (
     uniqueAddresses: string[]

@@ -1,10 +1,11 @@
+import type { ComputedDatum } from "@nivo/circle-packing";
 import { ResponsiveCirclePacking } from "@nivo/circle-packing";
 import React, { useEffect } from "react";
 
 import { useDomainsYearsMails } from "../../hooks/useDomainsYearMails";
 import { useTagManagerStore } from "../../store/TagManagerStore";
-import { BASE_COLOR, DELETE_COLOR, KEEP_COLOR } from "../../utils/constants";
-import type { PstComputedChild } from "../../utils/pst-extractor";
+import { COLORS } from "../../utils/constants";
+import type { PstComputed, PstComputedChild } from "../../utils/pst-extractor";
 import { isToDeleteFolder, isToKeepFolder } from "../../utils/pst-extractor";
 import {
     getChildrenToDeleteIds,
@@ -14,6 +15,8 @@ import {
 import { Menu } from "../menu/Menu";
 import style from "./CirclePacking.module.scss";
 import { commonProperties } from "./CirclePackingViewer";
+
+const { BASE_COLOR, BASE_COLOR_LIGHT, DELETE_COLOR, KEEP_COLOR } = COLORS;
 
 export const CirclePacking: React.FC = () => {
     const { currentView, computeNextView, restartView } =
@@ -46,28 +49,31 @@ export const CirclePacking: React.FC = () => {
         }
     }, [currentView]);
 
+    const getTaggedFilesColor = (
+        node: Omit<ComputedDatum<PstComputed>, "color" | "fill">
+    ) => {
+        if (node.depth === 0) return BASE_COLOR_LIGHT; // prefer to use equality over a '!node.depth' to understand that is a level
+
+        if (isToDeleteFolder(node.id, markedToDelete)) {
+            return DELETE_COLOR;
+        }
+        if (isToKeepFolder(node.id, markedToKeep)) {
+            return KEEP_COLOR;
+        }
+        return BASE_COLOR;
+    };
+
     return (
         <>
             <div id="circle-packing" className={style["circle-packing"]}>
                 <button onClick={restartView}>Restart</button>
                 <ResponsiveCirclePacking
                     data={currentView.elements}
-                    onClick={(node) => {
-                        computeNextView(node);
-                    }}
+                    onClick={computeNextView}
                     onMouseEnter={(node) => {
                         setHoveredId(node.id);
                     }}
-                    isInteractive={true}
-                    colors={(node) => {
-                        if (isToDeleteFolder(node.id, markedToDelete)) {
-                            return DELETE_COLOR as string;
-                        }
-                        if (isToKeepFolder(node.id, markedToKeep)) {
-                            return KEEP_COLOR as string;
-                        }
-                        return BASE_COLOR;
-                    }}
+                    colors={getTaggedFilesColor}
                     {...commonProperties}
                 />
             </div>
