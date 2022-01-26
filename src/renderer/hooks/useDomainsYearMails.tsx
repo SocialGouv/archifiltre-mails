@@ -20,23 +20,34 @@ export interface UseDomainsYearMailsProps {
     restartView: () => void;
 }
 
+export interface InitialViewState {
+    elements: Record<string, unknown>;
+    type: string;
+}
+
 export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
-    const { pstFile } = usePstStore();
+    const { pstFile, setBreadcrumb } = usePstStore();
     const [currentDomain, setCurrentDomain] = useState("");
     const [currentCorrespondant, setCurrentCorrespondant] = useState("");
     const [currentView, setCurrentView] = useState({ elements: {}, type: "" });
 
+    const [domainView, setDomainView] = useState<Any>(undefined);
+
     const createInitialView = useCallback(() => {
         const aggregatedDomainCount = findAllMailAddresses(pstFile!);
 
-        setCurrentView({
-            elements: createDomain(aggregatedDomainCount),
+        const initialView = {
+            elements: createDomain(aggregatedDomainCount, "root"),
             type: DOMAIN,
-        });
+        };
+
+        setCurrentView(initialView);
+        setDomainView(initialView);
     }, [pstFile]);
 
     const restartView = () => {
-        createInitialView();
+        setCurrentView(domainView);
+        setBreadcrumb("archive");
     };
 
     useEffect(() => {
@@ -46,6 +57,7 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
     const computeNextView = (data: Any) => {
         if (currentView.type === DOMAIN) {
             setCurrentDomain(data.data.name as string);
+            setBreadcrumb("archive > domaine");
 
             const uniqueCorrespondantsByDomain =
                 findUniqueCorrespondantsByDomain(
@@ -54,13 +66,17 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
                 );
 
             setCurrentView({
-                elements: createCorrespondants(uniqueCorrespondantsByDomain),
+                elements: createCorrespondants(
+                    uniqueCorrespondantsByDomain,
+                    data.id as string
+                ),
                 type: CORRESPONDANTS,
             });
         }
 
         if (currentView.type === CORRESPONDANTS) {
             setCurrentCorrespondant(data.data.name as string);
+            setBreadcrumb("archive > domaine > correspondant");
 
             const _yearByCorrespondants = _findYearByCorrespondants(
                 pstFile!,
@@ -68,12 +84,17 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
             );
 
             setCurrentView({
-                elements: _createYears(_yearByCorrespondants),
+                elements: _createYears(
+                    _yearByCorrespondants,
+                    data.id as string
+                ),
                 type: YEAR,
             });
         }
 
         if (currentView.type === YEAR) {
+            setBreadcrumb("archive > domaine > correspondant > mails");
+
             const mailsByYearAndCorrespondant =
                 findMailsByDomainCorrespondantAndYear(
                     pstFile!,
@@ -83,7 +104,10 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
                 );
 
             setCurrentView({
-                elements: createMails(mailsByYearAndCorrespondant),
+                elements: createMails(
+                    mailsByYearAndCorrespondant,
+                    data.id as string
+                ),
                 type: MAILS,
             });
         }

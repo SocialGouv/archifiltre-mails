@@ -14,6 +14,8 @@ import { computedRoot } from "../utils/pst-extractor";
 export interface UsePstStore {
     sentFolder: string;
     setSentFolder: (update: SetStateAction<string>) => void;
+    breadcrumb: string;
+    setBreadcrumb: (update: SetStateAction<string>) => void;
     deletedFolder: string;
     setDeletedFolder: (update: SetStateAction<string>) => void;
     rootPath: string;
@@ -42,6 +44,8 @@ const pstExtractTablesAtom = atom<PstExtractTables | undefined>(undefined);
 const pstMainInfosAtom = atom<PstEmail | undefined>(undefined);
 const pstDepthAtom = atom<number>(0);
 
+const breadcrumbAtom = atom<string>("archive");
+
 export const usePstStore = (): UsePstStore => {
     const [sentFolder, setSentFolder] = useAtom(sentFolderAtom);
     const [deletedFolder, setDeletedFolder] = useAtom(deletedFolderAtom);
@@ -52,6 +56,8 @@ export const usePstStore = (): UsePstStore => {
     const [mainInfos, setMainInfos] = useAtom(pstMainInfosAtom);
     const [depth, setDepth] = useAtom(pstDepthAtom);
 
+    const [breadcrumb, setBreadcrumb] = useAtom(breadcrumbAtom);
+
     const updateComputedPst = useCallback(
         (pst: PstFolder, nodeId: string): void => {
             const computed = computedRoot(pst, nodeId);
@@ -61,6 +67,7 @@ export const usePstStore = (): UsePstStore => {
     );
 
     return {
+        breadcrumb,
         computedPst,
         deletedFolder,
         depth,
@@ -69,6 +76,7 @@ export const usePstStore = (): UsePstStore => {
         pstFile,
         rootPath,
         sentFolder,
+        setBreadcrumb,
         setComputedPst,
         setDeletedFolder,
         setDepth,

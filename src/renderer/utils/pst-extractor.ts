@@ -204,8 +204,8 @@ export const getPstMailsPercentage = (
 // TODO: respect DRY pattern on "domains/year/mails" utils
 // ###########
 
-export const createBase = () => ({
-    id: "root",
+export const createBase = (id?: string) => ({
+    id: id ?? "root",
     name: "root",
     size: 0.0001,
     value: "size",
@@ -325,8 +325,6 @@ export const findAllMailAddresses = (
     };
 
     const THERESULT = orderByValues(thresholdify(mailCountPerDomain));
-
-    console.log({ THERESULT });
 
     return toRecord(THERESULT);
 };
@@ -488,7 +486,7 @@ export const findMailsByDomainCorrespondantAndYear = (
     return result;
 };
 
-export const createDomain = (domains: Record<string, number>) => {
+export const createDomain = (domains: Record<string, number>, id: string) => {
     const children = Object.entries(domains).map(([key, value]) => {
         return {
             id: randomUUID(),
@@ -500,64 +498,67 @@ export const createDomain = (domains: Record<string, number>) => {
 
     return {
         children,
-        ...createBase(),
+        ...createBase("root"),
     };
 };
-export const createCorrespondants = (correspondants: string[]) => {
-    const children = Object.entries(correspondants).map(([key, value]) => {
-        return {
+
+const correspondantCache = new Map<string, unknown>();
+
+export const createCorrespondants = (correspondants: string[], id: string) => {
+    if (!correspondantCache.has(id)) {
+        const children = Object.entries(correspondants).map(([key, value]) => {
+            return {
+                id: randomUUID(),
+                [key]: value,
+                name: value,
+                size: 1, // TODO: check coherence : if we need the volume, 1 is not accurate
+            };
+        });
+
+        correspondantCache.set(id, {
+            children,
+            ...createBase(id),
+        });
+    }
+    return correspondantCache.get(id);
+};
+
+const yearsCache = new Map<string, unknown>();
+
+export const _createYears = (years: number[], id: string) => {
+    if (!yearsCache.has(id)) {
+        const children = years.map((year) => ({
             id: randomUUID(),
-            [key]: value,
-            name: value,
-            size: 1, // TODO: check coherence : if we need the volume, 1 is not accurate
-        };
-    });
+            name: year.date,
+            size: year.value,
+        }));
 
-    return {
-        children,
-        ...createBase(),
-    };
+        yearsCache.set(id, {
+            children,
+            ...createBase(id),
+        });
+    }
+
+    return yearsCache.get(id);
 };
 
-export const createYears = (years: number[]) => {
-    const children = Object.entries(years).map(([key, value]) => {
-        return {
-            id: randomUUID(),
-            [key]: value,
-            name: value,
-            size: 1, // TODO: pas logique
-        };
-    });
-    return {
-        children,
-        ...createBase(),
-    };
-};
-export const _createYears = (years: number[]) => {
-    const children = years.map((year) => ({
-        id: randomUUID(),
-        name: year.date,
-        size: year.value,
-    }));
+const mailsCache = new Map<string, unknown>();
 
-    return {
-        children,
-        ...createBase(),
-    };
-};
+export const createMails = (mails: PstEmail[], id: string) => {
+    if (!mailsCache.get(id)) {
+        const children = Object.entries(mails).map(([, value]) => {
+            return {
+                id: value.id,
+                name: value.name,
+                size: value.size,
+                value: value.name,
+            };
+        });
 
-export const createMails = (mails: PstEmail[]) => {
-    const children = Object.entries(mails).map(([, value]) => {
-        return {
-            id: randomUUID(),
-            name: value.name,
-            size: value.size,
-            value: value.name,
-        };
-    });
-
-    return {
-        children,
-        ...createBase(),
-    };
+        mailsCache.set(id, {
+            children,
+            ...createBase(id),
+        });
+    }
+    return mailsCache.get(id);
 };
