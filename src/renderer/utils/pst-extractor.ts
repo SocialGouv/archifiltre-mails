@@ -8,7 +8,6 @@ import type {
     PstFolder,
 } from "@common/modules/pst-extractor/type";
 import { isPstEmail, isPstFolder } from "@common/modules/pst-extractor/type";
-import type { Any } from "@common/utils/type";
 import { randomUUID } from "crypto";
 
 import {
@@ -379,8 +378,7 @@ export const findUniqueCorrespondantsByDomain = (
     pst: PstElement,
     domain: string
 ): string[] => {
-    const result: string[] = [];
-    const _result: Any = [];
+    const result: Record<string, number | string>[] = [];
     const recursivelyFindProp = (_pst: PstElement) => {
         if (isPstFolder(_pst)) {
             _pst.children?.forEach((child) => {
@@ -391,14 +389,12 @@ export const findUniqueCorrespondantsByDomain = (
             _pst.from.email &&
             getDomain(_pst.from.email) === domain
         ) {
-            result.push(_pst.from.name); // TODO: est-ce bien ce que l'on veut
-
-            _result.push({ name: _pst.from.name, value: 1 });
+            result.push({ name: _pst.from.name, value: 1 });
         }
     };
     recursivelyFindProp(pst);
 
-    const output = _result.reduce((acc, current) => {
+    const output = result.reduce((acc, current) => {
         const name = current.name;
         const found = acc.find((elem) => {
             return elem.name === name;
@@ -415,7 +411,7 @@ export const findYearByCorrespondants = (
     pst: PstElement,
     correspondant: string
 ): number[] => {
-    const _result: Any = [];
+    const _result: Record<string, number | string>[] = [];
 
     const recursivelyFindProp = (_pst: PstElement) => {
         if (isPstFolder(_pst)) {
@@ -491,24 +487,6 @@ export const createDomain = (domains: Record<string, number>, id: string) => {
 
 const correspondantCache = new Map<string, unknown>();
 
-// export const createCorrespondants = (correspondants: string[], id: string) => {
-//     if (!correspondantCache.has(id)) {
-//         const children = Object.entries(correspondants).map(([key, value]) => {
-//             return {
-//                 id: randomUUID(),
-//                 [key]: value,
-//                 name: value,
-//                 size: 1, // TODO: check coherence : if we need the volume, 1 is not accurate
-//             };
-//         });
-
-//         correspondantCache.set(id, {
-//             children,
-//             ...createBase(id),
-//         });
-//     }
-//     return correspondantCache.get(id);
-// };
 export const createCorrespondants = (correspondants: string[], id: string) => {
     if (!correspondantCache.has(id)) {
         const children = correspondants.map((correspondant) => {
@@ -516,6 +494,7 @@ export const createCorrespondants = (correspondants: string[], id: string) => {
                 id: randomUUID(),
                 name: correspondant.name,
                 size: correspondant.value, // TODO: check coherence : if we need the volume, 1 is not accurate
+                value: correspondant.value,
             };
         });
 
@@ -535,6 +514,7 @@ export const createYears = (years: number[], id: string) => {
             id: randomUUID(),
             name: year.date,
             size: year.value,
+            value: year.value,
         }));
 
         yearsCache.set(id, {
@@ -551,11 +531,13 @@ const mailsCache = new Map<string, unknown>();
 export const createMails = (mails: PstEmail[], id: string) => {
     if (!mailsCache.get(id)) {
         const children = Object.entries(mails).map(([, value]) => {
+            const { name, size, ...email } = value;
             return {
-                id: value.id,
-                name: value.name,
-                size: value.size,
-                value: value.name,
+                email,
+                id: randomUUID(),
+                name: name,
+                size: size,
+                value: name,
             };
         });
 

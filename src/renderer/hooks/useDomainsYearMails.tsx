@@ -50,6 +50,10 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
         setBreadcrumb("archive");
     };
 
+    const computePreviousView = () => {
+        return void 0;
+    };
+
     useEffect(() => {
         createInitialView();
     }, [createInitialView]);

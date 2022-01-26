@@ -85,30 +85,3 @@ export const CirclePacking: React.FC = () => {
         </>
     );
 };
-
-// const getChildrenToDeleteIds = (
-//     children: PstComputedChild[]
-// ): string[] =>
-//     children
-//         .filter(
-//             (child: PstComputedChild) =>
-//                 !isToKeepFolder(child.id, markedToKeep)
-//         )
-//         .map((child) => child.id);
-
-// const getChildrenToKeepIds = (children: PstComputedChild[]): string[] =>
-//     children
-//         .filter(
-//             (child: PstComputedChild) =>
-//                 !isToDeleteFolder(child.id, markedToDelete)
-//         )
-//         .map((child) => child.id);
-
-// const getUntagChildrenIds = (children: PstComputedChild[]): string[] =>
-//     children
-//         .filter(
-//             (child: PstComputedChild) =>
-//                 !isToDeleteFolder(child.id, markedToDelete) &&
-//                 !isToKeepFolder(child.id, markedToKeep)
-//         )
-//         .map((child) => child.id);
