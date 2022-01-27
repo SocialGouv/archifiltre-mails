@@ -4,6 +4,7 @@ import { debounce } from "lodash";
 import React, { useEffect } from "react";
 
 import { useDomainsYearsMails } from "../../hooks/useDomainsYearMails";
+import { usePstStore } from "../../store/PSTStore";
 import { useTagManagerStore } from "../../store/TagManagerStore";
 import { COLORS } from "../../utils/constants";
 import type { PstComputed, PstComputedChild } from "../../utils/pst-extractor";
@@ -22,6 +23,8 @@ const { BASE_COLOR, BASE_COLOR_LIGHT, DELETE_COLOR, KEEP_COLOR } = COLORS;
 export const CirclePacking: React.FC = () => {
     const { currentView, computeNextView, restartView } =
         useDomainsYearsMails();
+
+    const { setMainInfos } = usePstStore(); // TODO: remove PstStore ?
 
     const {
         setHoveredId,
@@ -65,6 +68,7 @@ export const CirclePacking: React.FC = () => {
     };
 
     const debouncedHover = debounce((node: ComputedDatum<PstComputed>) => {
+        setMainInfos({ percentage: node.percentage, ...node.data });
         setHoveredId(node.id);
     }, 500);
 

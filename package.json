@@ -42,7 +42,8 @@
       "d3",
       "i18next",
       "react-dropzone",
-      "react-i18next"
+      "react-i18next",
+      "lodash"
     ]
   },
   "//build.extraResources": "Static should be set again because it is overwritten",

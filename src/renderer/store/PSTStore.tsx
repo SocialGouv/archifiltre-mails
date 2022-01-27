@@ -4,6 +4,7 @@ import type {
     PstExtractTables,
     PstFolder,
 } from "@common/modules/pst-extractor/type";
+import type { ComputedDatum } from "@nivo/circle-packing";
 import { atom, useAtom } from "jotai/index";
 import type { SetStateAction } from "react";
 import { useCallback } from "react";
@@ -30,7 +31,7 @@ export interface UsePstStore {
         update: SetStateAction<PstExtractTables | undefined>
     ) => void;
     mainInfos: PstEmail | undefined;
-    setMainInfos: (update: SetStateAction<PstEmail | undefined>) => void;
+    setMainInfos: (update?: SetStateAction<ComputedDatum<PstComputed>>) => void;
     depth: number | string;
     setDepth: (update: SetStateAction<number>) => void;
 }
@@ -41,7 +42,9 @@ const rootPathAtom = atom("");
 const pstFileAtom = atom<PstContent | undefined>(void 0);
 const computedPstAtom = atom<PstComputed | undefined>(undefined);
 const pstExtractTablesAtom = atom<PstExtractTables | undefined>(undefined);
-const pstMainInfosAtom = atom<PstEmail | undefined>(undefined);
+const pstMainInfosAtom = atom<ComputedDatum<PstComputed> | undefined>(
+    undefined
+);
 const pstDepthAtom = atom<number>(0);
 
 const breadcrumbAtom = atom<string>("archive");
