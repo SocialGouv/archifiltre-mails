@@ -34,6 +34,8 @@ jobs:
           fetch-depth: 0
       - name: Setup Node
         uses: ./.github/actions/setup-node
+      - name: Yarn install
+        run: yarn --frozen-lockfile --perfer-offline
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v4
         with:
@@ -85,6 +87,8 @@ jobs:
       CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+      ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
+      ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
 
     steps:
       - uses: actions/checkout@v2
@@ -92,6 +96,10 @@ jobs:
           fetch-depth: 0
       - name: Setup Node
         uses: ./.github/actions/setup-node
+      - name: Yarn install
+        run: |
+          yarn config set network-timeout 300000
+          yarn --frozen-lockfile --perfer-offline
       - name: Replace version in package.json
         shell: bash
         run: |
@@ -104,10 +112,6 @@ jobs:
           path: dist/
       - name: Build bin
         run: yarn dist:${{ matrix.target }}
-        # Test mode
-        # run: |
-        #   mkdir -p "electron/dist/${{ matrix.target }}/"
-        #   echo "${{ matrix.target }}.${{ matrix.os }}" > "electron/dist/${{ matrix.target }}/archifiltre-mails.${{ matrix.ext }}"
       - name: Archive bin
         uses: actions/upload-artifact@v2
         with:
@@ -136,6 +140,8 @@ jobs:
           -exec bash -c "openssl dgst -sha512 {} > {}.sha512" \;
       - name: Setup Node
         uses: ./.github/actions/setup-node
+      - name: Yarn install
+        run: yarn --frozen-lockfile --perfer-offline
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v4
         with:

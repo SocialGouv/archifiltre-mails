@@ -54,6 +54,7 @@
     "artifactName": "archifiltre-mails-${os}.${ext}",
     "productName": "Mails par Archifiltre",
     "afterSign": "scripts/notarize.js",
+    "publish": null,
     "files": [
       "electron/build/icon.*"
     ],
