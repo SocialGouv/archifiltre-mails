@@ -12,25 +12,25 @@ export const DashboardInformationsFolder: FC<{ mainInfos: Any }> = ({
 }) => (
     <>
         <li>
-            <span>Type: </span>dossier
+            <span>Type </span>dossier
         </li>
         <li>
-            <span>Titre: </span>
+            <span>Titre </span>
             {mainInfos.name}
         </li>
         <li>
-            <span>Nombre de mails: </span>
+            <span>Nombre de mails </span>
             {mainInfos.size}
         </li>
         <li>
-            <span>Nombre de PJ: </span>?
+            <span>Nombre de PJ </span>?
         </li>
         <li>
-            <span>Représentation (en %): </span>
+            <span>Représentation (en %) </span>
             {mainInfos.percentage.toFixed(1)}
         </li>
         <li>
-            <span>Etat: </span>
+            <span>Etat </span>
             {mainInfos.tag}
         </li>
     </>
@@ -40,36 +40,36 @@ export const DashboardInformationsMail: FC<{ mainInfos: Any }> = ({
 }) => (
     <>
         <li>
-            <span>Type: </span>mail
+            <span>Type </span>mail
         </li>
         <li>
-            <span>Titre: </span>
+            <span>Titre </span>
             {mainInfos.name}
         </li>
         <li>
-            <span>Nombre de PJ: </span> {mainInfos.email.attachementCount}
+            <span>Nombre de PJ </span> {mainInfos.email.attachementCount}
         </li>
         <li>
-            <span>De:</span> {mainInfos.email.from.name}
+            <span>De</span> {mainInfos.email.from.name}
         </li>
         <li>
-            <span>Cc:</span>{" "}
+            <span>Cc</span>{" "}
             {mainInfos.email.cc.map((cc: string, index: number) => (
                 <p key={index}>{cc.email}</p>
             )) ?? 0}
         </li>
         <li>
-            <span>Bcc:</span>{" "}
+            <span>Bcc</span>{" "}
             {mainInfos.email.bcc.map((bcc: string, index: number) => (
                 <p key={index}>{bcc.email}</p>
             )) ?? 0}
         </li>
         <li>
-            <span>Représentation (en %): </span>
+            <span>Représentation (en %) </span>
             {mainInfos.percentage.toFixed(1)}
         </li>
         <li>
-            <span>Etat: </span>
+            <span>Etat </span>
             {mainInfos.tag}
         </li>
     </>

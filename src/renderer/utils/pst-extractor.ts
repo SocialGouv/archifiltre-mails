@@ -18,23 +18,17 @@ import {
     TRESHOLD_KEY,
 } from "./constants";
 
-/**
- * Get the total received emails counts of a given PST.
- */
 export const getPstTotalReceivedMails = (
     extractTables: PstExtractTables | undefined
 ): number => {
     if (extractTables) {
         return [...extractTables.emails.values()]
-            .flat(ARBITRARY_FLAT_LEVEL) // TODO magic
+            .flat(ARBITRARY_FLAT_LEVEL) // TODO no magic number, should be a parameter
             .filter((mail) => !mail.isFromMe).length;
     }
     return 0;
 };
 
-/**
- * Get the total sent emails attachements counts of a given PST.
- */
 export const getPstTotalReceivedAttachments = (
     extractTables: PstExtractTables | undefined
 ): number => {
@@ -88,7 +82,31 @@ export const getPstTotalDeletedMails = (
     );
     return specificFolder[0]?.children?.length;
 };
+export const getPstTotalContacts = (
+    contactTable: Map<string, string[]> | undefined
+): number | undefined => {
+    if (contactTable) {
+        return [...contactTable].flat(ARBITRARY_FLAT_LEVEL).length;
+    }
+};
+export const getPstTotalMails = (
+    mailsTable: Map<string, PstEmail[]> | undefined
+): number | undefined => {
+    if (mailsTable) {
+        return [...mailsTable].flat(ARBITRARY_FLAT_LEVEL).length;
+    }
+};
 
+export const getPstMailsPercentage = (
+    current: number,
+    total: Map<string, PstEmail[]> | undefined
+): string => {
+    const totalMails = getPstTotalMails(total);
+    if (totalMails) {
+        return ((current / totalMails) * 100).toFixed(1);
+    }
+    return "0";
+};
 /**
  * Get all folder name from a given PST.
  */
@@ -171,32 +189,6 @@ export const isToDeleteFolder = (id: string, deleteIds: string[]): boolean =>
 
 export const isToKeepFolder = (id: string, keepIds: string[]): boolean =>
     keepIds.includes(id);
-
-export const getPstTotalContacts = (
-    contactTable: Map<string, string[]> | undefined
-): number | undefined => {
-    if (contactTable) {
-        return [...contactTable].flat(ARBITRARY_FLAT_LEVEL).length;
-    }
-};
-export const getPstTotalMails = (
-    mailsTable: Map<string, PstEmail[]> | undefined
-): number | undefined => {
-    if (mailsTable) {
-        return [...mailsTable].flat(ARBITRARY_FLAT_LEVEL).length;
-    }
-};
-
-export const getPstMailsPercentage = (
-    current: number,
-    total: Map<string, PstEmail[]> | undefined
-): string => {
-    const totalMails = getPstTotalMails(total);
-    if (totalMails) {
-        return ((current / totalMails) * 100).toFixed(1);
-    }
-    return "0";
-};
 
 // ###########
 // TODO: move domains/year/mails utils in dedicated folder
