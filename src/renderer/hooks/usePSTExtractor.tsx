@@ -4,6 +4,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 
 import { usePstStore } from "../store/PSTStore";
+import { ROOT } from "../utils/constants";
 
 interface UsePstExtractor {
     pstProgress: PstProgressState;
@@ -41,7 +42,7 @@ export const usePstExtractor = (): UsePstExtractor => {
                         pstFilePath,
                     });
                 setPstFile(pstExtractedFile);
-                updateComputedPst(pstExtractedFile, "root");
+                updateComputedPst(pstExtractedFile, ROOT);
                 setExtractTables(extractTables);
             })();
         }

@@ -4,8 +4,9 @@ import type {
     PstEmail,
     PstExtractTables,
     PstFolder,
-} from "./../../common/modules/pst-extractor/type";
-import { isPstEmail } from "./../../common/modules/pst-extractor/type";
+} from "@common/modules/pst-extractor/type";
+import { isPstEmail } from "@common/modules/pst-extractor/type";
+
 import { ARBITRARY_FLAT_LEVEL } from "./constants";
 
 /**
@@ -158,6 +159,9 @@ export const findPstChildById = (
 
 export const isToDeleteFolder = (id: string, deleteIds: string[]): boolean =>
     deleteIds.includes(id);
+
+export const isToKeepFolder = (id: string, keepIds: string[]): boolean =>
+    keepIds.includes(id);
 
 export const getPstTotalContacts = (
     contactTable: Map<string, string[]> | undefined
