@@ -202,6 +202,27 @@ $dashboard-card-padding: 2rem 3rem;
     font-weight: 600;
     font-size: 14px;
   }
+
+  &__tag {
+    width: 75%;
+    display: flex;
+    justify-content: space-between;
+    margin: 0 auto;
+    &__item {
+      width: 30%;
+      height: 35px;
+      border-radius: 35px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #4991f745;
+
+
+      &[data-tag="true"] {
+        background-color: #4991f7;
+      }
+    }
+  }
 }
 
 .dashboard__impact {

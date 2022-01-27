@@ -321,51 +321,6 @@ export const findAllMailAddresses = (
     return toRecord(THERESULT);
 };
 
-// export const getAllDomainsByAddresses = (
-//     uniqueAddresses: string[]
-// ): (string | undefined)[] =>
-//     uniqueAddresses
-//         .map((element) => {
-//             if (element.includes(ORG_UNIT_PST)) {
-//                 // TODO: handle "/DC"
-//                 return "Same LDAP";
-//             }
-//             if (element.indexOf("@")) {
-//                 return getDomain(element);
-//             }
-//         })
-//         .sort();
-
-// export const getDuplicatedDomainsCount = (
-//     domains: (string | undefined)[]
-// ): Record<string, number> => {
-//     return (domains.filter(Boolean) as string[]).reduce<Record<string, number>>(
-//         (acc, value) => ({
-//             ...acc,
-//             [value]: (acc[value] ?? 0) + 1,
-//         }),
-//         {}
-//     );
-// };
-
-// export const getAggregatedDomainsCount = (
-//     duplicatedDomainsCount: Record<string, number>
-// ): Record<string, number> => {
-//     const treshold = getMailTreshold(duplicatedDomainsCount);
-
-//     return Object.entries(duplicatedDomainsCount).reduce<
-//         Record<string, number>
-//     >(
-//         (acc, [email, count]) => {
-//             if (count > treshold) {
-//                 acc[email] = count;
-//             } else acc.__others += count;
-//             return acc;
-//         },
-//         { __others: 0 }
-//     );
-// };
-
 export const findUniqueCorrespondantsByDomain = (
     pst: PstElement,
     domain: string

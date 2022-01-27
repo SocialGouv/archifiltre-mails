@@ -5,7 +5,37 @@ import React from "react";
 
 import { Card } from "../../components/common/card/Card";
 import { usePstStore } from "../../store/PSTStore";
+import { markedTags } from "../../utils/constants";
 import style from "./Dashboard.module.scss";
+
+export const DashboardInformationsTags: FC<{ tag: Any }> = ({ tag }) => {
+    const isToDeleteTag = tag === markedTags.TO_DELETE;
+    const isToKeepTag = tag === markedTags.TO_KEEP;
+    const isUntag = tag === markedTags.UNTAG;
+
+    return (
+        <div className={style.dashboard__informations__tag}>
+            <div
+                className={style.dashboard__informations__tag__item}
+                data-tag={isToDeleteTag}
+            >
+                Supprimer
+            </div>
+            <div
+                className={style.dashboard__informations__tag__item}
+                data-tag={isUntag}
+            >
+                Non marqué
+            </div>
+            <div
+                className={style.dashboard__informations__tag__item}
+                data-tag={isToKeepTag}
+            >
+                Conserver
+            </div>
+        </div>
+    );
+};
 
 export const DashboardInformationsFolder: FC<{ mainInfos: Any }> = ({
     mainInfos,
@@ -50,7 +80,10 @@ export const DashboardInformationsMail: FC<{ mainInfos: Any }> = ({
             <span>Nombre de PJ </span> {mainInfos.email.attachementCount}
         </li>
         <li>
-            <span>De</span> {mainInfos.email.from.name}
+            <span>Expéditeur</span> {mainInfos.email.from.email}
+        </li>
+        <li>
+            <span>Destinataire(s)</span> {mainInfos.email.to.email}
         </li>
         <li>
             <span>Cc</span>{" "}
@@ -90,6 +123,7 @@ export const DashboardInformations: FC = () => {
                                 mainInfos={mainInfos}
                             />
                         )}
+                        <DashboardInformationsTags tag={mainInfos.tag} />
                     </ul>
                 ) : (
                     <p>
@@ -101,30 +135,3 @@ export const DashboardInformations: FC = () => {
         </Card>
     );
 };
-
-// <ul>
-// <li>
-//     <span>Nom du dossier / mail : </span>
-//     {mainInfos.name}
-// </li>
-// <li>
-//     <span>Nombre de pj : </span>
-//     {mainInfos.attachementCount}
-// </li>
-// <li>
-//     <span>Nombre de mails : </span>
-// </li>
-
-// <li>
-//     <span>Date d'envoi : </span>
-//     {JSON.stringify(mainInfos.sentTime)}
-// </li>
-// <li>
-//     <span>Date de réception : </span>
-//     {JSON.stringify(mainInfos.receivedDate)}
-// </li>
-// <li>
-//     <span>Adresse mail : </span>
-//     {JSON.stringify(mainInfos.from, null, 1)}
-// </li>
-// </ul>
