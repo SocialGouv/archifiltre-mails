@@ -54,3 +54,9 @@ export const DOMAIN = "domain";
 export const CORRESPONDANTS = "correspondants";
 export const YEAR = "year";
 export const MAILS = "mails";
+
+export const markedTags = {
+    TO_DELETE: "Supprimer",
+    TO_KEEP: "Conserver",
+    UNTAG: "Non marqué",
+};

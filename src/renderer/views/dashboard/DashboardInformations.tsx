@@ -29,6 +29,10 @@ export const DashboardInformationsFolder: FC<{ mainInfos: Any }> = ({
             <span>Représentation (en %): </span>
             {mainInfos.percentage.toFixed(1)}
         </li>
+        <li>
+            <span>Etat: </span>
+            {mainInfos.tag}
+        </li>
     </>
 );
 export const DashboardInformationsMail: FC<{ mainInfos: Any }> = ({
@@ -63,6 +67,10 @@ export const DashboardInformationsMail: FC<{ mainInfos: Any }> = ({
         <li>
             <span>Représentation (en %): </span>
             {mainInfos.percentage.toFixed(1)}
+        </li>
+        <li>
+            <span>Etat: </span>
+            {mainInfos.tag}
         </li>
     </>
 );

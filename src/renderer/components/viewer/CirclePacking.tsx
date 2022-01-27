@@ -6,7 +6,7 @@ import React, { useEffect } from "react";
 import { useDomainsYearsMails } from "../../hooks/useDomainsYearMails";
 import { usePstStore } from "../../store/PSTStore";
 import { useTagManagerStore } from "../../store/TagManagerStore";
-import { COLORS } from "../../utils/constants";
+import { COLORS, markedTags } from "../../utils/constants";
 import type { PstComputed, PstComputedChild } from "../../utils/pst-extractor";
 import { isToDeleteFolder, isToKeepFolder } from "../../utils/pst-extractor";
 import {
@@ -68,7 +68,17 @@ export const CirclePacking: React.FC = () => {
     };
 
     const debouncedHover = debounce((node: ComputedDatum<PstComputed>) => {
-        setMainInfos({ percentage: node.percentage, ...node.data });
+        const tag = isToDeleteFolder(node.id, markedToDelete)
+            ? markedTags.TO_DELETE
+            : isToKeepFolder(node.id, markedToKeep)
+            ? markedTags.TO_KEEP
+            : markedTags.UNTAG;
+
+        setMainInfos({
+            percentage: node.percentage,
+            ...node.data,
+            tag,
+        });
         setHoveredId(node.id);
     }, 500);
 
