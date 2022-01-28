@@ -51,7 +51,7 @@
   "build": {
     "generateUpdatesFilesForAllChannels": true,
     "appId": "fr.gouv.social.fabrique.archifiltre.mails",
-    "artifactName": "archifiltre-mails-${os}.${ext}",
+    "artifactName": "${name}-${os}.${ext}",
     "productName": "Mails par Archifiltre",
     "afterSign": "scripts/notarize.js",
     "publish": null,
@@ -87,13 +87,13 @@
     },
     "win": {
       "icon": "./electron/build/icon.png",
-      "artifactName": "archifiltre-mails-${os}-portable.${ext}"
+      "artifactName": "${name}-${os}-portable.${ext}"
     },
     "msi": {
-      "artifactName": "archifiltre-mails-${os}.${ext}"
+      "artifactName": "${name}-${os}.${ext}"
     },
     "nsis": {
-      "artifactName": "archifiltre-mails-${os}-setup.${ext}"
+      "artifactName": "${name}-${os}-setup.${ext}"
     },
     "linux": {
       "category": "Office",

@@ -117,7 +117,7 @@ jobs:
         with:
           name: ${{ matrix.target }}-bin
           path: |
-            electron/dist/*/archifiltre-mails*.*
+            electron/dist/*/archifiltre*.*
             electron/dist/*/latest*.yml
 
   release:
@@ -135,7 +135,7 @@ jobs:
       - name: Generate hashes
         run: >-
           find . -regextype posix-extended
-          -regex ".*/bin/.*/archifiltre-mails.*\.(exe|AppImage|dmg|msi|zip)$"
+          -regex ".*/bin/.*/archifiltre.*\.(exe|AppImage|dmg|msi|zip)$"
           -type f
           -exec bash -c "openssl dgst -sha512 {} > {}.sha512" \;
       - name: Setup Node

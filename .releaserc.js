@@ -35,8 +35,9 @@ if (releaseMode === "normal") {
             "@semantic-release/github",
             {
                 assets: [
-                    `bin/**/${binName}*.@(exe|dmg|AppImage|msi|zip)?(.sha512|blockmap)`,
-                    "bin/**/latest*.yml",
+                    `bin/**/${binName}*.@(exe|dmg|AppImage|msi|zip)`,
+                    `bin/**/${binName}*.sha512`,
+                    `bin/**/${binName}*.blockmap`,
                 ],
                 releasedLabels: false,
                 successComment: false,
