@@ -5,7 +5,8 @@ import React from "react";
 
 import { Card } from "../../components/common/card/Card";
 import { usePstStore } from "../../store/PSTStore";
-import { markedTags } from "../../utils/constants";
+import { markedTags, ROOT } from "../../utils/constants";
+import type { DashboardComponentProps } from "./Dashboard";
 import style from "./Dashboard.module.scss";
 
 export const DashboardInformationsTags: FC<{ tag: Any }> = ({ tag }) => {
@@ -41,80 +42,96 @@ export const DashboardInformationsFolder: FC<{ mainInfos: Any }> = ({
     mainInfos,
 }) => (
     <>
-        <li>
-            <span>Type </span>dossier
-        </li>
-        <li>
-            <span>Titre </span>
+        <div>
+            <strong>Type </strong>dossier
+        </div>
+        <div>
+            <strong>Titre </strong>
             {mainInfos.name}
-        </li>
-        <li>
-            <span>Nombre de mails </span>
+        </div>
+        <div>
+            <strong>Nombre de mails </strong>
             {mainInfos.size}
-        </li>
-        <li>
-            <span>Nombre de PJ </span>?
-        </li>
-        <li>
-            <span>Représentation (en %) </span>
+        </div>
+        <div>
+            <strong>Nombre de PJ </strong>?
+        </div>
+        <div>
+            <strong>Représentation (en %) </strong>
             {mainInfos.percentage.toFixed(1)}
-        </li>
-        <li>
-            <span>Etat </span>
+        </div>
+        <div>
+            <strong>Etat </strong>
             {mainInfos.tag}
-        </li>
+        </div>
     </>
 );
 export const DashboardInformationsMail: FC<{ mainInfos: Any }> = ({
     mainInfos,
 }) => (
     <>
-        <li>
-            <span>Type </span>mail
-        </li>
-        <li>
-            <span>Titre </span>
+        <div>
+            <strong>Type </strong>mail
+        </div>
+        <div>
+            <strong>Titre </strong>
             {mainInfos.name}
-        </li>
-        <li>
-            <span>Nombre de PJ </span> {mainInfos.email.attachementCount}
-        </li>
-        <li>
-            <span>Expéditeur</span> {mainInfos.email.from.email}
-        </li>
-        <li>
-            <span>Destinataire(s)</span> {mainInfos.email.to.email}
-        </li>
-        <li>
-            <span>Cc</span>{" "}
+        </div>
+        <div>
+            <strong>Date d'envoi </strong>{" "}
+            {JSON.stringify(mainInfos.email.sentTime)}
+        </div>
+        <div>
+            <strong>Date de réception </strong>{" "}
+            {JSON.stringify(mainInfos.email.receivedDate)}
+        </div>
+        <div>
+            <strong>Nombre de PJ </strong> {mainInfos.email.attachementCount}
+        </div>
+        <div>
+            <strong>Expéditeur</strong> {mainInfos.email.from.email}
+        </div>
+        <div>
+            <strong>Destinataire(s)</strong> {mainInfos.email.to.email}
+        </div>
+        <div>
+            <strong>Cc</strong>{" "}
             {mainInfos.email.cc.map((cc: string, index: number) => (
-                <p key={index}>{cc.email}</p>
+                <span key={index}>{cc.email}</span>
             )) ?? 0}
-        </li>
-        <li>
-            <span>Bcc</span>{" "}
+        </div>
+        <div>
+            <strong>Bcc</strong>{" "}
             {mainInfos.email.bcc.map((bcc: string, index: number) => (
-                <p key={index}>{bcc.email}</p>
+                <span key={index}>{bcc.email}</span>
             )) ?? 0}
-        </li>
-        <li>
-            <span>Représentation (en %) </span>
+        </div>
+        <div>
+            <strong>Représentation (en %) </strong>
             {mainInfos.percentage.toFixed(1)}
-        </li>
-        <li>
-            <span>Etat </span>
-            {mainInfos.tag}
-        </li>
+            <div>
+                <strong>Etat </strong>
+                {mainInfos.tag}
+            </div>
+        </div>
     </>
 );
 
-export const DashboardInformations: FC = () => {
+export const DashboardInformations: FC<DashboardComponentProps> = ({
+    className,
+}) => {
     const { mainInfos } = usePstStore();
 
+    if (!mainInfos) return null;
     return (
-        <Card title="Informations" color="green">
+        <Card title="Informations" color="green" className={className}>
             <div className={style.dashboard__informations}>
-                {mainInfos ? (
+                {mainInfos && mainInfos.name === ROOT ? (
+                    <p>
+                        Passer le curseur sur le visualiseur pour afficher des
+                        informations
+                    </p>
+                ) : (
                     <ul>
                         {mainInfos.email ? (
                             <DashboardInformationsMail mainInfos={mainInfos} />
@@ -123,15 +140,49 @@ export const DashboardInformations: FC = () => {
                                 mainInfos={mainInfos}
                             />
                         )}
-                        <DashboardInformationsTags tag={mainInfos.tag} />
+                        {/* <DashboardInformationsTags tag={mainInfos.tag} /> */}
                     </ul>
-                ) : (
-                    <p>
-                        Passer le curseur sur le visualiseur pour afficher des
-                        informations
-                    </p>
                 )}
             </div>
         </Card>
     );
 };
+
+{
+    /* <li>
+<span>Type </span>mail
+</li>
+<li>
+<span>Titre </span>
+{mainInfos.name}
+</li>
+<li>
+<span>Nombre de PJ </span> {mainInfos.email.attachementCount}
+</li>
+<li>
+<span>Expéditeur</span> {mainInfos.email.from.email}
+</li>
+<li>
+<span>Destinataire(s)</span> {mainInfos.email.to.email}
+</li>
+<li>
+<span>Cc</span>{" "}
+{mainInfos.email.cc.map((cc: string, index: number) => (
+    <p key={index}>{cc.email}</p>
+)) ?? 0}
+</li>
+<li>
+<span>Bcc</span>{" "}
+{mainInfos.email.bcc.map((bcc: string, index: number) => (
+    <p key={index}>{bcc.email}</p>
+)) ?? 0}
+</li>
+<li>
+<span>Représentation (en %) </span>
+{mainInfos.percentage.toFixed(1)}
+<li>
+    <span>Etat </span>
+    {mainInfos.tag}
+</li>
+</li> */
+}

@@ -12,6 +12,7 @@ import { isToDeleteFolder, isToKeepFolder } from "../../utils/pst-extractor";
 import {
     getChildrenToDeleteIds,
     getChildrenToKeepIds,
+    getColorFromTrimester,
     getUntagChildrenIds,
 } from "../../utils/pst-viewer";
 import { Menu } from "../menu/Menu";
@@ -59,11 +60,22 @@ export const CirclePacking: React.FC = () => {
         if (node.depth === 0) return BASE_COLOR_LIGHT; // prefer to use equality over a '!node.depth' to understand that is a level
 
         if (isToDeleteFolder(node.id, markedToDelete)) {
+            if (node.data.email) {
+                return `rgba(247, 94, 66, ${getColorFromTrimester(node)})`;
+            }
             return DELETE_COLOR;
         }
         if (isToKeepFolder(node.id, markedToKeep)) {
+            if (node.data.email) {
+                return `rgba(98, 188, 111, ${getColorFromTrimester(node)})`;
+            }
             return KEEP_COLOR;
         }
+
+        if (node.data.email) {
+            return `rgba(31, 120, 180, ${getColorFromTrimester(node)})`;
+        }
+
         return BASE_COLOR;
     };
 
@@ -94,7 +106,6 @@ export const CirclePacking: React.FC = () => {
                     {...commonProperties}
                 />
             </div>
-
             <Menu />
         </>
     );

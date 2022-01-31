@@ -240,7 +240,7 @@ export const getMailTreshold = (
 export const findAllMailAddresses = (
     pst: PstElement
 ): Record<string, number> => {
-    const result: string[] = [];
+    // const result: string[] = [];
     const mailCountPerMail = new Map<string, number>();
     const mailCountPerDomain = new Map<string, number>();
     const recursivelyFindProp = (_pst: PstElement) => {
@@ -250,15 +250,15 @@ export const findAllMailAddresses = (
             });
         } else if (isPstEmail(_pst) && _pst.from.email) {
             const emails = new Set([
-                _pst.from.email,
-                ...(["to", "cc", "bcc"] as const)
-                    .map(
-                        (theKey) =>
-                            _pst[theKey]
-                                .map((value) => value.email)
-                                .filter(Boolean) as string[]
-                    )
-                    .flat(),
+                _pst.from.email, // nb de messages par domain d'expediteur
+                // ...(["to", "cc", "bcc"] as const)
+                //     .map(
+                //         (theKey) =>
+                //             _pst[theKey]
+                //                 .map((value) => value.email)
+                //                 .filter(Boolean) as string[]
+                //     )
+                //     .flat(),
             ]);
             emails.forEach((email) => {
                 const emailKey = email.includes(ORG_UNIT_PST)
@@ -275,17 +275,17 @@ export const findAllMailAddresses = (
                 mailCountPerDomain.set(domainKey, currentDomainCount + 1);
             });
 
-            result.push(
-                _pst.from.email,
-                ...(["to", "cc", "bcc"] as const)
-                    .map(
-                        (theKey) =>
-                            _pst[theKey]
-                                .map((value) => value.email)
-                                .filter(Boolean) as string[]
-                    )
-                    .flat()
-            );
+            // result.push(
+            //     _pst.from.email,
+            //     ...(["to", "cc", "bcc"] as const)
+            //         .map(
+            //             (theKey) =>
+            //                 _pst[theKey]
+            //                     .map((value) => value.email)
+            //                     .filter(Boolean) as string[]
+            //         )
+            //         .flat()
+            // );
         }
     };
 
@@ -351,7 +351,7 @@ export const findUniqueCorrespondantsByDomain = (
         return acc;
     }, []);
 
-    return output;
+    return output.sort((a, b) => b.value - a.value);
 };
 
 export const findYearByCorrespondants = (
@@ -385,7 +385,7 @@ export const findYearByCorrespondants = (
         return acc;
     }, []);
 
-    return output;
+    return output.sort((a, b) => b.value - a.value);
 };
 
 export const findMailsByDomainCorrespondantAndYear = (
@@ -413,7 +413,9 @@ export const findMailsByDomainCorrespondantAndYear = (
     };
     recursivelyFindProp(pst);
 
-    return result;
+    return result.sort(function (a, b) {
+        return new Date(a.receivedDate) - new Date(b.receivedDate);
+    });
 };
 
 export const createDomain = (domains: Record<string, number>, id: string) => {
@@ -434,7 +436,10 @@ export const createDomain = (domains: Record<string, number>, id: string) => {
 
 const correspondantCache = new Map<string, unknown>();
 
-export const createCorrespondants = (correspondants: string[], id: string) => {
+export const createCorrespondants = (
+    correspondants: string[],
+    id: string
+): Record<string, unknown> => {
     if (!correspondantCache.has(id)) {
         const children = correspondants.map((correspondant) => {
             return {
@@ -450,12 +455,15 @@ export const createCorrespondants = (correspondants: string[], id: string) => {
             ...createBase(id),
         });
     }
-    return correspondantCache.get(id);
+    return correspondantCache.get(id) as Record<string, unknown>;
 };
 
 const yearsCache = new Map<string, unknown>();
 
-export const createYears = (years: number[], id: string) => {
+export const createYears = (
+    years: number[],
+    id: string
+): Record<string, unknown> => {
     if (!yearsCache.has(id)) {
         const children = years.map((year) => ({
             id: randomUUID(),
@@ -470,12 +478,15 @@ export const createYears = (years: number[], id: string) => {
         });
     }
 
-    return yearsCache.get(id);
+    return yearsCache.get(id) as Record<string, unknown>;
 };
 
 const mailsCache = new Map<string, unknown>();
 
-export const createMails = (mails: PstEmail[], id: string) => {
+export const createMails = (
+    mails: PstEmail[],
+    id: string
+): Record<string, unknown> => {
     if (!mailsCache.get(id)) {
         const children = Object.entries(mails).map(([, value]) => {
             const { name, size, ...email } = value;
@@ -493,5 +504,5 @@ export const createMails = (mails: PstEmail[], id: string) => {
             ...createBase(id),
         });
     }
-    return mailsCache.get(id);
+    return mailsCache.get(id) as Record<string, unknown>;
 };

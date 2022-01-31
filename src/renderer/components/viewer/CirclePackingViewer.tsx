@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import type { PstContent } from "@common/modules/pst-extractor/type";
 import { isPstFolder } from "@common/modules/pst-extractor/type";
 import type { Any } from "@common/utils/type";
@@ -47,12 +46,13 @@ type CirclePackingCommonProps = Partial<
 };
 
 export const commonProperties: CirclePackingCommonProps = {
-    // borderColor: BASE_COLOR_LIGHT,
-    // borderWidth: 2,
     enableLabels: true,
     id: "id",
     isInteractive: true,
-    label: (node) => node.data.name,
+    label: (node) =>
+        node.data.email
+            ? `${node.data.email.receivedDate.getDay()}/${node.data.email.receivedDate.getMonth()}/${node.data.email.receivedDate.getFullYear()}`
+            : node.data.name,
     labelsFilter: (label) => label.node.height === 0,
     labelsSkipRadius: 16,
     motionConfig: "slow",

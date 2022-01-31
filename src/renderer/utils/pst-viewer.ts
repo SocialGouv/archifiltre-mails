@@ -1,4 +1,6 @@
-import type { PstComputedChild } from "./pst-extractor";
+import type { ComputedDatum } from "@nivo/circle-packing";
+
+import type { PstComputed, PstComputedChild } from "./pst-extractor";
 import { isToDeleteFolder, isToKeepFolder } from "./pst-extractor";
 
 export const getChildrenToDeleteIds = (
@@ -35,3 +37,12 @@ export const getUntagChildrenIds = (
                 !isToKeepFolder(child.id, markedToKeepIds)
         )
         .map((child) => child.id);
+
+export const getColorFromTrimester = (
+    node: Omit<ComputedDatum<PstComputed>, "color" | "fill">
+): number => {
+    const month = node.data.email.receivedDate.getMonth();
+    console.log(month);
+
+    return month <= 3 ? 0.45 : month <= 6 ? 0.65 : month <= 9 ? 0.85 : 1;
+};

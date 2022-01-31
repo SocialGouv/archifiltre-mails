@@ -47,7 +47,7 @@ const pstMainInfosAtom = atom<ComputedDatum<PstComputed> | undefined>(
 );
 const pstDepthAtom = atom<number>(0);
 
-const breadcrumbAtom = atom<string>("archive");
+const breadcrumbAtom = atom<string>("domaine");
 
 export const usePstStore = (): UsePstStore => {
     const [sentFolder, setSentFolder] = useAtom(sentFolderAtom);
