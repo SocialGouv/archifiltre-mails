@@ -1,11 +1,11 @@
 import type { ComputedDatum } from "@nivo/circle-packing";
 import React from "react";
-import type { PstComputed } from "src/renderer/utils/pst-extractor";
+import type { DefaultViewerObject } from "src/renderer/utils/pst-extractor";
 
 import style from "./CirclePacking.module.scss";
 
 export const CirclePackingTooltip: React.FC<{
-    node: ComputedDatum<PstComputed>;
+    node: ComputedDatum<DefaultViewerObject<string>>;
 }> = ({ node }) => {
     return (
         <div className={style.circlePackingTooltip}>

@@ -1,58 +1,32 @@
 /* eslint-disable react/no-unescaped-entities */
 import type { Any } from "@common/utils/type";
+import type { ComputedDatum } from "@nivo/circle-packing";
 import type { FC } from "react";
 import React from "react";
+import type { MailViewerObject } from "src/renderer/utils/pst-extractor";
 
 import { Card } from "../../components/common/card/Card";
-import { usePstStore } from "../../store/PSTStore";
-import { markedTags, ROOT } from "../../utils/constants";
+import type { UsePstStore } from "../../store/PSTStore";
+import { isMailMainInfos, usePstStore } from "../../store/PSTStore";
+import { ROOT } from "../../utils/constants";
 import { sanitizeMailDate } from "../../utils/pst-viewer";
 import type { DashboardComponentProps } from "./Dashboard";
 import style from "./Dashboard.module.scss";
 
-export const DashboardInformationsTags: FC<{ tag: Any }> = ({ tag }) => {
-    const isToDeleteTag = tag === markedTags.TO_DELETE;
-    const isToKeepTag = tag === markedTags.TO_KEEP;
-    const isUntag = tag === markedTags.UNTAG;
-
-    return (
-        <div className={style.dashboard__informations__tag}>
-            <div
-                className={style.dashboard__informations__tag__item}
-                data-tag={isToDeleteTag}
-            >
-                Supprimer
-            </div>
-            <div
-                className={style.dashboard__informations__tag__item}
-                data-tag={isUntag}
-            >
-                Non marqué
-            </div>
-            <div
-                className={style.dashboard__informations__tag__item}
-                data-tag={isToKeepTag}
-            >
-                Conserver
-            </div>
-        </div>
-    );
-};
-
-export const DashboardInformationsFolder: FC<{ mainInfos: Any }> = ({
-    mainInfos,
-}) => (
+export const DashboardInformationsFolder: FC<{
+    mainInfos: NonNullable<UsePstStore["mainInfos"]>; // TODO: remove non null or handle loader
+}> = ({ mainInfos }) => (
     <>
         <div>
             <strong>Type </strong>dossier
         </div>
         <div>
             <strong>Titre </strong>
-            {mainInfos.name}
+            {mainInfos.data.name}
         </div>
         <div>
             <strong>Nombre de mails </strong>
-            {mainInfos.size}
+            {mainInfos.data.size}
         </div>
         <div>
             <strong>Nombre de PJ </strong>?
@@ -63,56 +37,62 @@ export const DashboardInformationsFolder: FC<{ mainInfos: Any }> = ({
         </div>
         <div>
             <strong>Etat </strong>
-            {mainInfos.tag}
+            {(mainInfos.data as Any).tag}
+            {/* TODO */}
         </div>
     </>
 );
-export const DashboardInformationsMail: FC<{ mainInfos: Any }> = ({
-    mainInfos,
-}) => (
+export const DashboardInformationsMail: FC<{
+    mainInfos: ComputedDatum<MailViewerObject<string>>;
+}> = ({ mainInfos }) => (
     <>
         <div>
             <strong>Type </strong>mail
         </div>
         <div>
             <strong>Titre </strong>
-            {mainInfos.name}
+            {mainInfos.data.name}
         </div>
         <div>
             <strong>Date d'envoi </strong>{" "}
-            {sanitizeMailDate(mainInfos.email.sentTime as Date)}
+            {sanitizeMailDate(mainInfos.data.email.sentTime!)}
         </div>
         <div>
             <strong>Date de réception </strong>{" "}
-            {sanitizeMailDate(mainInfos.email.receivedDate as Date)}
+            {sanitizeMailDate(mainInfos.data.email.receivedDate!)}
         </div>
         <div>
-            <strong>Nombre de PJ </strong> {mainInfos.email.attachementCount}
+            <strong>Nombre de PJ </strong>{" "}
+            {mainInfos.data.email.attachementCount}
         </div>
         <div>
-            <strong>Expéditeur</strong> {mainInfos.email.from.email}
+            <strong>Expéditeur</strong> {mainInfos.data.email.from.email}
         </div>
         <div>
-            <strong>Destinataire(s)</strong> {mainInfos.email.to.email}
+            <strong>Destinataire(s)</strong>{" "}
+            {mainInfos.data.email.to.map((to, index) => (
+                <span key={index}>{to.email}</span>
+            ))}
+            {/* TODO: use length of return elts to show "0" or elts */}
         </div>
         <div>
             <strong>Cc</strong>{" "}
-            {mainInfos.email.cc.map((cc: string, index: number) => (
+            {mainInfos.data.email.cc.map((cc, index) => (
                 <span key={index}>{cc.email}</span>
-            )) ?? 0}
+            ))}
         </div>
         <div>
             <strong>Bcc</strong>{" "}
-            {mainInfos.email.bcc.map((bcc: string, index: number) => (
+            {mainInfos.data.email.bcc.map((bcc, index) => (
                 <span key={index}>{bcc.email}</span>
-            )) ?? 0}
+            ))}
         </div>
         <div>
             <strong>Représentation (en %) </strong>
             {mainInfos.percentage.toFixed(1)}
             <div>
                 <strong>Etat </strong>
-                {mainInfos.tag}
+                {(mainInfos.data as Any).tag}
             </div>
         </div>
     </>
@@ -122,17 +102,18 @@ export const DashboardInformations: FC<DashboardComponentProps> = ({
     className,
 }) => {
     const { mainInfos } = usePstStore();
+    if (!mainInfos) return null; // TODO: loader
     return (
         <Card title="Informations" color="green" className={className}>
             <div className={style.dashboard__informations}>
-                {!mainInfos || (mainInfos && mainInfos.name === ROOT) ? (
+                {mainInfos.data.name === ROOT ? (
                     <p>
                         Passer le curseur sur le visualiseur pour afficher des
                         informations
                     </p>
                 ) : (
                     <ul>
-                        {mainInfos && mainInfos.email ? (
+                        {isMailMainInfos(mainInfos) ? (
                             <DashboardInformationsMail mainInfos={mainInfos} />
                         ) : (
                             <DashboardInformationsFolder
@@ -145,42 +126,3 @@ export const DashboardInformations: FC<DashboardComponentProps> = ({
         </Card>
     );
 };
-
-{
-    /* <li>
-<span>Type </span>mail
-</li>
-<li>
-<span>Titre </span>
-{mainInfos.name}
-</li>
-<li>
-<span>Nombre de PJ </span> {mainInfos.email.attachementCount}
-</li>
-<li>
-<span>Expéditeur</span> {mainInfos.email.from.email}
-</li>
-<li>
-<span>Destinataire(s)</span> {mainInfos.email.to.email}
-</li>
-<li>
-<span>Cc</span>{" "}
-{mainInfos.email.cc.map((cc: string, index: number) => (
-    <p key={index}>{cc.email}</p>
-)) ?? 0}
-</li>
-<li>
-<span>Bcc</span>{" "}
-{mainInfos.email.bcc.map((bcc: string, index: number) => (
-    <p key={index}>{bcc.email}</p>
-)) ?? 0}
-</li>
-<li>
-<span>Représentation (en %) </span>
-{mainInfos.percentage.toFixed(1)}
-<li>
-    <span>Etat </span>
-    {mainInfos.tag}
-</li>
-</li> */
-}

@@ -1,11 +1,8 @@
-/* eslint-disable @typescript-eslint/require-array-sort-compare */
-/* eslint-disable @typescript-eslint/naming-convention */
 import type {
     PstContent,
     PstElement,
     PstEmail,
     PstExtractTables,
-    PstFolder,
 } from "@common/modules/pst-extractor/type";
 import { isPstEmail, isPstFolder } from "@common/modules/pst-extractor/type";
 import { randomUUID } from "crypto";
@@ -113,54 +110,6 @@ export const getPstMailsPercentage = (
 export const getPSTRootFolderList = (pst: PstContent): string[] =>
     pst.children[0]!.children!.map(({ name }) => name);
 
-export interface PstComputedChild {
-    id: string;
-    name: string;
-    size: number;
-    attachementCount: number;
-}
-
-export interface PstComputed {
-    id: string;
-    name: string;
-    size: number;
-    value: string;
-    children: PstComputedChild[];
-}
-
-//TODO: comment
-/**
- * Get the next PST child level when navigates through the archive viewer.
- * @param pst the pst archive
- * @param nodeId the current clicked node id
- * @returns
- */
-export const computedRoot = (pst: PstFolder, nodeId: string): PstComputed => {
-    const root = pst.children;
-
-    const children: PstComputedChild[] =
-        root?.map((node) =>
-            isPstEmail(node)
-                ? node
-                : ({
-                      attachementCount: 0,
-                      id: node.id,
-                      name: node.name,
-                      size: node.size,
-                  } as PstComputedChild)
-        ) ?? [];
-
-    const newRoot: PstComputed = {
-        children,
-        id: nodeId,
-        name: "root",
-        size: 0.0001,
-        value: "size",
-    };
-
-    return newRoot;
-};
-
 const findDeeplyNestedElement = (
     objects: PstElement[] | undefined,
     id: string | undefined
@@ -195,8 +144,46 @@ export const isToKeepFolder = (id: string, keepIds: string[]): boolean =>
 // TODO: respect DRY pattern on "domains/year/mails" utils
 // ###########
 
-export const createBase = (id?: string) => ({
-    id: id ?? "root",
+interface BaseViewerObject<TId extends string> {
+    id: TId;
+    name: string;
+    size: number;
+    value: string;
+}
+
+export type ViewerObjectChild = Omit<BaseViewerObject<string>, "value"> &
+    Record<string, number | string>;
+export interface DefaultViewerObject<TId extends string>
+    extends BaseViewerObject<TId> {
+    children: ViewerObjectChild[];
+}
+
+export type DomainViewerObject = DefaultViewerObject<"root">;
+
+export type CorrespondantViewerObject<TId extends string> =
+    DefaultViewerObject<TId>;
+
+export type YearViewerObject<TId extends string> = DefaultViewerObject<TId>;
+export interface MailViewerObject<TId extends string>
+    extends DefaultViewerObject<TId> {
+    email: PstEmail;
+}
+
+export type ViewerObject<TId extends string> =
+    | CorrespondantViewerObject<TId>
+    | DomainViewerObject
+    | MailViewerObject<TId>
+    | YearViewerObject<TId>;
+
+export const isMailViewerObject = <TId extends string>(
+    viewerObject: ViewerObject<TId>
+): viewerObject is MailViewerObject<TId> =>
+    !!(viewerObject as MailViewerObject<TId>).email;
+
+export const createBase = <TId extends string>(
+    id: TId
+): BaseViewerObject<TId> => ({
+    id,
     name: "root",
     size: 0.0001,
     value: "size",
@@ -240,7 +227,6 @@ export const getMailTreshold = (
 export const findAllMailAddresses = (
     pst: PstElement
 ): Record<string, number> => {
-    // const result: string[] = [];
     const mailCountPerMail = new Map<string, number>();
     const mailCountPerDomain = new Map<string, number>();
     const recursivelyFindProp = (_pst: PstElement) => {
@@ -251,14 +237,6 @@ export const findAllMailAddresses = (
         } else if (isPstEmail(_pst) && _pst.from.email) {
             const emails = new Set([
                 _pst.from.email, // nb de messages par domain d'expediteur
-                // ...(["to", "cc", "bcc"] as const)
-                //     .map(
-                //         (theKey) =>
-                //             _pst[theKey]
-                //                 .map((value) => value.email)
-                //                 .filter(Boolean) as string[]
-                //     )
-                //     .flat(),
             ]);
             emails.forEach((email) => {
                 const emailKey = email.includes(ORG_UNIT_PST)
@@ -274,28 +252,14 @@ export const findAllMailAddresses = (
                     mailCountPerDomain.get(domainKey) ?? 0;
                 mailCountPerDomain.set(domainKey, currentDomainCount + 1);
             });
-
-            // result.push(
-            //     _pst.from.email,
-            //     ...(["to", "cc", "bcc"] as const)
-            //         .map(
-            //             (theKey) =>
-            //                 _pst[theKey]
-            //                     .map((value) => value.email)
-            //                     .filter(Boolean) as string[]
-            //         )
-            //         .flat()
-            // );
         }
     };
 
     recursivelyFindProp(pst);
 
+    /* eslint-disable @typescript-eslint/naming-convention */
     const orderByValues = <K, V extends number>(m: Map<K, V>): Map<K, V> =>
         new Map([...m.entries()].sort(([, va], [, vb]) => vb - va));
-
-    const orderByKeys = <K, V extends number>(m: Map<K, V>): Map<K, V> =>
-        new Map([...m.entries()].sort(([ka], [kb]) => (ka < kb ? 1 : -1)));
 
     const toRecord = <K extends string, V>(m: Map<K, V>): Record<K, V> =>
         [...m.entries()].reduce(
@@ -303,7 +267,8 @@ export const findAllMailAddresses = (
             // eslint-disable-next-line @typescript-eslint/prefer-reduce-type-parameter
             {} as Record<K, V>
         );
-    // threshold
+    /* eslint-enable @typescript-eslint/naming-convention */
+
     const threshold = getMailTreshold(mailCountPerDomain);
     const thresholdify = (m: Map<string, number>): Map<string, number> => {
         const out = new Map<string, number>();
@@ -321,71 +286,72 @@ export const findAllMailAddresses = (
     return toRecord(THERESULT);
 };
 
+type Correspondant = [name: string, value: number];
 export const findUniqueCorrespondantsByDomain = (
     pst: PstElement,
     domain: string
-): string[] => {
-    const result: Record<string, number | string>[] = [];
-    const recursivelyFindProp = (_pst: PstElement) => {
+): Correspondant[] => {
+    const correspsFound: Correspondant[] = [];
+    const recursivelyFindCorresp = (_pst: PstElement) => {
         if (isPstFolder(_pst)) {
             _pst.children?.forEach((child) => {
-                recursivelyFindProp(child);
+                recursivelyFindCorresp(child);
             });
         } else if (
             isPstEmail(_pst) &&
             _pst.from.email &&
             getDomain(_pst.from.email) === domain
         ) {
-            result.push({ name: _pst.from.name, value: 1 });
+            correspsFound.push([_pst.from.name, 1]);
         }
     };
-    recursivelyFindProp(pst);
+    recursivelyFindCorresp(pst);
 
-    const output = result.reduce((acc, current) => {
-        const name = current.name;
-        const found = acc.find((elem) => {
-            return elem.name === name;
-        });
-        if (found) found.value += current.value;
-        else acc.push(current);
-        return acc;
-    }, []);
+    const accumulatedCorresps = correspsFound.reduce<typeof correspsFound>(
+        (acc, [name, value]) => {
+            const found = acc.find(([nameToTest]) => nameToTest === name);
+            if (found) found[1] += value;
+            else acc.push([name, value]);
+            return acc;
+        },
+        []
+    );
 
-    return output.sort((a, b) => b.value - a.value);
+    return accumulatedCorresps.sort(([, v1], [, v2]) => v2 - v1);
 };
 
+type Year = [year: number, value: number];
 export const findYearByCorrespondants = (
     pst: PstElement,
     correspondant: string
-): number[] => {
-    const result: Record<string, number | string>[] = [];
-
-    const recursivelyFindProp = (_pst: PstElement) => {
+): Year[] => {
+    const yearsFound: Year[] = [];
+    const recursivelyFindYear = (_pst: PstElement) => {
         if (isPstFolder(_pst)) {
             _pst.children?.forEach((child) => {
-                recursivelyFindProp(child);
+                recursivelyFindYear(child);
             });
         } else if (
             isPstEmail(_pst) &&
             _pst.receivedDate &&
             _pst.from.name === correspondant
         ) {
-            result.push({ date: _pst.receivedDate.getFullYear(), value: 1 });
+            yearsFound.push([_pst.receivedDate.getFullYear(), 1]);
         }
     };
-    recursivelyFindProp(pst);
+    recursivelyFindYear(pst);
 
-    const output = result.reduce((acc, current) => {
-        const date = current.date;
-        const found = acc.find((elem) => {
-            return elem.date === date;
-        });
-        if (found) found.value += current.value;
-        else acc.push(current);
-        return acc;
-    }, []);
+    const accumulatedYears = yearsFound.reduce<typeof yearsFound>(
+        (acc, [year, value]) => {
+            const found = acc.find(([yearToTest]) => yearToTest === year);
+            if (found) found[1] += value;
+            else acc.push([year, value]);
+            return acc;
+        },
+        []
+    );
 
-    return output.sort((a, b) => b.value - a.value);
+    return accumulatedYears.sort(([, v1], [, v2]) => v2 - v1);
 };
 
 export const findMailsByDomainCorrespondantAndYear = (
@@ -394,11 +360,11 @@ export const findMailsByDomainCorrespondantAndYear = (
     correspondant: string,
     year: number
 ): PstEmail[] => {
-    const result: PstEmail[] = [];
-    const recursivelyFindProp = (_pst: PstElement) => {
+    const mailsFound: PstEmail[] = [];
+    const recursivelyFindMail = (_pst: PstElement) => {
         if (isPstFolder(_pst)) {
             _pst.children?.forEach((child) => {
-                recursivelyFindProp(child);
+                recursivelyFindMail(child);
             });
         } else if (
             isPstEmail(_pst) &&
@@ -408,17 +374,20 @@ export const findMailsByDomainCorrespondantAndYear = (
             _pst.receivedDate.getFullYear() === year &&
             _pst.from.name === correspondant
         ) {
-            result.push(_pst);
+            mailsFound.push(_pst);
         }
     };
-    recursivelyFindProp(pst);
+    recursivelyFindMail(pst);
 
-    return result.sort(function (a, b) {
-        return new Date(a.receivedDate) - new Date(b.receivedDate);
-    });
+    return mailsFound.sort(
+        (a, b) =>
+            (a.receivedDate?.valueOf() ?? 0) - (b.receivedDate?.valueOf() ?? 0)
+    );
 };
 
-export const createDomain = (domains: Record<string, number>, id: string) => {
+export const createDomain = (
+    domains: Record<string, number>
+): DomainViewerObject => {
     const children = Object.entries(domains).map(([key, value]) => {
         return {
             id: randomUUID(),
@@ -434,19 +403,18 @@ export const createDomain = (domains: Record<string, number>, id: string) => {
     };
 };
 
-const correspondantCache = new Map<string, unknown>();
-
-export const createCorrespondants = (
-    correspondants: string[],
-    id: string
-): Record<string, unknown> => {
+const correspondantCache = new Map<string, CorrespondantViewerObject<string>>();
+export const createCorrespondants = <TId extends string>(
+    correspondants: Correspondant[],
+    id: TId
+): CorrespondantViewerObject<TId> => {
     if (!correspondantCache.has(id)) {
-        const children = correspondants.map((correspondant) => {
+        const children = correspondants.map(([name, value]) => {
             return {
                 id: randomUUID(),
-                name: correspondant.name,
-                size: correspondant.value, // TODO: check coherence : if we need the volume, 1 is not accurate.
-                value: correspondant.value,
+                name,
+                size: value, // TODO: check coherence : if we need the volume, 1 is not accurate.
+                value,
             };
         });
 
@@ -455,21 +423,20 @@ export const createCorrespondants = (
             ...createBase(id),
         });
     }
-    return correspondantCache.get(id) as Record<string, unknown>;
+    return correspondantCache.get(id) as CorrespondantViewerObject<TId>;
 };
 
-const yearsCache = new Map<string, unknown>();
-
-export const createYears = (
-    years: number[],
-    id: string
-): Record<string, unknown> => {
+const yearsCache = new Map<string, YearViewerObject<string>>();
+export const createYears = <TId extends string>(
+    years: Year[],
+    id: TId
+): YearViewerObject<TId> => {
     if (!yearsCache.has(id)) {
-        const children = years.map((year) => ({
+        const children = years.map(([year, value]) => ({
             id: randomUUID(),
-            name: year.date,
-            size: year.value,
-            value: year.value,
+            name: year.toString(),
+            size: value,
+            value,
         }));
 
         yearsCache.set(id, {
@@ -478,23 +445,22 @@ export const createYears = (
         });
     }
 
-    return yearsCache.get(id) as Record<string, unknown>;
+    return yearsCache.get(id) as YearViewerObject<TId>;
 };
 
 const mailsCache = new Map<string, unknown>();
-
-export const createMails = (
+export const createMails = <TId extends string>(
     mails: PstEmail[],
-    id: string
-): Record<string, unknown> => {
+    id: TId
+): MailViewerObject<TId> => {
     if (!mailsCache.get(id)) {
         const children = Object.entries(mails).map(([, value]) => {
             const { name, size, ...email } = value;
             return {
                 email,
                 id: randomUUID(),
-                name: name,
-                size: size,
+                name,
+                size,
                 value: name,
             };
         });
@@ -504,5 +470,5 @@ export const createMails = (
             ...createBase(id),
         });
     }
-    return mailsCache.get(id) as Record<string, unknown>;
+    return mailsCache.get(id) as MailViewerObject<TId>;
 };

@@ -1,13 +1,20 @@
 import type {
     PstContent,
-    PstEmail,
     PstExtractTables,
 } from "@common/modules/pst-extractor/type";
 import type { ComputedDatum } from "@nivo/circle-packing";
 import { atom, useAtom } from "jotai/index";
 import type { SetStateAction } from "react";
 
-import type { PstComputed } from "../utils/pst-extractor";
+import type { MailViewerObject, ViewerObject } from "../utils/pst-extractor";
+import { isMailViewerObject } from "../utils/pst-extractor";
+
+export type MainInfos = ComputedDatum<ViewerObject<string>>;
+
+export const isMailMainInfos = (
+    mainInfos: MainInfos
+): mainInfos is ComputedDatum<MailViewerObject<string>> =>
+    isMailViewerObject(mainInfos.data);
 
 export interface UsePstStore {
     sentFolder: string;
@@ -22,20 +29,16 @@ export interface UsePstStore {
     setExtractTables: (
         update: SetStateAction<PstExtractTables | undefined>
     ) => void;
-    mainInfos: PstEmail | undefined;
-    setMainInfos: (
-        update?: SetStateAction<ComputedDatum<PstComputed> | PstEmail>
-    ) => void;
+    mainInfos: MainInfos | undefined;
+    setMainInfos: (update?: SetStateAction<MainInfos | undefined>) => void;
 }
 
 const sentFolderAtom = atom("");
 const deletedFolderAtom = atom("");
 const pstFileAtom = atom<PstContent | undefined>(void 0);
 const pstExtractTablesAtom = atom<PstExtractTables | undefined>(undefined);
-const pstMainInfosAtom = atom<
-    ComputedDatum<PstComputed | PstEmail> | undefined
->(undefined);
-const breadcrumbAtom = atom<string>("domaine");
+const pstMainInfosAtom = atom<MainInfos | undefined>(undefined);
+const breadcrumbAtom = atom<string>("domaine"); // TODO: i18n
 
 export const usePstStore = (): UsePstStore => {
     const [sentFolder, setSentFolder] = useAtom(sentFolderAtom);

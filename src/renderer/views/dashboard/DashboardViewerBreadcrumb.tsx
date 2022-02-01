@@ -7,7 +7,10 @@ export const DashboardViewerBreadcrumb: React.FC = () => {
     const { breadcrumb } = usePstStore();
     return (
         <div className={style.dashboard__viewer__breadcrumb}>
-            <div className={style.dashboard__viewer__breadcrumb__item}>
+            <div
+                data-i18n="TODO"
+                className={style.dashboard__viewer__breadcrumb__item}
+            >
                 Niveau: {breadcrumb}
             </div>
         </div>

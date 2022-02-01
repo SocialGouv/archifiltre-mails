@@ -23,21 +23,14 @@ export const ARBITRARY_FLAT_LEVEL = 12;
 export const ROOT = "root";
 
 // colors
-export const RED = "red";
-export const TRANSPARENT = "transparent";
-export const KEEP_COLOR = "#62bc6f";
-export const DELETE_COLOR = "rgb(247, 94, 66)";
-export const BASE_COLOR = "rgb(31, 120, 180)";
-export const BASE_COLOR_LIGHT = "#eaf0fd";
-// export const KEEP_COLOR = "#71c377";
-
 export const COLORS = {
-    BASE_COLOR,
-    BASE_COLOR_LIGHT,
-    DELETE_COLOR,
-    KEEP_COLOR,
-    RED,
-    TRANSPARENT,
+    // TODO: design system
+    BASE_COLOR: "rgb(31, 120, 180)",
+    BASE_COLOR_LIGHT: "#eaf0fd",
+    DELETE_COLOR: "rgb(247, 94, 66)",
+    KEEP_COLOR: "#62bc6f",
+    RED: "red",
+    TRANSPARENT: "transparent",
 };
 
 // html id and classname
@@ -56,6 +49,7 @@ export const YEAR = "year";
 export const MAILS = "mails";
 
 export const markedTags = {
+    // TODO: i18n
     TO_DELETE: "Supprimer",
     TO_KEEP: "Conserver",
     UNTAG: "Non marqué",

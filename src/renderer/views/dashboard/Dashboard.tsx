@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Card } from "../../components/common/card/Card";
-import { usePstStore } from "../../store/PSTStore";
+import { isMailMainInfos, usePstStore } from "../../store/PSTStore";
 import style from "./Dashboard.module.scss";
 import { DashboardActions } from "./DashboardActions";
 import { DashboardImpact } from "./DashboardImpact";
@@ -18,15 +18,17 @@ export const DashboardMailBody: React.FC<DashboardComponentProps> = ({
 }) => {
     const { mainInfos } = usePstStore();
 
+    if (!mainInfos) return null; // TODO: loader
+
     return (
         <Card title="Mail" color="grey" className={className}>
             <div className={style.dashboardMail}>
-                {mainInfos && mainInfos.email ? (
+                {isMailMainInfos(mainInfos) ? (
                     <div style={{ overflow: "scroll" }}>
-                        {mainInfos.email.contentText}
+                        {mainInfos.data.email.contentText}
                     </div>
                 ) : (
-                    <div>Empty</div>
+                    <div data-i18n="TODO">Empty</div>
                 )}
             </div>
         </Card>

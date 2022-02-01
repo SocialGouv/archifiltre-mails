@@ -1,8 +1,11 @@
-import type { Any } from "@common/utils/type";
 import { useCallback, useEffect, useState } from "react";
 
 import { usePstStore } from "../store/PSTStore";
 import { CORRESPONDANTS, DOMAIN, MAILS, YEAR } from "../utils/constants";
+import type {
+    DefaultViewerObject,
+    DomainViewerObject,
+} from "../utils/pst-extractor";
 import {
     createCorrespondants,
     createDomain,
@@ -13,34 +16,43 @@ import {
     findUniqueCorrespondantsByDomain,
     findYearByCorrespondants,
 } from "../utils/pst-extractor";
+import type { CirclePackingCommonProps } from "../utils/pst-viewer";
 
 export interface UseDomainsYearMailsProps {
-    currentView: Any;
-    computeNextView: (data: Any) => void;
+    currentView?: ViewState<DefaultViewerObject<string>>;
+    computeNextView: CirclePackingCommonProps["onClick"];
     restartView: () => void;
 }
 
-export interface InitialViewState {
-    elements: Record<string, unknown>;
-    type: string;
+export type ViewType =
+    | typeof CORRESPONDANTS
+    | typeof DOMAIN
+    | typeof MAILS
+    | typeof YEAR;
+export interface ViewState<TElement> {
+    elements: TElement;
+    type: ViewType;
 }
 
-const initialViewState: InitialViewState = { elements: {}, type: "" };
-
+/**
+ * TODO: COMMENT
+ */
 export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
     const { pstFile, setBreadcrumb } = usePstStore();
-    const [currentDomain, setCurrentDomain] = useState("");
-    const [currentCorrespondant, setCurrentCorrespondant] = useState("");
+    const [currentDomain, setCurrentDomain] = useState<string>();
+    const [currentCorrespondant, setCurrentCorrespondant] = useState<string>();
 
-    const [currentView, setCurrentView] = useState(initialViewState);
-    const [domainView, setDomainView] = useState(initialViewState);
+    const [currentView, setCurrentView] =
+        useState<ViewState<DefaultViewerObject<string>>>();
+    const [domainView, setDomainView] =
+        useState<ViewState<DomainViewerObject>>();
 
     const createInitialView = useCallback(() => {
         const aggregatedDomainCount = findAllMailAddresses(pstFile!);
 
         const computedInitialView = {
-            elements: createDomain(aggregatedDomainCount, "root"),
-            type: DOMAIN,
+            elements: createDomain(aggregatedDomainCount),
+            type: DOMAIN as ViewType,
         };
 
         setCurrentView(computedInitialView);
@@ -49,9 +61,10 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
 
     const restartView = () => {
         setCurrentView(domainView);
-        setBreadcrumb("domaine");
+        setBreadcrumb("domaine"); // TODO: i18n
     };
 
+    // TODO: click in root and back to previous viz
     const _computePreviousView = () => {
         return void 0;
     };
@@ -60,62 +73,55 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
         createInitialView();
     }, [createInitialView]);
 
-    const computeNextView = (data: Any) => {
-        if (currentView.type === DOMAIN) {
-            setCurrentDomain(data.data.name as string);
-            setBreadcrumb(`${data.data.name} > correspondant`);
+    const computeNextView: UseDomainsYearMailsProps["computeNextView"] = (
+        node
+    ) => {
+        if (currentView?.type === DOMAIN) {
+            setCurrentDomain(node.data.name);
+            setBreadcrumb(`${node.data.name} > correspondant`);
 
             const uniqueCorrespondantsByDomain =
-                findUniqueCorrespondantsByDomain(
-                    pstFile!,
-                    data.data.name as string
-                );
+                findUniqueCorrespondantsByDomain(pstFile!, node.data.name);
 
             setCurrentView({
-                // TODO: Simplifier cette fonction: mettre le type et elements en valeur de retour de createX()
                 elements: createCorrespondants(
                     uniqueCorrespondantsByDomain,
-                    data.id as string
+                    node.id
                 ),
                 type: CORRESPONDANTS,
             });
         }
 
-        if (currentView.type === CORRESPONDANTS) {
-            setCurrentCorrespondant(data.data.name as string);
-            setBreadcrumb(`${currentDomain} > ${data.data.name} > années`);
+        if (currentView?.type === CORRESPONDANTS) {
+            setCurrentCorrespondant(node.data.name);
+            setBreadcrumb(`${currentDomain} > ${node.data.name} > années`);
 
-            const _yearByCorrespondants = findYearByCorrespondants(
+            const yearByCorrespondants = findYearByCorrespondants(
                 pstFile!,
-                data.data.name as string
+                node.data.name
             );
 
             setCurrentView({
-                // TODO: Simplifier cette fonction: mettre le type et elements en valeur de retour de createX()
-                elements: createYears(_yearByCorrespondants, data.id as string),
+                elements: createYears(yearByCorrespondants, node.id),
                 type: YEAR,
             });
         }
 
-        if (currentView.type === YEAR) {
+        if (currentView?.type === YEAR) {
             setBreadcrumb(
-                `${currentDomain} > ${currentCorrespondant} > ${data.data.name} > mails`
+                `${currentDomain} > ${currentCorrespondant} > ${node.data.name} > mails`
             );
 
             const mailsByYearAndCorrespondant =
                 findMailsByDomainCorrespondantAndYear(
                     pstFile!,
-                    currentDomain,
-                    currentCorrespondant,
-                    data.data.name as number
+                    currentDomain!,
+                    currentCorrespondant!,
+                    +node.data.name
                 );
 
             setCurrentView({
-                // TODO: Simplifier cette fonction: mettre le type et elements en valeur de retour de createX()
-                elements: createMails(
-                    mailsByYearAndCorrespondant,
-                    data.id as string
-                ),
+                elements: createMails(mailsByYearAndCorrespondant, node.id),
                 type: MAILS,
             });
         }
