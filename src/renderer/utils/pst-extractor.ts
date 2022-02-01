@@ -445,7 +445,7 @@ export const createCorrespondants = (
             return {
                 id: randomUUID(),
                 name: correspondant.name,
-                size: correspondant.value, // TODO: check coherence : if we need the volume, 1 is not accurate
+                size: correspondant.value, // TODO: check coherence : if we need the volume, 1 is not accurate.
                 value: correspondant.value,
             };
         });
