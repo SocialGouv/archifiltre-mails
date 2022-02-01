@@ -43,5 +43,8 @@
   "i18n-ally.keystyle": "flat",
   "i18n-ally.extract.keygenStrategy": "empty",
   "i18n-ally.extract.autoDetect": false,
-  "editor.suggest.showWords": false
+  "editor.suggest.showWords": false,
+  "cSpell.words": [
+    "Archifiltre"
+  ]
 }
