@@ -36,8 +36,6 @@ jobs:
         env:
           ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
           ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
-      - name: Set .env to production
-        run: cp .env.prod .env
       - id: compile
         name: Compile
         run: |
