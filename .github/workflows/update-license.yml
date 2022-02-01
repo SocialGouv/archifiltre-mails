@@ -1,10 +1,10 @@
 name: Update LICENSE date
 on:
   schedule:
-    - cron: "0 0 1 1 *" # every 1rst January on dev
+    - cron: 0 0 1 1 * # every 1rst January on dev
 
 jobs:
-  update_date:
+  update-date:
     name: Update LICENSE date
     runs-on: ubuntu-latest
     steps:

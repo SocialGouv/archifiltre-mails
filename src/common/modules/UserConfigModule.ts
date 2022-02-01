@@ -11,7 +11,7 @@ import { IsomorphicService } from "./ContainerModule";
 import { IsomorphicModule } from "./Module";
 
 /**
- * Config for `Archimail@v1`
+ * Config for `ArchifiltreMails@v1`
  */
 interface UserConfigV1 {
     collectData: boolean;
@@ -84,7 +84,7 @@ export class UserConfigModule extends IsomorphicModule {
                 name:
                     process.env.NODE_ENV === "production"
                         ? "config"
-                        : "archimail",
+                        : "archifiltre-mails",
                 schema: {
                     collectData: {
                         default: true,

@@ -1,5 +1,7 @@
 /** @type {"normal" | "version"} */
-const releaseMode = process.env.ARCHIMAIL_RELEASE_MODE ?? "normal";
+const releaseMode = process.env.ARCHIFILTRE_RELEASE_MODE ?? "normal";
+const binName = require("./package.json").name;
+
 console.info("Release script ----- Branch", process.env.GITHUB_REF);
 const isPreRealse = process.env.GITHUB_REF
     ? ["refs/heads/dev", "refs/heads/beta"].includes(process.env.GITHUB_REF)
@@ -33,8 +35,9 @@ if (releaseMode === "normal") {
             "@semantic-release/github",
             {
                 assets: [
-                    "bin/**/archimail*.@(exe|dmg|AppImage|msi|zip)?(.sha512|blockmap)",
-                    "bin/**/latest*.yml",
+                    `bin/**/${binName}*.@(exe|dmg|AppImage|msi|zip)`,
+                    `bin/**/${binName}*.sha512`,
+                    `bin/**/${binName}*.blockmap`,
                 ],
                 releasedLabels: false,
                 successComment: false,
@@ -57,7 +60,7 @@ if (releaseMode === "normal") {
     ]);
 } else {
     throw new Error(
-        `process.env.ARCHIMAIL_RELEASE_MODE unknown (found=${process.env.ARCHIMAIL_RELEASE_MODE})`
+        `process.env.ARCHIFILTRE_RELEASE_MODE unknown (found=${process.env.ARCHIFILTRE_RELEASE_MODE})`
     );
 }
 
