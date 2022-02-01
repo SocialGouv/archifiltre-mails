@@ -1,5 +1,6 @@
 const path = require("path");
 const glob = require("glob");
+const webpack = require("webpack");
 
 module.exports =
     /** @param {import("webpack").Configuration} config */ function (config) {
@@ -21,6 +22,14 @@ module.exports =
                 acc[path.join(directoryPath, name)] = filePath;
                 return acc;
             }, {});
+
+        if (config.mode === "production" && config.plugins) {
+            for (const plugin of config.plugins) {
+                if (plugin instanceof webpack.BannerPlugin) {
+                    plugin.options.exclude = /\.worker\.js$/i;
+                }
+            }
+        }
 
         if (config.entry) {
             config.entry = {
