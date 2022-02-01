@@ -358,7 +358,7 @@ export const findYearByCorrespondants = (
     pst: PstElement,
     correspondant: string
 ): number[] => {
-    const _result: Record<string, number | string>[] = [];
+    const result: Record<string, number | string>[] = [];
 
     const recursivelyFindProp = (_pst: PstElement) => {
         if (isPstFolder(_pst)) {
@@ -370,12 +370,12 @@ export const findYearByCorrespondants = (
             _pst.receivedDate &&
             _pst.from.name === correspondant
         ) {
-            _result.push({ date: _pst.receivedDate.getFullYear(), value: 1 });
+            result.push({ date: _pst.receivedDate.getFullYear(), value: 1 });
         }
     };
     recursivelyFindProp(pst);
 
-    const output = _result.reduce((acc, current) => {
+    const output = result.reduce((acc, current) => {
         const date = current.date;
         const found = acc.find((elem) => {
             return elem.date === date;

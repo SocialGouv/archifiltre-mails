@@ -6,6 +6,7 @@ import React from "react";
 import { Card } from "../../components/common/card/Card";
 import { usePstStore } from "../../store/PSTStore";
 import { markedTags, ROOT } from "../../utils/constants";
+import { sanitizeMailDate } from "../../utils/pst-viewer";
 import type { DashboardComponentProps } from "./Dashboard";
 import style from "./Dashboard.module.scss";
 
@@ -79,11 +80,11 @@ export const DashboardInformationsMail: FC<{ mainInfos: Any }> = ({
         </div>
         <div>
             <strong>Date d'envoi </strong>{" "}
-            {JSON.stringify(mainInfos.email.sentTime)}
+            {sanitizeMailDate(mainInfos.email.sentTime as Date)}
         </div>
         <div>
             <strong>Date de réception </strong>{" "}
-            {JSON.stringify(mainInfos.email.receivedDate)}
+            {sanitizeMailDate(mainInfos.email.receivedDate as Date)}
         </div>
         <div>
             <strong>Nombre de PJ </strong> {mainInfos.email.attachementCount}
@@ -121,26 +122,23 @@ export const DashboardInformations: FC<DashboardComponentProps> = ({
     className,
 }) => {
     const { mainInfos } = usePstStore();
-
-    if (!mainInfos) return null;
     return (
         <Card title="Informations" color="green" className={className}>
             <div className={style.dashboard__informations}>
-                {mainInfos && mainInfos.name === ROOT ? (
+                {!mainInfos || (mainInfos && mainInfos.name === ROOT) ? (
                     <p>
                         Passer le curseur sur le visualiseur pour afficher des
                         informations
                     </p>
                 ) : (
                     <ul>
-                        {mainInfos.email ? (
+                        {mainInfos && mainInfos.email ? (
                             <DashboardInformationsMail mainInfos={mainInfos} />
                         ) : (
                             <DashboardInformationsFolder
                                 mainInfos={mainInfos}
                             />
                         )}
-                        {/* <DashboardInformationsTags tag={mainInfos.tag} /> */}
                     </ul>
                 )}
             </div>

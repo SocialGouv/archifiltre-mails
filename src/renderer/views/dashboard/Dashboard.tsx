@@ -4,6 +4,7 @@ import { Card } from "../../components/common/card/Card";
 import { usePstStore } from "../../store/PSTStore";
 import style from "./Dashboard.module.scss";
 import { DashboardActions } from "./DashboardActions";
+import { DashboardImpact } from "./DashboardImpact";
 import { DashboardInformations } from "./DashboardInformations";
 import { DashboardRecap } from "./DashboardRecap";
 import { DashboardViewer } from "./DashboardViewer";
@@ -19,13 +20,11 @@ export const DashboardMailBody: React.FC<DashboardComponentProps> = ({
 
     return (
         <Card title="Mail" color="grey" className={className}>
-            <div className="dashboard__mail">
+            <div className={style.dashboardMail}>
                 {mainInfos && mainInfos.email ? (
-                    <div
-                        dangerouslySetInnerHTML={{
-                            __html: mainInfos.email.contentText,
-                        }}
-                    />
+                    <div style={{ overflow: "scroll" }}>
+                        {mainInfos.email.contentText}
+                    </div>
                 ) : (
                     <div>Empty</div>
                 )}
@@ -40,30 +39,13 @@ export const Dashboard: React.FC = () => {
             <DashboardActions />
             <div className={style.dashboard__cards}>
                 <DashboardViewer />
-                <DashboardRecap />
-                <div className={style.dashboard__infos}>
+                <DashboardImpact />
+                <div className={style.dashboardInfos}>
+                    <DashboardRecap />
                     <DashboardInformations />
                     <DashboardMailBody />
                 </div>
-                {/* <DashboardImpact /> */}
             </div>
         </div>
     );
 };
-// export const Dashboard: React.FC = () => {
-//     return (
-//         <div className={style.dashboard}>
-//             <DashboardActions />
-//             <div className={style.dashboard__cards}>
-//                 <DashboardViewer />
-
-//                 <div className={style.dashboard__infos}>
-//                     <DashboardRecap />
-//                     <DashboardInformations />
-//                     {/* <DashboardImpact /> */}
-//                     <DashboardMailBody />
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// };

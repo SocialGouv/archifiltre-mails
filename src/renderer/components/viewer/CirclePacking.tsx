@@ -10,6 +10,7 @@ import { COLORS, markedTags } from "../../utils/constants";
 import type { PstComputed, PstComputedChild } from "../../utils/pst-extractor";
 import { isToDeleteFolder, isToKeepFolder } from "../../utils/pst-extractor";
 import {
+    commonProperties,
     getChildrenToDeleteIds,
     getChildrenToKeepIds,
     getColorFromTrimester,
@@ -17,7 +18,7 @@ import {
 } from "../../utils/pst-viewer";
 import { Menu } from "../menu/Menu";
 import style from "./CirclePacking.module.scss";
-import { commonProperties } from "./CirclePackingViewer";
+import { CirclePackingTooltip } from "./CirclePackingTooltip";
 
 const { BASE_COLOR, BASE_COLOR_LIGHT, DELETE_COLOR, KEEP_COLOR } = COLORS;
 
@@ -79,7 +80,7 @@ export const CirclePacking: React.FC = () => {
         return BASE_COLOR;
     };
 
-    const debouncedHover = debounce((node: ComputedDatum<PstComputed>) => {
+    const handleMouseEnter = debounce((node: ComputedDatum<PstComputed>) => {
         const tag = isToDeleteFolder(node.id, markedToDelete)
             ? markedTags.TO_DELETE
             : isToKeepFolder(node.id, markedToKeep)
@@ -94,6 +95,10 @@ export const CirclePacking: React.FC = () => {
         setHoveredId(node.id);
     }, 500);
 
+    const handleMouseLeave = () => {
+        setMainInfos(undefined);
+    };
+
     return (
         <>
             <div id="circle-packing" className={style["circle-packing"]}>
@@ -101,8 +106,10 @@ export const CirclePacking: React.FC = () => {
                 <ResponsiveCirclePacking
                     data={currentView.elements}
                     onClick={computeNextView}
-                    onMouseEnter={debouncedHover}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
                     colors={getTaggedFilesColor}
+                    tooltip={(node) => <CirclePackingTooltip node={node} />}
                     {...commonProperties}
                 />
             </div>
