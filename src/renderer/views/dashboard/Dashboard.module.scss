@@ -4,9 +4,53 @@ $dashboard-actions-bar: calc(75px + 2rem);
 $dashboard-breadcrumb-height: 30px;
 $dashboard-card-padding: 2rem 3rem;
 
-.dashboard__infos {
-  flex: 0;
-  font-size: 12px;
+$dashboard-card-width: calc(50vw - 0.5rem);
+
+
+
+.dashboard {
+  width: 100%;
+}
+
+.dashboard__cards {
+  height: calc(100% - (75px + 2rem));
+  display: flex;
+  position: relative;
+
+  >:nth-child(1) {
+    width: $dashboard-card-width;
+    height: 65vh;
+    :first-child {
+      margin: 0 0 2rem;
+    }
+  }
+
+  >:nth-child(2) {
+    width: $dashboard-card-width;
+    bottom: 0;
+    left: 0;
+    height: 22vh;
+  }
+
+  .dashboard__infos {
+    position: absolute;
+    width: $dashboard-card-width;
+    right: 0;
+    top: 0;
+    >:nth-child(1) {
+      position: relative;
+    }
+  
+    >:nth-child(2) {
+      position: relative;
+    }
+
+    >:nth-child(3) {
+      position: relative;
+      max-height: 250px;
+    }
+  }
+
 }
 
 .dashboard__select {
@@ -29,23 +73,14 @@ $dashboard-card-padding: 2rem 3rem;
   }
 }
 
-.dashboard {
-  width: 100%;
-}
-
-.dashboard__cards {
-  height: 100%;
-  display: flex;
-}
-
 .dashboard__recap {
   display: flex;
   flex-wrap: wrap;
 
   .dashboard__recap__item {
-    width: 40%;
+    width: 50%;
     display: flex;
-    margin: 0 2rem 2rem 0;
+    margin: 0 0 0.5rem;
 
     .dashboard__recap__picto {
       width: 50px;
@@ -54,8 +89,7 @@ $dashboard-card-padding: 2rem 3rem;
       justify-content: center;
       align-items: center;
       margin-right: 1rem;
-      border: solid 1px black;
-      border-radius: 50%;
+
       svg {
         stroke-width: 1.5px;
       }
@@ -154,7 +188,9 @@ $dashboard-card-padding: 2rem 3rem;
 }
 
 .dashboard__viewer {
-  min-width: 700px;
+  min-width: 50%;
+
+
 
   .dashboard__viewer__breadcrumb {
     height: $dashboard-breadcrumb-height;
@@ -182,10 +218,45 @@ $dashboard-card-padding: 2rem 3rem;
 }
 
 .dashboard__informations {
-  min-height: 150px;
-  span {
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: space-between;
+    div {
+      margin-bottom: 5px;
+    }
+    span {
+        display: table;
+    }
+  }
+
+  strong {
+    margin-right: 5px;
     font-weight: 600;
     font-size: 14px;
+  }
+
+  &__tag {
+    width: 75%;
+    display: flex;
+    justify-content: space-between;
+    margin: 0 auto;
+    &__item {
+      width: 30%;
+      height: 35px;
+      border-radius: 35px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #4991f745;
+
+
+      &[data-tag="true"] {
+        background-color: #4991f7;
+      }
+    }
   }
 }
 
@@ -215,5 +286,12 @@ $dashboard-card-padding: 2rem 3rem;
         }
       }
     }
+  }
+}
+
+.dashboard__mail {
+  div {
+    overflow: scroll;
+    max-height: 100px;
   }
 }

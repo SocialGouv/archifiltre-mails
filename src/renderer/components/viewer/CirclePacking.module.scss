@@ -47,7 +47,7 @@
 
 .circle-packing {
   width: 100%;
-  height: 500px;
+  height: 45vh;
 
   .circle-packing-pst-infos {
     text-align: center;
@@ -71,6 +71,11 @@
     bottom: 2rem;
     z-index: 999;
   }
+}
+
+.circle__packing__tooltip {
+  background: #fff;
+  padding: 10px;
 }
 
 @keyframes spin {

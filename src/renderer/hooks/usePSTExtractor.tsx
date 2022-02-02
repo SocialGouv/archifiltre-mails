@@ -4,7 +4,6 @@ import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 
 import { usePstStore } from "../store/PSTStore";
-import { ROOT } from "../utils/constants";
 
 interface UsePstExtractor {
     pstProgress: PstProgressState;
@@ -32,7 +31,7 @@ export const usePstExtractor = (): UsePstExtractor => {
     );
     const pstExtractorService = useService("pstExtractorService");
 
-    const { setPstFile, setExtractTables, updateComputedPst } = usePstStore();
+    const { setPstFile, setExtractTables } = usePstStore();
 
     useEffect(() => {
         if (pstFilePath && pstExtractorService) {
@@ -42,17 +41,10 @@ export const usePstExtractor = (): UsePstExtractor => {
                         pstFilePath,
                     });
                 setPstFile(pstExtractedFile);
-                updateComputedPst(pstExtractedFile, ROOT);
                 setExtractTables(extractTables);
             })();
         }
-    }, [
-        pstExtractorService,
-        pstFilePath,
-        setExtractTables,
-        setPstFile,
-        updateComputedPst,
-    ]);
+    }, [pstExtractorService, pstFilePath, setExtractTables, setPstFile]);
 
     pstExtractorService?.onProgress(setPstProgress);
 

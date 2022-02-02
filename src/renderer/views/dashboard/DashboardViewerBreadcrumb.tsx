@@ -4,11 +4,14 @@ import { usePstStore } from "../../store/PSTStore";
 import style from "./Dashboard.module.scss";
 
 export const DashboardViewerBreadcrumb: React.FC = () => {
-    const { depth } = usePstStore();
+    const { breadcrumb } = usePstStore();
     return (
         <div className={style.dashboard__viewer__breadcrumb}>
-            <div className={style.dashboard__viewer__breadcrumb__item}>
-                Niveau: {depth}
+            <div
+                data-i18n="TODO"
+                className={style.dashboard__viewer__breadcrumb__item}
+            >
+                Niveau: {breadcrumb}
             </div>
         </div>
     );

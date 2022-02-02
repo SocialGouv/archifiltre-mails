@@ -197,6 +197,7 @@ function processFolder(
             }
 
             const recipients = email.getRecipients();
+
             const emailContent: PstEmail = {
                 attachementCount: email.numberOfAttachments,
                 attachements: [],
