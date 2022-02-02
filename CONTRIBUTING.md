@@ -1,4 +1,4 @@
-Archimail est un projet open-source auquel vous pouvez contribuer. Vous retrouverez ci-après les différentes règles et nomenclatures suivies dans ce dépôt.
+"Mails par Archifiltre" est un projet open-source auquel vous pouvez contribuer. Vous retrouverez ci-après les différentes règles et nomenclatures suivies dans ce dépôt.
 
 - [Git](#git)
   - [Branches et flux Git](#branches-et-flux-git)
@@ -39,7 +39,7 @@ Le projet respecte une version allégée de "[GitFlow](https://danielkummer.gith
 - 🤖 Les branches préfixées `renovate/` sont réservées et ne doivent pas être utilisées
 
 ### Représentation imagée :
-![Archimail presque-"Git-flow"](./docs/img/archimail-git-flow.svg)
+![`Mails par Archifiltre` presque-"Git-flow"](./docs/img/archifiltre-mails-git-flow.svg)
 
 
 ## Commit
@@ -57,10 +57,10 @@ Comme dit plus haut, le format des commits sera ignoré au profit d'un squash de
 ## Tickets et fonctionnalités
 Les fonctionnalités suivent le processus de développement suivant :
 - Une idée arrive dans le [tableau des idées](https://github.com/orgs/SocialGouv/projects/10) (accès interne)
-- Cette idée est évaluée, travaillée, puis transformée en ticket pour le [backlog global](https://github.com/orgs/SocialGouv/projects/9) (accès interne) avec le label "archimail"
+- Cette idée est évaluée, travaillée, puis transformée en ticket pour le [backlog global](https://github.com/orgs/SocialGouv/projects/9) (accès interne) avec le label "archifiltre-mails"
 - Ce ticket est une nouvelle fois travaillé pour être soit transformé en EPIC soit rattaché à une EPIC existante
   - Si il devient une EPIC, il acquiert le label "EPIC" et reste dans le même tableau
-  - Si il est rattaché à une EPIC, il est raffiné puis transféré vers le [tableau de sprint d'Archimail](https://github.com/SocialGouv/archimail/projects/4) (accès public)
+  - Si il est rattaché à une EPIC, il est raffiné puis transféré vers le [tableau de sprint de `Mails`](https://github.com/SocialGouv/archifiltre-mails/projects/4) (accès public)
 
 Un ticket est toujours estimé avec une valeur business et une complexité, mesurés avec la technique du **T-shirt sizing** (*S*, *M*, *L*, *XL*).
 ![Qualification des tickets](docs/img/ticket-grooming.png)

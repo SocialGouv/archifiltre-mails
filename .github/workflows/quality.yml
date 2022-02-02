@@ -9,14 +9,7 @@ env:
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
 
 jobs:
-  Quality:
-    strategy:
-      matrix:
-        # default mandatory matrix
-        empty: [true]
-      # Don't fast-fail on push main
-      fail-fast: ${{ github.event_name == 'pull_request' || (github.ref != 'refs/heads/main') }}
-
+  quality:
     name: Quality Control on Node (ubuntu-latest)
     runs-on: ubuntu-latest
 
@@ -24,6 +17,10 @@ jobs:
       - uses: actions/checkout@v2
       - name: Setup Node
         uses: ./.github/actions/setup-node
+      - name: Yarn install
+        run: |
+          yarn config set network-timeout 300000
+          yarn --frozen-lockfile --perfer-offline
 
       - name: Lint
         run: yarn lint && yarn lint:test

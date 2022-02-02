@@ -9,7 +9,7 @@ import { exporters, exporterType } from "../../exporters/Exporter";
 import type { ConsoleToRendererService } from "../../services/ConsoleToRendererService";
 import { formatEmailTable } from "../../utils/exporter";
 // eslint-disable-next-line unused-imports/no-unused-imports -- MenuModule used in doc
-import type { ArchimailMenu, MenuModule } from "../MenuModule";
+import type { ArchifiltreMailsMenu, MenuModule } from "../MenuModule";
 import type { PstExtractorMainService } from "../PstExtractorModule";
 import { disableMenus, enableMenus } from "./utils";
 
@@ -20,7 +20,7 @@ const CHANGE_LANGUAGE_MENU_ID = "CHANGE_LANGUAGE_MENU_ID";
 /**
  * Loaded in {@link MenuModule}, the debug menu is only shown on demand or by default in dev mode.
  */
-export class DebugMenu implements ArchimailMenu {
+export class DebugMenu implements ArchifiltreMailsMenu {
     public readonly id = "DEBUG_MENU_ID";
 
     private lastPstFilePath = "";
