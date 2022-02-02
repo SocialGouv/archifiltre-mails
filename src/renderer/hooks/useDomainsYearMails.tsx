@@ -1,3 +1,4 @@
+import type { ComputedDatum } from "@nivo/circle-packing/dist/types/types";
 import { useCallback, useEffect, useState } from "react";
 
 import { usePstStore } from "../store/PSTStore";
@@ -16,11 +17,10 @@ import {
     findUniqueCorrespondantsByDomain,
     findYearByCorrespondants,
 } from "../utils/pst-extractor";
-import type { CirclePackingCommonProps } from "../utils/pst-viewer";
 
 export interface UseDomainsYearMailsProps {
     currentView?: ViewState<DefaultViewerObject<string>>;
-    computeNextView: CirclePackingCommonProps["onClick"];
+    computeNextView: (node: ComputedDatum<DefaultViewerObject<string>>) => void;
     restartView: () => void;
 }
 
@@ -73,8 +73,8 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
         createInitialView();
     }, [createInitialView]);
 
-    const computeNextView: UseDomainsYearMailsProps["computeNextView"] = (
-        node
+    const computeNextView = (
+        node: ComputedDatum<DefaultViewerObject<string>>
     ) => {
         if (currentView?.type === DOMAIN) {
             setCurrentDomain(node.data.name);

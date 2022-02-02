@@ -7,16 +7,13 @@ import { useDomainsYearsMails } from "../../hooks/useDomainsYearMails";
 import { usePstStore } from "../../store/PSTStore";
 import { useTagManagerStore } from "../../store/TagManagerStore";
 import { COLORS, ROOT } from "../../utils/constants";
-import type {
-    DefaultViewerObject,
-    MailViewerObject,
-    ViewerObject,
-} from "../../utils/pst-extractor";
+import type { MailViewerObject, ViewerObject } from "../../utils/pst-extractor";
 import {
     isMailViewerObject,
     isToDeleteFolder,
     isToKeepFolder,
 } from "../../utils/pst-extractor";
+import type { CirclePackingCommonProps } from "../../utils/pst-viewer";
 import {
     commonProperties,
     getChildrenToDeleteIds,
@@ -94,28 +91,27 @@ export const CirclePacking: React.FC = () => {
         return BASE_COLOR;
     };
 
-    const handleMouseEnter = debounce(
-        (node: ComputedDatum<ViewerObject<string>>) => {
-            if (node.data.name === ROOT) {
-                setMainInfos((infos) => infos);
-                return;
-            }
-            setMainInfos(node);
-            setHoveredId(node.id);
-        },
-        500
-    );
+    const handleMouseEnter = debounce<
+        NonNullable<CirclePackingCommonProps["onMouseEnter"]>
+    >((node) => {
+        if (node.data.name === ROOT) {
+            setMainInfos((infos) => infos);
+            return;
+        }
+        setMainInfos(node);
+        setHoveredId(node.id);
+    }, 500);
 
-    const handleMouseLeave = () => {
+    const handleMouseLeave: CirclePackingCommonProps["onMouseLeave"] = () => {
         if (isInfoFocus) return;
 
         setMainInfos(undefined);
     };
 
-    const handleClick = (node: ComputedDatum<DefaultViewerObject<string>>) => {
-        computeNextView(node);
-
+    const handleClick: CirclePackingCommonProps["onClick"] = (node) => {
         if (isMailViewerObject(node.data)) isInfoFocusKnob();
+
+        computeNextView(node);
     };
 
     if (!currentView) return null; // TODO: Loader

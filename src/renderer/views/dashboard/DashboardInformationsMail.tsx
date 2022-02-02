@@ -63,7 +63,9 @@ export const DashboardInformationsMail: FC<{
         <div>
             <div style={{ maxHeight: 200, overflow: "scroll" }}>
                 <strong>Mail (cliquer pour focus)</strong>
-                {mainInfos.data.email.contentText}
+                <p style={{ wordBreak: "break-word" }}>
+                    {mainInfos.data.email.contentText}
+                </p>
             </div>
         </div>
     </>
