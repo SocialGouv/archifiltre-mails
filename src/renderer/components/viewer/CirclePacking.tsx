@@ -6,8 +6,12 @@ import React, { useEffect } from "react";
 import { useDomainsYearsMails } from "../../hooks/useDomainsYearMails";
 import { usePstStore } from "../../store/PSTStore";
 import { useTagManagerStore } from "../../store/TagManagerStore";
-import { COLORS } from "../../utils/constants";
-import type { MailViewerObject, ViewerObject } from "../../utils/pst-extractor";
+import { COLORS, ROOT } from "../../utils/constants";
+import type {
+    DefaultViewerObject,
+    MailViewerObject,
+    ViewerObject,
+} from "../../utils/pst-extractor";
 import {
     isMailViewerObject,
     isToDeleteFolder,
@@ -37,7 +41,7 @@ export const CirclePacking: React.FC = () => {
     const { currentView, computeNextView, restartView } =
         useDomainsYearsMails();
 
-    const { setMainInfos } = usePstStore(); // TODO: remove PstStore ?
+    const { setMainInfos, isInfoFocusKnob, isInfoFocus } = usePstStore(); // TODO: remove PstStore ?
 
     const {
         setHoveredId,
@@ -92,18 +96,26 @@ export const CirclePacking: React.FC = () => {
 
     const handleMouseEnter = debounce(
         (node: ComputedDatum<ViewerObject<string>>) => {
-            // setMainInfos({
-            //     percentage: node.percentage,
-            //     ...node.data,
-            // });
-            setMainInfos(node); // TODO: verify if its working
+            if (node.data.name === ROOT) {
+                setMainInfos((infos) => infos);
+                return;
+            }
+            setMainInfos(node);
             setHoveredId(node.id);
         },
         500
     );
 
     const handleMouseLeave = () => {
+        if (isInfoFocus) return;
+
         setMainInfos(undefined);
+    };
+
+    const handleClick = (node: ComputedDatum<DefaultViewerObject<string>>) => {
+        computeNextView(node);
+
+        if (isMailViewerObject(node.data)) isInfoFocusKnob();
     };
 
     if (!currentView) return null; // TODO: Loader
@@ -114,7 +126,7 @@ export const CirclePacking: React.FC = () => {
                 <button onClick={restartView}>Restart</button>
                 <ResponsiveCirclePacking
                     data={currentView.elements}
-                    onClick={computeNextView}
+                    onClick={handleClick}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                     colors={getTaggedFilesColor}
