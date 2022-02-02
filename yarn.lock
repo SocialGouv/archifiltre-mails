@@ -5300,7 +5300,7 @@ d3-zoom@3:
     d3-selection "2 - 3"
     d3-transition "2 - 3"
 
-d3@^7.2.1:
+d3@^7.3.0:
   version "7.3.0"
   resolved "https://registry.yarnpkg.com/d3/-/d3-7.3.0.tgz#f3d5a22c1f658952a6491cf50132f5267ed7a40a"
   integrity sha512-MDRLJCMK232OJQRqGljQ/gCxtB8k3/sLKFjftMjzPB3nKVUODpdW9Rb3vcq7U8Ka5YKoZkAmp++Ur6I+6iNWIw==
@@ -9017,7 +9017,7 @@ joi@^17.3.0:
     "@sideway/formula" "^3.0.0"
     "@sideway/pinpoint" "^2.0.0"
 
-jotai@^1.4.6:
+jotai@^1.5.3:
   version "1.5.3"
   resolved "https://registry.yarnpkg.com/jotai/-/jotai-1.5.3.tgz#0157f962c6cd7d28389f9606a1eefebf223801ed"
   integrity sha512-iD8MkbehxTjfRUtIJJdyQcjbAe2MqjW1+oFc5lvfgRjLHwjRQyWnZC3gdGAOQCOqUSPZHOBGgWyP/8gBDckaNQ==
@@ -11686,10 +11686,10 @@ react-dom@^17.0.2:
     object-assign "^4.1.1"
     scheduler "^0.20.2"
 
-react-dropzone@^11.4.2:
-  version "11.5.1"
-  resolved "https://registry.yarnpkg.com/react-dropzone/-/react-dropzone-11.5.1.tgz#f4d664437bf8af6acfccbf5040a9890c6780a49f"
-  integrity sha512-eNhttdq4ZDe3eKbXAe54Opt+sbtqmNK5NWTHf/l5d+1TdZqShJ8gMjBrya00qx5zkI//TYxRhu1d9pemTgaWwg==
+react-dropzone@^11.5.3:
+  version "11.5.3"
+  resolved "https://registry.yarnpkg.com/react-dropzone/-/react-dropzone-11.5.3.tgz#757d4980fcae839896a894e41d3e72df04981f86"
+  integrity sha512-68+T6sWW5L89qJnn3SD1aRazhuRBhTT9JOI1W8vI5YWsfegM4C7tlGbPH1AgEbmZY5s8E8L0QhX0e3VdAa0KWA==
   dependencies:
     attr-accept "^2.2.1"
     file-selector "^0.2.2"
