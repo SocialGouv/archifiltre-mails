@@ -7,17 +7,17 @@ import style from "./Dashboard.module.scss";
 
 const dashboardImpactData: DashboardImpactItemProps[] = [
     {
-        img: "pictos/globe.png",
+        img: "img/pictos/globe.png",
         impactInfo: "supprimés sur 5",
         impactNumber: "25go",
     },
     {
-        img: "pictos/money.png",
+        img: "img/pictos/money.png",
         impactInfo: "économisés",
         impactNumber: "50€",
     },
     {
-        img: "pictos/tree.png",
+        img: "img/pictos/tree.png",
         impactInfo: "arbres plantés",
         impactNumber: "5",
     },

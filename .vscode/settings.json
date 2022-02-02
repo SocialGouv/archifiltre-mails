@@ -44,7 +44,6 @@
   "i18n-ally.extract.keygenStrategy": "empty",
   "i18n-ally.extract.autoDetect": false,
   "editor.suggest.showWords": false,
-  "cSpell.words": [
-    "Archifiltre"
-  ]
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "javascript.preferences.importModuleSpecifier": "relative"
 }

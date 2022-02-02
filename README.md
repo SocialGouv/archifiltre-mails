@@ -1,6 +1,11 @@
 # Mails par Archifiltre
 [![codecov](https://codecov.io/gh/SocialGouv/archifiltre-mails/branch/main/graph/badge.svg?token=JPCHQWKTKZ)](https://codecov.io/gh/SocialGouv/archifiltre-mails)
 
+
+<p align="center">
+    <img src="static/img/mails_logo.png" alt="logo" width="500">
+</p>
+
 ## Initialisation
 ```sh
 yarn install

@@ -3,6 +3,13 @@
   height: 100%;
   width: 100%;
   background: #eaf0fd;
+  text-align: center;
+}
+
+/* TODO: handle properly the logo */
+.logo {
+  height: 5em;
+  margin-top: 1em;
 }
 
 .startscreen__progress {

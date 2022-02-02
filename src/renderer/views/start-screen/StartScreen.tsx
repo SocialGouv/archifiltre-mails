@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect } from "react";
 
+import { StaticImage } from "../../components/common/staticImage/StaticImage";
 import { Dropzone } from "../../components/dropzone/Dropzone";
 import { useRouteContext } from "../../context/RouterContext";
 import { usePstExtractor } from "../../hooks/usePSTExtractor";
@@ -34,6 +35,7 @@ export const StartScreen: React.FC = () => {
 
     return (
         <div className={style.startscreen}>
+            <StaticImage className={style.logo} alt="logo" src="img/logo.png" />
             <Dropzone onDrop={onDrop} accept={ACCEPTED_EXTENSION} />
             <div className={progressClassName}>
                 <ul>
