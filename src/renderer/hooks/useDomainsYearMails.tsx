@@ -126,7 +126,7 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
             });
         }
 
-        return void 0;
+        return;
     };
 
     return {

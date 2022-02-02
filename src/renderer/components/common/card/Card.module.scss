@@ -3,6 +3,7 @@ $background-color-white: #fcfbfb;
 $dashboard-actions-bar: calc(75px + 2rem);
 $dashboard-breadcrumb-height: 30px;
 $dashboard-card-padding: 2rem 3rem;
+$dashboard-card-font-text: 12px;
 
 .card {
   margin: 10px;
@@ -10,7 +11,7 @@ $dashboard-card-padding: 2rem 3rem;
   border-radius: 10px;
   background: $background-color-white;
   position: absolute;
-  font-size: 12px;
+  font-size: $dashboard-card-font-text;
 
   .card__title {
     margin: 0 0 2rem;

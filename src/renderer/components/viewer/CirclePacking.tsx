@@ -68,7 +68,7 @@ export const CirclePacking: React.FC = () => {
     const getTaggedFilesColor = (
         node: Omit<ComputedDatum<ViewerObject<string>>, "color" | "fill">
     ) => {
-        if (node.depth === 0) return BASE_COLOR_LIGHT; // prefer to use equality over a '!node.depth' to understand that is a level
+        if (node.depth === 0) return BASE_COLOR_LIGHT;
 
         if (isToDeleteFolder(node.id, markedToDelete)) {
             if (isMailTagNode(node)) {

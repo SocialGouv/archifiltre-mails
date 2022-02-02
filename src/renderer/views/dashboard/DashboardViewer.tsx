@@ -10,11 +10,3 @@ export const DashboardViewer: React.FC = () => (
         <DashboardViewerCircle />
     </Card>
 );
-// export const DashboardViewer: React.FC = () => (
-//     <div className={style.dashboard__viewer}>
-//         <Card title="Visualisation" color="grey">
-//             <DashboardViewerBreadcrumb />
-//             <DashboardViewerCircle />
-//         </Card>
-//     </div>
-// );

@@ -87,6 +87,7 @@ export const commonProperties: CirclePackingCommonProps = {
     value: "size",
 };
 
+// TODO: Intl.DateTimeFormat() in combinaison with i18n module
 export const sanitizeMailDate = (date: Date): string =>
     JSON.stringify(date)
         .replace("T", " ")
