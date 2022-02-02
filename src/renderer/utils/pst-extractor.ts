@@ -10,7 +10,6 @@ import { randomUUID } from "crypto";
 import {
     ARBITRARY_FLAT_LEVEL,
     MAX_TRESHOLD,
-    ORG_UNIT_PST,
     RATIO_FROM_MAX,
     TRESHOLD_KEY,
 } from "./constants";
@@ -239,15 +238,17 @@ export const findAllMailAddresses = (
                 _pst.from.email, // nb de messages par domain d'expediteur
             ]);
             emails.forEach((email) => {
-                const emailKey = email.includes(ORG_UNIT_PST)
-                    ? "Same_LD"
-                    : email;
+                const emailKey = email;
+                // const emailKey = email.includes(ORG_UNIT_PST)
+                //     ? "Same_LD"
+                //     : email;
                 const currentMailCount = mailCountPerMail.get(emailKey) ?? 0;
                 mailCountPerMail.set(emailKey, currentMailCount + 1);
 
-                const domainKey = email.includes(ORG_UNIT_PST)
-                    ? "Same_LD"
-                    : getDomain(email);
+                const domainKey = getDomain(email);
+                // const domainKey = email.includes(ORG_UNIT_PST)
+                //     ? "Same_LD"
+                //     : getDomain(email);
                 const currentDomainCount =
                     mailCountPerDomain.get(domainKey) ?? 0;
                 mailCountPerDomain.set(domainKey, currentDomainCount + 1);
