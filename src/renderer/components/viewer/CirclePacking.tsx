@@ -20,9 +20,11 @@ import {
     getChildrenToKeepIds,
     getColorFromTrimester,
     getUntagChildrenIds,
+    handleFocusItemBorderColor,
 } from "../../utils/pst-viewer";
 import { Menu } from "../menu/Menu";
 import style from "./CirclePacking.module.scss";
+import { CirclePackingCancellableFocusZone } from "./CirclePackingCancellableFocusZone";
 import { CirclePackingTooltip } from "./CirclePackingTooltip";
 
 const { BASE_COLOR, BASE_COLOR_LIGHT, DELETE_COLOR, KEEP_COLOR } = COLORS;
@@ -38,7 +40,8 @@ export const CirclePacking: React.FC = () => {
     const { currentView, computeNextView, restartView } =
         useDomainsYearsMails();
 
-    const { setMainInfos, isInfoFocusKnob, isInfoFocus } = usePstStore(); // TODO: remove PstStore ?
+    const { setMainInfos, isInfoFocusKnob, isInfoFocus, mainInfos } =
+        usePstStore(); // TODO: remove PstStore ?
 
     const {
         setHoveredId,
@@ -94,6 +97,8 @@ export const CirclePacking: React.FC = () => {
     const handleMouseEnter = debounce<
         NonNullable<CirclePackingCommonProps["onMouseEnter"]>
     >((node) => {
+        if (isInfoFocus) return;
+
         if (node.data.name === ROOT) {
             setMainInfos((infos) => infos);
             return;
@@ -114,6 +119,9 @@ export const CirclePacking: React.FC = () => {
         computeNextView(node);
     };
 
+    const handleBorderColor: CirclePackingCommonProps["borderColor"] = (node) =>
+        handleFocusItemBorderColor(node, mainInfos, isInfoFocus);
+
     if (!currentView) return null; // TODO: Loader
 
     return (
@@ -126,10 +134,12 @@ export const CirclePacking: React.FC = () => {
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                     colors={getTaggedFilesColor}
+                    borderColor={handleBorderColor}
                     tooltip={(node) => <CirclePackingTooltip node={node} />}
                     {...commonProperties}
                 />
             </div>
+            <CirclePackingCancellableFocusZone />
             <Menu />
         </>
     );
