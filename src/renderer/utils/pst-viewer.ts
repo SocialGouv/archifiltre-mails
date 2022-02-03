@@ -4,6 +4,8 @@ import type {
     ComputedDatum,
 } from "@nivo/circle-packing";
 
+import type { MainInfos } from "../store/PSTStore";
+import { COLORS } from "./constants";
 import type {
     DefaultViewerObject,
     MailViewerObject,
@@ -73,6 +75,7 @@ export type CirclePackingCommonProps = Partial<
 };
 
 export const commonProperties: CirclePackingCommonProps = {
+    borderWidth: 3,
     enableLabels: true,
     id: "id",
     isInteractive: true,
@@ -93,3 +96,13 @@ export const sanitizeMailDate = (date: Date): string =>
         .replace("T", " ")
         .replace("Z", " ")
         .replaceAll('"', "");
+
+export const handleFocusItemBorderColor = (
+    node: ComputedDatum<DefaultViewerObject<string>>,
+    mainInfos: MainInfos | undefined,
+    isInfoFocus: boolean
+): string => {
+    if (mainInfos && isInfoFocus && node.data.id === mainInfos.id)
+        return COLORS.BLACK;
+    return COLORS.TRANSPARENT;
+};

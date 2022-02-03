@@ -6,22 +6,25 @@ import React, { useEffect } from "react";
 import { useDomainsYearsMails } from "../../hooks/useDomainsYearMails";
 import { usePstStore } from "../../store/PSTStore";
 import { useTagManagerStore } from "../../store/TagManagerStore";
-import { COLORS } from "../../utils/constants";
+import { COLORS, ROOT } from "../../utils/constants";
 import type { MailViewerObject, ViewerObject } from "../../utils/pst-extractor";
 import {
     isMailViewerObject,
     isToDeleteFolder,
     isToKeepFolder,
 } from "../../utils/pst-extractor";
+import type { CirclePackingCommonProps } from "../../utils/pst-viewer";
 import {
     commonProperties,
     getChildrenToDeleteIds,
     getChildrenToKeepIds,
     getColorFromTrimester,
     getUntagChildrenIds,
+    handleFocusItemBorderColor,
 } from "../../utils/pst-viewer";
 import { Menu } from "../menu/Menu";
 import style from "./CirclePacking.module.scss";
+import { CirclePackingCancellableFocusZone } from "./CirclePackingCancellableFocusZone";
 import { CirclePackingTooltip } from "./CirclePackingTooltip";
 
 const { BASE_COLOR, BASE_COLOR_LIGHT, DELETE_COLOR, KEEP_COLOR } = COLORS;
@@ -37,7 +40,7 @@ export const CirclePacking: React.FC = () => {
     const { currentView, computeNextView, restartView } =
         useDomainsYearsMails();
 
-    const { setMainInfos } = usePstStore(); // TODO: remove PstStore ?
+    const { setMainInfos, startFocus, isInfoFocus, mainInfos } = usePstStore(); // TODO: remove PstStore ?
 
     const {
         setHoveredId,
@@ -90,21 +93,33 @@ export const CirclePacking: React.FC = () => {
         return BASE_COLOR;
     };
 
-    const handleMouseEnter = debounce(
-        (node: ComputedDatum<ViewerObject<string>>) => {
-            // setMainInfos({
-            //     percentage: node.percentage,
-            //     ...node.data,
-            // });
-            setMainInfos(node); // TODO: verify if its working
-            setHoveredId(node.id);
-        },
-        500
-    );
+    const handleMouseEnter = debounce<
+        NonNullable<CirclePackingCommonProps["onMouseEnter"]>
+    >((node) => {
+        if (isInfoFocus) return;
 
-    const handleMouseLeave = () => {
+        if (node.data.name === ROOT) {
+            setMainInfos((infos) => infos);
+            return;
+        }
+        setMainInfos(node);
+        setHoveredId(node.id);
+    }, 500);
+
+    const handleMouseLeave: CirclePackingCommonProps["onMouseLeave"] = () => {
+        if (isInfoFocus) return;
+
         setMainInfos(undefined);
     };
+
+    const handleClick: CirclePackingCommonProps["onClick"] = (node) => {
+        if (isMailViewerObject(node.data)) startFocus();
+
+        computeNextView(node);
+    };
+
+    const handleBorderColor: CirclePackingCommonProps["borderColor"] = (node) =>
+        handleFocusItemBorderColor(node, mainInfos, isInfoFocus);
 
     if (!currentView) return null; // TODO: Loader
 
@@ -114,14 +129,16 @@ export const CirclePacking: React.FC = () => {
                 <button onClick={restartView}>Restart</button>
                 <ResponsiveCirclePacking
                     data={currentView.elements}
-                    onClick={computeNextView}
+                    onClick={handleClick}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                     colors={getTaggedFilesColor}
+                    borderColor={handleBorderColor}
                     tooltip={(node) => <CirclePackingTooltip node={node} />}
                     {...commonProperties}
                 />
             </div>
+            <CirclePackingCancellableFocusZone />
             <Menu />
         </>
     );
