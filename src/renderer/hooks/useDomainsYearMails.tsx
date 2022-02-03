@@ -38,7 +38,7 @@ export interface ViewState<TElement> {
  * TODO: COMMENT
  */
 export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
-    const { pstFile, setBreadcrumb, isInfoFocusKnob } = usePstStore();
+    const { pstFile, setBreadcrumb, cancelFocus } = usePstStore();
     const [currentDomain, setCurrentDomain] = useState<string>();
     const [currentCorrespondant, setCurrentCorrespondant] = useState<string>();
 
@@ -61,7 +61,7 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
 
     const restartView = () => {
         setCurrentView(domainView);
-        isInfoFocusKnob();
+        cancelFocus();
         setBreadcrumb("domaine"); // TODO: i18n
     };
 

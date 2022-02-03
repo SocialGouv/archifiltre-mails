@@ -33,6 +33,7 @@ export interface UsePstStore {
     setMainInfos: (update?: SetStateAction<MainInfos | undefined>) => void;
 
     isInfoFocusKnob: () => void;
+    cancelFocus: () => void;
     isInfoFocus: boolean;
 }
 
@@ -59,8 +60,13 @@ export const usePstStore = (): UsePstStore => {
         setIsInfoFocus((focus) => !focus);
     };
 
+    const cancelFocus = () => {
+        setIsInfoFocus(false);
+    };
+
     return {
         breadcrumb,
+        cancelFocus,
         deletedFolder,
         extractTables,
         isInfoFocus,

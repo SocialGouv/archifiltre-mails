@@ -7,14 +7,14 @@ import { usePstStore } from "../../store/PSTStore";
 import style from "./CirclePacking.module.scss";
 
 export const CirclePackingCancellableFocusZone: React.FC = () => {
-    const { isInfoFocus, isInfoFocusKnob } = usePstStore();
+    const { isInfoFocus, cancelFocus } = usePstStore();
 
     if (!isInfoFocus) return null;
 
     return (
         <div
             className={style.circlePackingCancellableZone}
-            onClick={isInfoFocusKnob}
+            onClick={cancelFocus}
         />
     );
 };
