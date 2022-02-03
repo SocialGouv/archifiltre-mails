@@ -32,7 +32,7 @@ export interface UsePstStore {
     mainInfos: MainInfos | undefined;
     setMainInfos: (update?: SetStateAction<MainInfos | undefined>) => void;
 
-    isInfoFocusKnob: () => void;
+    startFocus: () => void;
     cancelFocus: () => void;
     isInfoFocus: boolean;
 }
@@ -56,8 +56,8 @@ export const usePstStore = (): UsePstStore => {
     const [breadcrumb, setBreadcrumb] = useAtom(breadcrumbAtom);
     const [isInfoFocus, setIsInfoFocus] = useAtom(isInfoFocusAtom);
 
-    const isInfoFocusKnob = () => {
-        setIsInfoFocus((focus) => !focus);
+    const startFocus = () => {
+        setIsInfoFocus(true);
     };
 
     const cancelFocus = () => {
@@ -70,7 +70,6 @@ export const usePstStore = (): UsePstStore => {
         deletedFolder,
         extractTables,
         isInfoFocus,
-        isInfoFocusKnob,
         mainInfos,
         pstFile,
         sentFolder,
@@ -80,5 +79,6 @@ export const usePstStore = (): UsePstStore => {
         setMainInfos,
         setPstFile,
         setSentFolder,
+        startFocus,
     };
 };

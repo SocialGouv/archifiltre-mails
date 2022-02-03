@@ -40,8 +40,7 @@ export const CirclePacking: React.FC = () => {
     const { currentView, computeNextView, restartView } =
         useDomainsYearsMails();
 
-    const { setMainInfos, isInfoFocusKnob, isInfoFocus, mainInfos } =
-        usePstStore(); // TODO: remove PstStore ?
+    const { setMainInfos, startFocus, isInfoFocus, mainInfos } = usePstStore(); // TODO: remove PstStore ?
 
     const {
         setHoveredId,
@@ -114,7 +113,7 @@ export const CirclePacking: React.FC = () => {
     };
 
     const handleClick: CirclePackingCommonProps["onClick"] = (node) => {
-        if (isMailViewerObject(node.data)) isInfoFocusKnob();
+        if (isMailViewerObject(node.data)) startFocus();
 
         computeNextView(node);
     };
