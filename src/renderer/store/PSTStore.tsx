@@ -31,6 +31,10 @@ export interface UsePstStore {
     ) => void;
     mainInfos: MainInfos | undefined;
     setMainInfos: (update?: SetStateAction<MainInfos | undefined>) => void;
+
+    startFocus: () => void;
+    cancelFocus: () => void;
+    isInfoFocus: boolean;
 }
 
 const sentFolderAtom = atom("");
@@ -38,7 +42,10 @@ const deletedFolderAtom = atom("");
 const pstFileAtom = atom<PstContent | undefined>(void 0);
 const pstExtractTablesAtom = atom<PstExtractTables | undefined>(undefined);
 const pstMainInfosAtom = atom<MainInfos | undefined>(undefined);
+
 const breadcrumbAtom = atom<string>("domaine"); // TODO: i18n
+
+const isInfoFocusAtom = atom<boolean>(false);
 
 export const usePstStore = (): UsePstStore => {
     const [sentFolder, setSentFolder] = useAtom(sentFolderAtom);
@@ -47,11 +54,22 @@ export const usePstStore = (): UsePstStore => {
     const [extractTables, setExtractTables] = useAtom(pstExtractTablesAtom);
     const [mainInfos, setMainInfos] = useAtom(pstMainInfosAtom);
     const [breadcrumb, setBreadcrumb] = useAtom(breadcrumbAtom);
+    const [isInfoFocus, setIsInfoFocus] = useAtom(isInfoFocusAtom);
+
+    const startFocus = () => {
+        setIsInfoFocus(true);
+    };
+
+    const cancelFocus = () => {
+        setIsInfoFocus(false);
+    };
 
     return {
         breadcrumb,
+        cancelFocus,
         deletedFolder,
         extractTables,
+        isInfoFocus,
         mainInfos,
         pstFile,
         sentFolder,
@@ -61,5 +79,6 @@ export const usePstStore = (): UsePstStore => {
         setMainInfos,
         setPstFile,
         setSentFolder,
+        startFocus,
     };
 };

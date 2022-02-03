@@ -2,14 +2,10 @@ import React from "react";
 
 import { useRouteContext } from "../context/RouterContext";
 import { Dashboard } from "./dashboard/Dashboard";
-import { Ecology } from "./ecology/Ecology";
-import { History } from "./history/History";
 import { StartScreen } from "./start-screen/StartScreen";
 
 export const ROUTES = {
     DASHBOARD: <Dashboard />,
-    ECOLOGY: <Ecology />,
-    HISTORY: <History />,
     START_SCREEN: <StartScreen />,
 };
 

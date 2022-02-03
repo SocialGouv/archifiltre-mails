@@ -27,6 +27,7 @@ export const COLORS = {
     // TODO: design system
     BASE_COLOR: "rgb(31, 120, 180)",
     BASE_COLOR_LIGHT: "#eaf0fd",
+    BLACK: "#000",
     CARD_LABEL_BLUE: "blue",
     CARD_LABEL_GREEN: "green",
     CARD_LABEL_GREY: "grey",
