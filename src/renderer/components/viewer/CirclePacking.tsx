@@ -1,7 +1,7 @@
 import type { ComputedDatum } from "@nivo/circle-packing";
 import { ResponsiveCirclePacking } from "@nivo/circle-packing";
 import debounce from "lodash/debounce";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { useDomainsYearsMails } from "../../hooks/useDomainsYearMails";
 import { usePstStore } from "../../store/PSTStore";
@@ -24,6 +24,7 @@ import {
 } from "../../utils/pst-viewer";
 import { Menu } from "../menu/Menu";
 import style from "./CirclePacking.module.scss";
+import type { Osef } from "./CirclePackingCancellableFocusZone";
 import { CirclePackingCancellableFocusZone } from "./CirclePackingCancellableFocusZone";
 import { CirclePackingTooltip } from "./CirclePackingTooltip";
 
@@ -41,6 +42,9 @@ export const CirclePacking: React.FC = () => {
         useDomainsYearsMails();
 
     const { setMainInfos, startFocus, isInfoFocus, mainInfos } = usePstStore(); // TODO: remove PstStore ?
+
+    const [circlePackingHtmlElement, setCirclePackingHtmlElement] =
+        useState<EventTarget>();
 
     const {
         setHoveredId,
@@ -112,11 +116,36 @@ export const CirclePacking: React.FC = () => {
         setMainInfos(undefined);
     };
 
-    const handleClick: CirclePackingCommonProps["onClick"] = (node) => {
+    const handleClick: CirclePackingCommonProps["onClick"] = (node, evt) => {
+        if (!circlePackingHtmlElement)
+            setCirclePackingHtmlElement(evt.currentTarget);
         if (isMailViewerObject(node.data)) startFocus();
 
         computeNextView(node);
     };
+
+    const handleLostFocus = debounce<NonNullable<Osef["onBlur"]>>((evt) => {
+        const elt = document.elementFromPoint(evt.clientX, evt.clientY);
+        console.log({ elt, evt });
+        if (elt && elt !== evt.target) {
+            // (elt as any).click();
+            // elt?.dispatchEvent(
+            //     new MouseEvent("click", {
+            //         // bubbles: true,
+            //         // cancelable: true,
+            //         clientX: evt.clientX,
+            //         clientY: evt.clientY,
+            //         view: window,
+            //     })
+            // );
+            const reactFiberKey = Object.keys(elt).find((prop) =>
+                prop.startsWith("__reactFiber")
+            )!;
+            const fiber = (elt as any)[reactFiberKey];
+            console.log({ fiber, reactFiberKey });
+            fiber.ref.current.click();
+        }
+    }, 50);
 
     const handleBorderColor: CirclePackingCommonProps["borderColor"] = (node) =>
         handleFocusItemBorderColor(node, mainInfos, isInfoFocus);
@@ -138,7 +167,7 @@ export const CirclePacking: React.FC = () => {
                     {...commonProperties}
                 />
             </div>
-            <CirclePackingCancellableFocusZone />
+            <CirclePackingCancellableFocusZone onBlur={handleLostFocus} />
             <Menu />
         </>
     );

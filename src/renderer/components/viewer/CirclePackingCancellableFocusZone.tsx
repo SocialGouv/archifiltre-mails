@@ -6,7 +6,13 @@ import React from "react";
 import { usePstStore } from "../../store/PSTStore";
 import style from "./CirclePacking.module.scss";
 
-export const CirclePackingCancellableFocusZone: React.FC = () => {
+export interface Osef {
+    onBlur?: (evt: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+}
+
+export const CirclePackingCancellableFocusZone: React.FC<Osef> = ({
+    onBlur,
+}) => {
     const { isInfoFocus, cancelFocus } = usePstStore();
 
     if (!isInfoFocus) return null;
@@ -14,7 +20,10 @@ export const CirclePackingCancellableFocusZone: React.FC = () => {
     return (
         <div
             className={style.circlePackingCancellableZone}
-            onClick={cancelFocus}
+            onClick={(evt) => {
+                cancelFocus();
+                onBlur?.(evt);
+            }}
         />
     );
 };
