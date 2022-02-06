@@ -33,7 +33,7 @@ export const getIsomorphicModules = <
         ["userConfigService", userConfigModule.service],
         ["i18nService", i18nModule.service],
         ["fileExporterService", fileExporterModule.service],
-        ...[...additionalServices] // like "Set"
+        ...additionalServices
     );
 
     return [
