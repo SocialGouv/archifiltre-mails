@@ -48,7 +48,8 @@
       "react-dropzone",
       "react-i18next",
       "lodash",
-      "electron-store"
+      "electron-store",
+      "source-map-support"
     ]
   },
   "//build.extraResources": "Static should be set again because it is overwritten",

@@ -26,6 +26,11 @@ type ExportFunction = (
     ...args: Parameters<Exporter["export"]>
 ) => Promise<void>;
 
+/**
+ * Isomorphic module responsible for handling exports capabilities of the app.
+ *
+ * An export is a conversion from an data input to a file output.
+ */
 export class FileExporterModule extends IsomorphicModule {
     private inited = false;
 
