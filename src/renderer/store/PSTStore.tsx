@@ -3,6 +3,7 @@ import type {
     PstExtractTables,
 } from "@common/modules/pst-extractor/type";
 import type { ComputedDatum } from "@nivo/circle-packing";
+import { t } from "i18next";
 import { atom, useAtom } from "jotai/index";
 import type { SetStateAction } from "react";
 
@@ -43,7 +44,7 @@ const pstFileAtom = atom<PstContent | undefined>(void 0);
 const pstExtractTablesAtom = atom<PstExtractTables | undefined>(undefined);
 const pstMainInfosAtom = atom<MainInfos | undefined>(undefined);
 
-const breadcrumbAtom = atom<string>("domaine"); // TODO: i18n
+const breadcrumbAtom = atom<string>(t("dashboard.viewer.breadcrumb.domain"));
 
 const isInfoFocusAtom = atom<boolean>(false);
 

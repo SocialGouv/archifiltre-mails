@@ -1,12 +1,16 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import { Card } from "../../components/common/card/Card";
 import { DashboardViewerBreadcrumb } from "./DashboardViewerBreadcrumb";
 import { DashboardViewerCircle } from "./DashboardViewerCircle";
 
-export const DashboardViewer: React.FC = () => (
-    <Card title="Visualisation" color="grey">
-        <DashboardViewerBreadcrumb />
-        <DashboardViewerCircle />
-    </Card>
-);
+export const DashboardViewer: React.FC = () => {
+    const { t } = useTranslation();
+    return (
+        <Card title={t("dashboard.viewer.cardTitle")} color="grey">
+            <DashboardViewerBreadcrumb />
+            <DashboardViewerCircle />
+        </Card>
+    );
+};

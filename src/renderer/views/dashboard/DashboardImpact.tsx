@@ -1,5 +1,6 @@
 import type { FC } from "react";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import { Card } from "../../components/common/card/Card";
 import { StaticImage } from "../../components/common/staticImage/StaticImage";
@@ -45,8 +46,10 @@ const DashboardImpactItem: FC<DashboardImpactItemProps> = ({
 );
 
 export const DashboardImpact: FC = () => {
+    const { t } = useTranslation();
+
     return (
-        <Card title="Impact" color="orange">
+        <Card title={t("dashboard.impact.cardTitle")} color="orange">
             <div className={style.dashboard__impact}>
                 {dashboardImpactData.map((impact, index) => (
                     <DashboardImpactItem key={index} {...impact} />
