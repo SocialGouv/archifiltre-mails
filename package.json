@@ -26,6 +26,8 @@
     "test:integration": "jest integration",
     "test:e2e": "playwright test"
   },
+  "//electronWebpack.whiteListedModules.electron-store": "Needed for sourcemaps",
+  "//electronWebpack.whiteListedModules.source-map-support": "Needed for better sourcemaps in renderer AND main-workers",
   "electronWebpack": {
     "title": true,
     "main": {
@@ -45,7 +47,9 @@
       "jotai",
       "react-dropzone",
       "react-i18next",
-      "lodash"
+      "lodash",
+      "electron-store",
+      "source-map-support"
     ]
   },
   "//build.extraResources": "Static should be set again because it is overwritten",
@@ -166,7 +170,7 @@
     "i18next": "^21.6.6",
     "jotai": "^1.5.3",
     "json2csv": "^5.0.6",
-    "lodash-fp": "^0.10.4",
+    "lodash": "^4.17.21",
     "normalize.css": "^8.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

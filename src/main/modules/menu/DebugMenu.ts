@@ -1,11 +1,13 @@
 import { IS_DEV } from "@common/config";
 import { SupportedLocales } from "@common/i18n/raw";
+import type {
+    ExporterType,
+    FileExporterService,
+} from "@common/modules/FileExporterModule";
 import type { I18nService } from "@common/modules/I18nModule";
 import type { BrowserWindow } from "electron";
 import { dialog, MenuItem } from "electron";
 
-import type { ExporterType } from "../../exporters/Exporter";
-import { exporters, exporterType } from "../../exporters/Exporter";
 import type { ConsoleToRendererService } from "../../services/ConsoleToRendererService";
 import { formatEmailTable } from "../../utils/exporter";
 // eslint-disable-next-line unused-imports/no-unused-imports -- MenuModule used in doc
@@ -28,7 +30,8 @@ export class DebugMenu implements ArchifiltreMailsMenu {
     constructor(
         private readonly consoleToRendererService: ConsoleToRendererService,
         private readonly pstExtractorMainService: PstExtractorMainService,
-        private readonly i18nService: I18nService
+        private readonly i18nService: I18nService,
+        private readonly fileExporterService: FileExporterService
     ) {}
 
     public get item(): MenuItem {
@@ -100,19 +103,21 @@ export class DebugMenu implements ArchifiltreMailsMenu {
                 {
                     id: EXPORT_LAST_PST_MENU_ID,
                     label: `Export last file...`,
-                    submenu: exporterType.map((exportType) => ({
-                        click: async (_menuItem, browserWindow, _event) => {
-                            if (browserWindow) {
-                                await this.exportLast(
-                                    browserWindow,
-                                    exportType
-                                );
-                            }
-                        },
-                        enabled: true,
-                        id: `${EXPORT_LAST_PST_MENU_ID}_${exportType.toUpperCase()}`,
-                        label: exportType.toUpperCase(),
-                    })),
+                    submenu: this.fileExporterService.exporterTypes.map(
+                        (exportType) => ({
+                            click: async (_menuItem, browserWindow, _event) => {
+                                if (browserWindow) {
+                                    await this.exportLast(
+                                        browserWindow,
+                                        exportType
+                                    );
+                                }
+                            },
+                            enabled: true,
+                            id: `${EXPORT_LAST_PST_MENU_ID}_${exportType.toUpperCase()}`,
+                            label: exportType.toUpperCase(),
+                        })
+                    ),
                 },
                 {
                     id: CHANGE_LANGUAGE_MENU_ID,
@@ -166,7 +171,11 @@ export class DebugMenu implements ArchifiltreMailsMenu {
         });
 
         const emails = formatEmailTable(tables.emails);
-        await exporters[type].export(emails, dialogReturn.filePath);
+        await this.fileExporterService.export(
+            type,
+            emails,
+            dialogReturn.filePath
+        );
         console.info("MENU EXPORT DONE");
     }
 }
