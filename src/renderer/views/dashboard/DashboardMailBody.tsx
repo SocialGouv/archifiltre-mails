@@ -10,7 +10,7 @@ export const DashboardMailBody: React.FC<DashboardComponentProps> = ({
 }) => {
     const { mainInfos } = usePstStore();
 
-    if (!mainInfos) return null; // TODO: loader
+    if (!mainInfos) return null;
 
     return (
         <Card title="Mail" color="grey" className={className}>

@@ -35,7 +35,11 @@ export interface ViewState<TElement> {
 }
 
 /**
- * TODO: COMMENT
+ * A hook to manage the domain-year-mails vizualisation.
+ * - Compute all next view following the current one.
+ * - Allow breadcrumb dynamic display.
+ * - Allow user to restart the view.
+ * - Allow user to go back in the previous view
  */
 export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
     const { pstFile, setBreadcrumb, cancelFocus } = usePstStore();

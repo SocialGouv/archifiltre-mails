@@ -22,6 +22,7 @@ import {
     getUntagChildrenIds,
     handleFocusItemBorderColor,
 } from "../../utils/pst-viewer";
+import { Loader } from "../common/loader";
 import { Menu } from "../menu/Menu";
 import style from "./CirclePacking.module.scss";
 import { CirclePackingCancellableFocusZone } from "./CirclePackingCancellableFocusZone";
@@ -121,7 +122,7 @@ export const CirclePacking: React.FC = () => {
     const handleBorderColor: CirclePackingCommonProps["borderColor"] = (node) =>
         handleFocusItemBorderColor(node, mainInfos, isInfoFocus);
 
-    if (!currentView) return null; // TODO: Loader
+    if (!currentView) return <Loader />;
 
     return (
         <>
