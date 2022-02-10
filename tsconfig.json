@@ -5,6 +5,7 @@
       "ES2021",
       "DOM"
     ],
+    "incremental": true,
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "noUncheckedIndexedAccess": true,
