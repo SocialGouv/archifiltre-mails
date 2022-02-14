@@ -1,27 +1,30 @@
 import type { ComputedDatum } from "@nivo/circle-packing/dist/types/types";
 import { useCallback, useEffect, useState } from "react";
 
+import { useBreadcrumbStore } from "../store/BreadcrumbStore";
+import { usePstFMInfosStore } from "../store/PstFMInfosStore";
 import { usePstStore } from "../store/PSTStore";
 import { CORRESPONDANTS, DOMAIN, MAILS, YEAR } from "../utils/constants";
 import type {
     DefaultViewerObject,
     DomainViewerObject,
-} from "../utils/pst-extractor";
+} from "../utils/dashboard-viewer-dym";
 import {
     createCorrespondants,
     createDomain,
     createMails,
     createYears,
-    findAllMailAddresses,
-    findMailsByDomainCorrespondantAndYear,
-    findUniqueCorrespondantsByDomain,
-    findYearByCorrespondants,
-} from "../utils/pst-extractor";
+    getAggregatedDomainCount,
+    getMailsByDym,
+    getUniqueCorrespondantsByDomain,
+    getYearByCorrespondants,
+} from "../utils/dashboard-viewer-dym";
 
 export interface UseDomainsYearMailsProps {
     currentView?: ViewState<DefaultViewerObject<string>>;
     computeNextView: (node: ComputedDatum<DefaultViewerObject<string>>) => void;
     restartView: () => void;
+    computePreviousView: () => void;
 }
 
 export type ViewType =
@@ -29,6 +32,7 @@ export type ViewType =
     | typeof DOMAIN
     | typeof MAILS
     | typeof YEAR;
+
 export interface ViewState<TElement> {
     elements: TElement;
     type: ViewType;
@@ -36,23 +40,33 @@ export interface ViewState<TElement> {
 
 /**
  * A hook to manage the domain-year-mails vizualisation.
+ * DYM accronym of Domain Year Mails.
  * - Compute all next view following the current one.
  * - Allow breadcrumb dynamic display.
  * - Allow user to restart the view.
  * - Allow user to go back in the previous view
  */
-export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
-    const { pstFile, setBreadcrumb, cancelFocus } = usePstStore();
+export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
+    const { pstFile } = usePstStore();
+    const { setBreadcrumb } = useBreadcrumbStore();
+    const { cancelFocus } = usePstFMInfosStore();
     const [currentDomain, setCurrentDomain] = useState<string>();
     const [currentCorrespondant, setCurrentCorrespondant] = useState<string>();
 
     const [currentView, setCurrentView] =
         useState<ViewState<DefaultViewerObject<string>>>();
+
     const [domainView, setDomainView] =
         useState<ViewState<DomainViewerObject>>();
 
+    const [correspondantView, setCorrespondantView] =
+        useState<ViewState<DefaultViewerObject<string>>>();
+
+    const [yearView, setYearView] =
+        useState<ViewState<DefaultViewerObject<string>>>();
+
     const createInitialView = useCallback(() => {
-        const aggregatedDomainCount = findAllMailAddresses(pstFile!);
+        const aggregatedDomainCount = getAggregatedDomainCount(pstFile!);
 
         const computedInitialView = {
             elements: createDomain(aggregatedDomainCount),
@@ -69,14 +83,24 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
         setBreadcrumb("domaine"); // TODO: i18n
     };
 
-    // TODO: click in root and back to previous viz
-    const _computePreviousView = () => {
-        return void 0;
-    };
-
     useEffect(() => {
         createInitialView();
     }, [createInitialView]);
+
+    const computePreviousView = () => {
+        if (currentView?.type === CORRESPONDANTS) {
+            setCurrentView(domainView);
+        }
+        if (currentView?.type === YEAR) {
+            setCurrentView(correspondantView);
+        }
+
+        if (currentView?.type === MAILS) {
+            setCurrentView(yearView);
+        }
+
+        return;
+    };
 
     const computeNextView = (
         node: ComputedDatum<DefaultViewerObject<string>>
@@ -86,9 +110,17 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
             setBreadcrumb(`${node.data.name} > correspondant`);
 
             const uniqueCorrespondantsByDomain =
-                findUniqueCorrespondantsByDomain(pstFile!, node.data.name);
+                getUniqueCorrespondantsByDomain(pstFile!, node.data.name);
 
             setCurrentView({
+                elements: createCorrespondants(
+                    uniqueCorrespondantsByDomain,
+                    node.id
+                ),
+                type: CORRESPONDANTS,
+            });
+
+            setCorrespondantView({
                 elements: createCorrespondants(
                     uniqueCorrespondantsByDomain,
                     node.id
@@ -98,15 +130,20 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
         }
 
         if (currentView?.type === CORRESPONDANTS) {
-            setCurrentCorrespondant(node.data.name);
             setBreadcrumb(`${currentDomain} > ${node.data.name} > années`);
+            setCurrentCorrespondant(node.data.name);
 
-            const yearByCorrespondants = findYearByCorrespondants(
+            const yearByCorrespondants = getYearByCorrespondants(
                 pstFile!,
                 node.data.name
             );
 
             setCurrentView({
+                elements: createYears(yearByCorrespondants, node.id),
+                type: YEAR,
+            });
+
+            setYearView({
                 elements: createYears(yearByCorrespondants, node.id),
                 type: YEAR,
             });
@@ -117,13 +154,12 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
                 `${currentDomain} > ${currentCorrespondant} > ${node.data.name} > mails`
             );
 
-            const mailsByYearAndCorrespondant =
-                findMailsByDomainCorrespondantAndYear(
-                    pstFile!,
-                    currentDomain!,
-                    currentCorrespondant!,
-                    +node.data.name
-                );
+            const mailsByYearAndCorrespondant = getMailsByDym(
+                pstFile!,
+                currentDomain!,
+                currentCorrespondant!,
+                +node.data.name
+            );
 
             setCurrentView({
                 elements: createMails(mailsByYearAndCorrespondant, node.id),
@@ -136,6 +172,7 @@ export const useDomainsYearsMails = (): UseDomainsYearMailsProps => {
 
     return {
         computeNextView,
+        computePreviousView,
         currentView,
         restartView,
     };

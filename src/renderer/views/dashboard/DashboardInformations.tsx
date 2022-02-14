@@ -2,7 +2,10 @@ import type { FC } from "react";
 import React from "react";
 
 import { Card } from "../../components/common/card/Card";
-import { isMailMainInfos, usePstStore } from "../../store/PSTStore";
+import {
+    isMailMainInfos,
+    usePstFMInfosStore,
+} from "../../store/PstFMInfosStore";
 import { ROOT } from "../../utils/constants";
 import type { DashboardComponentProps } from "./Dashboard";
 import style from "./Dashboard.module.scss";
@@ -13,7 +16,7 @@ import { DashboardInformationsMail } from "./DashboardInformationsMail";
 export const DashboardInformations: FC<DashboardComponentProps> = ({
     className,
 }) => {
-    const { mainInfos } = usePstStore();
+    const { mainInfos } = usePstFMInfosStore();
 
     if (!mainInfos || mainInfos.data.name === ROOT)
         return <DashboardInformationsLoader />;

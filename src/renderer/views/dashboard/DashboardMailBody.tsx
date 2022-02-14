@@ -1,14 +1,17 @@
 import React from "react";
 
 import { Card } from "../../components/common/card/Card";
-import { isMailMainInfos, usePstStore } from "../../store/PSTStore";
+import {
+    isMailMainInfos,
+    usePstFMInfosStore,
+} from "../../store/PstFMInfosStore";
 import type { DashboardComponentProps } from "./Dashboard";
 import style from "./Dashboard.module.scss";
 
 export const DashboardMailBody: React.FC<DashboardComponentProps> = ({
     className,
 }) => {
-    const { mainInfos } = usePstStore();
+    const { mainInfos } = usePstFMInfosStore();
 
     if (!mainInfos) return null;
 
@@ -20,7 +23,7 @@ export const DashboardMailBody: React.FC<DashboardComponentProps> = ({
                         {mainInfos.data.email.contentText}
                     </div>
                 ) : (
-                    <div data-i18n="TODO">Empty</div>
+                    <div>Empty</div>
                 )}
             </div>
         </Card>

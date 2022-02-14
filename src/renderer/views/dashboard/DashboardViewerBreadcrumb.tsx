@@ -1,10 +1,10 @@
 import React from "react";
 
-import { usePstStore } from "../../store/PSTStore";
+import { useBreadcrumbStore } from "../../store/BreadcrumbStore";
 import style from "./Dashboard.module.scss";
 
 export const DashboardViewerBreadcrumb: React.FC = () => {
-    const { breadcrumb } = usePstStore();
+    const { breadcrumb } = useBreadcrumbStore();
     return (
         <div className={style.dashboard__viewer__breadcrumb}>
             <div

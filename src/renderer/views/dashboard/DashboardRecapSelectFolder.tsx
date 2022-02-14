@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import React from "react";
 
-import { usePstFolderList } from "../../hooks/usePSTFolderList";
+import { usePstFolderList } from "../../hooks/usePstFolderList";
 import style from "./Dashboard.module.scss";
 import { DashboardRecapSelectFolderItem } from "./DashboardRecapSelectFolderItem";
 

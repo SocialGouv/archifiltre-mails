@@ -1,3 +1,5 @@
+import { t } from "i18next";
+
 // views
 export type VIEWS = `views.dashboard` | `views.ecology` | `views.history`;
 export const DASHBOARD = "dashboard";
@@ -24,7 +26,6 @@ export const ROOT = "root";
 
 // colors
 export const COLORS = {
-    // TODO: design system
     BASE_COLOR: "rgb(31, 120, 180)",
     BASE_COLOR_LIGHT: "#eaf0fd",
     BLACK: "#000",
@@ -55,8 +56,13 @@ export const YEAR = "year";
 export const MAILS = "mails";
 
 export const markedTags = {
-    // TODO: i18n
-    TO_DELETE: "Supprimer",
-    TO_KEEP: "Conserver",
-    UNTAG: "Non marqué",
+    TO_DELETE: t("tag.markedTags.delete"),
+    TO_KEEP: t("tag.markedTags.keep"),
+    UNTAG: t("tag.markedTags.untag"),
+};
+
+export const MONTHS_NB = {
+    JUNE: 6,
+    MARCH: 3,
+    SEPT: 9,
 };

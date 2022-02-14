@@ -11,13 +11,11 @@ export interface DashboardRecapSelectFolderItemProps {
 
 export const DashboardRecapSelectFolderItem: FC<
     DashboardRecapSelectFolderItemProps
-> = ({ pstFolderList, type }) => {
-    const { setDeletedFolder, setSentFolder } = usePstStore();
+> = ({ pstFolderList }) => {
+    const { setDeletedFolder } = usePstStore();
 
     const handleChange = (folderName: string) => {
-        if (type === "sent") {
-            setSentFolder(folderName);
-        } else setDeletedFolder(folderName);
+        setDeletedFolder(folderName);
     };
 
     return (
@@ -26,8 +24,8 @@ export const DashboardRecapSelectFolderItem: FC<
                 onChange={(event) => {
                     handleChange(event.target.value);
                 }}
-                name="sent"
-                id="sent-item-select"
+                name="delete"
+                id="delete-item-select"
             >
                 <option value="">
                     -- Choisissez votre dossier de messages supprimés --

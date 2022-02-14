@@ -22,7 +22,6 @@ export const Menu: React.FC = () => {
                     onClick={addMarkedToDelete}
                     id="to-delete-btn"
                     className="to-delete-btn"
-                    todo-i18n={true}
                 >
                     Supprimé
                 </li>
