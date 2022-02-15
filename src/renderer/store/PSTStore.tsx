@@ -3,9 +3,10 @@ import type {
     PstExtractTables,
 } from "@common/modules/pst-extractor/type";
 import type { ComputedDatum } from "@nivo/circle-packing";
-import { t } from "i18next";
 import { atom, useAtom } from "jotai/index";
 import type { SetStateAction } from "react";
+import type { TFunction } from "react-i18next";
+import { useTranslation } from "react-i18next";
 
 import type { MailViewerObject, ViewerObject } from "../utils/pst-extractor";
 import { isMailViewerObject } from "../utils/pst-extractor";
@@ -44,17 +45,19 @@ const pstFileAtom = atom<PstContent | undefined>(void 0);
 const pstExtractTablesAtom = atom<PstExtractTables | undefined>(undefined);
 const pstMainInfosAtom = atom<MainInfos | undefined>(undefined);
 
-const breadcrumbAtom = atom<string>(t("dashboard.viewer.breadcrumb.domain"));
+const getBreadcrumbAtom = (t: TFunction) =>
+    atom<string>(t("dashboard.viewer.breadcrumb.domain"));
 
 const isInfoFocusAtom = atom<boolean>(false);
 
 export const usePstStore = (): UsePstStore => {
+    const { t } = useTranslation();
     const [sentFolder, setSentFolder] = useAtom(sentFolderAtom);
     const [deletedFolder, setDeletedFolder] = useAtom(deletedFolderAtom);
     const [pstFile, setPstFile] = useAtom(pstFileAtom);
     const [extractTables, setExtractTables] = useAtom(pstExtractTablesAtom);
     const [mainInfos, setMainInfos] = useAtom(pstMainInfosAtom);
-    const [breadcrumb, setBreadcrumb] = useAtom(breadcrumbAtom);
+    const [breadcrumb, setBreadcrumb] = useAtom(getBreadcrumbAtom(t));
     const [isInfoFocus, setIsInfoFocus] = useAtom(isInfoFocusAtom);
 
     const startFocus = () => {
