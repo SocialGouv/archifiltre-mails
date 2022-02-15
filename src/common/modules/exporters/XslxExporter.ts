@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { chunkString } from "@common/utils";
-import type { SimpleObject } from "@common/utils/type";
 import type { WorkBook } from "xlsx";
 import { utils, writeFile } from "xlsx";
 
+import { chunkString } from "../../utils";
+import type { SimpleObject } from "../../utils/type";
 import type { Exporter } from "./Exporter";
 
 const MAX_CELL_LENGTH = 32767;
@@ -12,12 +12,12 @@ const MAX_CELL_LENGTH = 32767;
  * Export JSON to Excel .xslx file.
  */
 export const xlsxExporter: Exporter = {
-    async export<T extends SimpleObject>(obj: T[], path: string) {
+    async export<T extends SimpleObject>(obj: T[], dest: string) {
         console.log("Generate XLSX");
         const sheet = utils.json_to_sheet(sanitize(obj), {
             WTF: true,
             cellDates: true,
-            dateNF: "dd/MM/yyyy hh:mm",
+            dateNF: "dd/MM/yyyy hh:mm", // TODO: i18n
         });
         const Sheets: WorkBook["Sheets"] = {
             "Export PST": sheet,
@@ -28,7 +28,7 @@ export const xlsxExporter: Exporter = {
         };
 
         console.log("And write");
-        return Promise.resolve(writeFile(book, path));
+        return Promise.resolve(writeFile(book, dest));
     },
 };
 

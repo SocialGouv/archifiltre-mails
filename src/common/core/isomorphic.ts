@@ -2,6 +2,8 @@ import { I18nModule } from "@common/modules/I18nModule";
 
 import type { ServiceKeys, ServicesConfig } from "../modules/container/type";
 import { containerModule } from "../modules/ContainerModule";
+import { FileExporterModule } from "../modules/FileExporterModule";
+import { IpcModule } from "../modules/IpcModule";
 import type { Module } from "../modules/Module";
 import { IsomorphicModuleFactory } from "../modules/Module";
 import { UserConfigModule } from "../modules/UserConfigModule";
@@ -23,11 +25,22 @@ export const getIsomorphicModules = <
         I18nModule,
         userConfigModule.service
     );
+    const fileExporterModule =
+        IsomorphicModuleFactory.getInstance(FileExporterModule);
+    const ipcModule = IsomorphicModuleFactory.getInstance(IpcModule);
+
     containerModule.registerServices(
         ["userConfigService", userConfigModule.service],
-        ["i18nService", i18nModule.service]
+        ["i18nService", i18nModule.service],
+        ["fileExporterService", fileExporterModule.service],
+        ...additionalServices
     );
 
-    containerModule.registerServices(...additionalServices);
-    return [containerModule, userConfigModule, i18nModule];
+    return [
+        containerModule,
+        userConfigModule,
+        i18nModule,
+        fileExporterModule,
+        ipcModule,
+    ];
 };

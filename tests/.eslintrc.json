@@ -13,7 +13,7 @@
   "overrides": [
     {
       "files": [
-        "(components|integration)/**/*.ts*"
+        "@(components|integration)/**/*.ts*"
       ],
       "env": {
         "jest": true

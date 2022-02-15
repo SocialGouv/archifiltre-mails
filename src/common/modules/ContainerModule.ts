@@ -161,6 +161,7 @@ export const containerModule = new ContainerModule();
  * @returns The wanted service
  *
  * @todo evolve when async service are needed
+ * @todo "useServices" (multiple)
  */
 export const useService = <T extends ServiceKeys | UnknownMapping>(
     name: ServiceKeys | T

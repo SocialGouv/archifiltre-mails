@@ -1,4 +1,5 @@
 import type { UnknownMapping } from "../../utils/type";
+import type { FileExporterService } from "../FileExporterModule";
 import type { I18nService } from "../I18nModule";
 import type { UserConfigService } from "../UserConfigModule";
 
@@ -10,6 +11,7 @@ import type { UserConfigService } from "../UserConfigModule";
 export interface ServicesKeyType {
     userConfigService: UserConfigService;
     i18nService: I18nService;
+    fileExporterService: FileExporterService;
 }
 
 export type ServiceKeys = keyof ServicesKeyType;
