@@ -1,6 +1,6 @@
-import type { Any } from "@common/utils/type";
 import type { FC } from "react";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import { Loader } from "../../components/common/loader";
 import type { UsePstMainInfosStore } from "../../store/PstFMInfosStore";
@@ -8,30 +8,29 @@ import type { UsePstMainInfosStore } from "../../store/PstFMInfosStore";
 export const DashboardInformationsFolder: FC<{
     mainInfos: UsePstMainInfosStore["mainInfos"];
 }> = ({ mainInfos }) => {
+    const { t } = useTranslation();
     if (!mainInfos) return <Loader />;
+
     return (
         <>
             <div>
-                <strong>Type </strong>dossier
+                <strong>{t("dashboard.informations.type")} </strong>
+                {t("dashboard.informations.folder")}
             </div>
             <div>
-                <strong>Titre </strong>
+                <strong>{t("dashboard.informations.title")} </strong>
                 {mainInfos.data.name}
             </div>
             <div>
-                <strong>Nombre de mails </strong>
+                <strong>{t("dashboard.informations.mailCount")} </strong>
                 {mainInfos.data.size}
             </div>
             <div>
-                <strong>Nombre de PJ </strong>?
+                <strong>{t("dashboard.informations.attachedCount")} </strong>?
             </div>
             <div>
-                <strong>Représentation (en %) </strong>
+                <strong>{t("dashboard.informations.percentage")} </strong>
                 {mainInfos.percentage.toFixed(1)}
-            </div>
-            <div>
-                <strong>Etat </strong>
-                {(mainInfos.data as Any).tag}
             </div>
         </>
     );

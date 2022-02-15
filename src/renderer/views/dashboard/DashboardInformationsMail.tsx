@@ -1,72 +1,74 @@
-import type { Any } from "@common/utils/type";
 import type { ComputedDatum } from "@nivo/circle-packing";
 import type { FC } from "react";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import { sanitizeMailDate } from "../../utils/dashboard-viewer";
 import type { MailViewerObject } from "../../utils/dashboard-viewer-dym";
 
 export const DashboardInformationsMail: FC<{
     mainInfos: ComputedDatum<MailViewerObject<string>>;
-}> = ({ mainInfos }) => (
-    <>
-        <div>
-            <strong>Type </strong>mail
-        </div>
-        <div>
-            <strong>Titre </strong>
-            {mainInfos.data.name}
-        </div>
-        <div>
-            {/* eslint-disable-next-line react/no-unescaped-entities */}
-            <strong>Date d'envoi </strong>{" "}
-            {sanitizeMailDate(mainInfos.data.email.sentTime!)}
-        </div>
-        <div>
-            <strong>Date de réception </strong>{" "}
-            {sanitizeMailDate(mainInfos.data.email.receivedDate!)}
-        </div>
-        <div>
-            <strong>Nombre de PJ </strong>{" "}
-            {mainInfos.data.email.attachementCount}
-        </div>
-        <div>
-            <strong>Expéditeur</strong> {mainInfos.data.email.from.email}
-        </div>
-        <div>
-            <strong>Destinataire(s)</strong>{" "}
-            {mainInfos.data.email.to.map((to, index) => (
-                <span key={index}>{to.email}</span>
-            ))}
-            {/* TODO: use length of return elts to show "0" or elts */}
-        </div>
-        <div>
-            <strong>Cc</strong>{" "}
-            {mainInfos.data.email.cc.map((cc, index) => (
-                <span key={index}>{cc.email}</span>
-            ))}
-        </div>
-        <div>
-            <strong>Bcc</strong>{" "}
-            {mainInfos.data.email.bcc.map((bcc, index) => (
-                <span key={index}>{bcc.email}</span>
-            ))}
-        </div>
-        <div>
-            <strong>Représentation (en %) </strong>
-            {mainInfos.percentage.toFixed(1)}
+}> = ({ mainInfos }) => {
+    const { t } = useTranslation();
+
+    return (
+        <>
             <div>
-                <strong>Etat </strong>
-                {(mainInfos.data as Any).tag}
+                <strong>{t("dashboard.informations.type")} </strong>
+                {t("dashboard.informations.mail")}
             </div>
-        </div>
-        <div>
-            <div style={{ maxHeight: 200, overflow: "scroll" }}>
-                <strong>Mail (cliquer pour focus)</strong>
-                <p style={{ wordBreak: "break-word" }}>
-                    {mainInfos.data.email.contentText}
-                </p>
+            <div>
+                <strong>{t("dashboard.informations.title")} </strong>
+                {mainInfos.data.name}
             </div>
-        </div>
-    </>
-);
+            <div>
+                {/* eslint-disable-next-line react/no-unescaped-entities */}
+                <strong>{t("dashboard.informations.sentDate")} </strong>{" "}
+                {sanitizeMailDate(mainInfos.data.email.sentTime!)}
+            </div>
+            <div>
+                <strong>{t("dashboard.informations.receivedDate")} </strong>{" "}
+                {sanitizeMailDate(mainInfos.data.email.receivedDate!)}
+            </div>
+            <div>
+                <strong>{t("dashboard.informations.attachedCount")} </strong>{" "}
+                {mainInfos.data.email.attachementCount}
+            </div>
+            <div>
+                <strong>{t("dashboard.informations.to")}</strong>{" "}
+                {mainInfos.data.email.from.email}
+            </div>
+            <div>
+                <strong>{t("dashboard.informations.from")}</strong>{" "}
+                {mainInfos.data.email.to.map((to, index) => (
+                    <span key={index}>{to.email}</span>
+                ))}
+                {/* TODO: use length of return elts to show "0" or elts */}
+            </div>
+            <div>
+                <strong>{t("dashboard.informations.cc")}</strong>{" "}
+                {mainInfos.data.email.cc.map((cc, index) => (
+                    <span key={index}>{cc.email}</span>
+                ))}
+            </div>
+            <div>
+                <strong>{t("dashboard.informations.bcc")}</strong>{" "}
+                {mainInfos.data.email.bcc.map((bcc, index) => (
+                    <span key={index}>{bcc.email}</span>
+                ))}
+            </div>
+            <div>
+                <strong>{t("dashboard.informations.percentage")} </strong>
+                {mainInfos.percentage.toFixed(1)}
+            </div>
+            <div>
+                <div style={{ maxHeight: 200, overflow: "scroll" }}>
+                    <strong>{t("dashboard.informations.mailFocus")}</strong>
+                    <p style={{ wordBreak: "break-word" }}>
+                        {mainInfos.data.email.contentText}
+                    </p>
+                </div>
+            </div>
+        </>
+    );
+};

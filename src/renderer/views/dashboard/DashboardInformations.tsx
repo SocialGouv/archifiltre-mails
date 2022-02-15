@@ -1,5 +1,6 @@
 import type { FC } from "react";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import { Card } from "../../components/common/card/Card";
 import {
@@ -16,19 +17,21 @@ import { DashboardInformationsMail } from "./DashboardInformationsMail";
 export const DashboardInformations: FC<DashboardComponentProps> = ({
     className,
 }) => {
+    const { t } = useTranslation();
     const { mainInfos } = usePstFMInfosStore();
 
     if (!mainInfos || mainInfos.data.name === ROOT)
         return <DashboardInformationsLoader />;
 
     return (
-        <Card title="Informations" color="green" className={className}>
+        <Card
+            title={t("dashboard.informations.cardTitle")}
+            color="green" // TODO: const
+            className={className}
+        >
             <div className={style.dashboard__informations}>
                 {mainInfos.data.name === ROOT ? (
-                    <p>
-                        Passer le curseur sur le visualiseur pour afficher des
-                        informations
-                    </p>
+                    <p>{t("dashboard.informations.emptyInfos")}</p>
                 ) : (
                     <ul>
                         {isMailMainInfos(mainInfos) ? (

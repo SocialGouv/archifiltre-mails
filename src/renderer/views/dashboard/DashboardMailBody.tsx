@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import { Card } from "../../components/common/card/Card";
 import {
@@ -12,6 +13,7 @@ export const DashboardMailBody: React.FC<DashboardComponentProps> = ({
     className,
 }) => {
     const { mainInfos } = usePstFMInfosStore();
+    const { t } = useTranslation();
 
     if (!mainInfos) return null;
 
@@ -23,7 +25,7 @@ export const DashboardMailBody: React.FC<DashboardComponentProps> = ({
                         {mainInfos.data.email.contentText}
                     </div>
                 ) : (
-                    <div>Empty</div>
+                    <div>{t("dashboard.informations.mailEmpty")}</div>
                 )}
             </div>
         </Card>

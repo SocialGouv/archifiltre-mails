@@ -1,5 +1,6 @@
 import type { FC } from "react";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import style from "./Dashboard.module.scss";
 
@@ -20,12 +21,11 @@ export const DashboardRecapItem: FC<DashboardRecapItemProps> = ({
     contact,
     picto,
 }) => {
+    const { t } = useTranslation();
+
     return (
         <div className={style.dashboard__recap__item}>
-            <div className={style.dashboard__recap__picto}>
-                {/* <HomePicto /> */}
-                {picto}
-            </div>
+            <div className={style.dashboard__recap__picto}>{picto}</div>
             {contact ? (
                 <div className={style.dashboard__recap__informations}>
                     <span
@@ -36,7 +36,7 @@ export const DashboardRecapItem: FC<DashboardRecapItemProps> = ({
                     <span
                         className={style.dashboard__recap__informations__item}
                     >
-                        {contact} contacts
+                        {contact} {t("dashboard.recap.contacts")}
                     </span>
                 </div>
             ) : (
@@ -54,12 +54,12 @@ export const DashboardRecapItem: FC<DashboardRecapItemProps> = ({
                     <span
                         className={style.dashboard__recap__informations__item}
                     >
-                        {mails ?? 0} mails
+                        {mails ?? 0} {t("dashboard.recap.mails")}
                     </span>
                     <span
                         className={style.dashboard__recap__informations__item}
                     >
-                        {attachements} pj
+                        {attachements} {t("dashboard.recap.pc")}
                     </span>
                 </div>
             )}

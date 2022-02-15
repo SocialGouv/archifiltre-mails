@@ -1,5 +1,6 @@
 import type { FC } from "react";
 import React, { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Card } from "../../components/common/card/Card";
 import {
@@ -24,6 +25,7 @@ import { DashboardRecapSelectFolder } from "./DashboardRecapSelectFolder";
 
 // TODO: pas toujours de dossiers "supprimés" ou "envoyés" // Will be done in the associate PR
 export const DashboardRecap: FC = () => {
+    const { t } = useTranslation();
     const [isRecapReady, setIsRecapReady] = useState(false);
 
     const switchView = useCallback(() => {
@@ -56,32 +58,32 @@ export const DashboardRecap: FC = () => {
     const contactTotal = getPstTotalContacts(extractTables?.contacts);
 
     return (
-        <Card title="Synthèse" color="blue">
+        <Card title={t("dashboard.recap.cardTitle")} color="blue">
             {isRecapReady ? (
                 <div className={style.dashboard__recap}>
                     <DashboardRecapItem
-                        title="Messages reçus"
+                        title={t("dashboard.recap.receivedMessages")}
                         mails={receivedMailsTotal}
                         attachements={receivedAttachmentsTotal}
                         percentage={receivedPercentageMails}
                         picto={<MailPicto />}
                     />
                     <DashboardRecapItem
-                        title="Messages envoyés"
+                        title={t("dashboard.recap.sentMessages")}
                         mails={sentMailsTotal}
                         attachements={sentAttachmentsTotal}
                         percentage={sentPercentageMails}
                         picto={<MailSentPicto />}
                     />
                     <DashboardRecapItem
-                        title="Messages supprimés"
+                        title={t("dashboard.recap.deletedMessages")}
                         mails={deletedMailsTotal}
                         attachements={0}
                         percentage={"0"}
                         picto={<TrashPicto />}
                     />
                     <DashboardRecapItem
-                        title="Contacts"
+                        title={t("dashboard.recap.contacts")}
                         contact={contactTotal}
                         picto={<ContactPicto />}
                     />

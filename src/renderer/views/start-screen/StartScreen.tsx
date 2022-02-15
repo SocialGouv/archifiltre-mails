@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 import { StaticImage } from "../../components/common/staticImage/StaticImage";
 import { Dropzone } from "../../components/dropzone/Dropzone";
@@ -13,6 +14,8 @@ export const StartScreen: React.FC = () => {
     const { pstFile } = usePstStore();
 
     const { changeRoute } = useRouteContext();
+
+    const { t } = useTranslation();
 
     const onDrop = useCallback(
         (acceptedFiles: File[]) => {
@@ -40,24 +43,26 @@ export const StartScreen: React.FC = () => {
             <div className={progressClassName}>
                 <ul>
                     <li>
-                        <span>Emails:</span>
+                        <span>{t("startscreen.importInfo.emails")}:</span>
                         <span>{pstProgress.countEmail}</span>
                     </li>
                     <li>
-                        <span>Dossiers:</span>
+                        <span>{t("startscreen.importInfo.folders")}:</span>
                         <span>{pstProgress.countFolder}</span>
                     </li>
                     <li>
-                        <span>PJ:</span>
+                        <span>
+                            {t("startscreen.importInfo.attachedCount")}:
+                        </span>
                         <span>{pstProgress.countAttachement}</span>
                     </li>
                     <li>
-                        <span>Total:</span>
+                        <span>{t("startscreen.importInfo.totalFiles")}:</span>
                         <span>{pstProgress.countTotal}</span>
                     </li>
                     <li>
-                        <span>Temps total:</span>
-                        <span>{pstProgress.elapsed}</span>
+                        <span>{t("startscreen.importInfo.totalTime")}:</span>
+                        <span>{pstProgress.elapsed / 1000}</span>
                     </li>
                 </ul>
             </div>
