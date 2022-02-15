@@ -1,6 +1,6 @@
 import type { PstElement, PstEmail } from "@common/modules/pst-extractor/type";
 import { isPstEmail, isPstFolder } from "@common/modules/pst-extractor/type";
-import { randomUUID } from "crypto";
+import { v4 as randomUUID } from "uuid";
 
 import { MAX_TRESHOLD, RATIO_FROM_MAX, TRESHOLD_KEY } from "./constants";
 
@@ -109,18 +109,18 @@ export const getMailTreshold = (
 // ### GETTER ###
 
 export const getAggregatedDomainCount = (
-    pst: PstElement
+    initPst: PstElement
 ): Record<string, number> => {
     const mailCountPerMail = new Map<string, number>();
     const mailCountPerDomain = new Map<string, number>();
-    const recursivelyFindProp = (_pst: PstElement) => {
-        if (isPstFolder(_pst)) {
-            _pst.children?.forEach((child) => {
+    const recursivelyFindProp = (pst: PstElement) => {
+        if (isPstFolder(pst)) {
+            pst.children?.forEach((child) => {
                 recursivelyFindProp(child);
             });
-        } else if (isPstEmail(_pst) && _pst.from.email) {
+        } else if (isPstEmail(pst) && pst.from.email) {
             const emails = new Set([
-                _pst.from.email, // nb de messages par domain d'expediteur
+                pst.from.email, // nb de messages par domain d'expediteur
             ]);
             emails.forEach((email) => {
                 const emailKey = email;
@@ -141,7 +141,7 @@ export const getAggregatedDomainCount = (
         }
     };
 
-    recursivelyFindProp(pst);
+    recursivelyFindProp(initPst);
 
     /* eslint-disable @typescript-eslint/naming-convention */
     const orderByValues = <K, V extends number>(m: Map<K, V>): Map<K, V> =>
@@ -173,24 +173,24 @@ export const getAggregatedDomainCount = (
 };
 
 export const getUniqueCorrespondantsByDomain = (
-    pst: PstElement,
+    initPst: PstElement,
     domain: string
 ): Correspondant[] => {
     const correspsFound: Correspondant[] = [];
-    const recursivelyFindCorresp = (_pst: PstElement) => {
-        if (isPstFolder(_pst)) {
-            _pst.children?.forEach((child) => {
+    const recursivelyFindCorresp = (pst: PstElement) => {
+        if (isPstFolder(pst)) {
+            pst.children?.forEach((child) => {
                 recursivelyFindCorresp(child);
             });
         } else if (
-            isPstEmail(_pst) &&
-            _pst.from.email &&
-            getDomain(_pst.from.email) === domain
+            isPstEmail(pst) &&
+            pst.from.email &&
+            getDomain(pst.from.email) === domain
         ) {
-            correspsFound.push([_pst.from.name, 1]);
+            correspsFound.push([pst.from.name, 1]);
         }
     };
-    recursivelyFindCorresp(pst);
+    recursivelyFindCorresp(initPst);
 
     const accumulatedCorresps = correspsFound.reduce<typeof correspsFound>(
         (acc, [name, value]) => {
@@ -206,24 +206,24 @@ export const getUniqueCorrespondantsByDomain = (
 };
 
 export const getYearByCorrespondants = (
-    pst: PstElement,
+    initPst: PstElement,
     correspondant: string
 ): Year[] => {
     const yearsFound: Year[] = [];
-    const recursivelyFindYear = (_pst: PstElement) => {
-        if (isPstFolder(_pst)) {
-            _pst.children?.forEach((child) => {
+    const recursivelyFindYear = (pst: PstElement) => {
+        if (isPstFolder(pst)) {
+            pst.children?.forEach((child) => {
                 recursivelyFindYear(child);
             });
         } else if (
-            isPstEmail(_pst) &&
-            _pst.receivedDate &&
-            _pst.from.name === correspondant
+            isPstEmail(pst) &&
+            pst.receivedDate &&
+            pst.from.name === correspondant
         ) {
-            yearsFound.push([_pst.receivedDate.getFullYear(), 1]);
+            yearsFound.push([pst.receivedDate.getFullYear(), 1]);
         }
     };
-    recursivelyFindYear(pst);
+    recursivelyFindYear(initPst);
 
     const accumulatedYears = yearsFound.reduce<typeof yearsFound>(
         (acc, [year, value]) => {
@@ -239,29 +239,29 @@ export const getYearByCorrespondants = (
 };
 
 export const getMailsByDym = (
-    pst: PstElement,
+    initPst: PstElement,
     domain: string,
     correspondant: string,
     year: number
 ): PstEmail[] => {
     const mailsFound: PstEmail[] = [];
-    const recursivelyFindMail = (_pst: PstElement) => {
-        if (isPstFolder(_pst)) {
-            _pst.children?.forEach((child) => {
+    const recursivelyFindMail = (pst: PstElement) => {
+        if (isPstFolder(pst)) {
+            pst.children?.forEach((child) => {
                 recursivelyFindMail(child);
             });
         } else if (
-            isPstEmail(_pst) &&
-            _pst.from.email &&
-            _pst.receivedDate &&
-            getDomain(_pst.from.email) === domain &&
-            _pst.receivedDate.getFullYear() === year &&
-            _pst.from.name === correspondant
+            isPstEmail(pst) &&
+            pst.from.email &&
+            pst.receivedDate &&
+            getDomain(pst.from.email) === domain &&
+            pst.receivedDate.getFullYear() === year &&
+            pst.from.name === correspondant
         ) {
-            mailsFound.push(_pst);
+            mailsFound.push(pst);
         }
     };
-    recursivelyFindMail(pst);
+    recursivelyFindMail(initPst);
 
     return mailsFound.sort(
         (a, b) =>

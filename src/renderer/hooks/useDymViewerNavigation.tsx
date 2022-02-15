@@ -40,6 +40,7 @@ export interface ViewState<TElement> {
 
 /**
  * A hook to manage the domain-year-mails vizualisation.
+ *
  * DYM accronym of Domain Year Mails.
  * - Compute all next view following the current one.
  * - Allow breadcrumb dynamic display.
@@ -50,8 +51,9 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
     const { pstFile } = usePstStore();
     const { setBreadcrumb } = useBreadcrumbStore();
     const { cancelFocus } = usePstFMInfosStore();
-    const [currentDomain, setCurrentDomain] = useState<string>();
-    const [currentCorrespondant, setCurrentCorrespondant] = useState<string>();
+    const [currentDomain, setCurrentDomain] = useState<string>("");
+    const [currentCorrespondant, setCurrentCorrespondant] =
+        useState<string>("");
 
     const [currentView, setCurrentView] =
         useState<ViewState<DefaultViewerObject<string>>>();
@@ -80,7 +82,7 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
     const restartView = () => {
         setCurrentView(domainView);
         cancelFocus();
-        setBreadcrumb("domaine"); // TODO: i18n
+        setBreadcrumb({ id: "domain" });
     };
 
     useEffect(() => {
@@ -107,7 +109,10 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
     ) => {
         if (currentView?.type === DOMAIN) {
             setCurrentDomain(node.data.name);
-            setBreadcrumb(`${node.data.name} > correspondant`);
+            setBreadcrumb({
+                history: [node.data.name],
+                id: "correspondant",
+            });
 
             const uniqueCorrespondantsByDomain =
                 getUniqueCorrespondantsByDomain(pstFile!, node.data.name);
@@ -130,7 +135,10 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
         }
 
         if (currentView?.type === CORRESPONDANTS) {
-            setBreadcrumb(`${currentDomain} > ${node.data.name} > années`);
+            setBreadcrumb({
+                history: [currentDomain, node.data.name],
+                id: "year",
+            });
             setCurrentCorrespondant(node.data.name);
 
             const yearByCorrespondants = getYearByCorrespondants(
@@ -150,14 +158,15 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
         }
 
         if (currentView?.type === YEAR) {
-            setBreadcrumb(
-                `${currentDomain} > ${currentCorrespondant} > ${node.data.name} > mails`
-            );
+            setBreadcrumb({
+                history: [currentDomain, currentCorrespondant, node.data.name],
+                id: "mails",
+            });
 
             const mailsByYearAndCorrespondant = getMailsByDym(
                 pstFile!,
-                currentDomain!,
-                currentCorrespondant!,
+                currentDomain,
+                currentCorrespondant,
                 +node.data.name
             );
 

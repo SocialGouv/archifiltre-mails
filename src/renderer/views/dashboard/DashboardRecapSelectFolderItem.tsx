@@ -27,7 +27,6 @@ export const DashboardRecapSelectFolderItem: FC<
                     handleChange(event.target.value);
                 }}
                 name="delete"
-                id="delete-item-select"
             >
                 <option value="">
                     -- {t("dashboard.recap.selectFolder.choosePlaceholder")} --

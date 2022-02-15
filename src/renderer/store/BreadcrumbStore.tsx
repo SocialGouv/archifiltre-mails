@@ -1,28 +1,30 @@
-import type { ComputedDatum } from "@nivo/circle-packing";
-import type { Atom } from "jotai/index";
 import { atom, useAtom } from "jotai/index";
 import type { SetStateAction } from "react";
-import type { TFunction } from "react-i18next";
-import { useTranslation } from "react-i18next";
 
-import type { ViewerObject } from "../utils/dashboard-viewer-dym";
+import type { LocaleFileResources } from "../../common/i18n/raw";
 
-export type MainInfos = ComputedDatum<ViewerObject<string>>;
+export type BreadcrumbId = {
+    [K in keyof LocaleFileResources["translation"]]: K extends `dashboard.viewer.breadcrumb.id.${infer R}`
+        ? R
+        : never;
+}[keyof LocaleFileResources["translation"]];
 
-export interface UseBreadcrumbStore {
-    breadcrumb: string;
-    setBreadcrumb: (update: SetStateAction<string>) => void;
+export interface BreadcrumbObject {
+    id: BreadcrumbId;
+    history?: string[];
 }
 
-let breadcrumbAtom: Atom<string> | null = null;
-const getBreadcrumbAtom = (t: TFunction) =>
-    (breadcrumbAtom =
-        breadcrumbAtom ??
-        atom<string>(t("dashboard.viewer.breadcrumb.domain"))); // TODO: change because dynamic
+export interface UseBreadcrumbStore {
+    breadcrumb: BreadcrumbObject;
+    setBreadcrumb: (update: SetStateAction<BreadcrumbObject>) => void;
+}
+
+const breadcrumbAtom = atom<BreadcrumbObject>({
+    id: "domain",
+});
 
 export const useBreadcrumbStore = (): UseBreadcrumbStore => {
-    const { t } = useTranslation();
-    const [breadcrumb, setBreadcrumb] = useAtom(getBreadcrumbAtom(t));
+    const [breadcrumb, setBreadcrumb] = useAtom(breadcrumbAtom);
 
     return {
         breadcrumb,

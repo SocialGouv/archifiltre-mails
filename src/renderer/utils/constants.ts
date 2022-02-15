@@ -1,5 +1,3 @@
-import { t } from "i18next";
-
 // views
 export type VIEWS = `views.dashboard` | `views.ecology` | `views.history`;
 export const DASHBOARD = "dashboard";
@@ -38,7 +36,7 @@ export const COLORS = {
     KEEP_COLOR: "#62bc6f",
     RED: "red",
     TRANSPARENT: "transparent",
-};
+} as const;
 
 // html id and classname
 export const CIRCLE_PACKING_ID = "#circle-packing";
@@ -55,14 +53,8 @@ export const CORRESPONDANTS = "correspondants";
 export const YEAR = "year";
 export const MAILS = "mails";
 
-export const markedTags = {
-    TO_DELETE: t("tag.markedTags.delete"),
-    TO_KEEP: t("tag.markedTags.keep"),
-    UNTAG: t("tag.markedTags.untag"),
-};
-
 export const MONTHS_NB = {
     JUNE: 6,
     MARCH: 3,
     SEPT: 9,
-};
+} as const;

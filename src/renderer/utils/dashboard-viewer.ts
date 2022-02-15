@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import type { PstContent } from "@common/modules/pst-extractor/type";
+import { Object } from "@common/utils/overload";
 import type {
     CirclePackingSvgProps,
     ComputedDatum,
 } from "@nivo/circle-packing";
 
-import type { MainInfos } from "../store/PSTStore";
+import type { MainInfos } from "../store/PstFMInfosStore";
 import { COLORS, MONTHS_NB } from "./constants";
 import type {
     DefaultViewerObject,
@@ -27,18 +27,23 @@ export type CirclePackingCommonProps = Partial<
 
 export type TagType = "delete" | "keep" | "untag";
 
+const opacities = {
+    [MONTHS_NB.MARCH]: 0.45,
+    [MONTHS_NB.JUNE]: 0.65,
+    [MONTHS_NB.SEPT]: 0.85,
+    default: 1,
+};
 export const getColorFromTrimester = (
     node: Omit<ComputedDatum<MailViewerObject<string>>, "color" | "fill">
 ): number => {
     const month = node.data.email.receivedDate?.getMonth() ?? 1; // January
 
-    return month <= MONTHS_NB.MARCH
-        ? 0.45
-        : month <= MONTHS_NB.JUNE
-        ? 0.65
-        : month <= MONTHS_NB.SEPT
-        ? 0.85
-        : 1;
+    const opacityMonthKey = Object.keys(opacities).find((monthOpa) =>
+        month > MONTHS_NB.SEPT
+            ? opacities.default
+            : month <= opacities[monthOpa]
+    )!;
+    return opacities[opacityMonthKey];
 };
 
 // const getDeleteColor = (
@@ -64,10 +69,9 @@ export const getTagColor = (
     if (tag === "keep") {
         return `rgba(98, 188, 111, ${getColorFromTrimester(node)})`;
     }
-    if (tag === "untag") {
-        return `rgba(31, 120, 180, ${getColorFromTrimester(node)})`;
-    }
-    return "";
+
+    // untag
+    return `rgba(31, 120, 180, ${getColorFromTrimester(node)})`;
 };
 
 export const commonProperties: CirclePackingCommonProps = {
