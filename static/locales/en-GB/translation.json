@@ -15,7 +15,7 @@
   "dashboard.informations.from": "Sender",
   "dashboard.informations.mail": "email",
   "dashboard.informations.mailCount": "Number of emails",
-  "dashboard.informations.mailFocus": "Mail (click for focus)",
+  "dashboard.informations.mailFocus": "Mail",
   "dashboard.informations.percentage": "Representation (in %)",
   "dashboard.informations.receivedDate": "Receipt date",
   "dashboard.informations.sentDate": "Sending date",
