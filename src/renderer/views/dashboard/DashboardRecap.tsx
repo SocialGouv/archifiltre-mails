@@ -18,12 +18,12 @@ import {
     getPstTotalReceivedMails,
     getPstTotalSentAttachments,
     getPstTotalSentMails,
-} from "../../utils/pst-extractor";
+} from "../../utils/dashboard-recap";
 import style from "./Dashboard.module.scss";
 import { DashboardRecapItem } from "./DashboardRecapItem";
 import { DashboardRecapSelectFolder } from "./DashboardRecapSelectFolder";
 
-// TODO: pas toujours de dossiers "supprimés" ou "envoyés"
+// TODO: pas toujours de dossiers "supprimés" ou "envoyés" // Will be done in the associate PR
 export const DashboardRecap: FC = () => {
     const { t } = useTranslation();
     const [isRecapReady, setIsRecapReady] = useState(false);

@@ -1,11 +1,11 @@
 import { useService } from "@common/modules/ContainerModule";
 import type { ExporterType } from "@common/modules/FileExporterModule";
+import { formatEmailTable } from "@common/utils/exporter";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
 import { usePstStore } from "../store/PSTStore";
 import { dialog } from "../utils/electron";
-import { formatEmailTable } from "../utils/exporter";
 
 interface UseExporter {
     openSaveDialog: (type: ExporterType) => void;

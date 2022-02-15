@@ -12,14 +12,12 @@ export interface DashboardRecapSelectFolderItemProps {
 
 export const DashboardRecapSelectFolderItem: FC<
     DashboardRecapSelectFolderItemProps
-> = ({ pstFolderList, type }) => {
+> = ({ pstFolderList }) => {
     const { t } = useTranslation();
-    const { setDeletedFolder, setSentFolder } = usePstStore();
+    const { setDeletedFolder } = usePstStore();
 
     const handleChange = (folderName: string) => {
-        if (type === "sent") {
-            setSentFolder(folderName);
-        } else setDeletedFolder(folderName);
+        setDeletedFolder(folderName);
     };
 
     return (
@@ -28,8 +26,7 @@ export const DashboardRecapSelectFolderItem: FC<
                 onChange={(event) => {
                     handleChange(event.target.value);
                 }}
-                name="sent"
-                id="sent-item-select"
+                name="delete"
             >
                 <option value="">
                     -- {t("dashboard.recap.selectFolder.choosePlaceholder")} --

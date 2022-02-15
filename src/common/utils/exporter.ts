@@ -1,6 +1,7 @@
-import type { PstExtractTables } from "@common/modules/pst-extractor/type";
-import type { SimpleObject } from "@common/utils/type";
 import { t } from "i18next";
+
+import type { PstExtractTables } from "../modules/pst-extractor/type";
+import type { SimpleObject } from "./type";
 
 /**
  * Format the given emails table into a "readable" JSON for exporters to use.

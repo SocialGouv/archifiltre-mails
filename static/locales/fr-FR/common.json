@@ -1,5 +1,6 @@
 {
   "button.no": "Non",
   "button.save": "Sauvegarder",
-  "button.yes": "Oui"
+  "button.yes": "Oui",
+  "loader.loading": "Chargement ..."
 }

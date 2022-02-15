@@ -2,12 +2,14 @@ import type { FC } from "react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import type { UsePstStore } from "../../store/PSTStore";
+import { Loader } from "../../components/common/loader";
+import type { UsePstMainInfosStore } from "../../store/PstFMInfosStore";
 
 export const DashboardInformationsFolder: FC<{
-    mainInfos: NonNullable<UsePstStore["mainInfos"]>; // TODO: remove non null or handle loader
+    mainInfos: UsePstMainInfosStore["mainInfos"];
 }> = ({ mainInfos }) => {
     const { t } = useTranslation();
+    if (!mainInfos) return <Loader />;
 
     return (
         <>

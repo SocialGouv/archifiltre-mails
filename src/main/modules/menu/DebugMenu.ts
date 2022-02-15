@@ -5,11 +5,11 @@ import type {
     FileExporterService,
 } from "@common/modules/FileExporterModule";
 import type { I18nService } from "@common/modules/I18nModule";
+import { formatEmailTable } from "@common/utils/exporter";
 import type { BrowserWindow } from "electron";
 import { dialog, MenuItem } from "electron";
 
 import type { ConsoleToRendererService } from "../../services/ConsoleToRendererService";
-import { formatEmailTable } from "../../utils/exporter";
 // eslint-disable-next-line unused-imports/no-unused-imports -- MenuModule used in doc
 import type { ArchifiltreMailsMenu, MenuModule } from "../MenuModule";
 import type { PstExtractorMainService } from "../PstExtractorModule";

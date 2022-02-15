@@ -3,25 +3,28 @@ import { ResponsiveCirclePacking } from "@nivo/circle-packing";
 import debounce from "lodash/debounce";
 import React, { useEffect } from "react";
 
-import { useDomainsYearsMails } from "../../hooks/useDomainsYearMails";
-import { usePstStore } from "../../store/PSTStore";
+import { useDymViewerNavigation } from "../../hooks/useDymViewerNavigation";
+import { usePstFMInfosStore } from "../../store/PstFMInfosStore";
 import { useTagManagerStore } from "../../store/TagManagerStore";
 import { COLORS, ROOT } from "../../utils/constants";
-import type { MailViewerObject, ViewerObject } from "../../utils/pst-extractor";
-import {
-    isMailViewerObject,
-    isToDeleteFolder,
-    isToKeepFolder,
-} from "../../utils/pst-extractor";
-import type { CirclePackingCommonProps } from "../../utils/pst-viewer";
+import type { CirclePackingCommonProps } from "../../utils/dashboard-viewer";
 import {
     commonProperties,
+    getTagColor,
+    handleFocusItemBorderColor,
+} from "../../utils/dashboard-viewer";
+import type {
+    MailViewerObject,
+    ViewerObject,
+} from "../../utils/dashboard-viewer-dym";
+import { isMailViewerObject } from "../../utils/dashboard-viewer-dym";
+import {
     getChildrenToDeleteIds,
     getChildrenToKeepIds,
-    getColorFromTrimester,
     getUntagChildrenIds,
-    handleFocusItemBorderColor,
-} from "../../utils/pst-viewer";
+    isToDeleteFolder,
+    isToKeepFolder,
+} from "../../utils/tag-manager";
 import { Menu } from "../menu/Menu";
 import style from "./CirclePacking.module.scss";
 import { CirclePackingCancellableFocusZone } from "./CirclePackingCancellableFocusZone";
@@ -37,10 +40,11 @@ const isMailTagNode = (
     isMailViewerObject(node.data);
 
 export const CirclePacking: React.FC = () => {
-    const { currentView, computeNextView, restartView } =
-        useDomainsYearsMails();
+    const { currentView, computeNextView, restartView, computePreviousView } =
+        useDymViewerNavigation();
 
-    const { setMainInfos, startFocus, isInfoFocus, mainInfos } = usePstStore(); // TODO: remove PstStore ?
+    const { setMainInfos, startFocus, isInfoFocus, mainInfos, cancelFocus } =
+        usePstFMInfosStore();
 
     const {
         setHoveredId,
@@ -75,19 +79,19 @@ export const CirclePacking: React.FC = () => {
 
         if (isToDeleteFolder(node.id, markedToDelete)) {
             if (isMailTagNode(node)) {
-                return `rgba(247, 94, 66, ${getColorFromTrimester(node)})`; // TODO: magic color
+                return getTagColor(node, "delete");
             }
             return DELETE_COLOR;
         }
         if (isToKeepFolder(node.id, markedToKeep)) {
             if (isMailTagNode(node)) {
-                return `rgba(98, 188, 111, ${getColorFromTrimester(node)})`;
+                return getTagColor(node, "keep");
             }
             return KEEP_COLOR;
         }
 
         if (isMailTagNode(node)) {
-            return `rgba(31, 120, 180, ${getColorFromTrimester(node)})`;
+            return getTagColor(node, "untag");
         }
 
         return BASE_COLOR;
@@ -121,12 +125,25 @@ export const CirclePacking: React.FC = () => {
     const handleBorderColor: CirclePackingCommonProps["borderColor"] = (node) =>
         handleFocusItemBorderColor(node, mainInfos, isInfoFocus);
 
-    if (!currentView) return null; // TODO: Loader
+    const goToParentView = () => {
+        cancelFocus();
+        computePreviousView();
+    };
+
+    const goToInitialView = () => {
+        cancelFocus();
+        restartView();
+    };
+
+    if (!currentView) return null;
 
     return (
         <>
             <div id="circle-packing" className={style["circle-packing"]}>
-                <button onClick={restartView}>Restart</button>
+                <div className={style.circlePackingActionsButton}>
+                    <button onClick={goToParentView}>{"<"}</button>
+                    <button onClick={goToInitialView}>{"<<"}</button>
+                </div>
                 <ResponsiveCirclePacking
                     data={currentView.elements}
                     onClick={handleClick}

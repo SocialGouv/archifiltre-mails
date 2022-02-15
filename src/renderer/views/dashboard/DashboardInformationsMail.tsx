@@ -3,8 +3,8 @@ import type { FC } from "react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import type { MailViewerObject } from "../../utils/pst-extractor";
-import { sanitizeMailDate } from "../../utils/pst-viewer";
+import { sanitizeMailDate } from "../../utils/dashboard-viewer";
+import type { MailViewerObject } from "../../utils/dashboard-viewer-dym";
 
 export const DashboardInformationsMail: FC<{
     mainInfos: ComputedDatum<MailViewerObject<string>>;

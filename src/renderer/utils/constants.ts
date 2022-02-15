@@ -24,7 +24,6 @@ export const ROOT = "root";
 
 // colors
 export const COLORS = {
-    // TODO: design system
     BASE_COLOR: "rgb(31, 120, 180)",
     BASE_COLOR_LIGHT: "#eaf0fd",
     BLACK: "#000",
@@ -37,7 +36,7 @@ export const COLORS = {
     KEEP_COLOR: "#62bc6f",
     RED: "red",
     TRANSPARENT: "transparent",
-};
+} as const;
 
 // html id and classname
 export const CIRCLE_PACKING_ID = "#circle-packing";
@@ -54,9 +53,8 @@ export const CORRESPONDANTS = "correspondants";
 export const YEAR = "year";
 export const MAILS = "mails";
 
-export const markedTags = {
-    // TODO: i18n
-    TO_DELETE: "Supprimer",
-    TO_KEEP: "Conserver",
-    UNTAG: "Non marqué",
-};
+export const MONTHS_NB = {
+    JUNE: 6,
+    MARCH: 3,
+    SEPT: 9,
+} as const;

@@ -2,7 +2,7 @@ import type { FC } from "react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import { usePstFolderList } from "../../hooks/usePSTFolderList";
+import { usePstFolderList } from "../../hooks/usePstFolderList";
 import style from "./Dashboard.module.scss";
 import { DashboardRecapSelectFolderItem } from "./DashboardRecapSelectFolderItem";
 
