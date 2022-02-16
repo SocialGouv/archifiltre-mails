@@ -71,7 +71,7 @@ jobs:
           echo ::set-output name=current-version::$(node -e "console.log(require('./package.json').version)")
           yarn semantic-release
           echo ::set-output name=next-version::$(node -e "console.log(require('./package.json').version)")
-          yarn compile
+          yarn compile --no-progress
         env:
           ARCHIFILTRE_RELEASE_MODE: version
       - name: Archive dist
