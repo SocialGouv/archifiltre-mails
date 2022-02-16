@@ -31,19 +31,17 @@ const opacities = {
     [MONTHS_NB.MARCH]: 0.45,
     [MONTHS_NB.JUNE]: 0.65,
     [MONTHS_NB.SEPT]: 0.85,
-    default: 1,
 };
+const DEFAULT_OPACITY = 1;
 export const getColorFromTrimester = (
     node: Omit<ComputedDatum<MailViewerObject<string>>, "color" | "fill">
 ): number => {
     const month = node.data.email.receivedDate?.getMonth() ?? 1; // January
 
-    const opacityMonthKey = Object.keys(opacities).find((monthOpa) =>
-        month > MONTHS_NB.SEPT
-            ? opacities.default
-            : month <= opacities[monthOpa]
-    )!;
-    return opacities[opacityMonthKey];
+    const opacityMonthKey = Object.keys(opacities).find(
+        (monthOpa) => month <= monthOpa
+    );
+    return opacityMonthKey ? opacities[opacityMonthKey] : DEFAULT_OPACITY;
 };
 
 // const getDeleteColor = (
