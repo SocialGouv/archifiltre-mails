@@ -2,7 +2,13 @@ import type { PstElement, PstEmail } from "@common/modules/pst-extractor/type";
 import { isPstEmail, isPstFolder } from "@common/modules/pst-extractor/type";
 import { v4 as randomUUID } from "uuid";
 
-import { MAX_TRESHOLD, RATIO_FROM_MAX, TRESHOLD_KEY } from "./constants";
+import {
+    LDAP_ARBITRARY_SPLICE_CHAR,
+    LDAP_ORG,
+    MAX_TRESHOLD,
+    RATIO_FROM_MAX,
+    TRESHOLD_KEY,
+} from "./constants";
 
 interface BaseViewerObject<TId extends string> {
     id: TId;
@@ -106,12 +112,18 @@ export const getMailTreshold = (
     return Math.min(Math.ceil(maxMail * (RATIO_FROM_MAX / 100)), MAX_TRESHOLD);
 };
 
+export const getLdapDomain = (ldap: string): string =>
+    ldap.split("/")[1]?.split(LDAP_ARBITRARY_SPLICE_CHAR)[1] ?? "";
+
+export const isLdap = (mail: string): boolean => mail.includes(LDAP_ORG);
+
+export const isLdapDomain = (domain: string): boolean => !domain.includes("@");
+
 // ### GETTER ###
 
 export const getAggregatedDomainCount = (
     initPst: PstElement
 ): Record<string, number> => {
-    const mailCountPerMail = new Map<string, number>();
     const mailCountPerDomain = new Map<string, number>();
     const recursivelyFindProp = (pst: PstElement) => {
         if (isPstFolder(pst)) {
@@ -119,21 +131,12 @@ export const getAggregatedDomainCount = (
                 recursivelyFindProp(child);
             });
         } else if (isPstEmail(pst) && pst.from.email) {
-            const emails = new Set([
-                pst.from.email, // nb de messages par domain d'expediteur
-            ]);
+            const emails = new Set([pst.from.email]);
             emails.forEach((email) => {
-                const emailKey = email;
-                // const emailKey = email.includes(ORG_UNIT_PST)
-                //     ? "Same_LD"
-                //     : email;
-                const currentMailCount = mailCountPerMail.get(emailKey) ?? 0;
-                mailCountPerMail.set(emailKey, currentMailCount + 1);
+                const domainKey = isLdap(email)
+                    ? getLdapDomain(email)
+                    : getDomain(email);
 
-                const domainKey = getDomain(email);
-                // const domainKey = email.includes(ORG_UNIT_PST)
-                //     ? "Same_LD"
-                //     : getDomain(email);
                 const currentDomainCount =
                     mailCountPerDomain.get(domainKey) ?? 0;
                 mailCountPerDomain.set(domainKey, currentDomainCount + 1);
@@ -185,7 +188,8 @@ export const getUniqueCorrespondantsByDomain = (
         } else if (
             isPstEmail(pst) &&
             pst.from.email &&
-            getDomain(pst.from.email) === domain
+            (getDomain(pst.from.email) === domain ||
+                getLdapDomain(pst.from.email) === domain)
         ) {
             correspsFound.push([pst.from.name, 1]);
         }
@@ -254,9 +258,10 @@ export const getMailsByDym = (
             isPstEmail(pst) &&
             pst.from.email &&
             pst.receivedDate &&
-            getDomain(pst.from.email) === domain &&
             pst.receivedDate.getFullYear() === year &&
-            pst.from.name === correspondant
+            pst.from.name === correspondant &&
+            (getDomain(pst.from.email) === domain ||
+                getLdapDomain(pst.from.email) === domain)
         ) {
             mailsFound.push(pst);
         }
