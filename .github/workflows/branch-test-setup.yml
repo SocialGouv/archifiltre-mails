@@ -46,7 +46,7 @@ jobs:
           yarn global add replace
           $(yarn global bin)/replace "\"version": \"$TMP_CURRENT_VERSION\"" "\"version": \"$TMP_NEXT_VERSION\"" package.json
           echo ::set-output name=next-version::$TMP_NEXT_VERSION
-          yarn compile
+          yarn compile --no-progress
       - name: Archive dist
         uses: actions/upload-artifact@v2
         with:
