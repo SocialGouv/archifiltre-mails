@@ -45,7 +45,8 @@ export const MAX_TRESHOLD = 20;
 export const TRESHOLD_KEY = "_other";
 export const RATIO_FROM_MAX = 10;
 
-export const ORG_UNIT_PST = "/OU=";
+export const LDAP_ORG = "/O=";
+export const LDAP_ARBITRARY_SPLICE_CHAR = "O=";
 export const COMMON_NAME_PST = "/CN=";
 
 export const DOMAIN = "domain";

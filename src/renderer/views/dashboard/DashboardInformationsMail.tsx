@@ -22,7 +22,6 @@ export const DashboardInformationsMail: FC<{
                 {mainInfos.data.name}
             </div>
             <div>
-                {/* eslint-disable-next-line react/no-unescaped-entities */}
                 <strong>{t("dashboard.informations.sentDate")} </strong>{" "}
                 {sanitizeMailDate(mainInfos.data.email.sentTime!)}
             </div>
