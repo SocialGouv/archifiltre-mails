@@ -15,7 +15,7 @@ export const DashboardInformationsMail: FC<{
         <>
             <div>
                 <strong>{t("dashboard.informations.type")} </strong>
-                {t("dashboard.informations.mail")}
+                {t("dashboard.informations.id.mail")}
             </div>
             <div>
                 <strong>{t("dashboard.informations.title")} </strong>
