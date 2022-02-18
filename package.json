@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "description": "Visualisez, triez, et améliorez votre boite mail !",
-  "author": "Fabrique des ministère sociaux",
+  "author": "Fabrique des ministères sociaux",
   "license": "Apache-2.0",
   "main": "dist/main/main.js",
   "repository": "git@github.com:SocialGouv/archifiltre-mails.git",
@@ -91,7 +91,9 @@
       "entitlementsInherit": "./electron/build/entitlements.mac.plist"
     },
     "win": {
-      "icon": "./electron/build/icon.png",
+      "icon": "./electron/build/icon.png"
+    },
+    "portable": {
       "artifactName": "${name}-${os}-portable.${ext}"
     },
     "msi": {
