@@ -30,7 +30,7 @@ Les noms de version produits sont itératifs au nombre de fois où une version n
 ### Windows
 Trois types d'exécutables sont disponibles pour la plateforme Windows : `exe` portable (qui n'a pas besoin d'installation pour être lancé), `msi`, et `exe` auto installable.
 ### OSX
-Pour un système sous OSX (Mac) deux version sont disponibles : `zip` et `dmg`. Ces versions sont complémentaires car la version zippée est essentiel au bon fonctionnement des mise à jours automatiques. Il est toutefois préférable d'utiliser la version `dmg` pour une première installation.
+Pour un système sous OSX (Mac) deux versions sont disponibles : `zip` et `dmg`. Ces versions sont complémentaires car la version zippée est essentielle au bon fonctionnement des mise à jours automatiques. Il est toutefois préférable d'utiliser la version `dmg` pour une première installation.
 ## Mise à jour automatique
 L'application est capable de se mettre à jour automatiquement suivant la canal de distribution choisi. Il n'est en revanche pas possible de mettre à jour automatique d'un canal à l'autre que ce soit en montée ou en descente de version.  
 Sous Windows, uniquement la version `exe` auto installable est capable de se mettre à jour automatiquement, pour les autres il faudra obligatoirement télécharger les nouvelles version.

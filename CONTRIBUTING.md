@@ -83,7 +83,7 @@ Les tests d'intégration peuvent être liés aux critères d'acceptances (ou à 
 Les tests E2E sont fortement et souvent liés aux critères d'acceptances en plus d'être "scénarisés" pour être ensuite développés et exécutés pendant les phases de recette.
 
 ## Bots
-Régulièrement, des bots de contrôle passent sur le code pour garantir le maintiens des dépendances à jour, ainsi que l'application de leurs derniers patch de sécurité (Dependabot 🤖).
+Régulièrement, des bots de contrôle passent sur le code pour garantir le maintiens des dépendances directes à jour, ainsi que l'application de leurs derniers patch de sécurité (Dependabot 🤖).
 
 ## CI: QA + tests classiques
 Les tests se situent dans le dossier [`./tests/`](./tests/) et peuvent être exécutés avec la commande `yarn test`.  
@@ -112,4 +112,4 @@ Avant de contribuer au projet, il est fortement conseillé d'installer et désin
 
 Lors des développements, il est obligatoire de respecter les conventions de code dictées par l'outils de `lint` (lançable avec la commande `yarn lint`).
 
-Enfin, dans un esprit d'amélioration continue, pour chaque contribution, il est essentiel d'apporter au maximum de la documentation afin de donner du contexte sous la forme de commentaires sensés dans le code, et si besoin, de faire évoluer la documentation existante par exemple lors de l'ajout de nouveaux modules et services dans dans [la page associée](docs/modules-and-services.md) le cas échéant.
+Enfin, dans un esprit d'amélioration continue, pour chaque contribution, il est essentiel d'apporter au maximum de la documentation afin de donner du contexte sous la forme de commentaires sensés dans le code, et si besoin, de faire évoluer la documentation existante (par exemple lors de l'ajout de nouveaux modules et services dans dans [la page associée](docs/modules-and-services.md) le cas échéant).

@@ -11,7 +11,7 @@ body:
     id: us
     attributes:
       label: User Story
-      description: Copier l'url de la user story associée
+      description: Copier l'url de la user story associée (si applicable)
       placeholder: SocialGouv/archifiltre-mails#<number>
       value: SocialGouv/archifiltre-mails#
     validations:
@@ -45,16 +45,16 @@ body:
   - type: textarea
     id: solution
     validations:
-      required: true
+      required: false
     attributes:
       label: Solution
-      description: Quelle est le moyen de résoudre ce problème ? (Il n'est pas nécessaire de se perdre dans les détails techniques d'implémentation)
+      description: Si différent du comportement attendu, quel serait le ou les moyen(s) fonctionnels de résoudre ce problème ? (Il n'est pas nécessaire de se perdre dans les détails techniques d'implémentation)
   - type: textarea
     attributes:
       label: Captures d'écran (si possible)
       placeholder: |
-        # Copiez-collez directement votre image après capture d'écran
-        # ou utilisez une image markdown (![nom-de-mon-image](https://url-de-mon-image)) si vous l'avez uploadé vous même.
+        # Copiez-collez directement vos images après capture d'écran
+        # ou utilisez une image markdown "![nom-de-mon-image](https://url-de-mon-image)" si vous l'avez uploadée vous même.
   - type: textarea
     id: specs
     validations:
@@ -62,9 +62,9 @@ body:
     attributes:
       label: Liste des caractéristiques de votre machine
       placeholder: |
-        - OS (windows 10, windows 11, OSX 11, OSX 12.1 Montery, Ubuntu 20.04, etc)
-        - RAM (4Go) (si possible)
-        - Type de version de l'application (setup, portable, msi, dmg, zip etc)
+        - OS (Windows 10, Windows 11, OSX 11, OSX 12.1 Montery, Ubuntu 20.04, etc)
+        - RAM (4Go, 6Go, etc) (si possible)
+        - Type de version de l'application (setup, portable, msi, dmg, zip, etc)
   - type: dropdown
     id: version
     validations:
@@ -74,10 +74,10 @@ body:
       options:
         - "1.x"
         - "0.x"
-        - beta (à préciser)
-        - next (à préciser)
+        - beta (à préciser dans les caratéristiques)
+        - next (à préciser dans les caratéristiques)
   - type: textarea
     id: misc
     attributes:
       label: Informations complémentaires
-      placeholder: Ajoutez toute autre données qui pourrait potentiellement aider à la résolution du bug.
+      placeholder: Ajoutez toutes autres données qui pourraient potentiellement aider à la résolution du bug.
