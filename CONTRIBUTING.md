@@ -11,7 +11,7 @@
   - [CI: QA + tests classiques](#ci-qa--tests-classiques)
   - [E2E](#e2e)
 - [Déploiement continu + sortie de version](#déploiement-continu--sortie-de-version)
-- [Code](#code)
+- [Code et documentation](#code-et-documentation)
 
 # Git
 ## Branches et flux Git
