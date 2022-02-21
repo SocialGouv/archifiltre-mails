@@ -22,6 +22,9 @@
       "url": "https://docs.renovatebot.com/renovate-schema.json"
     }
   ],
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-issue-config.json": ".github/ISSUE_TEMPLATE/config.yml"
+  },
   "jest.jestCommandLine": "yarn jest",
   "jest.autoRun": "off",
   "i18n-ally.localesPaths": [
