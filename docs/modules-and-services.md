@@ -20,6 +20,7 @@ Les modules communs (présents dans common) sont par définition isomorphiques.
 - [UserConfigModule](../src/common/modules/UserConfigModule.ts) : charge la configuration utilisateur sauvegardée
 - [I18nModule](../src/common/modules/I18nModule.ts) : charge le moteur de traduction
 - [IpcModule](../src/common/modules/IpcModule.ts) : rend accessible des fonctionnalités `main` à travers le protocole IPC
+- [FileExporterModule](../src/common/modules/FileExporterModule.ts) : expose différents types d'`exporter` pour convertir des données dans un format de fichier choisi. (`json`, `csv`, `xlsx`, ...)
 
 **Main** :
 - [DevToolsModule](../src/main/modules/DevToolsModule.ts) : récupère et injecte les extensions de dev tools

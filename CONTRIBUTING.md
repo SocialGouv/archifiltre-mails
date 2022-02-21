@@ -7,9 +7,11 @@
 - [Produit](#produit)
   - [Tickets et fonctionnalités](#tickets-et-fonctionnalités)
 - [Intégration continue et tests](#intégration-continue-et-tests)
+  - [Bots](#bots)
   - [CI: QA + tests classiques](#ci-qa--tests-classiques)
   - [E2E](#e2e)
 - [Déploiement continu + sortie de version](#déploiement-continu--sortie-de-version)
+- [Code](#code)
 
 # Git
 ## Branches et flux Git
@@ -38,12 +40,12 @@ Le projet respecte une version allégée de "[GitFlow](https://danielkummer.gith
   - Exception faite pour les branches `*/e2e/*` (ex: `feature/e2e/icicle`, `hotfix/e2e/bug-chargement-empreinte`) qui adoptent cette nomenclature afin de déclencher les tests e2e en plus dans la CI
 - 🤖 Les branches préfixées `renovate/` sont réservées et ne doivent pas être utilisées
 
-### Représentation imagée :
+**Représentation imagée :**
 ![`Mails par Archifiltre` presque-"Git-flow"](./docs/img/archifiltre-mails-git-flow.svg)
 
 
 ## Commit
-La convention de commit adoptée par le projet est [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) MAIS cette convention n'est imposée que sur les branches principales `dev` et `main`.  
+La convention de commit adoptée par le projet est [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) **MAIS** cette convention n'est imposée que sur les branches principales `dev` et `main`.  
 En effet, les pull requests étant "squash", seul importe le commit de merge en fin de pull request.  
 [Gitm😍 ji](https://gitmoji.dev/) peut donc par exemple être utilisé à l'intérieur des branches si besoin.
 
@@ -81,12 +83,12 @@ Les tests d'intégration peuvent être liés aux critères d'acceptances (ou à 
 Les tests E2E sont fortement et souvent liés aux critères d'acceptances en plus d'être "scénarisés" pour être ensuite développés et exécutés pendant les phases de recette.
 
 ## Bots
-Régulièrement, des bots de contrôle passent sur le code pour garantir le maintiens des dépendances à jour (Renovate 🧹), ainsi que l'application de leurs derniers patch de sécurité (Dependabot 🤖).
+Régulièrement, des bots de contrôle passent sur le code pour garantir le maintiens des dépendances à jour, ainsi que l'application de leurs derniers patch de sécurité (Dependabot 🤖).
 
 ## CI: QA + tests classiques
 Les tests se situent dans le dossier [`./tests/`](./tests/) et peuvent être exécutés avec la commande `yarn test`.  
 Automatiquement, les pull requests dont les branches sont à destination de `dev` et `main` sont contrôlées sur leur qualité via [CodeQL](https://codeql.github.com/) ainsi que sur notre CI interne.  
-Notre CI contrôlera de son côté l'uniformité du code (`lint`) et lancera les tests "classiques" (composants et intégration).
+Notre CI contrôlera de son côté l'uniformité du code (`lint`), compilera le code pour vérifier son intégrité, et lancera les tests "classiques" (composants et intégration).
 
 ## E2E
 Les tests E2E se situent dans le dossier [`./tests/e2e/`](./tests/e2e/) et peuvent être exécutés avec la commande `yarn test:e2e`.  
@@ -101,7 +103,13 @@ Les tests e2e seront automatiquement lancés sur les trois systèmes d'exploitat
 Il est donc important dans le cas de code spécifique à l'un des OS de bien définir une non exécution des tests pour les autres.
 
 # Déploiement continu + sortie de version
-TODO
+Comme l'ensemble des produits Archifiltre, `Mails` est déployé en continue en fonction des phases de développement.  
+Chaque nuit à 1h du matin, une version de développement `next` sort **si du code a été poussé dans la journée** sur la branche `dev`. Cette version est itérative, et compatible avec le système de mise à jour automatique.  
+Consultez la page de [release](./docs/release.md) pour plus d'informations.
 
-# Code
-TODO
+# Code et documentation
+Avant de contribuer au projet, il est fortement conseillé d'installer et désinstaller les extensions recommandées de VSCode. (listées [ici](.vscode/extensions.json)). Dans la majeure partie des cas, ces extensions ont été configurées pour offrir une expérience développeur adéquat.
+
+Lors des développements, il est obligatoire de respecter les conventions de code dictées par l'outils de `lint` (lançable avec la commande `yarn lint`).
+
+Enfin, dans un esprit d'amélioration continue, pour chaque contribution, il est essentiel d'apporter au maximum de la documentation afin de donner du contexte sous la forme de commentaires sensés dans le code, et si besoin, de faire évoluer la documentation existante par exemple lors de l'ajout de nouveaux modules et services dans dans [la page associée](docs/modules-and-services.md) le cas échéant.
