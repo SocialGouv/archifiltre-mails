@@ -1,11 +1,12 @@
 {
-  "extends": "@tsconfig/node14/tsconfig.json",
+  "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
     "lib": [
       "ES2021",
       "DOM"
     ],
     "incremental": true,
+    "sourceMap": true,
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "noUncheckedIndexedAccess": true,

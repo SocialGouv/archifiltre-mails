@@ -1,6 +1,6 @@
 const path = require("path");
 const fs = require("fs");
-const { pathsToModuleNameMapper } = require("ts-jest/utils");
+const { pathsToModuleNameMapper } = require("ts-jest");
 
 const tsconfig = JSON.parse(
     fs.readFileSync(path.resolve(__dirname, "tests", "tsconfig.json"), {

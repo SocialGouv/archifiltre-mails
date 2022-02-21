@@ -120,7 +120,7 @@
     "@socialgouv/eslint-config-typescript": "^1.102.0",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
-    "@tsconfig/node14": "^1.0.1",
+    "@tsconfig/node16": "^1.0.2",
     "@types/d3": "^7.1.0",
     "@types/glob": "^7.2.0",
     "@types/jest": "^27.4.0",
