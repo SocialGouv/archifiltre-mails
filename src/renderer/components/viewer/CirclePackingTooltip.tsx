@@ -10,7 +10,6 @@ export const CirclePackingTooltip: React.FC<{
     return (
         <div className={style.circlePackingTooltip}>
             <strong>{node.data.name}</strong>
-            {/* <strong>{node.data.name}</strong>: {node.percentage.toFixed(2)}% */}
         </div>
     );
 };
