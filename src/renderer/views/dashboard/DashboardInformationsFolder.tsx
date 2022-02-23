@@ -1,11 +1,16 @@
+/* eslint-disable react/no-unescaped-entities */
 import type { LocaleFileResources } from "@common/i18n/raw";
+import { getPercentage } from "@common/utils";
 import type { FC } from "react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import { Loader } from "../../components/common/loader";
 import { useBreadcrumbStore } from "../../store/BreadcrumbStore";
+import { useAttachmentCountStore } from "../../store/PstAttachmentCountStore";
 import type { UsePstMainInfosStore } from "../../store/PstFMInfosStore";
+import { useMailCountStore } from "../../store/PstMailCountStore";
+import style from "./Dashboard.module.scss";
+import { DashboardInformationsLoader } from "./DashboardInformationsLoader";
 
 export type InformationsId = {
     [K in keyof LocaleFileResources["translation"]]: K extends `dashboard.informations.id.${infer R}`
@@ -18,35 +23,84 @@ export const DashboardInformationsFolder: FC<{
 }> = ({ mainInfos }) => {
     const { t } = useTranslation();
 
+    const { attachmentTotalCount, attachmentPerLevelCount } =
+        useAttachmentCountStore();
+    const { totalMailPerLevel } = useMailCountStore();
+
     const {
-        breadcrumb: { id: breadcrumbId },
+        breadcrumb: { id: breadcrumbId, history },
     } = useBreadcrumbStore();
 
     const infosId = breadcrumbId as InformationsId;
-
-    if (!mainInfos) return <Loader />;
+    const currentElementTitle =
+        history?.[history.length - 1] ?? "tous les domaines";
 
     return (
-        <>
-            <div>
-                <strong>{t("dashboard.informations.type")} </strong>
-                {t(`dashboard.informations.id.${infosId}`)}
+        <div className={style.dashboard__informations__wrapper__folder}>
+            <div
+                className={style.dashboard__informations__wrapper__folder__item}
+            >
+                <div style={{ margin: "0 0 1rem" }}>
+                    <strong>
+                        {t("dashboard.informations.infosOf")}{" "}
+                        {currentElementTitle}
+                    </strong>
+                </div>
+                <div>
+                    <span>{t("dashboard.informations.mailCountTotal")} : </span>
+                    <span>
+                        {totalMailPerLevel[totalMailPerLevel.length - 1]}
+                    </span>
+                </div>
+                <div>
+                    <span>{t("dashboard.informations.attachedCount")} : </span>
+                    <span>
+                        {
+                            attachmentPerLevelCount[
+                                attachmentPerLevelCount.length - 1
+                            ]
+                        }
+                    </span>
+                </div>
+                <div>
+                    <span>{t("dashboard.informations.percentage")} : </span>
+                    XXX Ko (
+                    {getPercentage(
+                        attachmentPerLevelCount[
+                            attachmentPerLevelCount.length - 1
+                        ] ?? 0,
+                        attachmentTotalCount
+                    ).toFixed(2)}
+                    %)
+                </div>
             </div>
-            <div>
-                <strong>{t("dashboard.informations.title")} </strong>
-                {mainInfos.data.name}
+            <div
+                className={style.dashboard__informations__wrapper__folder__item}
+            >
+                {!mainInfos ? (
+                    <DashboardInformationsLoader />
+                ) : (
+                    <>
+                        <div style={{ margin: "0 0 1rem" }}>
+                            <strong>
+                                {t("dashboard.informations.elementRollover")} :
+                            </strong>
+                        </div>
+                        <div>
+                            <span>
+                                {t(`dashboard.informations.id.${infosId}`)} :{" "}
+                            </span>
+                            <span>{mainInfos.data.name}</span>
+                        </div>
+                        <div>
+                            <span>
+                                {t("dashboard.informations.mailCount")} :{" "}
+                            </span>
+                            <span>{mainInfos.data.size} </span>
+                        </div>
+                    </>
+                )}
             </div>
-            <div>
-                <strong>{t("dashboard.informations.mailCount")} </strong>
-                {mainInfos.data.size}
-            </div>
-            <div>
-                <strong>{t("dashboard.informations.attachedCount")} </strong>?
-            </div>
-            <div>
-                <strong>{t("dashboard.informations.percentage")} </strong>
-                {mainInfos.percentage.toFixed(1)}
-            </div>
-        </>
+        </div>
     );
 };

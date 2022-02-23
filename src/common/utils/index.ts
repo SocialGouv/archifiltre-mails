@@ -48,3 +48,6 @@ export const chunkString = (input: string, length: number): string[] => {
 export const notImplemented = (..._args: Any[]): Any | Promise<Any> => {
     throw new Error("Not implemented");
 };
+
+export const getPercentage = (current: number, total: number): number =>
+    (current / total) * 100;

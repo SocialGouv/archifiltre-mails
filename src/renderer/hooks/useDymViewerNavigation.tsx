@@ -2,7 +2,16 @@ import type { ComputedDatum } from "@nivo/circle-packing/dist/types/types";
 import { useCallback, useEffect, useState } from "react";
 
 import { useBreadcrumbStore } from "../store/BreadcrumbStore";
+import {
+    setInitialAttachmentPerLevelCount,
+    setPreviousAttachmentPerLevelCount,
+} from "../store/PstAttachmentCountStore";
 import { usePstFMInfosStore } from "../store/PstFMInfosStore";
+import {
+    setInitialTotalMailPerLevelCount,
+    setPreviousTotalMailsPerLevel,
+    setTotalMailPerLevel,
+} from "../store/PstMailCountStore";
 import { usePstStore } from "../store/PSTStore";
 import { CORRESPONDANTS, DOMAIN, MAILS, YEAR } from "../utils/constants";
 import type {
@@ -16,6 +25,7 @@ import {
     createYears,
     getAggregatedDomainCount,
     getMailsByDym,
+    getTotalLevelMail,
     getUniqueCorrespondantsByDomain,
     getYearByCorrespondants,
 } from "../utils/dashboard-viewer-dym";
@@ -49,7 +59,7 @@ export interface ViewState<TElement> {
  */
 export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
     const { pstFile } = usePstStore();
-    const { setBreadcrumb } = useBreadcrumbStore();
+    const { setBreadcrumb, setPreviousBreadcrumb } = useBreadcrumbStore();
     const { cancelFocus } = usePstFMInfosStore();
     const [currentDomain, setCurrentDomain] = useState<string>("");
     const [currentCorrespondant, setCurrentCorrespondant] =
@@ -79,26 +89,35 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
         setDomainView(computedInitialView);
     }, [pstFile]);
 
-    const restartView = () => {
-        setCurrentView(domainView);
-        cancelFocus();
-        setBreadcrumb({ id: "domain" });
-    };
-
     useEffect(() => {
         createInitialView();
     }, [createInitialView]);
 
+    const restartView = () => {
+        setCurrentView(domainView);
+        cancelFocus();
+        setInitialAttachmentPerLevelCount();
+        setInitialTotalMailPerLevelCount();
+        setBreadcrumb({ id: "domain" });
+    };
+
     const computePreviousView = () => {
+        cancelFocus();
+        setPreviousAttachmentPerLevelCount();
+        setPreviousTotalMailsPerLevel();
+
         if (currentView?.type === CORRESPONDANTS) {
             setCurrentView(domainView);
+            setPreviousBreadcrumb("domain");
         }
         if (currentView?.type === YEAR) {
             setCurrentView(correspondantView);
+            setPreviousBreadcrumb("correspondant");
         }
 
         if (currentView?.type === MAILS) {
             setCurrentView(yearView);
+            setPreviousBreadcrumb("year");
         }
 
         return;
@@ -117,11 +136,15 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
             const uniqueCorrespondantsByDomain =
                 getUniqueCorrespondantsByDomain(pstFile!, node.data.name);
 
+            const elements = createCorrespondants(
+                uniqueCorrespondantsByDomain,
+                node.id
+            );
+            const totalLevelMails = getTotalLevelMail(elements);
+            setTotalMailPerLevel(totalLevelMails);
+
             setCurrentView({
-                elements: createCorrespondants(
-                    uniqueCorrespondantsByDomain,
-                    node.id
-                ),
+                elements,
                 type: CORRESPONDANTS,
             });
 
@@ -146,13 +169,17 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
                 node.data.name
             );
 
+            const elements = createYears(yearByCorrespondants, node.id);
+            const totalLevelMails = getTotalLevelMail(elements);
+            setTotalMailPerLevel(totalLevelMails);
+
             setCurrentView({
-                elements: createYears(yearByCorrespondants, node.id),
+                elements,
                 type: YEAR,
             });
 
             setYearView({
-                elements: createYears(yearByCorrespondants, node.id),
+                elements,
                 type: YEAR,
             });
         }
@@ -169,9 +196,12 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
                 currentCorrespondant,
                 +node.data.name
             );
+            const elements = createMails(mailsByYearAndCorrespondant, node.id);
+            const totalLevelMails = getTotalLevelMail(elements);
+            setTotalMailPerLevel(totalLevelMails);
 
             setCurrentView({
-                elements: createMails(mailsByYearAndCorrespondant, node.id),
+                elements,
                 type: MAILS,
             });
         }

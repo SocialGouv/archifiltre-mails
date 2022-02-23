@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { sanitizeMailDate } from "../../utils/dashboard-viewer";
 import type { MailViewerObject } from "../../utils/dashboard-viewer-dym";
+import style from "./Dashboard.module.scss";
 
 export const DashboardInformationsMail: FC<{
     mainInfos: ComputedDatum<MailViewerObject<string>>;
@@ -12,14 +13,14 @@ export const DashboardInformationsMail: FC<{
     const { t } = useTranslation();
 
     return (
-        <>
+        <div className={style.dashboard__informations__wrapper__mail}>
             <div>
                 <strong>{t("dashboard.informations.type")} </strong>
                 {t("dashboard.informations.id.mail")}
             </div>
             <div>
                 <strong>{t("dashboard.informations.title")} </strong>
-                {mainInfos.data.name}
+                {mainInfos.data.email.subject}
             </div>
             <div>
                 <strong>{t("dashboard.informations.sentDate")} </strong>{" "}
@@ -32,6 +33,15 @@ export const DashboardInformationsMail: FC<{
             <div>
                 <strong>{t("dashboard.informations.attachedCount")} </strong>{" "}
                 {mainInfos.data.email.attachementCount}
+            </div>
+
+            <div>
+                <strong>{t("dashboard.informations.attachedTitles")} </strong>{" "}
+                {mainInfos.data.email.attachements.map(
+                    ({ filename }, index: number) => (
+                        <span key={index}>{filename}</span>
+                    )
+                )}
             </div>
             <div>
                 <strong>{t("dashboard.informations.to")}</strong>{" "}
@@ -68,6 +78,6 @@ export const DashboardInformationsMail: FC<{
                     </p>
                 </div>
             </div>
-        </>
+        </div>
     );
 };

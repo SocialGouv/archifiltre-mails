@@ -3,6 +3,7 @@ import type { PstProgressState } from "@common/modules/pst-extractor/type";
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 
+import { setTotalMail } from "../store/PstMailCountStore";
 import { usePstStore } from "../store/PSTStore";
 
 interface UsePstExtractor {
@@ -41,6 +42,12 @@ export const usePstExtractor = (): UsePstExtractor => {
                         pstFilePath,
                     });
                 setPstFile(pstExtractedFile);
+
+                const totalMail = [
+                    ...Object(extractTables.emails).values(),
+                ].flat().length;
+
+                setTotalMail(totalMail);
                 setExtractTables(extractTables);
             })();
         }

@@ -3,6 +3,10 @@ import { isPstEmail, isPstFolder } from "@common/modules/pst-extractor/type";
 import { v4 as randomUUID } from "uuid";
 
 import {
+    setAttachmentPerLevelCount,
+    setAttachmentTotalCount,
+} from "../store/PstAttachmentCountStore";
+import {
     LDAP_ARBITRARY_SPLICE_CHAR,
     LDAP_ORG,
     MAX_TRESHOLD,
@@ -58,6 +62,9 @@ export const createBase = <TId extends string>(
     size: 0.0001,
     value: "size",
 });
+
+export const getTotalLevelMail = (elements: ViewerObject<string>): number =>
+    elements.children.flat().reduce((acc, curr) => acc + curr.size, 0);
 
 export const createBaseMail = (): PstEmail => ({
     attachementCount: 0,
@@ -125,12 +132,16 @@ export const getAggregatedDomainCount = (
     initPst: PstElement
 ): Record<string, number> => {
     const mailCountPerDomain = new Map<string, number>();
+    let attachmentTotalCount = 0;
+
     const recursivelyFindProp = (pst: PstElement) => {
         if (isPstFolder(pst)) {
             pst.children?.forEach((child) => {
                 recursivelyFindProp(child);
             });
         } else if (isPstEmail(pst) && pst.from.email) {
+            attachmentTotalCount += pst.attachementCount;
+
             const emails = new Set([pst.from.email]);
             emails.forEach((email) => {
                 const domainKey = isLdap(email)
@@ -145,6 +156,7 @@ export const getAggregatedDomainCount = (
     };
 
     recursivelyFindProp(initPst);
+    setAttachmentTotalCount(attachmentTotalCount);
 
     /* eslint-disable @typescript-eslint/naming-convention */
     const orderByValues = <K, V extends number>(m: Map<K, V>): Map<K, V> =>
@@ -180,6 +192,7 @@ export const getUniqueCorrespondantsByDomain = (
     domain: string
 ): Correspondant[] => {
     const correspsFound: Correspondant[] = [];
+    let attachmentPerLevelCount = 0;
     const recursivelyFindCorresp = (pst: PstElement) => {
         if (isPstFolder(pst)) {
             pst.children?.forEach((child) => {
@@ -191,10 +204,12 @@ export const getUniqueCorrespondantsByDomain = (
             (getDomain(pst.from.email) === domain ||
                 getLdapDomain(pst.from.email) === domain)
         ) {
+            attachmentPerLevelCount += pst.attachementCount;
             correspsFound.push([pst.from.name, 1]);
         }
     };
     recursivelyFindCorresp(initPst);
+    setAttachmentPerLevelCount(attachmentPerLevelCount);
 
     const accumulatedCorresps = correspsFound.reduce<typeof correspsFound>(
         (acc, [name, value]) => {
@@ -214,6 +229,7 @@ export const getYearByCorrespondants = (
     correspondant: string
 ): Year[] => {
     const yearsFound: Year[] = [];
+    let attachmentPerLevelCount = 0;
     const recursivelyFindYear = (pst: PstElement) => {
         if (isPstFolder(pst)) {
             pst.children?.forEach((child) => {
@@ -224,10 +240,12 @@ export const getYearByCorrespondants = (
             pst.receivedDate &&
             pst.from.name === correspondant
         ) {
+            attachmentPerLevelCount += pst.attachementCount;
             yearsFound.push([pst.receivedDate.getFullYear(), 1]);
         }
     };
     recursivelyFindYear(initPst);
+    setAttachmentPerLevelCount(attachmentPerLevelCount);
 
     const accumulatedYears = yearsFound.reduce<typeof yearsFound>(
         (acc, [year, value]) => {
@@ -249,6 +267,8 @@ export const getMailsByDym = (
     year: number
 ): PstEmail[] => {
     const mailsFound: PstEmail[] = [];
+    let attachmentPerLevelCount = 0;
+
     const recursivelyFindMail = (pst: PstElement) => {
         if (isPstFolder(pst)) {
             pst.children?.forEach((child) => {
@@ -263,10 +283,12 @@ export const getMailsByDym = (
             (getDomain(pst.from.email) === domain ||
                 getLdapDomain(pst.from.email) === domain)
         ) {
+            attachmentPerLevelCount += pst.attachementCount;
             mailsFound.push(pst);
         }
     };
     recursivelyFindMail(initPst);
+    setAttachmentPerLevelCount(attachmentPerLevelCount);
 
     return mailsFound.sort(
         (a, b) =>
@@ -298,6 +320,7 @@ export const createCorrespondants = <TId extends string>(
             ...createBase(id),
         });
     }
+
     return correspondantCache.get(id) as CorrespondantViewerObject<TId>;
 };
 
