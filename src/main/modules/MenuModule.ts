@@ -1,9 +1,11 @@
 import { IS_MAC } from "@common/config";
+import type { Service } from "@common/modules/container/type";
 import type { FileExporterService } from "@common/modules/FileExporterModule";
 import type { I18nService } from "@common/modules/I18nModule";
 import type { Module } from "@common/modules/Module";
 import type { MenuItem } from "electron";
 import { Menu } from "electron";
+import { t } from "i18next";
 
 import type { ConsoleToRendererService } from "../services/ConsoleToRendererService";
 import { DebugMenu } from "./menu/DebugMenu";
@@ -21,6 +23,20 @@ export interface ArchifiltreMailsMenu {
      * Id used for searching in whole menu
      */
     readonly id: string;
+    /**
+     * Show or hide the menu (**when hidden, shortcuts are still active!**)
+     */
+    visible?: boolean;
+    /**
+     * Enable of disable the menu
+     */
+    enabled?: boolean;
+}
+
+type ReloadMenuFunction = typeof MenuModule["prototype"]["reloadMenu"];
+export interface MenuService extends Service {
+    name: "MenuService";
+    reloadMenu: ReloadMenuFunction;
 }
 
 /**
@@ -28,6 +44,8 @@ export interface ArchifiltreMailsMenu {
  */
 export class MenuModule implements Module {
     private readonly customMenus: ArchifiltreMailsMenu[] = [];
+
+    private debugMenu?: DebugMenu;
 
     constructor(
         private readonly consoleToRendererService: ConsoleToRendererService,
@@ -37,17 +55,42 @@ export class MenuModule implements Module {
     ) {}
 
     public async init(): Promise<void> {
-        this.customMenus.push(
-            new DebugMenu(
-                this.consoleToRendererService,
-                this.pstExtractorMainService,
-                this.i18nService,
-                this.fileExporterService
-            )
+        await this.i18nService.wait();
+        this.debugMenu = new DebugMenu(
+            this.consoleToRendererService,
+            this.pstExtractorMainService,
+            this.i18nService,
+            this.fileExporterService
         );
+        this.customMenus.push(this.debugMenu);
+        this.loadMenu();
+        this.i18nService.addLanguageChangedListener(() => {
+            this.reloadMenu();
+        });
+    }
 
+    public reloadMenu(): void {
+        Menu.setApplicationMenu(null);
+        this.loadMenu();
+    }
+
+    private loadMenu() {
         const template: Parameters<typeof Menu.buildFromTemplate>[0] = [
-            { role: "help", submenu: [{ role: "toggleDevTools" }] }, // TODO: Update with links and other helpful stuff
+            {
+                role: "help",
+                submenu: [
+                    {
+                        checked: this.debugMenu?.visible,
+                        click: (item) => {
+                            this.debugMenu!.visible = item.checked;
+                            this.reloadMenu();
+                        },
+                        label: t("common:menu.help.enableDebug"),
+                        type: "checkbox",
+                    },
+                    { role: "about" },
+                ],
+            }, // TODO: Update with links and other helpful stuff
             ...this.customMenus.map((m) => m.item),
         ];
 
@@ -58,8 +101,12 @@ export class MenuModule implements Module {
         const menu = Menu.buildFromTemplate(template);
 
         Menu.setApplicationMenu(menu);
-        return Promise.resolve();
+    }
+
+    public get service(): MenuService {
+        return {
+            name: "MenuService",
+            reloadMenu: this.reloadMenu.bind(this),
+        };
     }
 }
-
-// TODO: reload menu

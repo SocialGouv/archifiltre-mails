@@ -1,4 +1,4 @@
-import { IS_DEV } from "@common/config";
+import { IS_PACKAGED } from "@common/config";
 import { SupportedLocales } from "@common/i18n/raw";
 import type {
     ExporterType,
@@ -8,6 +8,7 @@ import type { I18nService } from "@common/modules/I18nModule";
 import { formatEmailTable } from "@common/utils/exporter";
 import type { BrowserWindow } from "electron";
 import { dialog, MenuItem } from "electron";
+import { t } from "i18next";
 
 import type { ConsoleToRendererService } from "../../services/ConsoleToRendererService";
 // eslint-disable-next-line unused-imports/no-unused-imports -- MenuModule used in doc
@@ -23,6 +24,10 @@ const CHANGE_LANGUAGE_MENU_ID = "CHANGE_LANGUAGE_MENU_ID";
  * Loaded in {@link MenuModule}, the debug menu is only shown on demand or by default in dev mode.
  */
 export class DebugMenu implements ArchifiltreMailsMenu {
+    public visible = !IS_PACKAGED();
+
+    public enabled = true;
+
     public readonly id = "DEBUG_MENU_ID";
 
     private lastPstFilePath = "";
@@ -36,10 +41,10 @@ export class DebugMenu implements ArchifiltreMailsMenu {
 
     public get item(): MenuItem {
         return new MenuItem({
-            enabled: IS_DEV,
+            enabled: this.enabled,
             id: this.id,
-            label: "Debug",
-            sublabel: "Custom debugging",
+            label: t("common:menu.debug.label"),
+            sublabel: t("common:menu.debug.sublabel"),
             submenu: [
                 { role: "toggleDevTools" },
                 {
@@ -80,7 +85,7 @@ export class DebugMenu implements ArchifiltreMailsMenu {
                             );
                         }
                     },
-                    label: "Open and console log PST file...",
+                    label: t("common:menu.debug.openConsolePst"),
                 },
                 {
                     accelerator: "CommandOrControl+Shift+I",
@@ -96,13 +101,13 @@ export class DebugMenu implements ArchifiltreMailsMenu {
                             );
                         }
                     },
-                    enabled: false,
+                    enabled: !!this.lastPstFilePath,
                     id: OPEN_AND_CONSOLE_LAST_PST_MENU_ID,
-                    label: `Open and console log last PST file`,
+                    label: t("common:menu.debug.openConsolePstLast"),
                 },
                 {
                     id: EXPORT_LAST_PST_MENU_ID,
-                    label: `Export last file...`,
+                    label: t("common:menu.debug.exportLastFile"),
                     submenu: this.fileExporterService.exporterTypes.map(
                         (exportType) => ({
                             click: async (_menuItem, browserWindow, _event) => {
@@ -113,7 +118,6 @@ export class DebugMenu implements ArchifiltreMailsMenu {
                                     );
                                 }
                             },
-                            enabled: true,
                             id: `${EXPORT_LAST_PST_MENU_ID}_${exportType.toUpperCase()}`,
                             label: exportType.toUpperCase(),
                         })
@@ -121,16 +125,18 @@ export class DebugMenu implements ArchifiltreMailsMenu {
                 },
                 {
                     id: CHANGE_LANGUAGE_MENU_ID,
-                    label: "Change language...",
+                    label: t("common:menu.debug.changeLanguage"),
                     submenu: SupportedLocales.map((lng) => ({
                         click: async () => this.i18nService.changeLanguage(lng),
                         enabled: true,
                         id: `${CHANGE_LANGUAGE_MENU_ID}_${lng}`,
-                        label: lng,
+                        label: t(
+                            `common:menu.debug.changeLanguage_${lng.toUpperCase()}`
+                        ),
                     })),
                 },
             ],
-            visible: IS_DEV,
+            visible: this.visible,
         });
     }
 
@@ -153,12 +159,15 @@ export class DebugMenu implements ArchifiltreMailsMenu {
         const dialogReturn = await dialog.showSaveDialog(browserWindow, {
             defaultPath: this.lastPstFilePath.replace(/\.pst$/i, `.${type}`),
             filters: [
-                { extensions: [type], name: `${type.toUpperCase()} File` },
+                {
+                    extensions: [type],
+                    name: t("exporter.save.filterName", { type }),
+                },
             ],
-            message: "✨",
-            nameFieldLabel: "👉",
+            message: t("exporter.save.message"),
+            nameFieldLabel: t("exporter.save.nameFieldLabel"),
             showsTagField: false,
-            title: `Save ${type.toUpperCase()} export`,
+            title: t("exporter.save.title", { type }),
         });
         if (dialogReturn.canceled || !dialogReturn.filePath) {
             return;

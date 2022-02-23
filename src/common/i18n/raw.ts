@@ -31,3 +31,27 @@ declare module "react-i18next" {
         resources: LocaleFileResources;
     }
 }
+
+// augment "i18next classic" TFunction
+type DefaultNamespace = "translation";
+type OtherNamespace = Exclude<Namespace, DefaultNamespace>;
+
+type ResourceKeys =
+    | {
+          [K in OtherNamespace]: `${OtherNamespace}:${keyof LocaleFileResources[OtherNamespace]}`;
+      }[OtherNamespace]
+    | keyof LocaleFileResources[DefaultNamespace];
+
+declare module "i18next" {
+    interface TFunction {
+        // eslint-disable-next-line @typescript-eslint/prefer-function-type
+        <
+            TResult extends TFunctionResult = string,
+            // eslint-disable-next-line @typescript-eslint/ban-types
+            TInterpolationMap extends object = StringMap
+        >(
+            key: ResourceKeys | ResourceKeys[],
+            options?: TOptions<TInterpolationMap> | string
+        ): TResult;
+    }
+}

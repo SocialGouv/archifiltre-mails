@@ -12,3 +12,10 @@ const _Object = {
 };
 
 export { _Object as Object };
+
+/* eslint-disable @typescript-eslint/method-signature-style */
+declare global {
+    interface String {
+        toUpperCase<T extends string>(this: T): Uppercase<T>;
+    }
+}

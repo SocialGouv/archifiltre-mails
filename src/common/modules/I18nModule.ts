@@ -25,6 +25,8 @@ const I18N_CHANGE_LANGUAGE_EVENT = "i18n.event.changeLanguage";
 const I18N_PREPARE_CHANGE_LANGUAGE_EVENT = "i18n.event.prepareChangeLanguage";
 const I18N_CHANGE_LANGUAGE_CALLBACK_EVENT = "i18n.event.changeLanguageCallback";
 
+export type LanguageChangedListener = (evt: { lng: Locale }) => void;
+
 /**
  * Isomorphic module responsible for loading all i18n resources.
  *
@@ -36,6 +38,9 @@ export class I18nModule extends IsomorphicModule {
     private readonly mainCache = new Map<Locale, Map<Namespace, ResourceKey>>();
 
     private changeLanguageRendererCallback?: IpcMainEvent["reply"];
+
+    private readonly languageChangedListeners =
+        new Set<LanguageChangedListener>();
 
     constructor(private readonly userConfigService: UserConfigService) {
         super();
@@ -110,15 +115,43 @@ export class I18nModule extends IsomorphicModule {
         this.userConfigService.set("locale", lng);
     }
 
+    public addLanguageChangedListener(listener: LanguageChangedListener): void {
+        this.languageChangedListeners.add(listener);
+    }
+
+    public removeLanguageChangedListener(
+        listener: LanguageChangedListener
+    ): void {
+        this.languageChangedListeners.delete(listener);
+    }
+
+    public async triggerLanguageChangedListeners(lng: Locale): Promise<void> {
+        await Promise.all(
+            [...this.languageChangedListeners].map(
+                async (listener) =>
+                    new Promise<void>((resolve) => {
+                        try {
+                            listener({ lng });
+                        } finally {
+                            resolve();
+                        }
+                    })
+            )
+        );
+    }
+
     private prepareChangeLanguage() {
         if (IS_MAIN) {
             // when renderer asks for changing language, do it in main
-            // and update user config
+            // update user config
+            // and trigger set main listeners if applicable
             ipcMain.handle(
                 I18N_CHANGE_LANGUAGE_EVENT,
                 async (_evt, lng: Locale) => {
+                    console.log("change asked from renderer");
                     await i18next.changeLanguage(lng);
                     this.userConfigService.set("locale", lng);
+                    await this.triggerLanguageChangedListeners(lng);
                 }
             );
 
@@ -131,10 +164,12 @@ export class I18nModule extends IsomorphicModule {
             // send renderer callback when changing the language is asked first from main
             ipcRenderer.send(I18N_PREPARE_CHANGE_LANGUAGE_EVENT);
             // when main asks for changing language, do it in renderer
+            // and trigger set renderer listeners if applicable
             ipcRenderer.on(
                 I18N_CHANGE_LANGUAGE_CALLBACK_EVENT,
                 async (_evt, lng: Locale) => {
                     await i18next.changeLanguage(lng);
+                    await this.triggerLanguageChangedListeners(lng);
                 }
             );
         }
@@ -181,11 +216,27 @@ class InnerI18nService extends IsomorphicService {
     public async changeLanguage(lng: Locale) {
         const validLng = validLocale(lng);
         await i18next.changeLanguage(validLng);
+        await this.i18nModule.triggerLanguageChangedListeners(lng);
         if (IS_MAIN) {
             this.i18nModule.callChangeLanguageRendererCallback(validLng);
         } else {
             await ipcRenderer.invoke(I18N_CHANGE_LANGUAGE_EVENT, validLng);
         }
+    }
+
+    // TODO: change to proper pub/sub or classic event manager module
+    /**
+     * Listen to any language changes from any side.
+     */
+    public addLanguageChangedListener(listener: LanguageChangedListener) {
+        this.i18nModule.addLanguageChangedListener(listener);
+    }
+
+    /**
+     * Stop listening to any language changes by giving the same function added earlier.
+     */
+    public removeLanguageChangedListener(listener: LanguageChangedListener) {
+        this.i18nModule.removeLanguageChangedListener(listener);
     }
 }
 
