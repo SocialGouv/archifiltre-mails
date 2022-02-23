@@ -47,19 +47,19 @@ export const DashboardInformationsFolder: FC<{
                     </strong>
                 </div>
                 <div>
-                    <span>{t("dashboard.informations.mailCountTotal")} : </span>
+                    <span>{t("dashboard.informations.mailCountTotal")} </span>
                     <span>
                         {totalMailPerLevel[totalMailPerLevel.length - 1]}
                     </span>
                 </div>
                 <div>
-                    <span>{t("dashboard.informations.attachedCount")} : </span>
+                    <span>{t("dashboard.informations.attachedCount")} </span>
                     <span>
                         {attachmentPerLevel[attachmentPerLevel.length - 1]}
                     </span>
                 </div>
                 <div>
-                    <span>{t("dashboard.informations.percentage")} : </span>
+                    <span>{t("dashboard.informations.percentage")} </span>
                     {fileSizePerLevel[fileSizePerLevel.length - 1]} Mo (
                     {getPercentage(
                         fileSizePerLevel[fileSizePerLevel.length - 1] ?? 0,
@@ -77,18 +77,18 @@ export const DashboardInformationsFolder: FC<{
                     <>
                         <div style={{ margin: "0 0 1rem" }}>
                             <strong>
-                                {t("dashboard.informations.elementRollover")} :
+                                {t("dashboard.informations.elementRollover")}
                             </strong>
                         </div>
                         <div>
                             <span>
-                                {t(`dashboard.informations.id.${infosId}`)} :{" "}
+                                {t(`dashboard.informations.id.${infosId}`)}{" "}
                             </span>
                             <span>{mainInfos.data.name}</span>
                         </div>
                         <div>
                             <span>
-                                {t("dashboard.informations.mailCount")} :{" "}
+                                {t("dashboard.informations.mailCount")}{" "}
                             </span>
                             <span>{mainInfos.data.size} </span>
                         </div>
