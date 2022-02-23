@@ -1,7 +1,10 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import type { ComputedDatum } from "@nivo/circle-packing";
 import { ResponsiveCirclePacking } from "@nivo/circle-packing";
 import debounce from "lodash/debounce";
 import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useDymViewerNavigation } from "../../hooks/useDymViewerNavigation";
 import { usePstFMInfosStore } from "../../store/PstFMInfosStore";
@@ -40,6 +43,7 @@ const isMailTagNode = (
     isMailViewerObject(node.data);
 
 export const CirclePacking: React.FC = () => {
+    const { t } = useTranslation();
     const { currentView, computeNextView, restartView, computePreviousView } =
         useDymViewerNavigation();
 
@@ -56,6 +60,7 @@ export const CirclePacking: React.FC = () => {
 
     useEffect(() => {
         if (!currentView) return;
+
         const children = currentView.elements.children;
 
         if (isToDeleteFolder(currentView.elements.id, markedToDelete)) {
@@ -106,6 +111,7 @@ export const CirclePacking: React.FC = () => {
             setMainInfos((infos) => infos);
             return;
         }
+
         setMainInfos(node);
         setHoveredId(node.id);
     }, 500);
@@ -125,8 +131,7 @@ export const CirclePacking: React.FC = () => {
     const handleBorderColor: CirclePackingCommonProps["borderColor"] = (node) =>
         handleFocusItemBorderColor(node, mainInfos, isInfoFocus);
 
-    const goToParentView = () => {
-        cancelFocus();
+    const goToPreviousView = () => {
         computePreviousView();
     };
 
@@ -141,8 +146,12 @@ export const CirclePacking: React.FC = () => {
         <>
             <div id="circle-packing" className={style["circle-packing"]}>
                 <div className={style.circlePackingActionsButton}>
-                    <button onClick={goToParentView}>{"<"}</button>
-                    <button onClick={goToInitialView}>{"<<"}</button>
+                    <button onClick={goToPreviousView}>
+                        {t("dashboard.viewer.previous")}
+                    </button>
+                    <button onClick={goToInitialView}>
+                        {t("dashboard.viewer.restart")}
+                    </button>
                 </div>
                 <ResponsiveCirclePacking
                     data={currentView.elements}

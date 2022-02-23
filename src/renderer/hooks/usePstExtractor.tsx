@@ -3,7 +3,15 @@ import type { PstProgressState } from "@common/modules/pst-extractor/type";
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 
+import { setAttachmentTotal } from "../store/PstAttachmentCountStore";
+import { setTotalFileSize } from "../store/PstFileSizeStore";
+import { setTotalMail } from "../store/PstMailCountStore";
 import { usePstStore } from "../store/PSTStore";
+import {
+    getInitialTotalAttachements,
+    getInitialTotalMail,
+    getInititalTotalFileSize,
+} from "../utils/dashboard-viewer-dym";
 
 interface UsePstExtractor {
     pstProgress: PstProgressState;
@@ -40,8 +48,20 @@ export const usePstExtractor = (): UsePstExtractor => {
                     await pstExtractorService.extract({
                         pstFilePath,
                     });
+
                 setPstFile(pstExtractedFile);
                 setExtractTables(extractTables);
+
+                const totalMail = getInitialTotalMail(extractTables);
+                setTotalMail(totalMail);
+
+                const totalAttachments: number =
+                    getInitialTotalAttachements(extractTables);
+                setAttachmentTotal(totalAttachments);
+
+                const totalFileSize: number =
+                    getInititalTotalFileSize(extractTables);
+                setTotalFileSize(totalFileSize);
             })();
         }
     }, [pstExtractorService, pstFilePath, setExtractTables, setPstFile]);

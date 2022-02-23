@@ -44,18 +44,6 @@ export const getColorFromTrimester = (
     return opacityMonthKey ? opacities[opacityMonthKey] : DEFAULT_OPACITY;
 };
 
-// const getDeleteColor = (
-//     node: Omit<ComputedDatum<MailViewerObject<string>>, "color" | "fill">
-// ) => `rgba(247, 94, 66, ${getColorFromTrimester(node)})`;
-
-// const getKeepColor = (
-//     node: Omit<ComputedDatum<MailViewerObject<string>>, "color" | "fill">
-// ) => `rgba(98, 188, 111, ${getColorFromTrimester(node)})`;
-
-// const getUntagColor = (
-//     node: Omit<ComputedDatum<MailViewerObject<string>>, "color" | "fill">
-// ) => `rgba(31, 120, 180, ${getColorFromTrimester(node)})`;
-
 export const getTagColor = (
     node: Omit<ComputedDatum<MailViewerObject<string>>, "color" | "fill">,
     tag: TagType

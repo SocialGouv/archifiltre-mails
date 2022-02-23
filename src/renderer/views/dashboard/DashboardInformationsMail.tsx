@@ -1,25 +1,35 @@
+import { bytesToKilobytes, getPercentage } from "@common/utils";
 import type { ComputedDatum } from "@nivo/circle-packing";
 import type { FC } from "react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
+import { usePstFileSizeStore } from "../../store/PstFileSizeStore";
+import { AVERAGE_MAIL_SIZE_IN_KO } from "../../utils/constants";
 import { sanitizeMailDate } from "../../utils/dashboard-viewer";
 import type { MailViewerObject } from "../../utils/dashboard-viewer-dym";
+import { getFileSizeByMail } from "../../utils/dashboard-viewer-dym";
+import style from "./Dashboard.module.scss";
 
 export const DashboardInformationsMail: FC<{
     mainInfos: ComputedDatum<MailViewerObject<string>>;
 }> = ({ mainInfos }) => {
     const { t } = useTranslation();
+    const { totalFileSize } = usePstFileSizeStore();
+
+    const volumeTotal =
+        bytesToKilobytes(getFileSizeByMail(mainInfos.data.email.attachements)) +
+        AVERAGE_MAIL_SIZE_IN_KO;
 
     return (
-        <>
+        <div className={style.dashboard__informations__wrapper__mail}>
             <div>
                 <strong>{t("dashboard.informations.type")} </strong>
-                {t("dashboard.informations.mail")}
+                {t("dashboard.informations.id.mail")}
             </div>
             <div>
                 <strong>{t("dashboard.informations.title")} </strong>
-                {mainInfos.data.name}
+                {mainInfos.data.email.subject}
             </div>
             <div>
                 <strong>{t("dashboard.informations.sentDate")} </strong>{" "}
@@ -32,6 +42,15 @@ export const DashboardInformationsMail: FC<{
             <div>
                 <strong>{t("dashboard.informations.attachedCount")} </strong>{" "}
                 {mainInfos.data.email.attachementCount}
+            </div>
+
+            <div>
+                <strong>{t("dashboard.informations.attachedTitles")} </strong>{" "}
+                {mainInfos.data.email.attachements.map(
+                    ({ filename }, index: number) => (
+                        <span key={index}>{filename}</span>
+                    )
+                )}
             </div>
             <div>
                 <strong>{t("dashboard.informations.to")}</strong>{" "}
@@ -50,24 +69,27 @@ export const DashboardInformationsMail: FC<{
                     <span key={index}>{cc.email}</span>
                 ))}
             </div>
-            <div>
-                <strong>{t("dashboard.informations.bcc")}</strong>{" "}
-                {mainInfos.data.email.bcc.map((bcc, index) => (
-                    <span key={index}>{bcc.email}</span>
-                ))}
-            </div>
+            {mainInfos.data.email.bcc.length > 0 && (
+                <div>
+                    <strong>{t("dashboard.informations.bcc")}</strong>{" "}
+                    {mainInfos.data.email.bcc.map((bcc, index) => (
+                        <span key={index}>{bcc.email}</span>
+                    ))}
+                </div>
+            )}
             <div>
                 <strong>{t("dashboard.informations.percentage")} </strong>
-                {mainInfos.percentage.toFixed(1)}
+                {volumeTotal.toFixed(2)}Ko (
+                {getPercentage(volumeTotal / 1000, totalFileSize).toFixed(2)}%)
             </div>
             <div>
+                <strong>{t("dashboard.informations.mailFocus")}</strong>
                 <div style={{ maxHeight: 200, overflow: "scroll" }}>
-                    <strong>{t("dashboard.informations.mailFocus")}</strong>
                     <p style={{ wordBreak: "break-word" }}>
                         {mainInfos.data.email.contentText}
                     </p>
                 </div>
             </div>
-        </>
+        </div>
     );
 };

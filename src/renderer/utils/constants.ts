@@ -59,3 +59,6 @@ export const MONTHS_NB = {
     MARCH: 3,
     SEPT: 9,
 } as const;
+
+export const AVERAGE_MAIL_SIZE_IN_MO = 0.005;
+export const AVERAGE_MAIL_SIZE_IN_KO = 5;

@@ -49,7 +49,8 @@
       "react-i18next",
       "lodash",
       "electron-store",
-      "source-map-support"
+      "source-map-support",
+      "zustand"
     ]
   },
   "//build.extraResources": "Static should be set again because it is overwritten",
@@ -181,6 +182,7 @@
     "source-map-support": "^0.5.21",
     "ts-node": "^10.4.0",
     "uuid": "^8.3.2",
-    "xlsx": "^0.18.0"
+    "xlsx": "^0.18.0",
+    "zustand": "^3.7.0"
   }
 }

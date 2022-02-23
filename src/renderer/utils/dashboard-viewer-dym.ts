@@ -1,7 +1,14 @@
-import type { PstElement, PstEmail } from "@common/modules/pst-extractor/type";
+import type {
+    PstAttachement,
+    PstElement,
+    PstEmail,
+    PstExtractTables,
+} from "@common/modules/pst-extractor/type";
 import { isPstEmail, isPstFolder } from "@common/modules/pst-extractor/type";
 import { v4 as randomUUID } from "uuid";
 
+import { setAttachmentPerLevel } from "../store/PstAttachmentCountStore";
+import { setFileSizePerLevel } from "../store/PstFileSizeStore";
 import {
     LDAP_ARBITRARY_SPLICE_CHAR,
     LDAP_ORG,
@@ -58,6 +65,37 @@ export const createBase = <TId extends string>(
     size: 0.0001,
     value: "size",
 });
+
+export const getInitialTotalMail = (extractTables: PstExtractTables): number =>
+    [...Object(extractTables.emails).values()].flat().length;
+
+export const getInitialTotalAttachements = (
+    extractTables: PstExtractTables
+): number =>
+    [...Object(extractTables.emails).values()]
+        .flat()
+        .reduce(
+            (acc: number, { attachementCount }: { attachementCount: number }) =>
+                acc + attachementCount,
+            0
+        ) as number;
+
+export const getInititalTotalFileSize = (
+    extractTables: PstExtractTables
+): number =>
+    getFileSizeByMail(
+        [
+            ...Object(extractTables.attachements).values(),
+        ].flat() as PstAttachement[]
+    );
+
+export const getTotalLevelMail = (elements: ViewerObject<string>): number =>
+    elements.children.flat().reduce((acc, curr) => acc + curr.size, 0);
+
+export const getFileSizeByMail = (attachments: PstAttachement[]): number =>
+    attachments.reduce((acc: number, { filesize }: { filesize: number }) => {
+        return acc + filesize;
+    }, 0);
 
 export const createBaseMail = (): PstEmail => ({
     attachementCount: 0,
@@ -125,6 +163,7 @@ export const getAggregatedDomainCount = (
     initPst: PstElement
 ): Record<string, number> => {
     const mailCountPerDomain = new Map<string, number>();
+
     const recursivelyFindProp = (pst: PstElement) => {
         if (isPstFolder(pst)) {
             pst.children?.forEach((child) => {
@@ -180,6 +219,8 @@ export const getUniqueCorrespondantsByDomain = (
     domain: string
 ): Correspondant[] => {
     const correspsFound: Correspondant[] = [];
+    let attachementPerLevel = 0;
+    let fileSizePerLevel = 0;
     const recursivelyFindCorresp = (pst: PstElement) => {
         if (isPstFolder(pst)) {
             pst.children?.forEach((child) => {
@@ -191,10 +232,15 @@ export const getUniqueCorrespondantsByDomain = (
             (getDomain(pst.from.email) === domain ||
                 getLdapDomain(pst.from.email) === domain)
         ) {
+            fileSizePerLevel += getFileSizeByMail(pst.attachements);
+
+            attachementPerLevel += pst.attachementCount;
             correspsFound.push([pst.from.name, 1]);
         }
     };
     recursivelyFindCorresp(initPst);
+    setAttachmentPerLevel(attachementPerLevel);
+    setFileSizePerLevel(fileSizePerLevel);
 
     const accumulatedCorresps = correspsFound.reduce<typeof correspsFound>(
         (acc, [name, value]) => {
@@ -214,6 +260,8 @@ export const getYearByCorrespondants = (
     correspondant: string
 ): Year[] => {
     const yearsFound: Year[] = [];
+    let attachementPerLevel = 0;
+    let fileSizePerLevel = 0;
     const recursivelyFindYear = (pst: PstElement) => {
         if (isPstFolder(pst)) {
             pst.children?.forEach((child) => {
@@ -224,10 +272,15 @@ export const getYearByCorrespondants = (
             pst.receivedDate &&
             pst.from.name === correspondant
         ) {
+            attachementPerLevel += pst.attachementCount;
+            fileSizePerLevel += getFileSizeByMail(pst.attachements);
+
             yearsFound.push([pst.receivedDate.getFullYear(), 1]);
         }
     };
     recursivelyFindYear(initPst);
+    setAttachmentPerLevel(attachementPerLevel);
+    setFileSizePerLevel(fileSizePerLevel);
 
     const accumulatedYears = yearsFound.reduce<typeof yearsFound>(
         (acc, [year, value]) => {
@@ -249,6 +302,9 @@ export const getMailsByDym = (
     year: number
 ): PstEmail[] => {
     const mailsFound: PstEmail[] = [];
+    let attachementPerLevel = 0;
+    let fileSizePerLevel = 0;
+
     const recursivelyFindMail = (pst: PstElement) => {
         if (isPstFolder(pst)) {
             pst.children?.forEach((child) => {
@@ -263,10 +319,15 @@ export const getMailsByDym = (
             (getDomain(pst.from.email) === domain ||
                 getLdapDomain(pst.from.email) === domain)
         ) {
+            attachementPerLevel += pst.attachementCount;
+            fileSizePerLevel += getFileSizeByMail(pst.attachements);
+
             mailsFound.push(pst);
         }
     };
     recursivelyFindMail(initPst);
+    setAttachmentPerLevel(attachementPerLevel);
+    setFileSizePerLevel(fileSizePerLevel);
 
     return mailsFound.sort(
         (a, b) =>
@@ -298,6 +359,7 @@ export const createCorrespondants = <TId extends string>(
             ...createBase(id),
         });
     }
+
     return correspondantCache.get(id) as CorrespondantViewerObject<TId>;
 };
 

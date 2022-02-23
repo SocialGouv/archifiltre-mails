@@ -7,11 +7,9 @@ import {
     isMailMainInfos,
     usePstFMInfosStore,
 } from "../../store/PstFMInfosStore";
-import { ROOT } from "../../utils/constants";
 import type { DashboardComponentProps } from "./Dashboard";
 import style from "./Dashboard.module.scss";
 import { DashboardInformationsFolder } from "./DashboardInformationsFolder";
-import { DashboardInformationsLoader } from "./DashboardInformationsLoader";
 import { DashboardInformationsMail } from "./DashboardInformationsMail";
 
 export const DashboardInformations: FC<DashboardComponentProps> = ({
@@ -20,9 +18,6 @@ export const DashboardInformations: FC<DashboardComponentProps> = ({
     const { t } = useTranslation();
     const { mainInfos } = usePstFMInfosStore();
 
-    if (!mainInfos || mainInfos.data.name === ROOT)
-        return <DashboardInformationsLoader />;
-
     return (
         <Card
             title={t("dashboard.informations.cardTitle")}
@@ -30,19 +25,13 @@ export const DashboardInformations: FC<DashboardComponentProps> = ({
             className={className}
         >
             <div className={style.dashboard__informations}>
-                {mainInfos.data.name === ROOT ? (
-                    <p>{t("dashboard.informations.emptyInfos")}</p>
-                ) : (
-                    <ul>
-                        {isMailMainInfos(mainInfos) ? (
-                            <DashboardInformationsMail mainInfos={mainInfos} />
-                        ) : (
-                            <DashboardInformationsFolder
-                                mainInfos={mainInfos}
-                            />
-                        )}
-                    </ul>
-                )}
+                <div className={style.dashboard__informations__wrapper}>
+                    {mainInfos && isMailMainInfos(mainInfos) ? (
+                        <DashboardInformationsMail mainInfos={mainInfos} />
+                    ) : (
+                        <DashboardInformationsFolder mainInfos={mainInfos} />
+                    )}
+                </div>
             </div>
         </Card>
     );

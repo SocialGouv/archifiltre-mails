@@ -16,6 +16,7 @@ export interface BreadcrumbObject {
 
 export interface UseBreadcrumbStore {
     breadcrumb: BreadcrumbObject;
+    setPreviousBreadcrumb: (id: BreadcrumbId) => void;
     setBreadcrumb: (update: SetStateAction<BreadcrumbObject>) => void;
 }
 
@@ -26,8 +27,20 @@ const breadcrumbAtom = atom<BreadcrumbObject>({
 export const useBreadcrumbStore = (): UseBreadcrumbStore => {
     const [breadcrumb, setBreadcrumb] = useAtom(breadcrumbAtom);
 
+    const setPreviousBreadcrumb = (id: BreadcrumbId) => {
+        setBreadcrumb((prevBreadcrumb) => {
+            const history = prevBreadcrumb.history;
+            history?.pop();
+            return {
+                history,
+                id,
+            };
+        });
+    };
+
     return {
         breadcrumb,
         setBreadcrumb,
+        setPreviousBreadcrumb,
     };
 };
