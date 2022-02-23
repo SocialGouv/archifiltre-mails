@@ -34,7 +34,7 @@ export const setPreviousTotalMailsPerLevel = (): void => {
     });
 };
 
-export const setInitialTotalMailPerLevelCount = (): void => {
+export const setInitialTotalMailPerLevel = (): void => {
     setState(({ totalMailPerLevel }) => ({
         totalMailPerLevel: [totalMailPerLevel[0] ?? 0],
     }));

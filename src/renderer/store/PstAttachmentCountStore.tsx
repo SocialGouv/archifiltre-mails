@@ -2,49 +2,44 @@ import createHook from "zustand/index";
 import create from "zustand/vanilla";
 
 export const attachmentCountStore = create(() => ({
-    attachmentPerLevelCount: [0],
-    attachmentTotalCount: 0,
+    attachmentPerLevel: [0],
+    attachmentTotal: 0,
 }));
 
 const { setState } = attachmentCountStore;
 
-export const setAttachmentTotalCount = (attachmentTotalCount: number): void => {
+export const setAttachmentTotal = (attachmentTotal: number): void => {
     setState({
-        attachmentPerLevelCount: [attachmentTotalCount],
-        attachmentTotalCount,
+        attachmentPerLevel: [attachmentTotal],
+        attachmentTotal,
     });
 };
 
-export const setAttachmentPerLevelCount = (
-    newAttachmentPerLevelCount: number
-): void => {
-    setState(({ attachmentPerLevelCount }) => ({
-        attachmentPerLevelCount: [
-            ...attachmentPerLevelCount,
-            newAttachmentPerLevelCount,
-        ],
+export const setAttachmentPerLevel = (newAttachmentPerLevel: number): void => {
+    setState(({ attachmentPerLevel }) => ({
+        attachmentPerLevel: [...attachmentPerLevel, newAttachmentPerLevel],
     }));
 };
 
-export const setPreviousAttachmentPerLevelCount = (): void => {
-    setState(({ attachmentPerLevelCount }) => {
-        if (attachmentPerLevelCount.length === 1)
+export const setPreviousAttachmentPerLevel = (): void => {
+    setState(({ attachmentPerLevel: attachmentPerLevel }) => {
+        if (attachmentPerLevel.length === 1)
             return {
-                attachmentPerLevelCount: [attachmentPerLevelCount[0] ?? 0],
+                attachmentPerLevel: [attachmentPerLevel[0] ?? 0],
             };
 
-        const previousAttachmentPerLevelCount = attachmentPerLevelCount;
-        previousAttachmentPerLevelCount.pop();
+        const previousAttachmentPerLevel = attachmentPerLevel;
+        previousAttachmentPerLevel.pop();
 
         return {
-            attachmentPerLevelCount: previousAttachmentPerLevelCount,
+            attachmentPerLevel: previousAttachmentPerLevel,
         };
     });
 };
 
-export const setInitialAttachmentPerLevelCount = (): void => {
-    setState(({ attachmentPerLevelCount }) => ({
-        attachmentPerLevelCount: [attachmentPerLevelCount[0] ?? 0],
+export const setInitialAttachmentPerLevel = (): void => {
+    setState(({ attachmentPerLevel }) => ({
+        attachmentPerLevel: [attachmentPerLevel[0] ?? 0],
     }));
 };
 /**

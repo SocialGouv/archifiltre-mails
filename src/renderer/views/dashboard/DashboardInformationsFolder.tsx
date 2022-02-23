@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 import type { LocaleFileResources } from "@common/i18n/raw";
 import { getPercentage } from "@common/utils";
 import type { FC } from "react";
@@ -7,6 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { useBreadcrumbStore } from "../../store/BreadcrumbStore";
 import { useAttachmentCountStore } from "../../store/PstAttachmentCountStore";
+import { usePstFileSizeStore } from "../../store/PstFileSizeStore";
 import type { UsePstMainInfosStore } from "../../store/PstFMInfosStore";
 import { useMailCountStore } from "../../store/PstMailCountStore";
 import style from "./Dashboard.module.scss";
@@ -23,9 +23,9 @@ export const DashboardInformationsFolder: FC<{
 }> = ({ mainInfos }) => {
     const { t } = useTranslation();
 
-    const { attachmentTotalCount, attachmentPerLevelCount } =
-        useAttachmentCountStore();
+    const { attachmentPerLevel } = useAttachmentCountStore();
     const { totalMailPerLevel } = useMailCountStore();
+    const { fileSizePerLevel, totalFileSize } = usePstFileSizeStore();
 
     const {
         breadcrumb: { id: breadcrumbId, history },
@@ -33,7 +33,7 @@ export const DashboardInformationsFolder: FC<{
 
     const infosId = breadcrumbId as InformationsId;
     const currentElementTitle =
-        history?.[history.length - 1] ?? "tous les domaines";
+        history?.[history.length - 1] ?? t("dashboard.informations.allDomains");
 
     return (
         <div className={style.dashboard__informations__wrapper__folder}>
@@ -55,21 +55,15 @@ export const DashboardInformationsFolder: FC<{
                 <div>
                     <span>{t("dashboard.informations.attachedCount")} : </span>
                     <span>
-                        {
-                            attachmentPerLevelCount[
-                                attachmentPerLevelCount.length - 1
-                            ]
-                        }
+                        {attachmentPerLevel[attachmentPerLevel.length - 1]}
                     </span>
                 </div>
                 <div>
                     <span>{t("dashboard.informations.percentage")} : </span>
-                    XXX Ko (
+                    {fileSizePerLevel[fileSizePerLevel.length - 1]} Mo (
                     {getPercentage(
-                        attachmentPerLevelCount[
-                            attachmentPerLevelCount.length - 1
-                        ] ?? 0,
-                        attachmentTotalCount
+                        fileSizePerLevel[fileSizePerLevel.length - 1] ?? 0,
+                        totalFileSize
                     ).toFixed(2)}
                     %)
                 </div>

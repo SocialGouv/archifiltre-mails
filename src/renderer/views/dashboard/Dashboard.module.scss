@@ -227,6 +227,12 @@ $dashboard-card-width: calc(50vw - 0.5rem);
 
     &__mail {
       width: 100%;
+      > div {
+        margin: 0 0 0.4rem;
+      }
+      span {
+        display: table;
+      }
     }
 
     &__folder {

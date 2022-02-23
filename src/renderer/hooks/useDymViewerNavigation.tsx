@@ -3,12 +3,16 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useBreadcrumbStore } from "../store/BreadcrumbStore";
 import {
-    setInitialAttachmentPerLevelCount,
-    setPreviousAttachmentPerLevelCount,
+    setInitialAttachmentPerLevel,
+    setPreviousAttachmentPerLevel,
 } from "../store/PstAttachmentCountStore";
+import {
+    setInitialFileSizePerLevel,
+    setPreviousFileSizePerLevel,
+} from "../store/PstFileSizeStore";
 import { usePstFMInfosStore } from "../store/PstFMInfosStore";
 import {
-    setInitialTotalMailPerLevelCount,
+    setInitialTotalMailPerLevel,
     setPreviousTotalMailsPerLevel,
     setTotalMailPerLevel,
 } from "../store/PstMailCountStore";
@@ -96,15 +100,17 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
     const restartView = () => {
         setCurrentView(domainView);
         cancelFocus();
-        setInitialAttachmentPerLevelCount();
-        setInitialTotalMailPerLevelCount();
+        setInitialAttachmentPerLevel();
+        setInitialTotalMailPerLevel();
+        setInitialFileSizePerLevel();
         setBreadcrumb({ id: "domain" });
     };
 
     const computePreviousView = () => {
         cancelFocus();
-        setPreviousAttachmentPerLevelCount();
+        setPreviousAttachmentPerLevel();
         setPreviousTotalMailsPerLevel();
+        setPreviousFileSizePerLevel();
 
         if (currentView?.type === CORRESPONDANTS) {
             setCurrentView(domainView);

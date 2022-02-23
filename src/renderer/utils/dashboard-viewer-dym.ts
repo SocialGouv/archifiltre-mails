@@ -1,11 +1,14 @@
-import type { PstElement, PstEmail } from "@common/modules/pst-extractor/type";
+import type {
+    PstAttachement,
+    PstElement,
+    PstEmail,
+    PstExtractTables,
+} from "@common/modules/pst-extractor/type";
 import { isPstEmail, isPstFolder } from "@common/modules/pst-extractor/type";
 import { v4 as randomUUID } from "uuid";
 
-import {
-    setAttachmentPerLevelCount,
-    setAttachmentTotalCount,
-} from "../store/PstAttachmentCountStore";
+import { setAttachmentPerLevel } from "../store/PstAttachmentCountStore";
+import { setFileSizePerLevel } from "../store/PstFileSizeStore";
 import {
     LDAP_ARBITRARY_SPLICE_CHAR,
     LDAP_ORG,
@@ -63,8 +66,36 @@ export const createBase = <TId extends string>(
     value: "size",
 });
 
+export const getInitialTotalMail = (extractTables: PstExtractTables): number =>
+    [...Object(extractTables.emails).values()].flat().length;
+
+export const getInitialTotalAttachements = (
+    extractTables: PstExtractTables
+): number =>
+    [...Object(extractTables.emails).values()]
+        .flat()
+        .reduce(
+            (acc: number, { attachementCount }: { attachementCount: number }) =>
+                acc + attachementCount,
+            0
+        ) as number;
+
+export const getInititalTotalFileSize = (
+    extractTables: PstExtractTables
+): number =>
+    getFileSizeByMail(
+        [
+            ...Object(extractTables.attachements).values(),
+        ].flat() as PstAttachement[]
+    );
+
 export const getTotalLevelMail = (elements: ViewerObject<string>): number =>
     elements.children.flat().reduce((acc, curr) => acc + curr.size, 0);
+
+export const getFileSizeByMail = (attachments: PstAttachement[]): number =>
+    attachments.reduce((acc: number, { filesize }: { filesize: number }) => {
+        return acc + filesize;
+    }, 0);
 
 export const createBaseMail = (): PstEmail => ({
     attachementCount: 0,
@@ -132,7 +163,6 @@ export const getAggregatedDomainCount = (
     initPst: PstElement
 ): Record<string, number> => {
     const mailCountPerDomain = new Map<string, number>();
-    let attachmentTotalCount = 0;
 
     const recursivelyFindProp = (pst: PstElement) => {
         if (isPstFolder(pst)) {
@@ -140,8 +170,6 @@ export const getAggregatedDomainCount = (
                 recursivelyFindProp(child);
             });
         } else if (isPstEmail(pst) && pst.from.email) {
-            attachmentTotalCount += pst.attachementCount;
-
             const emails = new Set([pst.from.email]);
             emails.forEach((email) => {
                 const domainKey = isLdap(email)
@@ -156,7 +184,6 @@ export const getAggregatedDomainCount = (
     };
 
     recursivelyFindProp(initPst);
-    setAttachmentTotalCount(attachmentTotalCount);
 
     /* eslint-disable @typescript-eslint/naming-convention */
     const orderByValues = <K, V extends number>(m: Map<K, V>): Map<K, V> =>
@@ -192,7 +219,8 @@ export const getUniqueCorrespondantsByDomain = (
     domain: string
 ): Correspondant[] => {
     const correspsFound: Correspondant[] = [];
-    let attachmentPerLevelCount = 0;
+    let attachementPerLevel = 0;
+    let fileSizePerLevel = 0;
     const recursivelyFindCorresp = (pst: PstElement) => {
         if (isPstFolder(pst)) {
             pst.children?.forEach((child) => {
@@ -204,12 +232,15 @@ export const getUniqueCorrespondantsByDomain = (
             (getDomain(pst.from.email) === domain ||
                 getLdapDomain(pst.from.email) === domain)
         ) {
-            attachmentPerLevelCount += pst.attachementCount;
+            fileSizePerLevel += getFileSizeByMail(pst.attachements);
+
+            attachementPerLevel += pst.attachementCount;
             correspsFound.push([pst.from.name, 1]);
         }
     };
     recursivelyFindCorresp(initPst);
-    setAttachmentPerLevelCount(attachmentPerLevelCount);
+    setAttachmentPerLevel(attachementPerLevel);
+    setFileSizePerLevel(fileSizePerLevel);
 
     const accumulatedCorresps = correspsFound.reduce<typeof correspsFound>(
         (acc, [name, value]) => {
@@ -229,7 +260,8 @@ export const getYearByCorrespondants = (
     correspondant: string
 ): Year[] => {
     const yearsFound: Year[] = [];
-    let attachmentPerLevelCount = 0;
+    let attachementPerLevel = 0;
+    let fileSizePerLevel = 0;
     const recursivelyFindYear = (pst: PstElement) => {
         if (isPstFolder(pst)) {
             pst.children?.forEach((child) => {
@@ -240,12 +272,15 @@ export const getYearByCorrespondants = (
             pst.receivedDate &&
             pst.from.name === correspondant
         ) {
-            attachmentPerLevelCount += pst.attachementCount;
+            attachementPerLevel += pst.attachementCount;
+            fileSizePerLevel += getFileSizeByMail(pst.attachements);
+
             yearsFound.push([pst.receivedDate.getFullYear(), 1]);
         }
     };
     recursivelyFindYear(initPst);
-    setAttachmentPerLevelCount(attachmentPerLevelCount);
+    setAttachmentPerLevel(attachementPerLevel);
+    setFileSizePerLevel(fileSizePerLevel);
 
     const accumulatedYears = yearsFound.reduce<typeof yearsFound>(
         (acc, [year, value]) => {
@@ -267,7 +302,8 @@ export const getMailsByDym = (
     year: number
 ): PstEmail[] => {
     const mailsFound: PstEmail[] = [];
-    let attachmentPerLevelCount = 0;
+    let attachementPerLevel = 0;
+    let fileSizePerLevel = 0;
 
     const recursivelyFindMail = (pst: PstElement) => {
         if (isPstFolder(pst)) {
@@ -283,12 +319,15 @@ export const getMailsByDym = (
             (getDomain(pst.from.email) === domain ||
                 getLdapDomain(pst.from.email) === domain)
         ) {
-            attachmentPerLevelCount += pst.attachementCount;
+            attachementPerLevel += pst.attachementCount;
+            fileSizePerLevel += getFileSizeByMail(pst.attachements);
+
             mailsFound.push(pst);
         }
     };
     recursivelyFindMail(initPst);
-    setAttachmentPerLevelCount(attachmentPerLevelCount);
+    setAttachmentPerLevel(attachementPerLevel);
+    setFileSizePerLevel(fileSizePerLevel);
 
     return mailsFound.sort(
         (a, b) =>

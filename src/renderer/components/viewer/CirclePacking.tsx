@@ -111,6 +111,7 @@ export const CirclePacking: React.FC = () => {
             setMainInfos((infos) => infos);
             return;
         }
+
         setMainInfos(node);
         setHoveredId(node.id);
     }, 500);
