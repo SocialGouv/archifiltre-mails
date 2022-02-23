@@ -49,7 +49,8 @@
       "react-i18next",
       "lodash",
       "electron-store",
-      "source-map-support"
+      "source-map-support",
+      "zustand"
     ]
   },
   "//build.extraResources": "Static should be set again because it is overwritten",
