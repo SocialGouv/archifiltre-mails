@@ -1,16 +1,21 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import { Card } from "../../components/common/card/Card";
-import { isMailMainInfos, usePstStore } from "../../store/PSTStore";
+import {
+    isMailMainInfos,
+    usePstFMInfosStore,
+} from "../../store/PstFMInfosStore";
 import type { DashboardComponentProps } from "./Dashboard";
 import style from "./Dashboard.module.scss";
 
 export const DashboardMailBody: React.FC<DashboardComponentProps> = ({
     className,
 }) => {
-    const { mainInfos } = usePstStore();
+    const { mainInfos } = usePstFMInfosStore();
+    const { t } = useTranslation();
 
-    if (!mainInfos) return null; // TODO: loader
+    if (!mainInfos) return null;
 
     return (
         <Card title="Mail" color="grey" className={className}>
@@ -20,7 +25,7 @@ export const DashboardMailBody: React.FC<DashboardComponentProps> = ({
                         {mainInfos.data.email.contentText}
                     </div>
                 ) : (
-                    <div data-i18n="TODO">Empty</div>
+                    <div>{t("dashboard.informations.mailEmpty")}</div>
                 )}
             </div>
         </Card>

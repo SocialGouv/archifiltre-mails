@@ -3,11 +3,11 @@
 
 import React from "react";
 
-import { usePstStore } from "../../store/PSTStore";
+import { usePstFMInfosStore } from "../../store/PstFMInfosStore";
 import style from "./CirclePacking.module.scss";
 
 export const CirclePackingCancellableFocusZone: React.FC = () => {
-    const { isInfoFocus, cancelFocus } = usePstStore();
+    const { isInfoFocus, cancelFocus } = usePstFMInfosStore();
 
     if (!isInfoFocus) return null;
 

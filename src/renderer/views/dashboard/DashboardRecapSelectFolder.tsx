@@ -1,7 +1,8 @@
 import type { FC } from "react";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
-import { usePstFolderList } from "../../hooks/usePSTFolderList";
+import { usePstFolderList } from "../../hooks/usePstFolderList";
 import style from "./Dashboard.module.scss";
 import { DashboardRecapSelectFolderItem } from "./DashboardRecapSelectFolderItem";
 
@@ -12,19 +13,21 @@ export interface DashboardRecapSelectFolderProps {
 export const DashboardRecapSelectFolder: FC<
     DashboardRecapSelectFolderProps
 > = ({ switchView }) => {
+    const { t } = useTranslation();
     const { folderList } = usePstFolderList();
 
     return (
         <div className={style.dashboard__select}>
             <p className={style.dashboard__select__info}>
-                Pour afficher la synthèse de votre PST, sélectionnez votre
-                dossier de mails supprimés
+                {t("dashboard.recap.selectFolder.selector")}
             </p>
             <DashboardRecapSelectFolderItem
                 type="deleted"
                 pstFolderList={folderList}
             />
-            <button onClick={switchView}>Valider mon choix</button>
+            <button onClick={switchView}>
+                {t("dashboard.recap.selectFolder.validate")}
+            </button>
         </div>
     );
 };
