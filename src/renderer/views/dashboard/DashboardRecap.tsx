@@ -112,7 +112,9 @@ export const DashboardRecap: FC = () => {
                                     style.dashboard__recap__informations__item
                                 }
                             >
-                                {totalFolderSize} {t("dashboard.recap.folder")}
+                                {t("dashboard.recap.folder", {
+                                    count: totalFolderSize,
+                                })}
                             </span>
                         </div>
                     </div>
