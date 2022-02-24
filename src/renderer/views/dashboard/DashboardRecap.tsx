@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Card } from "../../components/common/card/Card";
 import {
     ContactPicto,
+    ExtremeDatePicto,
     FolderPicto,
     MailPicto,
     MailSentPicto,
@@ -21,6 +22,7 @@ import {
     getPstTotalSentAttachments,
     getPstTotalSentMails,
 } from "../../utils/dashboard-recap";
+import { getExtremeMailsDates } from "../../utils/pst-extractor";
 import style from "./Dashboard.module.scss";
 import { DashboardRecapItem } from "./DashboardRecapItem";
 import { DashboardRecapSelectFolder } from "./DashboardRecapSelectFolder";
@@ -62,8 +64,15 @@ export const DashboardRecap: FC = () => {
 
     if (!pstFile) return null;
 
+    // folders
     const totalFolderSize = getPstListOfFolder(pstFile.children).length;
 
+    // dates extrêmes
+    const { minDate, maxDate } = getExtremeMailsDates(extractTables!);
+    // TODO: move to default config (?)
+    const extremeDateFormatParam: Intl.DateTimeFormatOptions = {
+        dateStyle: "full",
+    };
     return (
         <Card title={t("dashboard.recap.cardTitle")} color="blue">
             {isRecapReady ? (
@@ -90,10 +99,49 @@ export const DashboardRecap: FC = () => {
                         picto={<TrashPicto />}
                     />
                     <DashboardRecapItem
-                        title={t("dashboard.recap.contacts")}
+                        title={t("dashboard.recap.contactsTitle")}
                         contact={contactTotal}
                         picto={<ContactPicto />}
                     />
+                    <div className={style.dashboard__recap__item}>
+                        <div className={style.dashboard__recap__picto}>
+                            <ExtremeDatePicto />
+                        </div>
+
+                        <div className={style.dashboard__recap__informations}>
+                            <span
+                                className={
+                                    style.dashboard__recap__informations__item
+                                }
+                            >
+                                {t("dashboard.recap.extremum")}
+                            </span>
+                            <span
+                                className={
+                                    style.dashboard__recap__informations__item
+                                }
+                            >
+                                {t("dashboard.recap.extremum.minDate", {
+                                    formatParams: {
+                                        minDate: extremeDateFormatParam,
+                                    },
+                                    minDate,
+                                })}
+                            </span>
+                            <span
+                                className={
+                                    style.dashboard__recap__informations__item
+                                }
+                            >
+                                {t("dashboard.recap.extremum.maxDate", {
+                                    formatParams: {
+                                        maxDate: extremeDateFormatParam,
+                                    },
+                                    maxDate,
+                                })}
+                            </span>
+                        </div>
+                    </div>
                     <div className={style.dashboard__recap__item}>
                         <div className={style.dashboard__recap__picto}>
                             <FolderPicto />
@@ -105,7 +153,7 @@ export const DashboardRecap: FC = () => {
                                     style.dashboard__recap__informations__item
                                 }
                             >
-                                {t("dashboard.recap.folder")}
+                                {t("dashboard.recap.folderLabel")}
                             </span>
                             <span
                                 className={
