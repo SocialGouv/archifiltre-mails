@@ -14,16 +14,16 @@ export const getExtremumDate = (
     dates: PstEmail[],
     compare: "max" | "min",
     messageType: "receivedDate" | "sentTime"
-): string =>
+): Date =>
     new Date(
         Math[compare](
             ...dates.map((date) => new Date(date[messageType]!).getTime())
         )
-    ).toDateString();
+    );
 
 interface ExtremeMailDates {
-    max: string;
-    min: string;
+    maxDate: Date;
+    minDate: Date;
 }
 export const getExtremeMailsDates = (
     extractTables: PstExtractTables
@@ -36,8 +36,8 @@ export const getExtremeMailsDates = (
     const extremumMaxR = getExtremumDate(dates, "max", "receivedDate");
     const extremumMinR = getExtremumDate(dates, "min", "receivedDate");
 
-    const max = extremumMaxR > extremumMaxS ? extremumMaxR : extremumMaxS;
-    const min = extremumMinR < extremumMinS ? extremumMinR : extremumMinS;
+    const maxDate = extremumMaxR > extremumMaxS ? extremumMaxR : extremumMaxS;
+    const minDate = extremumMinR < extremumMinS ? extremumMinR : extremumMinS;
 
-    return { max, min };
+    return { maxDate, minDate };
 };

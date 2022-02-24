@@ -6,12 +6,14 @@ import { Card } from "../../components/common/card/Card";
 import {
     ContactPicto,
     ExtremeDatePicto,
+    FolderPicto,
     MailPicto,
     MailSentPicto,
     TrashPicto,
 } from "../../components/common/pictos/picto";
 import { usePstStore } from "../../store/PSTStore";
 import {
+    getPstListOfFolder,
     getPstMailsPercentage,
     getPstTotalContacts,
     getPstTotalDeletedMails,
@@ -33,6 +35,7 @@ export const DashboardRecap: FC = () => {
     const switchView = useCallback(() => {
         setIsRecapReady(true);
     }, []);
+
     const { pstFile, deletedFolder, extractTables } = usePstStore();
 
     // mails received
@@ -59,8 +62,17 @@ export const DashboardRecap: FC = () => {
     // contact
     const contactTotal = getPstTotalContacts(extractTables?.contacts);
 
+    if (!pstFile) return null;
+
+    // folders
+    const totalFolderSize = getPstListOfFolder(pstFile.children).length;
+
     // dates extrêmes
-    const { min, max } = getExtremeMailsDates(extractTables!);
+    const { minDate, maxDate } = getExtremeMailsDates(extractTables!);
+    // TODO: move to default config (?)
+    const extremeDateFormatParam: Intl.DateTimeFormatOptions = {
+        dateStyle: "full",
+    };
     return (
         <Card title={t("dashboard.recap.cardTitle")} color="blue">
             {isRecapReady ? (
@@ -87,7 +99,7 @@ export const DashboardRecap: FC = () => {
                         picto={<TrashPicto />}
                     />
                     <DashboardRecapItem
-                        title={t("dashboard.recap.contacts")}
+                        title={t("dashboard.recap.contactsTitle")}
                         contact={contactTotal}
                         picto={<ContactPicto />}
                     />
@@ -109,14 +121,48 @@ export const DashboardRecap: FC = () => {
                                     style.dashboard__recap__informations__item
                                 }
                             >
-                                {t("dashboard.recap.extremum.min", { min })}
+                                {t("dashboard.recap.extremum.minDate", {
+                                    formatParams: {
+                                        minDate: extremeDateFormatParam,
+                                    },
+                                    minDate,
+                                })}
                             </span>
                             <span
                                 className={
                                     style.dashboard__recap__informations__item
                                 }
                             >
-                                {t("dashboard.recap.extremum.max", { max })}
+                                {t("dashboard.recap.extremum.maxDate", {
+                                    formatParams: {
+                                        maxDate: extremeDateFormatParam,
+                                    },
+                                    maxDate,
+                                })}
+                            </span>
+                        </div>
+                    </div>
+                    <div className={style.dashboard__recap__item}>
+                        <div className={style.dashboard__recap__picto}>
+                            <FolderPicto />
+                        </div>
+
+                        <div className={style.dashboard__recap__informations}>
+                            <span
+                                className={
+                                    style.dashboard__recap__informations__item
+                                }
+                            >
+                                {t("dashboard.recap.folderLabel")}
+                            </span>
+                            <span
+                                className={
+                                    style.dashboard__recap__informations__item
+                                }
+                            >
+                                {t("dashboard.recap.folder", {
+                                    count: totalFolderSize,
+                                })}
                             </span>
                         </div>
                     </div>

@@ -2,7 +2,9 @@ import type {
     PstContent,
     PstEmail,
     PstExtractTables,
+    PstFolder,
 } from "@common/modules/pst-extractor/type";
+import { isPstFolder } from "@common/modules/pst-extractor/type";
 
 export const getPstTotalReceivedMails = (
     extractTables: PstExtractTables | undefined
@@ -93,4 +95,23 @@ export const getPstMailsPercentage = (
         return ((current / totalMails) * 100).toFixed(1);
     }
     return "0";
+};
+
+interface FolderListItem {
+    name: string;
+    type: string;
+    id: string;
+}
+
+export const getPstListOfFolder = (pst: PstFolder[]): FolderListItem[] => {
+    const folderList: FolderListItem[] = [];
+    pst.forEach((folder) => {
+        const { id, name, type, children } = folder;
+        if (isPstFolder(folder)) {
+            folderList.push({ id, name, type });
+        }
+        const childFolders = children?.filter(isPstFolder);
+        if (childFolders) folderList.push(...getPstListOfFolder(childFolders));
+    });
+    return folderList;
 };

@@ -36,7 +36,7 @@ export const DashboardRecapItem: FC<DashboardRecapItemProps> = ({
                     <span
                         className={style.dashboard__recap__informations__item}
                     >
-                        {contact} {t("dashboard.recap.contacts")}
+                        {t("dashboard.recap.contact", { count: contact })}
                     </span>
                 </div>
             ) : (
@@ -54,12 +54,14 @@ export const DashboardRecapItem: FC<DashboardRecapItemProps> = ({
                     <span
                         className={style.dashboard__recap__informations__item}
                     >
-                        {mails ?? 0} {t("dashboard.recap.mails")}
+                        {t("dashboard.recap.mail", { count: mails ?? 0 })}
                     </span>
                     <span
                         className={style.dashboard__recap__informations__item}
                     >
-                        {attachements} {t("dashboard.recap.pc")}
+                        {t("dashboard.recap.attachement", {
+                            count: attachements,
+                        })}
                     </span>
                 </div>
             )}
