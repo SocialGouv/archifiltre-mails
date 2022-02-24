@@ -15,6 +15,7 @@ export const Dropzone: React.FC<DropzoneProps> = ({ accept, onDrop }) => {
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept,
         onDrop,
+        useFsAccessApi: false,
     });
 
     const getClassName = (className: string, isActive: boolean) => {
