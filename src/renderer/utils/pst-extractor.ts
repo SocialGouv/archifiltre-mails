@@ -10,11 +10,6 @@ import type {
 export const getPstFolderList = (pst: PstContent): string[] =>
     pst.children[0]!.children!.map(({ name }) => name);
 
-export interface ExtremeMails {
-    max: string;
-    min: string;
-}
-
 export const getExtremumDate = (
     dates: PstEmail[],
     compare: "max" | "min",
@@ -26,9 +21,13 @@ export const getExtremumDate = (
         )
     ).toDateString();
 
-export const getExtremeMailsDate = (
+interface ExtremeMailDates {
+    max: string;
+    min: string;
+}
+export const getExtremeMailsDates = (
     extractTables: PstExtractTables
-): ExtremeMails => {
+): ExtremeMailDates => {
     const dates: PstEmail[] = [...Object(extractTables.emails).values()].flat();
 
     const extremumMaxS = getExtremumDate(dates, "max", "sentTime");

@@ -20,7 +20,7 @@ import {
     getPstTotalSentAttachments,
     getPstTotalSentMails,
 } from "../../utils/dashboard-recap";
-import { getExtremeMailsDate } from "../../utils/pst-extractor";
+import { getExtremeMailsDates } from "../../utils/pst-extractor";
 import style from "./Dashboard.module.scss";
 import { DashboardRecapItem } from "./DashboardRecapItem";
 import { DashboardRecapSelectFolder } from "./DashboardRecapSelectFolder";
@@ -60,7 +60,7 @@ export const DashboardRecap: FC = () => {
     const contactTotal = getPstTotalContacts(extractTables?.contacts);
 
     // dates extrêmes
-    const { min, max } = getExtremeMailsDate(extractTables!);
+    const { min, max } = getExtremeMailsDates(extractTables!);
     return (
         <Card title={t("dashboard.recap.cardTitle")} color="blue">
             {isRecapReady ? (
@@ -109,14 +109,14 @@ export const DashboardRecap: FC = () => {
                                     style.dashboard__recap__informations__item
                                 }
                             >
-                                Min: {min}
+                                {t("dashboard.recap.extremum.min", { min })}
                             </span>
                             <span
                                 className={
                                     style.dashboard__recap__informations__item
                                 }
                             >
-                                Max: {max}
+                                {t("dashboard.recap.extremum.max", { max })}
                             </span>
                         </div>
                     </div>

@@ -34,6 +34,8 @@
   "dashboard.recap.cardTitle": "Summary",
   "dashboard.recap.contacts": "Contacts",
   "dashboard.recap.deletedMessages": "Deleted messages",
+  "dashboard.recap.extremum.max": "Max: {{ max, number }}",
+  "dashboard.recap.extremum.min": "Min: {{ min, number }}",
   "dashboard.recap.extremum": "Extreme dates",
   "dashboard.recap.mails": "Emails",
   "dashboard.recap.pc": "pc",
