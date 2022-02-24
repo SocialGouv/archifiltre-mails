@@ -5,12 +5,14 @@ import { useTranslation } from "react-i18next";
 import { Card } from "../../components/common/card/Card";
 import {
     ContactPicto,
+    FolderPicto,
     MailPicto,
     MailSentPicto,
     TrashPicto,
 } from "../../components/common/pictos/picto";
 import { usePstStore } from "../../store/PSTStore";
 import {
+    getPstListOfFolder,
     getPstMailsPercentage,
     getPstTotalContacts,
     getPstTotalDeletedMails,
@@ -31,6 +33,7 @@ export const DashboardRecap: FC = () => {
     const switchView = useCallback(() => {
         setIsRecapReady(true);
     }, []);
+
     const { pstFile, deletedFolder, extractTables } = usePstStore();
 
     // mails received
@@ -56,6 +59,10 @@ export const DashboardRecap: FC = () => {
 
     // contact
     const contactTotal = getPstTotalContacts(extractTables?.contacts);
+
+    if (!pstFile) return null;
+
+    const totalFolderSize = getPstListOfFolder(pstFile.children).length;
 
     return (
         <Card title={t("dashboard.recap.cardTitle")} color="blue">
@@ -87,6 +94,28 @@ export const DashboardRecap: FC = () => {
                         contact={contactTotal}
                         picto={<ContactPicto />}
                     />
+                    <div className={style.dashboard__recap__item}>
+                        <div className={style.dashboard__recap__picto}>
+                            <FolderPicto />
+                        </div>
+
+                        <div className={style.dashboard__recap__informations}>
+                            <span
+                                className={
+                                    style.dashboard__recap__informations__item
+                                }
+                            >
+                                {t("dashboard.recap.folder")}
+                            </span>
+                            <span
+                                className={
+                                    style.dashboard__recap__informations__item
+                                }
+                            >
+                                {totalFolderSize} {t("dashboard.recap.folder")}
+                            </span>
+                        </div>
+                    </div>
                 </div>
             ) : (
                 <DashboardRecapSelectFolder switchView={switchView} />
