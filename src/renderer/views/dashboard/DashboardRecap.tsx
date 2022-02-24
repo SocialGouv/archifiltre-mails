@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Card } from "../../components/common/card/Card";
 import {
     ContactPicto,
+    ExtremeDatePicto,
     MailPicto,
     MailSentPicto,
     TrashPicto,
@@ -19,6 +20,7 @@ import {
     getPstTotalSentAttachments,
     getPstTotalSentMails,
 } from "../../utils/dashboard-recap";
+import { getExtremeMailsDates } from "../../utils/pst-extractor";
 import style from "./Dashboard.module.scss";
 import { DashboardRecapItem } from "./DashboardRecapItem";
 import { DashboardRecapSelectFolder } from "./DashboardRecapSelectFolder";
@@ -57,6 +59,8 @@ export const DashboardRecap: FC = () => {
     // contact
     const contactTotal = getPstTotalContacts(extractTables?.contacts);
 
+    // dates extrêmes
+    const { min, max } = getExtremeMailsDates(extractTables!);
     return (
         <Card title={t("dashboard.recap.cardTitle")} color="blue">
             {isRecapReady ? (
@@ -87,6 +91,35 @@ export const DashboardRecap: FC = () => {
                         contact={contactTotal}
                         picto={<ContactPicto />}
                     />
+                    <div className={style.dashboard__recap__item}>
+                        <div className={style.dashboard__recap__picto}>
+                            <ExtremeDatePicto />
+                        </div>
+
+                        <div className={style.dashboard__recap__informations}>
+                            <span
+                                className={
+                                    style.dashboard__recap__informations__item
+                                }
+                            >
+                                {t("dashboard.recap.extremum")}
+                            </span>
+                            <span
+                                className={
+                                    style.dashboard__recap__informations__item
+                                }
+                            >
+                                {t("dashboard.recap.extremum.min", { min })}
+                            </span>
+                            <span
+                                className={
+                                    style.dashboard__recap__informations__item
+                                }
+                            >
+                                {t("dashboard.recap.extremum.max", { max })}
+                            </span>
+                        </div>
+                    </div>
                 </div>
             ) : (
                 <DashboardRecapSelectFolder switchView={switchView} />
