@@ -3,7 +3,7 @@
 import type { ComputedDatum } from "@nivo/circle-packing";
 import { ResponsiveCirclePacking } from "@nivo/circle-packing";
 import debounce from "lodash/debounce";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useDymViewerNavigation } from "../../hooks/useDymViewerNavigation";
@@ -50,9 +50,6 @@ export const CirclePacking: React.FC = () => {
 
     const { setMainInfos, startFocus, isInfoFocus, mainInfos, cancelFocus } =
         usePstFMInfosStore();
-
-    const [circlePackingHtmlElement, setCirclePackingHtmlElement] =
-        useState<EventTarget>();
 
     const {
         setHoveredId,
@@ -126,36 +123,48 @@ export const CirclePacking: React.FC = () => {
         setMainInfos(undefined);
     };
 
-    const handleClick: CirclePackingCommonProps["onClick"] = (node, evt) => {
-        if (!circlePackingHtmlElement)
-            setCirclePackingHtmlElement(evt.currentTarget);
-        if (isMailViewerObject(node.data)) startFocus();
+    const handleClick: CirclePackingCommonProps["onClick"] = (node) => {
+        if (isMailViewerObject(node.data)) {
+            console.log({ node });
+            setMainInfos(node);
+            startFocus();
+        }
 
         computeNextView(node);
     };
 
     const handleLostFocus = debounce<NonNullable<Osef["onBlur"]>>((evt) => {
         const elt = document.elementFromPoint(evt.clientX, evt.clientY);
-        console.log({ elt, evt });
-        if (elt && elt !== evt.target) {
-            // (elt as any).click();
-            // elt?.dispatchEvent(
-            //     new MouseEvent("click", {
-            //         // bubbles: true,
-            //         // cancelable: true,
-            //         clientX: evt.clientX,
-            //         clientY: evt.clientY,
-            //         view: window,
-            //     })
-            // );
-            const reactFiberKey = Object.keys(elt).find((prop) =>
-                prop.startsWith("__reactFiber")
-            )!;
-            const fiber = (elt as any)[reactFiberKey];
-            console.log({ fiber, reactFiberKey });
-            fiber.ref.current.click();
-        }
-    }, 50);
+        // console.log({ elt, evt });
+        // if (elt && elt !== evt.target) {
+        //     // (elt as any).click();
+        //     // elt?.dispatchEvent(
+        //     //     new MouseEvent("click", {
+        //     //         // bubbles: true,
+        //     //         // cancelable: true,
+        //     //         clientX: evt.clientX,
+        //     //         clientY: evt.clientY,
+        //     //         view: window,
+        //     //     })
+        //     // );
+        //     const reactFiberKey = Object.keys(elt).find((prop) =>
+        //         prop.startsWith("__reactFiber")
+        //     )!;
+        //     const fiber = (elt as Any)[reactFiberKey];
+        //     console.log({ fiber, reactFiberKey });
+        //     fiber.ref.current.click();
+
+        elt?.dispatchEvent(
+            new MouseEvent(
+                "click", // or "mousedown" if the canvas listens for such an event
+                {
+                    bubbles: true,
+                    clientX: evt.clientX,
+                    clientY: evt.clientY,
+                }
+            )
+        );
+    }, 200);
 
     const handleBorderColor: CirclePackingCommonProps["borderColor"] = (node) =>
         handleFocusItemBorderColor(node, mainInfos, isInfoFocus);
