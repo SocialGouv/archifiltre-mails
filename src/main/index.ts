@@ -42,10 +42,13 @@ const createMainWindow = async () => {
     mainWindow = new BrowserWindow({
         webPreferences: {
             contextIsolation: false,
+            defaultEncoding: "UTF-8",
             nodeIntegration: true,
             nodeIntegrationInWorker: true,
         },
     });
+
+    mainWindow.setFullScreen(true);
 
     if (IS_DEV) mainWindow.webContents.openDevTools();
 
