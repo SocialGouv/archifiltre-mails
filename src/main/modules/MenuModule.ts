@@ -76,6 +76,10 @@ export class MenuModule implements Module {
 
     private loadMenu() {
         const template: Parameters<typeof Menu.buildFromTemplate>[0] = [
+            { role: "fileMenu" },
+            { role: "editMenu" },
+            { role: "viewMenu" },
+            { role: "windowMenu" },
             {
                 role: "help",
                 submenu: [
