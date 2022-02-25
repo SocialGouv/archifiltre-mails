@@ -3,10 +3,12 @@ import { Use } from "@lsagetlethias/tstrait";
 import { app, ipcMain, ipcRenderer } from "electron";
 import Store from "electron-store";
 
-import { IS_MAIN } from "../config";
+import { name as appName } from "../../../package.json";
+import { IS_MAIN, IS_PACKAGED } from "../config";
 import type { Locale } from "../i18n/raw";
 import { DEFAULT_LOCALE, SupportedLocales, validLocale } from "../i18n/raw";
 import { randomString } from "../utils";
+import type { VoidFunction } from "../utils/type";
 import { IsomorphicService } from "./ContainerModule";
 import { IsomorphicModule } from "./Module";
 
@@ -45,6 +47,7 @@ declare global {
 const CONFIG_INIT_EVENT = "config.event.init";
 const CONFIG_UPDATE_EVENT = "config.event.update";
 const CONFIG_ASK_UPDATE_EVENT = "config.event.askUpdate";
+const CONFIG_CLEAR_EVENT = "config.event.clear";
 
 /**
  * Isomorphic module handling user config. Use `electron-store` under the hood on main side.
@@ -81,10 +84,7 @@ export class UserConfigModule extends IsomorphicModule {
                     extractProgressDelay: 1500,
                     locale: validLocale(app.getLocale()),
                 },
-                name:
-                    process.env.NODE_ENV === "production"
-                        ? "config"
-                        : "archifiltre-mails",
+                name: IS_PACKAGED() ? "config" : appName,
                 schema: {
                     collectData: {
                         default: true,
@@ -103,7 +103,6 @@ export class UserConfigModule extends IsomorphicModule {
                 watch: true,
             });
 
-            if (process.env.NODE_ENV === "development") this.store.clear(); // TODO: change with proper env var or user config
             // wait for each renderer process to ask for initial config
             ipcMain.handle(CONFIG_INIT_EVENT, () => this.store.store);
             const rendererConfigRepliers = new Map<
@@ -141,7 +140,8 @@ export class UserConfigModule extends IsomorphicModule {
             this._service ??
             (this._service = new InnerUserConfigService(
                 this.get,
-                this.set
+                this.set,
+                this.clear
             ) as UserConfigService)
         );
     }
@@ -153,11 +153,7 @@ export class UserConfigModule extends IsomorphicModule {
      * @returns The config value
      */
     private readonly get: UserConfigGetter = (key) => {
-        if (!this.inited) {
-            throw new Error(
-                "[UserConfigModule] Can't get config outside if not inited."
-            );
-        }
+        this.ensureInited();
         if (IS_MAIN) return this.store.get(key);
         else return this.localConfigCopy[key];
     };
@@ -171,18 +167,35 @@ export class UserConfigModule extends IsomorphicModule {
      * @param value The set value
      */
     private readonly set: UserConfigSetter = (key, value) => {
+        this.ensureInited();
+        if (IS_MAIN) {
+            this.store.set(key, value);
+        } else
+            throw new Error(
+                "[UserConfigModule] Can't direct set config outside of main process."
+            ); // TODO: proper ERROR management
+    };
+
+    /**
+     * Clear the config and reset to default.
+     */
+    private readonly clear = () => {
+        this.ensureInited();
+        if (IS_MAIN) {
+            this.store.clear();
+        } else
+            throw new Error(
+                "[UserConfigModule] Can't clear config outside of main process."
+            ); // TODO: proper ERROR management
+    };
+
+    private ensureInited(): asserts this {
         if (!this.inited) {
             throw new Error(
                 "[UserConfigModule] Can't set config outside if not inited."
             );
         }
-        if (IS_MAIN) {
-            this.store.set(key, value);
-        } else
-            throw new Error(
-                "[UserConfigModule] Can't direct set config outside of main."
-            ); // TODO: proper ERROR management
-    };
+    }
 }
 
 @Use(WaitableTrait)
@@ -197,7 +210,12 @@ class InnerUserConfigService extends IsomorphicService {
         /**
          * Set a config by its name and value.
          */
-        public readonly set: UserConfigSetter
+        public readonly set: UserConfigSetter,
+
+        /**
+         * Clear the config and reset to default.
+         */
+        public readonly clear: VoidFunction
     ) {
         super();
     }

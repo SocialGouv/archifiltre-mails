@@ -3,6 +3,7 @@ import type { Service } from "@common/modules/container/type";
 import type { FileExporterService } from "@common/modules/FileExporterModule";
 import type { I18nService } from "@common/modules/I18nModule";
 import type { Module } from "@common/modules/Module";
+import type { UserConfigService } from "@common/modules/UserConfigModule";
 import type { MenuItem } from "electron";
 import { Menu } from "electron";
 import { t } from "i18next";
@@ -51,16 +52,19 @@ export class MenuModule implements Module {
         private readonly consoleToRendererService: ConsoleToRendererService,
         private readonly pstExtractorMainService: PstExtractorMainService,
         private readonly i18nService: I18nService,
-        private readonly fileExporterService: FileExporterService
+        private readonly fileExporterService: FileExporterService,
+        private readonly userConfigService: UserConfigService
     ) {}
 
     public async init(): Promise<void> {
         await this.i18nService.wait();
+        await this.userConfigService.wait();
         this.debugMenu = new DebugMenu(
             this.consoleToRendererService,
             this.pstExtractorMainService,
             this.i18nService,
-            this.fileExporterService
+            this.fileExporterService,
+            this.userConfigService
         );
         this.customMenus.push(this.debugMenu);
         this.loadMenu();

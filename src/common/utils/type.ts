@@ -70,3 +70,7 @@ export type DirectOrUnpackedChainedSubKeyOf<T> = {
 export type KeyAndSubKeyOf<T> = DirectOrUnpackedChainedSubKeyOf<T> | keyof T;
 
 export type SimpleObject = Record<string, unknown>;
+export type VoidFunction = () => void;
+export type VoidArgsFunction<TArgs extends Any[] = Any[]> = (
+    ...args: TArgs
+) => void;

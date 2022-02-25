@@ -5,8 +5,9 @@ import type {
     FileExporterService,
 } from "@common/modules/FileExporterModule";
 import type { I18nService } from "@common/modules/I18nModule";
+import type { UserConfigService } from "@common/modules/UserConfigModule";
 import { formatEmailTable } from "@common/utils/exporter";
-import type { BrowserWindow } from "electron";
+import type { BrowserWindow, MenuItemConstructorOptions } from "electron";
 import { dialog, MenuItem } from "electron";
 import { t } from "i18next";
 
@@ -36,7 +37,8 @@ export class DebugMenu implements ArchifiltreMailsMenu {
         private readonly consoleToRendererService: ConsoleToRendererService,
         private readonly pstExtractorMainService: PstExtractorMainService,
         private readonly i18nService: I18nService,
-        private readonly fileExporterService: FileExporterService
+        private readonly fileExporterService: FileExporterService,
+        private readonly userConfigService: UserConfigService
     ) {}
 
     public get item(): MenuItem {
@@ -48,59 +50,20 @@ export class DebugMenu implements ArchifiltreMailsMenu {
             submenu: [
                 { role: "toggleDevTools" },
                 {
-                    accelerator: "CommandOrControl+Shift+O",
-                    // TODO: clean "click" events into dedicated functions
-                    click: async (_menuItem, browserWindow, _event) => {
-                        if (!browserWindow) {
-                            return;
-                        }
-
-                        const dialogReturn = await dialog.showOpenDialog({
-                            filters: [
-                                {
-                                    extensions: ["pst"],
-                                    name: "PST Files",
-                                },
-                            ],
-                            properties: ["openFile", "showHiddenFiles"],
-                        });
-
-                        if (!dialogReturn.filePaths[0]) {
-                            return;
-                        }
-
-                        const pstFilePath = (this.lastPstFilePath =
-                            dialogReturn.filePaths[0]);
-
-                        if (pstFilePath) {
-                            disableMenus(this.id);
-                            await this.extractAndLogPst(
-                                browserWindow,
-                                pstFilePath
-                            );
-                            enableMenus(
-                                this.id,
-                                EXPORT_LAST_PST_MENU_ID,
-                                OPEN_AND_CONSOLE_LAST_PST_MENU_ID
-                            );
-                        }
+                    accelerator: "CommandOrControl+Shift+C",
+                    click: () => {
+                        this.userConfigService.clear();
                     },
+                    label: t("common:menu.debug.resetConfig"),
+                },
+                {
+                    accelerator: "CommandOrControl+Shift+O",
+                    click: this.onClickOpenLogPST,
                     label: t("common:menu.debug.openConsolePst"),
                 },
                 {
                     accelerator: "CommandOrControl+Shift+I",
-                    click: async (_menuItem, browserWindow, _event) => {
-                        if (this.lastPstFilePath && browserWindow) {
-                            this.consoleToRendererService.log(
-                                browserWindow,
-                                `Open last PST file: ${this.lastPstFilePath}`
-                            );
-                            await this.extractAndLogPst(
-                                browserWindow,
-                                this.lastPstFilePath
-                            );
-                        }
-                    },
+                    click: this.onClickOpenLogLastPST,
                     enabled: !!this.lastPstFilePath,
                     id: OPEN_AND_CONSOLE_LAST_PST_MENU_ID,
                     label: t("common:menu.debug.openConsolePstLast"),
@@ -139,6 +102,54 @@ export class DebugMenu implements ArchifiltreMailsMenu {
             visible: this.visible,
         });
     }
+
+    private readonly onClickOpenLogPST: MenuItemConstructorOptions["click"] =
+        async (_menuItem, browserWindow, _event) => {
+            if (!browserWindow) {
+                return;
+            }
+
+            const dialogReturn = await dialog.showOpenDialog({
+                filters: [
+                    {
+                        extensions: ["pst"],
+                        name: "PST Files",
+                    },
+                ],
+                properties: ["openFile", "showHiddenFiles"],
+            });
+
+            if (!dialogReturn.filePaths[0]) {
+                return;
+            }
+
+            const pstFilePath = (this.lastPstFilePath =
+                dialogReturn.filePaths[0]);
+
+            if (pstFilePath) {
+                disableMenus(this.id);
+                await this.extractAndLogPst(browserWindow, pstFilePath);
+                enableMenus(
+                    this.id,
+                    EXPORT_LAST_PST_MENU_ID,
+                    OPEN_AND_CONSOLE_LAST_PST_MENU_ID
+                );
+            }
+        };
+
+    private readonly onClickOpenLogLastPST: MenuItemConstructorOptions["click"] =
+        async (_menuItem, browserWindow, _event) => {
+            if (this.lastPstFilePath && browserWindow) {
+                this.consoleToRendererService.log(
+                    browserWindow,
+                    `Open last PST file: ${this.lastPstFilePath}`
+                );
+                await this.extractAndLogPst(
+                    browserWindow,
+                    this.lastPstFilePath
+                );
+            }
+        };
 
     private async extractAndLogPst(
         browserWindow: BrowserWindow,

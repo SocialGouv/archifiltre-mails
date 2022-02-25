@@ -12,5 +12,6 @@
   "menu.debug.changeLanguage_FR-FR": "Français 🇫🇷",
   "menu.debug.changeLanguage_EN-GB": "English 🇬🇧",
   "menu.debug.changeLanguage_DE-DE": "Deutsch 🇩🇪",
-  "menu.help.enableDebug": "Activer Debogue"
+  "menu.help.enableDebug": "Activer Debogue",
+  "menu.debug.resetConfig": "Réinitialiser la config utilisateur"
 }
