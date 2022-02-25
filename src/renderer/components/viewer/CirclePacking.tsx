@@ -52,7 +52,7 @@ export const CirclePacking: React.FC = () => {
         usePstFMInfosStore();
 
     const {
-        setHoveredId,
+        setHoveredNode,
         addChildrenMarkedToKeep,
         addChildrenMarkedToDelete,
         markedToDelete,
@@ -114,7 +114,7 @@ export const CirclePacking: React.FC = () => {
         }
 
         setMainInfos(node);
-        setHoveredId(node.id);
+        setHoveredNode(node);
     }, 500);
 
     const handleMouseLeave: CirclePackingCommonProps["onMouseLeave"] = () => {

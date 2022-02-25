@@ -22,10 +22,11 @@ interface BaseViewerObject<TId extends string> {
     name: string;
     size: number;
     value: string;
+    ids: string[];
 }
 
 export type ViewerObjectChild = Omit<BaseViewerObject<string>, "value"> &
-    Record<string, number | string>;
+    Record<string, BaseViewerObject<string>[keyof BaseViewerObject<string>]>;
 
 export interface DefaultViewerObject<TId extends string>
     extends BaseViewerObject<TId> {
@@ -49,8 +50,8 @@ export type ViewerObject<TId extends string> =
     | MailViewerObject<TId>
     | YearViewerObject<TId>;
 
-type Correspondant = [name: string, value: number];
-type Year = [year: number, value: number];
+type Correspondant = [name: string, count: number, ids: string[]];
+type Year = [year: number, count: number, ids: string[]];
 
 export const isMailViewerObject = <TId extends string>(
     viewerObject: ViewerObject<TId>
@@ -61,6 +62,7 @@ export const createBase = <TId extends string>(
     id: TId
 ): BaseViewerObject<TId> => ({
     id,
+    ids: [],
     name: "root",
     size: 0.0001,
     value: "size",
@@ -93,7 +95,7 @@ export const getTotalLevelMail = (elements: ViewerObject<string>): number =>
     elements.children.flat().reduce((acc, curr) => acc + curr.size, 0);
 
 export const getFileSizeByMail = (attachments: PstAttachement[]): number =>
-    attachments.reduce((acc: number, { filesize }: { filesize: number }) => {
+    attachments.reduce((acc: number, { filesize }) => {
         return acc + filesize;
     }, 0);
 
@@ -120,11 +122,12 @@ export const createBaseMail = (): PstEmail => ({
 });
 
 export const createDomain = (
-    domains: Record<string, number>
+    domains: Record<string, [number, string[]]>
 ): DomainViewerObject => {
-    const children = Object.entries(domains).map(([key, value]) => {
+    const children = Object.entries(domains).map(([key, [value, ids]]) => {
         return {
             id: randomUUID(),
+            ids,
             [key]: value,
             name: key,
             size: value,
@@ -140,12 +143,12 @@ export const createDomain = (
 export const getDomain = (element: string): string =>
     element.substring(element.indexOf("@"));
 
-export const getMailTreshold = (
-    base: Map<string, number> | Record<string, number>
+const getMailTreshold = (
+    base: Map<string, [number, string[]]> | Record<string, [number, string[]]>
 ): number => {
     const maxMail = (
         base instanceof Map ? [...base.values()] : Object.values(base)
-    ).reduce((acc, cur) => Math.max(acc, cur), 0);
+    ).reduce((acc, [cur]) => Math.max(acc, cur), 0);
 
     return Math.min(Math.ceil(maxMail * (RATIO_FROM_MAX / 100)), MAX_TRESHOLD);
 };
@@ -159,10 +162,41 @@ export const isLdapDomain = (domain: string): boolean => !domain.includes("@");
 
 // ### GETTER ###
 
-export const getAggregatedDomainCount = (
+/*
+
+DOMAIN => string[] => domainPstIDs[]
+YEAR => string[] => yearPstIDs[] => doublon
+CORR => same => correspondantPstIDs[]
+MAIL => string => 1 pstId
+
+-
+
+const toDeleteIDs = new Set<string>();
+
+-
+toDeleteIds =>
+DOMAIN =>
+    DELETE => toDeleteIDs.add(...domainPstIDs);
+    KEEP => toDeleteIDs.remove(...domainPstIDs);
+YEAR =>
+    DELETE => toDeleteIDs.add(...yearPstIDs);
+    KEEP => toDeleteIDs.remove(...yearPstIDs);
+CORR =>
+    DELETE => toDeleteIDs.add(...correspondantPstIDs);
+    KEEP => toDeleteIDs.remove(...correspondantPstIDs);
+MAIL =>
+    DELETE => toDeleteIDs.add(pstId);
+    KEEP => toDeleteIDs.remove(pstId);
+
+- mesure
+const totalDeletedSize = toDeleteIDs.reduce(id => extractTables.attachements.get(id).reduce(att => att.filesize, 0), 0)
+
+*/
+
+export const getAggregatedDomains = (
     initPst: PstElement
-): Record<string, number> => {
-    const mailCountPerDomain = new Map<string, number>();
+): Record<string, [number, string[]]> => {
+    const domains = new Map<string, [count: number, ids: string[]]>();
 
     const recursivelyFindProp = (pst: PstElement) => {
         if (isPstFolder(pst)) {
@@ -176,9 +210,8 @@ export const getAggregatedDomainCount = (
                     ? getLdapDomain(email)
                     : getDomain(email);
 
-                const currentDomainCount =
-                    mailCountPerDomain.get(domainKey) ?? 0;
-                mailCountPerDomain.set(domainKey, currentDomainCount + 1);
+                const [count, ids] = domains.get(domainKey) ?? [0, []];
+                domains.set(domainKey, [count + 1, [...ids, pst.id]]);
             });
         }
     };
@@ -186,8 +219,10 @@ export const getAggregatedDomainCount = (
     recursivelyFindProp(initPst);
 
     /* eslint-disable @typescript-eslint/naming-convention */
-    const orderByValues = <K, V extends number>(m: Map<K, V>): Map<K, V> =>
-        new Map([...m.entries()].sort(([, va], [, vb]) => vb - va));
+    const orderByValues = <K, V extends [number, string[]]>(
+        m: Map<K, V>
+    ): Map<K, V> =>
+        new Map([...m.entries()].sort(([, [va]], [, [vb]]) => vb - va));
 
     const toRecord = <K extends string, V>(m: Map<K, V>): Record<K, V> =>
         [...m.entries()].reduce(
@@ -197,19 +232,25 @@ export const getAggregatedDomainCount = (
         );
     /* eslint-enable @typescript-eslint/naming-convention */
 
-    const threshold = getMailTreshold(mailCountPerDomain);
-    const thresholdify = (m: Map<string, number>): Map<string, number> => {
-        const out = new Map<string, number>();
-        for (const [k, v] of m) {
-            if (v < threshold) {
-                out.set(TRESHOLD_KEY, v + (out.get(TRESHOLD_KEY) ?? 0));
-            } else out.set(k, v);
+    const threshold = getMailTreshold(domains);
+    const thresholdify = (
+        m: Map<string, [number, string[]]>
+    ): Map<string, [number, string[]]> => {
+        const out = new Map<string, [number, string[]]>();
+        for (const [k, [count, ids]] of m) {
+            if (count < threshold) {
+                const domainOther = out.get(TRESHOLD_KEY) ?? [0, []];
+                out.set(TRESHOLD_KEY, [
+                    count + domainOther[0],
+                    [...ids, ...domainOther[1]],
+                ]);
+            } else out.set(k, [count, ids]);
         }
 
         return out;
     };
 
-    const THERESULT = orderByValues(thresholdify(mailCountPerDomain));
+    const THERESULT = orderByValues(thresholdify(domains));
 
     return toRecord(THERESULT);
 };
@@ -235,7 +276,7 @@ export const getUniqueCorrespondantsByDomain = (
             fileSizePerLevel += getFileSizeByMail(pst.attachements);
 
             attachementPerLevel += pst.attachementCount;
-            correspsFound.push([pst.from.name, 1]);
+            correspsFound.push([pst.from.name, 1, [pst.id]]);
         }
     };
     recursivelyFindCorresp(initPst);
@@ -243,10 +284,12 @@ export const getUniqueCorrespondantsByDomain = (
     setFileSizePerLevel(fileSizePerLevel);
 
     const accumulatedCorresps = correspsFound.reduce<typeof correspsFound>(
-        (acc, [name, value]) => {
+        (acc, [name, count, ids]) => {
             const found = acc.find(([nameToTest]) => nameToTest === name);
-            if (found) found[1] += value;
-            else acc.push([name, value]);
+            if (found) {
+                found[1] += count;
+                found[2].push(...ids);
+            } else acc.push([name, count, ids]);
             return acc;
         },
         []
@@ -275,7 +318,7 @@ export const getYearByCorrespondants = (
             attachementPerLevel += pst.attachementCount;
             fileSizePerLevel += getFileSizeByMail(pst.attachements);
 
-            yearsFound.push([pst.receivedDate.getFullYear(), 1]);
+            yearsFound.push([pst.receivedDate.getFullYear(), 1, [pst.id]]);
         }
     };
     recursivelyFindYear(initPst);
@@ -283,10 +326,12 @@ export const getYearByCorrespondants = (
     setFileSizePerLevel(fileSizePerLevel);
 
     const accumulatedYears = yearsFound.reduce<typeof yearsFound>(
-        (acc, [year, value]) => {
+        (acc, [year, count, ids]) => {
             const found = acc.find(([yearToTest]) => yearToTest === year);
-            if (found) found[1] += value;
-            else acc.push([year, value]);
+            if (found) {
+                found[1] += count;
+                found[2].push(...ids);
+            } else acc.push([year, count, ids]);
             return acc;
         },
         []
@@ -345,9 +390,10 @@ export const createCorrespondants = <TId extends string>(
     id: TId
 ): CorrespondantViewerObject<TId> => {
     if (!correspondantCache.has(id)) {
-        const children = correspondants.map(([name, value]) => {
+        const children = correspondants.map(([name, value, ids]) => {
             return {
                 id: randomUUID(),
+                ids,
                 name,
                 size: value,
                 value,
@@ -368,8 +414,9 @@ export const createYears = <TId extends string>(
     id: TId
 ): YearViewerObject<TId> => {
     if (!yearsCache.has(id)) {
-        const children = years.map(([year, value]) => ({
+        const children = years.map(([year, value, ids]) => ({
             id: randomUUID(),
+            ids,
             name: year.toString(),
             size: value,
             value,

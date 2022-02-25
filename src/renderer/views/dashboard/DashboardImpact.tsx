@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 
 import { Card } from "../../components/common/card/Card";
 import { StaticImage } from "../../components/common/staticImage/StaticImage";
+import { useImpactStore } from "../../store/ImpactStore";
+import { usePstStore } from "../../store/PSTStore";
 import style from "./Dashboard.module.scss";
 
 const dashboardImpactData: DashboardImpactItemProps[] = [
@@ -47,9 +49,12 @@ const DashboardImpactItem: FC<DashboardImpactItemProps> = ({
 
 export const DashboardImpact: FC = () => {
     const { t } = useTranslation();
+    const { extractTables } = usePstStore();
+    const { size } = useImpactStore(extractTables?.attachements);
 
     return (
         <Card title={t("dashboard.impact.cardTitle")} color="orange">
+            <span>{size}</span>
             <div className={style.dashboard__impact}>
                 {dashboardImpactData.map((impact, index) => (
                     <DashboardImpactItem key={index} {...impact} />
