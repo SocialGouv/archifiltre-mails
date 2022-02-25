@@ -1,0 +1,48 @@
+import createHook from "zustand/index";
+import create from "zustand/vanilla";
+
+export const attachmentCountStore = create(() => ({
+    attachmentPerLevel: [0],
+    attachmentTotal: 0,
+}));
+
+const { setState } = attachmentCountStore;
+
+export const setAttachmentTotal = (attachmentTotal: number): void => {
+    setState({
+        attachmentPerLevel: [attachmentTotal],
+        attachmentTotal,
+    });
+};
+
+export const setAttachmentPerLevel = (newAttachmentPerLevel: number): void => {
+    setState(({ attachmentPerLevel }) => ({
+        attachmentPerLevel: [...attachmentPerLevel, newAttachmentPerLevel],
+    }));
+};
+
+export const setPreviousAttachmentPerLevel = (): void => {
+    setState(({ attachmentPerLevel: attachmentPerLevel }) => {
+        if (attachmentPerLevel.length === 1)
+            return {
+                attachmentPerLevel: [attachmentPerLevel[0] ?? 0],
+            };
+
+        const previousAttachmentPerLevel = attachmentPerLevel;
+        previousAttachmentPerLevel.pop();
+
+        return {
+            attachmentPerLevel: previousAttachmentPerLevel,
+        };
+    });
+};
+
+export const setInitialAttachmentPerLevel = (): void => {
+    setState(({ attachmentPerLevel }) => ({
+        attachmentPerLevel: [attachmentPerLevel[0] ?? 0],
+    }));
+};
+/**
+ * Consume vanilla attachmentCount store in React scope with a hook.
+ */
+export const useAttachmentCountStore = createHook(attachmentCountStore);

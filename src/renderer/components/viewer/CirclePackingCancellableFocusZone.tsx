@@ -3,7 +3,7 @@
 
 import React from "react";
 
-import { usePstStore } from "../../store/PSTStore";
+import { usePstFMInfosStore } from "../../store/PstFMInfosStore";
 import style from "./CirclePacking.module.scss";
 
 export interface Osef {
@@ -13,7 +13,7 @@ export interface Osef {
 export const CirclePackingCancellableFocusZone: React.FC<Osef> = ({
     onBlur,
 }) => {
-    const { isInfoFocus, cancelFocus } = usePstStore();
+    const { isInfoFocus, cancelFocus } = usePstFMInfosStore();
 
     if (!isInfoFocus) return null;
 

@@ -11,6 +11,9 @@ interface UseContextMenuType {
     show?: boolean;
 }
 
+export const DELETE_ACTION_BUTTON_ID = "delete-action-btn";
+export const KEEP_ACTION_BUTTON_ID = "delete-action-btn";
+
 export const useContextMenu = (): UseContextMenuType => {
     const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
     const [show, setShow] = useState<UseContextMenuType["show"]>(false);
@@ -41,8 +44,10 @@ export const useContextMenu = (): UseContextMenuType => {
     }, [show]);
 
     const menu = document.querySelector(CIRCLE_PACKING_ID);
-    const markedToDeleteBtn = document.querySelector("#to-delete-btn");
-    const markedToKeepBtn = document.querySelector("#to-keep-btn");
+    const markedToDeleteBtn = document.querySelector(
+        `#${DELETE_ACTION_BUTTON_ID}`
+    );
+    const markedToKeepBtn = document.querySelector(`#${KEEP_ACTION_BUTTON_ID}`);
 
     useEffect(() => {
         menu?.addEventListener("click", handleClick);

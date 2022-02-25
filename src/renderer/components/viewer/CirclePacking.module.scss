@@ -56,21 +56,34 @@
     left: 300px;
   }
 
-  button {
-    height: 45px;
-    display: flex;
-    align-items: center;
-    color: #fff;
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: #4991f7;
-    border-radius: 10px;
-    padding: 1rem;
+  .circle-packing-actions-button {
     position: absolute;
-    right: calc(3rem + 10px);
     bottom: 2rem;
-    z-index: 999;
+    margin: 0 !important;
+    display: flex;
+    right: 2rem;
+
+    button {
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #4991f7;
+      border-radius: 10px;
+      padding: 1rem;
+      z-index: 999;
+      margin: 0 !important;
+      width: 80px;
+
+      &:first-child {
+        margin-right: 10px !important;
+      }
+    }
   }
+
 }
 
 .circle__packing__tooltip {

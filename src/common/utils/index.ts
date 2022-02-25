@@ -1,5 +1,7 @@
 import { randomBytes } from "crypto";
 
+import type { Any } from "./type";
+
 /**
  * Generate a random string of 20 hex char by default.
  *
@@ -39,3 +41,19 @@ export const chunkString = (input: string, length: number): string[] => {
 
     return result;
 };
+
+/**
+ * Stub function to use like "noop" but as a safe guard when a feature is not implemented.
+ */
+export const notImplemented = (..._args: Any[]): Any | Promise<Any> => {
+    throw new Error("Not implemented");
+};
+
+export const getPercentage = (current: number, total: number): number =>
+    (current / total) * 100;
+
+export const bytesToMegabytes = (bytes: number): number =>
+    +(bytes / 1.0e6).toFixed(1);
+
+export const bytesToKilobytes = (bytes: number): number =>
+    +(bytes / 1000).toFixed(1);

@@ -1,67 +1,18 @@
 import type { PstContent } from "@common/modules/pst-extractor/type";
+import { Object } from "@common/utils/overload";
 import type {
     CirclePackingSvgProps,
     ComputedDatum,
 } from "@nivo/circle-packing";
 
-import type { MainInfos } from "../store/PSTStore";
-import { COLORS } from "./constants";
+import type { MainInfos } from "../store/PstFMInfosStore";
+import { COLORS, MONTHS_NB } from "./constants";
 import type {
     DefaultViewerObject,
     MailViewerObject,
-    ViewerObjectChild,
-} from "./pst-extractor";
-import {
-    isMailViewerObject,
-    isToDeleteFolder,
-    isToKeepFolder,
-} from "./pst-extractor";
+} from "./dashboard-viewer-dym";
+import { isMailViewerObject } from "./dashboard-viewer-dym";
 
-export const getChildrenToDeleteIds = (
-    children: ViewerObjectChild[],
-    markedToKeepIds: string[]
-): string[] =>
-    children
-        .filter(
-            (child: ViewerObjectChild) =>
-                !isToKeepFolder(child.id, markedToKeepIds)
-        )
-        .map((child) => child.id);
-
-export const getChildrenToKeepIds = (
-    children: ViewerObjectChild[],
-    markedToDeleteIds: string[]
-): string[] =>
-    children
-        .filter(
-            (child: ViewerObjectChild) =>
-                !isToDeleteFolder(child.id, markedToDeleteIds)
-        )
-        .map((child) => child.id);
-
-export const getUntagChildrenIds = (
-    children: ViewerObjectChild[],
-    markedToDeleteIds: string[],
-    markedToKeepIds: string[]
-): string[] =>
-    children
-        .filter(
-            (child: ViewerObjectChild) =>
-                !isToDeleteFolder(child.id, markedToDeleteIds) &&
-                !isToKeepFolder(child.id, markedToKeepIds)
-        )
-        .map((child) => child.id);
-
-export const getColorFromTrimester = (
-    node: Omit<ComputedDatum<MailViewerObject<string>>, "color" | "fill">
-): number => {
-    const month = node.data.email.receivedDate?.getMonth() ?? 1; // January
-
-    return month <= 3 ? 0.45 : month <= 6 ? 0.65 : month <= 9 ? 0.85 : 1; // TODO: magic number
-};
-
-////////////
-// Redeclare because ResponsiveCirclePackingProps is not exported.
 type ResponsiveCirclePackingProps<TRawDatum> = Partial<
     Omit<CirclePackingSvgProps<TRawDatum>, "data" | "height" | "width">
 > &
@@ -72,6 +23,41 @@ export type CirclePackingCommonProps = Partial<
 > & {
     id: keyof PstContent;
     value: keyof PstContent;
+};
+
+export type TagType = "delete" | "keep" | "untag";
+
+const opacities = {
+    [MONTHS_NB.MARCH]: 0.45,
+    [MONTHS_NB.JUNE]: 0.65,
+    [MONTHS_NB.SEPT]: 0.85,
+};
+const DEFAULT_OPACITY = 1;
+export const getColorFromTrimester = (
+    node: Omit<ComputedDatum<MailViewerObject<string>>, "color" | "fill">
+): number => {
+    const month = node.data.email.receivedDate?.getMonth() ?? 1; // January
+
+    const opacityMonthKey = Object.keys(opacities).find(
+        (monthOpa) => month <= monthOpa
+    );
+    return opacityMonthKey ? opacities[opacityMonthKey] : DEFAULT_OPACITY;
+};
+
+export const getTagColor = (
+    node: Omit<ComputedDatum<MailViewerObject<string>>, "color" | "fill">,
+    tag: TagType
+): string => {
+    if (tag === "delete") {
+        return `rgba(247, 94, 66, ${getColorFromTrimester(node)})`;
+    }
+
+    if (tag === "keep") {
+        return `rgba(98, 188, 111, ${getColorFromTrimester(node)})`;
+    }
+
+    // untag
+    return `rgba(31, 120, 180, ${getColorFromTrimester(node)})`;
 };
 
 export const commonProperties: CirclePackingCommonProps = {

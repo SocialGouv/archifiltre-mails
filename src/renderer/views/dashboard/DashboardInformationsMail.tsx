@@ -1,72 +1,95 @@
-import type { Any } from "@common/utils/type";
+import { bytesToKilobytes, getPercentage } from "@common/utils";
 import type { ComputedDatum } from "@nivo/circle-packing";
 import type { FC } from "react";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
-import type { MailViewerObject } from "../../utils/pst-extractor";
-import { sanitizeMailDate } from "../../utils/pst-viewer";
+import { usePstFileSizeStore } from "../../store/PstFileSizeStore";
+import { AVERAGE_MAIL_SIZE_IN_KO } from "../../utils/constants";
+import { sanitizeMailDate } from "../../utils/dashboard-viewer";
+import type { MailViewerObject } from "../../utils/dashboard-viewer-dym";
+import { getFileSizeByMail } from "../../utils/dashboard-viewer-dym";
+import style from "./Dashboard.module.scss";
 
 export const DashboardInformationsMail: FC<{
     mainInfos: ComputedDatum<MailViewerObject<string>>;
-}> = ({ mainInfos }) => (
-    <>
-        <div>
-            <strong>Type </strong>mail
-        </div>
-        <div>
-            <strong>Titre </strong>
-            {mainInfos.data.name}
-        </div>
-        <div>
-            {/* eslint-disable-next-line react/no-unescaped-entities */}
-            <strong>Date d'envoi </strong>{" "}
-            {sanitizeMailDate(mainInfos.data.email.sentTime!)}
-        </div>
-        <div>
-            <strong>Date de réception </strong>{" "}
-            {sanitizeMailDate(mainInfos.data.email.receivedDate!)}
-        </div>
-        <div>
-            <strong>Nombre de PJ </strong>{" "}
-            {mainInfos.data.email.attachementCount}
-        </div>
-        <div>
-            <strong>Expéditeur</strong> {mainInfos.data.email.from.email}
-        </div>
-        <div>
-            <strong>Destinataire(s)</strong>{" "}
-            {mainInfos.data.email.to.map((to, index) => (
-                <span key={index}>{to.email}</span>
-            ))}
-            {/* TODO: use length of return elts to show "0" or elts */}
-        </div>
-        <div>
-            <strong>Cc</strong>{" "}
-            {mainInfos.data.email.cc.map((cc, index) => (
-                <span key={index}>{cc.email}</span>
-            ))}
-        </div>
-        <div>
-            <strong>Bcc</strong>{" "}
-            {mainInfos.data.email.bcc.map((bcc, index) => (
-                <span key={index}>{bcc.email}</span>
-            ))}
-        </div>
-        <div>
-            <strong>Représentation (en %) </strong>
-            {mainInfos.percentage.toFixed(1)}
+}> = ({ mainInfos }) => {
+    const { t } = useTranslation();
+    const { totalFileSize } = usePstFileSizeStore();
+
+    const volumeTotal =
+        bytesToKilobytes(getFileSizeByMail(mainInfos.data.email.attachements)) +
+        AVERAGE_MAIL_SIZE_IN_KO;
+
+    return (
+        <div className={style.dashboard__informations__wrapper__mail}>
             <div>
-                <strong>Etat </strong>
-                {(mainInfos.data as Any).tag}
+                <strong>{t("dashboard.informations.type")} </strong>
+                {t("dashboard.informations.id.mail")}
+            </div>
+            <div>
+                <strong>{t("dashboard.informations.title")} </strong>
+                {mainInfos.data.email.subject}
+            </div>
+            <div>
+                <strong>{t("dashboard.informations.sentDate")} </strong>{" "}
+                {sanitizeMailDate(mainInfos.data.email.sentTime!)}
+            </div>
+            <div>
+                <strong>{t("dashboard.informations.receivedDate")} </strong>{" "}
+                {sanitizeMailDate(mainInfos.data.email.receivedDate!)}
+            </div>
+            <div>
+                <strong>{t("dashboard.informations.attachedCount")} </strong>{" "}
+                {mainInfos.data.email.attachementCount}
+            </div>
+
+            <div>
+                <strong>{t("dashboard.informations.attachedTitles")} </strong>{" "}
+                {mainInfos.data.email.attachements.map(
+                    ({ filename }, index: number) => (
+                        <span key={index}>{filename}</span>
+                    )
+                )}
+            </div>
+            <div>
+                <strong>{t("dashboard.informations.to")}</strong>{" "}
+                {mainInfos.data.email.from.email}
+            </div>
+            <div>
+                <strong>{t("dashboard.informations.from")}</strong>{" "}
+                {mainInfos.data.email.to.map((to, index) => (
+                    <span key={index}>{to.email}</span>
+                ))}
+                {/* TODO: use length of return elts to show "0" or elts */}
+            </div>
+            <div>
+                <strong>{t("dashboard.informations.cc")}</strong>{" "}
+                {mainInfos.data.email.cc.map((cc, index) => (
+                    <span key={index}>{cc.email}</span>
+                ))}
+            </div>
+            {mainInfos.data.email.bcc.length > 0 && (
+                <div>
+                    <strong>{t("dashboard.informations.bcc")}</strong>{" "}
+                    {mainInfos.data.email.bcc.map((bcc, index) => (
+                        <span key={index}>{bcc.email}</span>
+                    ))}
+                </div>
+            )}
+            <div>
+                <strong>{t("dashboard.informations.percentage")} </strong>
+                {volumeTotal.toFixed(2)}Ko (
+                {getPercentage(volumeTotal / 1000, totalFileSize).toFixed(2)}%)
+            </div>
+            <div>
+                <strong>{t("dashboard.informations.mailFocus")}</strong>
+                <div style={{ maxHeight: 200, overflow: "scroll" }}>
+                    <p style={{ wordBreak: "break-word" }}>
+                        {mainInfos.data.email.contentText}
+                    </p>
+                </div>
             </div>
         </div>
-        <div>
-            <div style={{ maxHeight: 200, overflow: "scroll" }}>
-                <strong>Mail (cliquer pour focus)</strong>
-                <p style={{ wordBreak: "break-word" }}>
-                    {mainInfos.data.email.contentText}
-                </p>
-            </div>
-        </div>
-    </>
-);
+    );
+};

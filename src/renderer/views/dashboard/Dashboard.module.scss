@@ -219,16 +219,46 @@ $dashboard-card-width: calc(50vw - 0.5rem);
 
 .dashboard__informations {
 
-  ul {
+  &__wrapper {
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
     justify-content: space-between;
-    div {
-      margin-bottom: 5px;
-    }
-    span {
+
+    &__mail {
+      width: 100%;
+      > div {
+        margin: 0 0 0.4rem;
+      }
+      span {
         display: table;
+      }
+    }
+
+    &__folder {
+      display: flex;
+      justify-content: space-between;
+      &__item {
+        padding: 15px;
+        border: solid 2px;
+        border-radius: 10px;
+        width: 45%;
+        min-height: 250px;
+
+        div {
+          margin: 0 0 1rem;
+        }
+        &:first-child {
+          border-color: #bcd1ff
+        }
+
+        &:last-child {
+          border-color: rgb(31, 120, 180);
+        }
+      }
+      span {
+        display: table;
+      }
     }
   }
 

@@ -1,4 +1,5 @@
 import { IS_MAC } from "@common/config";
+import type { FileExporterService } from "@common/modules/FileExporterModule";
 import type { I18nService } from "@common/modules/I18nModule";
 import type { Module } from "@common/modules/Module";
 import type { MenuItem } from "electron";
@@ -31,7 +32,8 @@ export class MenuModule implements Module {
     constructor(
         private readonly consoleToRendererService: ConsoleToRendererService,
         private readonly pstExtractorMainService: PstExtractorMainService,
-        private readonly i18nService: I18nService
+        private readonly i18nService: I18nService,
+        private readonly fileExporterService: FileExporterService
     ) {}
 
     public async init(): Promise<void> {
@@ -39,7 +41,8 @@ export class MenuModule implements Module {
             new DebugMenu(
                 this.consoleToRendererService,
                 this.pstExtractorMainService,
-                this.i18nService
+                this.i18nService,
+                this.fileExporterService
             )
         );
 
