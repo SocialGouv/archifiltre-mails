@@ -6,7 +6,6 @@ import {
 } from "@common/constant/event";
 import type { Service } from "@common/modules/container/type";
 import { containerModule } from "@common/modules/ContainerModule";
-import type { Module } from "@common/modules/Module";
 import type {
     ExtractOptions,
     PstContent,
@@ -17,6 +16,7 @@ import type { UserConfigService } from "@common/modules/UserConfigModule";
 import { ipcMain } from "electron";
 
 import { TSWorker } from "../worker";
+import { MainModule } from "./MainModule";
 import type {
     PstWorkerData,
     PstWorkerMessageType,
@@ -33,7 +33,7 @@ const REGEXP_PST = /\.pst$/i;
  *
  * It will load a worker to extract the PST without blocking the main thread.
  */
-export class PstExtractorModule implements Module {
+export class PstExtractorModule extends MainModule {
     private inited = false;
 
     private working = false;
@@ -56,6 +56,7 @@ export class PstExtractorModule implements Module {
     ) => void;
 
     constructor(private readonly userConfigService: UserConfigService) {
+        super();
         containerModule.registerService(
             "pstExtractorMainService",
             this.service
@@ -81,6 +82,10 @@ export class PstExtractorModule implements Module {
         });
 
         this.inited = true;
+        return Promise.resolve();
+    }
+
+    public async uninit(): Promise<void> {
         return Promise.resolve();
     }
 

@@ -32,7 +32,7 @@ declare module "../ipc/event" {
 export class IpcModule extends IsomorphicModule {
     private inited = false;
 
-    async init(): Promise<void> {
+    public async init(): Promise<void> {
         if (!IS_MAIN || this.inited) {
             return Promise.resolve();
         }
@@ -51,5 +51,10 @@ export class IpcModule extends IsomorphicModule {
         });
 
         this.inited = true;
+    }
+
+    public async uninit(): Promise<void> {
+        this.inited = false;
+        return Promise.resolve();
     }
 }

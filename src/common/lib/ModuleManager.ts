@@ -1,9 +1,7 @@
 import type { Module } from "../modules/Module";
 
 /**
- * Load and init the given modules in the current process
- *
- * @param mods Given modules
+ * Load and init the given modules in the current process.
  */
 export const loadModules = async (...mods: Module[]): Promise<void> => {
     await Promise.all(
@@ -17,6 +15,26 @@ export const loadModules = async (...mods: Module[]): Promise<void> => {
         })
     ).catch((error) => {
         console.error(`<APP_ERROR> Cannot load modules.\n${error}`);
+        throw error;
+    });
+};
+/**
+ * Unload and uninit the given modules in the current process.
+ */
+export const unloadModules = async (...mods: Module[]): Promise<void> => {
+    await Promise.all(
+        mods.map(async (mod) => {
+            console.warn(
+                `<MODULE_UNLOADER> ${mod.constructor.name} unloading !`
+            );
+            await mod.uninit?.().catch((error) => {
+                throw new Error(
+                    `<MODULE_ERROR> ${mod.constructor.name} failed uninit.\n${error}`
+                );
+            });
+        })
+    ).catch((error) => {
+        console.error(`<APP_ERROR> Cannot unload modules.\n${error}`);
         throw error;
     });
 };

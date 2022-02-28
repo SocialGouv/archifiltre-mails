@@ -13,4 +13,8 @@ export class ConsoleFromMainModule implements Module {
 
         return Promise.resolve();
     }
+
+    public async uninit(): Promise<void> {
+        return Promise.resolve();
+    }
 }

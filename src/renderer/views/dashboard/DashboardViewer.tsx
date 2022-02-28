@@ -7,7 +7,6 @@ import { DashboardViewerCircle } from "./DashboardViewerCircle";
 
 export const DashboardViewer: React.FC = () => {
     const { t } = useTranslation();
-    // TODO: "grey" => const
     return (
         <Card title={t("dashboard.viewer.cardTitle")} color="grey">
             <DashboardViewerBreadcrumb />

@@ -2,6 +2,7 @@ import type {
     IpcMain as BaseIpcMain,
     IpcMainInvokeEvent,
     IpcRenderer as BaseIpcRenderer,
+    IpcRendererEvent,
 } from "electron";
 import {
     ipcMain as baseIpcMain,
@@ -13,18 +14,27 @@ import type {
     AsyncIpcChannel,
     AsyncIpcKeys,
     CustomIpcMainEvent,
+    DualAsyncIpcChannel,
+    DualAsyncIpcKeys,
     GetAsyncIpcConfig,
+    GetDualAsyncIpcConfig,
+    GetRepliedDualAsyncIpcConfig,
     GetSyncIpcConfig,
+    ReplyDualAsyncIpcChannel,
+    ReplyDualAsyncIpcKeys,
     SyncIpcChannel,
     SyncIpcKeys,
 } from "./event";
 
 interface IpcMain extends BaseIpcMain {
-    on: <T extends SyncIpcKeys | UnknownMapping>(
-        channel: SyncIpcChannel<T>,
+    on: <T extends DualAsyncIpcKeys | SyncIpcKeys | UnknownMapping>(
+        channel: DualAsyncIpcChannel<T> | SyncIpcChannel<T>,
         listener: (
             event: CustomIpcMainEvent<T>,
-            ...args: GetSyncIpcConfig<T>["args"]
+            ...args: T extends SyncIpcKeys
+                ? // @ts-expect-error -- conflict because of pre filled ipc mapping for pubsub
+                  GetSyncIpcConfig<T>["args"]
+                : GetDualAsyncIpcConfig<T>["args"]
         ) => void
     ) => this;
 
@@ -44,10 +54,23 @@ interface IpcRenderer extends BaseIpcRenderer {
         ...args: GetSyncIpcConfig<T>["args"]
     ) => GetSyncIpcConfig<T>["returnValue"];
 
+    send: <T extends DualAsyncIpcKeys | UnknownMapping>(
+        channel: DualAsyncIpcChannel<T>,
+        ...args: GetDualAsyncIpcConfig<T>["args"]
+    ) => void;
+
     invoke: <T extends AsyncIpcKeys | UnknownMapping>(
         channel: AsyncIpcChannel<T>,
         ...args: GetAsyncIpcConfig<T>["args"]
     ) => Promise<GetAsyncIpcConfig<T>["returnValue"]>;
+
+    on: <T extends ReplyDualAsyncIpcKeys | UnknownMapping>(
+        channel: ReplyDualAsyncIpcChannel<T>,
+        listener: (
+            event: IpcRendererEvent,
+            ...args: GetRepliedDualAsyncIpcConfig<T>["args"]
+        ) => void
+    ) => this;
 }
 
 export const ipcMain = baseIpcMain as IpcMain;

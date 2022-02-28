@@ -1,6 +1,4 @@
 /* eslint-disable import/no-named-as-default-member */
-import { IS_MAIN, STATIC_PATH } from "@common/config";
-import { WaitableTrait } from "@common/utils/WaitableTrait";
 import { Use } from "@lsagetlethias/tstrait";
 import type { IpcMainEvent } from "electron";
 import { ipcMain, ipcRenderer } from "electron";
@@ -9,6 +7,9 @@ import type { ReadCallback, ResourceKey } from "i18next";
 import i18next from "i18next";
 import path from "path";
 
+import { IS_MAIN, STATIC_PATH } from "../config";
+import type { PubSub } from "../event/PubSub";
+import type { Event, Unsubscriber } from "../event/type";
 import type { Locale, Namespace } from "../i18n/raw";
 import {
     DEFAULT_LOCALE,
@@ -16,6 +17,7 @@ import {
     SupportedLocales,
     validLocale,
 } from "../i18n/raw";
+import { WaitableTrait } from "../utils/WaitableTrait";
 import { IsomorphicService } from "./ContainerModule";
 import { IsomorphicModule } from "./Module";
 import type { UserConfigService } from "./UserConfigModule";
@@ -25,7 +27,31 @@ const I18N_CHANGE_LANGUAGE_EVENT = "i18n.event.changeLanguage";
 const I18N_PREPARE_CHANGE_LANGUAGE_EVENT = "i18n.event.prepareChangeLanguage";
 const I18N_CHANGE_LANGUAGE_CALLBACK_EVENT = "i18n.event.changeLanguageCallback";
 
-export type LanguageChangedListener = (evt: { lng: Locale }) => void;
+export interface I18nEventState {
+    currentLng: Locale;
+}
+export class I18nEvent<T> implements Event<I18nEventState & T> {
+    public namespace = "event.i18n" as const;
+
+    public state;
+
+    constructor(state: I18nEventState & T) {
+        this.state = { ...state };
+    }
+}
+
+export interface I18nLanguageChangedState extends I18nEventState {
+    oldLng: Locale;
+}
+export class I18nLanguageChangedEvent extends I18nEvent<I18nLanguageChangedState> {}
+
+export type LanguageChangedListener = (evt: I18nLanguageChangedEvent) => void;
+
+declare module "../event/type" {
+    interface EventKeyType {
+        "event.i18n.languageChanged": I18nLanguageChangedEvent;
+    }
+}
 
 /**
  * Isomorphic module responsible for loading all i18n resources.
@@ -39,10 +65,19 @@ export class I18nModule extends IsomorphicModule {
 
     private changeLanguageRendererCallback?: IpcMainEvent["reply"];
 
-    private readonly languageChangedListeners =
-        new Set<LanguageChangedListener>();
+    private readonly languageChangedListeners = new Map<
+        LanguageChangedListener,
+        Unsubscriber
+    >();
 
-    constructor(private readonly userConfigService: UserConfigService) {
+    private userConfigChangedFromHere = false;
+
+    private unsubscriberConfigUpdate?: Unsubscriber;
+
+    constructor(
+        private readonly userConfigService: UserConfigService,
+        private readonly pubSub: PubSub
+    ) {
         super();
     }
 
@@ -100,8 +135,31 @@ export class I18nModule extends IsomorphicModule {
             supportedLngs: SupportedLocales,
         });
 
+        // subscribe to locale change from config
+        this.unsubscriberConfigUpdate = this.pubSub.subscribe(
+            "event.userconfig.updated",
+            (event) => {
+                console.log(
+                    "[i18nModule] pubsub trigger",
+                    this.userConfigChangedFromHere,
+                    event
+                );
+                if (this.userConfigChangedFromHere) {
+                    this.userConfigChangedFromHere = false;
+                    return;
+                }
+                void i18next.changeLanguage(event.state.locale);
+            }
+        );
+
         this.prepareChangeLanguage();
         this.service.resolve();
+    }
+
+    public async uninit(): Promise<void> {
+        console.info("[I18nModule] uninit ", this.unsubscriberConfigUpdate);
+        this.unsubscriberConfigUpdate?.();
+        return Promise.resolve();
     }
 
     /**
@@ -112,31 +170,34 @@ export class I18nModule extends IsomorphicModule {
             I18N_CHANGE_LANGUAGE_CALLBACK_EVENT,
             lng
         );
+        this.userConfigChangedFromHere = true;
         this.userConfigService.set("locale", lng);
     }
 
     public addLanguageChangedListener(listener: LanguageChangedListener): void {
-        this.languageChangedListeners.add(listener);
+        this.languageChangedListeners.set(
+            listener,
+            this.pubSub.subscribe("event.i18n.languageChanged", listener)
+        );
     }
 
     public removeLanguageChangedListener(
         listener: LanguageChangedListener
     ): void {
+        this.languageChangedListeners.get(listener)?.();
         this.languageChangedListeners.delete(listener);
     }
 
-    public async triggerLanguageChangedListeners(lng: Locale): Promise<void> {
-        await Promise.all(
-            [...this.languageChangedListeners].map(
-                async (listener) =>
-                    new Promise<void>((resolve) => {
-                        try {
-                            listener({ lng });
-                        } finally {
-                            resolve();
-                        }
-                    })
-            )
+    public triggerLanguageChangedListeners(
+        currentLng: Locale,
+        oldLng: Locale
+    ): void {
+        this.pubSub.publish(
+            "event.i18n.languageChanged",
+            new I18nLanguageChangedEvent({
+                currentLng,
+                oldLng,
+            })
         );
     }
 
@@ -148,10 +209,12 @@ export class I18nModule extends IsomorphicModule {
             ipcMain.handle(
                 I18N_CHANGE_LANGUAGE_EVENT,
                 async (_evt, lng: Locale) => {
-                    console.log("change asked from renderer");
+                    console.log("[I18nModule] change asked from renderer", lng);
+                    const oldLng = i18next.language;
                     await i18next.changeLanguage(lng);
+                    this.userConfigChangedFromHere = true;
                     this.userConfigService.set("locale", lng);
-                    await this.triggerLanguageChangedListeners(lng);
+                    this.triggerLanguageChangedListeners(lng, oldLng as Locale);
                 }
             );
 
@@ -168,8 +231,10 @@ export class I18nModule extends IsomorphicModule {
             ipcRenderer.on(
                 I18N_CHANGE_LANGUAGE_CALLBACK_EVENT,
                 async (_evt, lng: Locale) => {
+                    console.log("[I18nModule] Change by ipcRenderer");
+                    const oldLng = i18next.language;
                     await i18next.changeLanguage(lng);
-                    await this.triggerLanguageChangedListeners(lng);
+                    this.triggerLanguageChangedListeners(lng, oldLng as Locale);
                 }
             );
         }
@@ -215,8 +280,9 @@ class InnerI18nService extends IsomorphicService {
      */
     public async changeLanguage(lng: Locale) {
         const validLng = validLocale(lng);
+        const oldLng = i18next.language;
         await i18next.changeLanguage(validLng);
-        await this.i18nModule.triggerLanguageChangedListeners(lng);
+        this.i18nModule.triggerLanguageChangedListeners(lng, oldLng as Locale);
         if (IS_MAIN) {
             this.i18nModule.callChangeLanguageRendererCallback(validLng);
         } else {
@@ -224,7 +290,6 @@ class InnerI18nService extends IsomorphicService {
         }
     }
 
-    // TODO: change to proper pub/sub or classic event manager module
     /**
      * Listen to any language changes from any side.
      */

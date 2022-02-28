@@ -55,6 +55,11 @@ export class FileExporterModule extends IsomorphicModule {
         return Promise.resolve();
     }
 
+    public async uninit(): Promise<void> {
+        this.inited = false;
+        return Promise.resolve();
+    }
+
     public get service(): FileExporterService {
         return (
             this._service ??

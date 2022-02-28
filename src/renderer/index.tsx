@@ -1,5 +1,6 @@
 import { getIsomorphicModules } from "@common/core/isomorphic";
-import { loadModules } from "@common/lib/ModuleManager";
+import { loadModules, unloadModules } from "@common/lib/ModuleManager";
+import type { Module } from "@common/modules/Module";
 import React from "react";
 import { render } from "react-dom";
 
@@ -7,15 +8,20 @@ import { App } from "./app";
 import { ConsoleFromMainModule } from "./modules/ConsoleFromMainModule";
 import { pstExtractorService } from "./services/PstExtractorService";
 
-if (module.hot) {
-    module.hot.accept();
-}
+module.hot?.accept();
 
 void (async () => {
     const isomorphicModules = getIsomorphicModules([
         "pstExtractorService",
         pstExtractorService,
     ]);
-    await loadModules(...isomorphicModules, new ConsoleFromMainModule());
+    const modules: Module[] = [
+        ...isomorphicModules,
+        new ConsoleFromMainModule(),
+    ];
+    window.addEventListener("beforeunload", async () =>
+        unloadModules(...modules)
+    );
+    await loadModules(...modules);
     render(<App />, document.querySelector("#app"));
 })();

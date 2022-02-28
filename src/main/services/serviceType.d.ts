@@ -4,7 +4,7 @@ import type { ConsoleToRendererService } from "./ConsoleToRendererService";
 
 // add "main-only" services for autocomplete
 declare module "@common/modules/container/type" {
-    export interface ServicesKeyType {
+    interface ServicesKeyType {
         consoleToRendererService: ConsoleToRendererService;
         pstExtractorMainService: PstExtractorMainService;
         mainWindowRetriever: MainWindowRetriever;

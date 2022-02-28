@@ -2,13 +2,13 @@ import { IS_MAC } from "@common/config";
 import type { Service } from "@common/modules/container/type";
 import type { FileExporterService } from "@common/modules/FileExporterModule";
 import type { I18nService } from "@common/modules/I18nModule";
-import type { Module } from "@common/modules/Module";
 import type { UserConfigService } from "@common/modules/UserConfigModule";
 import type { MenuItem } from "electron";
 import { Menu } from "electron";
 import { t } from "i18next";
 
 import type { ConsoleToRendererService } from "../services/ConsoleToRendererService";
+import { MainModule } from "./MainModule";
 import { DebugMenu } from "./menu/DebugMenu";
 import type { PstExtractorMainService } from "./PstExtractorModule";
 
@@ -43,7 +43,7 @@ export interface MenuService extends Service {
 /**
  * Module for the menu bar. Will load various menus each of them containing (or not) submenus.
  */
-export class MenuModule implements Module {
+export class MenuModule extends MainModule {
     private readonly customMenus: ArchifiltreMailsMenu[] = [];
 
     private debugMenu?: DebugMenu;
@@ -54,7 +54,9 @@ export class MenuModule implements Module {
         private readonly i18nService: I18nService,
         private readonly fileExporterService: FileExporterService,
         private readonly userConfigService: UserConfigService
-    ) {}
+    ) {
+        super();
+    }
 
     public async init(): Promise<void> {
         await this.i18nService.wait();

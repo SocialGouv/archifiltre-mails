@@ -17,6 +17,9 @@
       "@main/*": [
         "src/main/*"
       ],
+      "@event/*": [
+        "src/common/event/*"
+      ],
       "@common/*": [
         "src/common/*"
       ]

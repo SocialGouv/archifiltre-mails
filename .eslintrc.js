@@ -1,6 +1,16 @@
 const path = require("path");
 
 const tsconfigPath = path.resolve(__dirname, "./tsconfig.json");
+const tsconfigRendererPath = path.resolve(
+    __dirname,
+    "./src/renderer/tsconfig.json"
+);
+const tsconfigMainPath = path.resolve(__dirname, "./src/main/tsconfig.json");
+const tsconfigCommonPath = path.resolve(
+    __dirname,
+    "./src/common/tsconfig.json"
+);
+const tsconfigScriptsPath = path.resolve(__dirname, "./scripts/tsconfig.json");
 
 /** @type {import("eslint").Linter.Config} */
 const typescriptConfig = {
@@ -16,6 +26,7 @@ const typescriptConfig = {
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-unused-vars": "off",
         "import/default": "off",
+        "no-console": "warn",
         "no-unused-vars": "off",
         "prefer-template": "warn",
         "unused-imports/no-unused-imports": "error",
@@ -59,14 +70,14 @@ const defaultConfig = {
             files: ["src/renderer/**/*.ts*", "src/common/**/*.ts*"],
         },
         {
-            files: ["src/renderer/**/*.ts"],
+            files: ["src/renderer/**/*.ts*"],
             parserOptions: {
-                project: "./src/renderer/tsconfig.json",
+                project: tsconfigRendererPath,
             },
             settings: {
                 "import/resolver": {
                     typescript: {
-                        project: "./src/renderer/tsconfig.json",
+                        project: tsconfigRendererPath,
                     },
                 },
             },
@@ -74,12 +85,12 @@ const defaultConfig = {
         {
             files: ["src/common/**/*.ts"],
             parserOptions: {
-                project: "./src/common/tsconfig.json",
+                project: tsconfigCommonPath,
             },
             settings: {
                 "import/resolver": {
                     typescript: {
-                        project: "./src/common/tsconfig.json",
+                        project: tsconfigCommonPath,
                     },
                 },
             },
@@ -91,12 +102,12 @@ const defaultConfig = {
             },
             files: ["src/main/**/*.ts"],
             parserOptions: {
-                project: "./src/main/tsconfig.json",
+                project: tsconfigMainPath,
             },
             settings: {
                 "import/resolver": {
                     typescript: {
-                        project: "./src/main/tsconfig.json",
+                        project: tsconfigMainPath,
                     },
                 },
             },
@@ -110,12 +121,12 @@ const defaultConfig = {
         {
             files: "scripts/**/*.ts",
             parserOptions: {
-                project: "./scripts/tsconfig.json",
+                project: tsconfigScriptsPath,
             },
             settings: {
                 "import/resolver": {
                     typescript: {
-                        project: "./scripts/tsconfig.json",
+                        project: tsconfigScriptsPath,
                     },
                 },
             },

@@ -1,6 +1,6 @@
-import { IS_DEV } from "@common/config";
 import { useEffect, useState } from "react";
 
+import { IS_PACKAGED } from "../config";
 import type { UnknownMapping } from "../utils/type";
 import type {
     ReturnServiceType,
@@ -41,8 +41,8 @@ export const isService = (service: unknown): service is Service => {
     const suppose = service as Service;
     return (
         "name" in suppose &&
-        "init" in suppose &&
-        typeof suppose.init === "function"
+        (typeof suppose.init === "function" ||
+            typeof suppose.uninit === "function")
     );
 };
 
@@ -59,7 +59,7 @@ class ContainerModule extends IsomorphicModule {
     private inited = false;
 
     public async init(): Promise<void> {
-        if (this.inited && !IS_DEV) {
+        if (this.inited && IS_PACKAGED()) {
             throw new Error("ContainerModule has already been inited.");
         }
 
@@ -80,6 +80,28 @@ class ContainerModule extends IsomorphicModule {
         this.inited = true;
     }
 
+    public async uninit(): Promise<void> {
+        if (!this.inited && IS_PACKAGED()) {
+            throw new Error("ContainerModule not yet inited.");
+        }
+
+        await Promise.all(
+            [...isomorphicServiceMap.values(), ...serviceMap.values()]
+                .map((service) => {
+                    console.warn(
+                        `[ContainerModule] ${
+                            (service as Service).name
+                        } unloading !`
+                    );
+                    if (isService(service)) {
+                        return service.uninit?.();
+                    }
+                })
+                .filter((promise) => promise)
+        );
+        this.inited = false;
+    }
+
     /**
      * Register a single service to be loaded.
      *
@@ -94,7 +116,7 @@ class ContainerModule extends IsomorphicModule {
         service?: ServiceConfigType<T>
     ): this {
         if (this.inited) {
-            if (IS_DEV) {
+            if (!IS_PACKAGED()) {
                 isomorphicServiceMap.clear();
                 serviceMap.clear();
             } else {

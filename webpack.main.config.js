@@ -6,6 +6,10 @@ module.exports =
     /** @param {import("webpack").Configuration} config */ function (config) {
         if (config.resolve) {
             config.resolve.alias["@common"] = config.resolve.alias["common"];
+            config.resolve.alias["@event"] = path.resolve(
+                config.resolve.alias["@common"],
+                "event"
+            );
         }
 
         const workers = glob

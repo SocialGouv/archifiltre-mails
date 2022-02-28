@@ -1,3 +1,5 @@
+const path = require("path");
+
 module.exports =
     /** @param {import("webpack").Configuration} config */ function (config) {
         const styleRules = config.module.rules.filter((rule) =>
@@ -27,6 +29,10 @@ module.exports =
 
         if (config.resolve) {
             config.resolve.alias["@common"] = config.resolve.alias["common"];
+            config.resolve.alias["@event"] = path.resolve(
+                config.resolve.alias["@common"],
+                "event"
+            );
         }
 
         return config;

@@ -1,8 +1,8 @@
-import { I18nModule } from "@common/modules/I18nModule";
-
+import { PubSub } from "../event/PubSub";
 import type { ServiceKeys, ServicesConfig } from "../modules/container/type";
 import { containerModule } from "../modules/ContainerModule";
 import { FileExporterModule } from "../modules/FileExporterModule";
+import { I18nModule } from "../modules/I18nModule";
 import { IpcModule } from "../modules/IpcModule";
 import type { Module } from "../modules/Module";
 import { IsomorphicModuleFactory } from "../modules/Module";
@@ -19,17 +19,23 @@ export const getIsomorphicModules = <
 >(
     ...additionalServices: ServicesConfig<TNames>
 ): Module[] => {
-    const userConfigModule =
-        IsomorphicModuleFactory.getInstance(UserConfigModule);
+    // for dev purpose
+    module.hot?.addDisposeHandler(() => void containerModule.uninit());
+    const userConfigModule = IsomorphicModuleFactory.getInstance(
+        UserConfigModule,
+        PubSub.getInstance()
+    );
     const i18nModule = IsomorphicModuleFactory.getInstance(
         I18nModule,
-        userConfigModule.service
+        userConfigModule.service,
+        PubSub.getInstance()
     );
     const fileExporterModule =
         IsomorphicModuleFactory.getInstance(FileExporterModule);
     const ipcModule = IsomorphicModuleFactory.getInstance(IpcModule);
 
     containerModule.registerServices(
+        ["pubSub", PubSub.getInstance()],
         ["userConfigService", userConfigModule.service],
         ["i18nService", i18nModule.service],
         ["fileExporterService", fileExporterModule.service],

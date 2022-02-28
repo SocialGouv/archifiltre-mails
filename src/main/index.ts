@@ -1,7 +1,8 @@
-import { IS_DEV, IS_DIST_MODE, IS_E2E, IS_PACKAGED } from "@common/config";
+import { IS_DIST_MODE, IS_E2E, IS_PACKAGED } from "@common/config";
 import { getIsomorphicModules } from "@common/core/isomorphic";
-import { loadModules } from "@common/lib/ModuleManager";
+import { loadModules, unloadModules } from "@common/lib/ModuleManager";
 import { containerModule } from "@common/modules/ContainerModule";
+import type { Module } from "@common/modules/Module";
 import type { Any } from "@common/utils/type";
 import { app, BrowserWindow, Menu } from "electron";
 import path from "path";
@@ -15,9 +16,7 @@ import { consoleToRendererService } from "./services/ConsoleToRendererService";
 export type MainWindowRetriever = () => Promise<BrowserWindow>;
 
 // enable hot reload when needed
-if (module.hot) {
-    module.hot.accept();
-}
+module.hot?.accept();
 
 Menu.setApplicationMenu(null);
 
@@ -50,7 +49,7 @@ const createMainWindow = async () => {
 
     mainWindow.setFullScreen(true);
 
-    if (IS_DEV) mainWindow.webContents.openDevTools();
+    if (!IS_PACKAGED()) mainWindow.webContents.openDevTools();
 
     await mainWindow.loadURL(INDEX_URL);
 };
@@ -62,12 +61,12 @@ app.on("window-all-closed", () => {
     app.quit();
 });
 
-const MAIN_WINDOW_CREATED_EVENT = "main-window-created";
+const MAIN_WINDOW_CREATED_APP_EVENT = "main-window-created";
 const mainWindowRetriever: MainWindowRetriever = async () =>
     mainWindow ??
     new Promise<BrowserWindow>((ok) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- Because custom event
-        app.on(MAIN_WINDOW_CREATED_EVENT as Any, () => {
+        app.on(MAIN_WINDOW_CREATED_APP_EVENT as Any, () => {
             ok(mainWindow!);
         });
     });
@@ -79,8 +78,7 @@ app.on("ready", async () => {
         ["consoleToRendererService", consoleToRendererService],
         ["mainWindowRetriever", mainWindowRetriever]
     );
-    // load "main-process" modules
-    await loadModules(
+    const modules: Module[] = [
         ...isomorphicModules,
         new AppModule(
             mainWindowRetriever,
@@ -95,9 +93,16 @@ app.on("ready", async () => {
             containerModule.get("i18nService"),
             containerModule.get("fileExporterService"),
             containerModule.get("userConfigService")
-        )
-    );
+        ),
+    ];
+    app.on("will-quit", async (event) => {
+        event.preventDefault();
+        await unloadModules(...modules);
+        process.exit();
+    });
+    // load "main-process" modules
+    await loadModules(...modules);
     // create actual main BrowserWindow
     await createMainWindow();
-    app.emit(MAIN_WINDOW_CREATED_EVENT);
+    app.emit(MAIN_WINDOW_CREATED_APP_EVENT);
 });

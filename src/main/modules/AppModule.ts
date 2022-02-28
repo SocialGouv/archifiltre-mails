@@ -1,24 +1,26 @@
 import { IS_E2E } from "@common/config";
 import type { I18nService } from "@common/modules/I18nModule";
-import type { Module } from "@common/modules/Module";
 import { dialog } from "electron";
 import type { ProgressInfo, UpdateInfo } from "electron-updater";
 import { autoUpdater } from "electron-updater";
 
 import type { MainWindowRetriever } from "..";
 import type { ConsoleToRendererService } from "../services/ConsoleToRendererService";
+import { MainModule } from "./MainModule";
 
 /**
  * Module to handle almost all global app related stuff like closing, navigating.
  */
-export class AppModule implements Module {
+export class AppModule extends MainModule {
     constructor(
         private readonly mainWindowRetriever: MainWindowRetriever,
         private readonly consoleToRendererService: ConsoleToRendererService,
         private readonly i18nService: I18nService
-    ) {}
+    ) {
+        super();
+    }
 
-    async init(): Promise<void> {
+    public async init(): Promise<void> {
         // can't await because mainWindow is created after this init
         void this.mainWindowRetriever().then(async (mainWindow) => {
             // prevent navigation
@@ -51,6 +53,7 @@ export class AppModule implements Module {
                 });
             }
 
+            // TODO: more interactive auto-update
             autoUpdater.on("check-for-update", (evt) => {
                 this.consoleToRendererService.log(
                     mainWindow,
