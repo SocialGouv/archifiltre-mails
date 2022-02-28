@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 import type { ComputedDatum } from "@nivo/circle-packing";
 import { ResponsiveCirclePacking } from "@nivo/circle-packing";
 import debounce from "lodash/debounce";
@@ -30,7 +28,7 @@ import {
 } from "../../utils/tag-manager";
 import { Menu } from "../menu/Menu";
 import style from "./CirclePacking.module.scss";
-import type { Osef } from "./CirclePackingCancellableFocusZone";
+import type { OnBlur } from "./CirclePackingCancellableFocusZone";
 import { CirclePackingCancellableFocusZone } from "./CirclePackingCancellableFocusZone";
 import { CirclePackingTooltip } from "./CirclePackingTooltip";
 
@@ -133,26 +131,8 @@ export const CirclePacking: React.FC = () => {
         computeNextView(node);
     };
 
-    const handleLostFocus = debounce<NonNullable<Osef["onBlur"]>>((evt) => {
+    const handleLostFocus = debounce<NonNullable<OnBlur["onBlur"]>>((evt) => {
         const elt = document.elementFromPoint(evt.clientX, evt.clientY);
-        // console.log({ elt, evt });
-        // if (elt && elt !== evt.target) {
-        //     // (elt as any).click();
-        //     // elt?.dispatchEvent(
-        //     //     new MouseEvent("click", {
-        //     //         // bubbles: true,
-        //     //         // cancelable: true,
-        //     //         clientX: evt.clientX,
-        //     //         clientY: evt.clientY,
-        //     //         view: window,
-        //     //     })
-        //     // );
-        //     const reactFiberKey = Object.keys(elt).find((prop) =>
-        //         prop.startsWith("__reactFiber")
-        //     )!;
-        //     const fiber = (elt as Any)[reactFiberKey];
-        //     console.log({ fiber, reactFiberKey });
-        //     fiber.ref.current.click();
 
         elt?.dispatchEvent(
             new MouseEvent(

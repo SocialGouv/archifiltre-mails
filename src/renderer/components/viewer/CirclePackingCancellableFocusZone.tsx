@@ -6,11 +6,11 @@ import React from "react";
 import { usePstFMInfosStore } from "../../store/PstFMInfosStore";
 import style from "./CirclePacking.module.scss";
 
-export interface Osef {
+export interface OnBlur {
     onBlur?: (evt: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 }
 
-export const CirclePackingCancellableFocusZone: React.FC<Osef> = ({
+export const CirclePackingCancellableFocusZone: React.FC<OnBlur> = ({
     onBlur,
 }) => {
     const { isInfoFocus, cancelFocus } = usePstFMInfosStore();

@@ -3,7 +3,6 @@ import type { FC } from "react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import { Card } from "../../components/common/card/Card";
 import { StaticImage } from "../../components/common/staticImage/StaticImage";
 import { useImpactStore } from "../../store/ImpactStore";
 import { usePstFileSizeStore } from "../../store/PstFileSizeStore";
@@ -13,24 +12,6 @@ import {
     ECOLOGIC_TRAIN_FACTOR,
 } from "../../utils/constants";
 import style from "./Dashboard.module.scss";
-
-// const dashboardImpactData: DashboardImpactItemProps[] = [
-//     {
-//         img: "img/pictos/globe.png",
-//         impactInfo: "supprimés sur 5",
-//         impactNumber: "25go",
-//     },
-//     {
-//         img: "img/pictos/money.png",
-//         impactInfo: "économisés",
-//         impactNumber: "50€",
-//     },
-//     {
-//         img: "img/pictos/tree.png",
-//         impactInfo: "arbres plantés",
-//         impactNumber: "5",
-//     },
-// ];
 
 interface DashboardImpactItemProps {
     img: string;
@@ -42,7 +23,6 @@ const DashboardImpactItem: FC<DashboardImpactItemProps> = ({
     impactNumber,
     impactInfo,
 }) => {
-    const { t } = useTranslation();
     return (
         <div className={style.dashboard__impact__item}>
             <div className={style.dashboard__impact__item__picto}>
@@ -69,19 +49,19 @@ export const DashboardImpact: FC = () => {
 
     const computedImpactInMega = bytesToMegabytes(size);
     const cO2EqKgToDelete =
-        +megabytesToCo2EqInKilo(computedImpactInMega).toFixed(2);
-    const cO2EqKgByTrainInKm = +cO2EqKgToTrain(cO2EqKgToDelete).toFixed(2);
+        +megabytesToCo2EqInKilo(computedImpactInMega).toFixed();
+    const cO2EqKgByTrainInKm = +cO2EqKgToTrain(cO2EqKgToDelete).toFixed();
 
     return (
-        <Card title={t("dashboard.impact.cardTitle")} color="orange">
-            <div className={style.dashboard__impact}>
+        <div className={style.dashboard__impact}>
+            <div className={style.dashboard__impact__inner}>
                 <DashboardImpactItem
                     img={"img/pictos/globe.png"}
                     impactNumber={`${totalFileSize} Mo`}
                     impactInfo={t("dashboard.impact.totalSize")}
                 />
                 <DashboardImpactItem
-                    img={"img/pictos/globe.png"}
+                    img={"img/pictos/airplane.png"}
                     impactNumber={`${t(
                         "dashboard.impact.ecologicImpactByTrain",
                         {
@@ -93,11 +73,11 @@ export const DashboardImpact: FC = () => {
                     })}`}
                 />
                 <DashboardImpactItem
-                    img={"img/pictos/globe.png"}
+                    img={"img/pictos/desktop.png"}
                     impactNumber={`${bytesToMegabytes(size)} Mo`}
-                    impactInfo={"identifiés à supprimer"}
+                    impactInfo={t("dashboard.impact.identify")}
                 />
             </div>
-        </Card>
+        </div>
     );
 };

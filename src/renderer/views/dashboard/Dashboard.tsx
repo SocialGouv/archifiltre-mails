@@ -14,10 +14,12 @@ export interface DashboardComponentProps {
 export const Dashboard: React.FC = () => {
     return (
         <div className={style.dashboard}>
-            <DashboardActions />
+            <div className={style.dashboard__header}>
+                <DashboardActions />
+                <DashboardImpact />
+            </div>
             <div className={style.dashboard__cards}>
                 <DashboardViewer />
-                <DashboardImpact />
                 <div className={style.dashboardInfos}>
                     <DashboardRecap />
                     <DashboardInformations />

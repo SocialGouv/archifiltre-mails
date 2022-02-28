@@ -62,7 +62,7 @@ export const StartScreen: React.FC = () => {
                     </li>
                     <li>
                         <span>{t("startscreen.importInfo.totalTime")}:</span>
-                        <span>{pstProgress.elapsed / 1000}</span>
+                        <span>{(pstProgress.elapsed / 1000).toFixed(1)}</span>
                     </li>
                 </ul>
             </div>

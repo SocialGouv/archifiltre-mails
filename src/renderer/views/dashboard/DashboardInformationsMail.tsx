@@ -28,7 +28,7 @@ export const DashboardInformationsMail: FC<{
                 {t("dashboard.informations.id.mail")}
             </div>
             <div>
-                <strong>{t("dashboard.informations.title")} </strong>
+                <strong>{t("dashboard.informations.object")} </strong>
                 {mainInfos.data.email.subject}
             </div>
             <div>
@@ -84,7 +84,7 @@ export const DashboardInformationsMail: FC<{
             </div>
             <div>
                 <strong>{t("dashboard.informations.mailFocus")}</strong>
-                <div style={{ maxHeight: 200, overflow: "scroll" }}>
+                <div style={{ maxHeight: 150, overflow: "scroll" }}>
                     <p style={{ wordBreak: "break-word" }}>
                         {mainInfos.data.email.contentText}
                     </p>
