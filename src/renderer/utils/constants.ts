@@ -62,3 +62,6 @@ export const MONTHS_NB = {
 
 export const AVERAGE_MAIL_SIZE_IN_MO = 0.005;
 export const AVERAGE_MAIL_SIZE_IN_KO = 5;
+
+export const ECOLOGIC_IMPACT_FACTOR = 19;
+export const ECOLOGIC_TRAIN_FACTOR = 578;

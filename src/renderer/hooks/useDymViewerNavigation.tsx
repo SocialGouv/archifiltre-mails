@@ -89,8 +89,6 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
             type: DOMAIN as ViewType,
         };
 
-        console.log({ computedInitialView });
-
         setCurrentView(computedInitialView);
         setDomainView(computedInitialView);
     }, [pstFile]);
@@ -148,7 +146,7 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
                 uniqueCorrespondantsByDomain,
                 node.id
             );
-            console.log("DOMAIN", { elements });
+
             const totalLevelMails = getTotalLevelMail(elements);
             setTotalMailPerLevel(totalLevelMails);
 

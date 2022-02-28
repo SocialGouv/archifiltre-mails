@@ -53,6 +53,7 @@ export const useTagManagerStore = (): UseTagManagerStore => {
         hoveredNode,
         markedToDelete,
         markedToKeep,
+        updateToDeleteImpact,
         setMarkedToDelete,
         setMarkedToKeep,
     ]);
@@ -88,6 +89,7 @@ export const useTagManagerStore = (): UseTagManagerStore => {
         hoveredNode,
         markedToDelete,
         markedToKeep,
+        updateToDeleteImpact,
         setMarkedToDelete,
         setMarkedToKeep,
     ]);
