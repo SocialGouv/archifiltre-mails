@@ -1,4 +1,4 @@
-import { IS_MAC } from "@common/config";
+import { IS_MAC, IS_PACKAGED } from "@common/config";
 import type { Service } from "@common/modules/container/type";
 import type { FileExporterService } from "@common/modules/FileExporterModule";
 import type { I18nService } from "@common/modules/I18nModule";
@@ -81,11 +81,12 @@ export class MenuModule extends MainModule {
     }
 
     private loadMenu() {
+        const visible = !IS_PACKAGED();
         const template: Parameters<typeof Menu.buildFromTemplate>[0] = [
-            { role: "fileMenu" },
-            { role: "editMenu" },
-            { role: "viewMenu" },
-            { role: "windowMenu" },
+            { role: "fileMenu", visible },
+            { role: "editMenu", visible },
+            { role: "viewMenu", visible },
+            { role: "windowMenu", visible },
             {
                 role: "help",
                 submenu: [

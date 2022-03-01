@@ -231,7 +231,7 @@ export class I18nModule extends IsomorphicModule {
             ipcRenderer.on(
                 I18N_CHANGE_LANGUAGE_CALLBACK_EVENT,
                 async (_evt, lng: Locale) => {
-                    console.log("[I18nModule] Change by ipcRenderer");
+                    console.log("[I18nModule] change triggered by main", lng);
                     const oldLng = i18next.language;
                     await i18next.changeLanguage(lng);
                     this.triggerLanguageChangedListeners(lng, oldLng as Locale);

@@ -34,6 +34,8 @@ declare module "../ipc/event" {
 /**
  * PubSub - as Publisher/Subscriber - is an isomorphic service that
  * provide a way to send and receive events through all processes.
+ *
+ * See pubsub doc for more infos.
  */
 export class PubSub extends IsomorphicService {
     private static INSTANCE: PubSub | null = null;
@@ -86,7 +88,7 @@ export class PubSub extends IsomorphicService {
     }
 
     /**
-     * Returns one and only one instance of PubSub.
+     * Return one and only one instance of PubSub.
      */
     public static getInstance(): PubSub {
         return PubSub.INSTANCE ?? (PubSub.INSTANCE = new PubSub());
@@ -108,9 +110,9 @@ export class PubSub extends IsomorphicService {
     /**
      * Subscribe to an event with a given listener.
      *
-     * From main to main, will localy saves the listener for later trigger.
-     * From renderer to renderer, acts the same.
-     * From renderer to main, will saves the listener but also send an ipc event
+     * - From main to main, will localy saves the listener for later trigger.
+     * - From renderer to renderer, acts the same.
+     * - From renderer to main, will saves the listener but also send an ipc event
      * to main for it be able to calls back a trigger from main to renderer.
      */
     public subscribe<

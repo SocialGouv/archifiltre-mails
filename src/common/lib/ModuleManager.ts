@@ -27,7 +27,7 @@ export const unloadModules = async (...mods: Module[]): Promise<void> => {
             console.warn(
                 `<MODULE_UNLOADER> ${mod.constructor.name} unloading !`
             );
-            await mod.uninit?.().catch((error) => {
+            await mod.uninit().catch((error) => {
                 throw new Error(
                     `<MODULE_ERROR> ${mod.constructor.name} failed uninit.\n${error}`
                 );
