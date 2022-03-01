@@ -97,7 +97,7 @@ export const getPstMailsPercentage = (
     return "0";
 };
 
-interface FolderListItem {
+export interface FolderListItem {
     name: string;
     type: string;
     id: string;

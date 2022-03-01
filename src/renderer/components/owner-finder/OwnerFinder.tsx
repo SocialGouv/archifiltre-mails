@@ -1,26 +1,35 @@
 import React from "react";
 
 import { usePstStore } from "../../store/PSTStore";
+import type { FolderListItem } from "../../utils/dashboard-recap";
+import { getPstListOfFolder } from "../../utils/dashboard-recap";
 import style from "./OwnerFinder.module.scss";
+import { OwnerFinderBoard } from "./OwnerFinderBoard";
 
 export const OwnerFinder: React.FC = () => {
-    const { pstFile } = usePstStore();
-    const list = pstFile?.children.flat(12);
+    const { pstFile, extractTables } = usePstStore();
+    if (!pstFile || !extractTables) return null;
 
-    console.log({ list });
+    const folderList = getPstListOfFolder(pstFile.children);
+    const contactList = [...extractTables.contacts.keys()].map(
+        (contact) =>
+            ({
+                id: "",
+                name: contact,
+                type: "",
+            } as FolderListItem)
+    );
 
     return (
         <section className={style.finder}>
-            <div className={style.finder__item}>
-                <h1>Sélectionner le dossier des mails supprimés</h1>
-            </div>
-            <div className={style.finder__item}>
-                <h1>
-                    {/* eslint-disable-next-line react/no-unescaped-entities */}
-                    Chercher et/ou sélectionner l'adresse associée à cette
-                    messagerie
-                </h1>
-            </div>
+            <OwnerFinderBoard
+                title="Sélectionner le dossier des mails supprimés"
+                list={folderList}
+            />
+            <OwnerFinderBoard
+                title="Sélectionner l'adresse associée à cette messagerie"
+                list={contactList}
+            />
         </section>
     );
 };

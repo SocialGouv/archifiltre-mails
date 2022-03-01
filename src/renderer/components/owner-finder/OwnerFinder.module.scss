@@ -14,6 +14,7 @@
       font-weight: 600;
       text-align: center;
       padding: 2.5rem 0 0;
+      margin: 0 0 3rem;
     }
 
     &:first-child {
@@ -26,6 +27,53 @@
         top: 50%;
         transform: translate(0, -50%);
         background: #ddd;
+      }
+    }
+
+    &__search {
+      width: 80%;
+      margin: 0 auto 2vh;
+      display: flex;
+
+      input {
+        width: 100%;
+        display: inline-block;
+        height: 50px;
+        border-radius: 10px;
+        border: solid 1px #ddd;
+        margin: 0 auto 2vh;
+        padding: 0 20px;
+        font-size: 1rem;
+      }
+      
+      button {
+        height: 50px;
+        border-radius: 10px;
+        padding: 10px 20px;
+        background: #ddd;
+        margin-left: 10px;
+      }
+    }
+
+    &__board {
+      height: 70vh;
+      width: 80%;
+      background: wheat;
+      margin: 0 auto;
+      overflow: scroll;
+      border-radius: 20px;
+
+      &__line {
+        height: 50px;
+        background: #ddd;
+        padding: 0 20px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+
+        &:nth-child(2n) {
+          background-color: #fff;
+        }
       }
     }
   }
