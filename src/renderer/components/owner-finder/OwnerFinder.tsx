@@ -25,10 +25,12 @@ export const OwnerFinder: React.FC = () => {
             <OwnerFinderBoard
                 title="Sélectionner le dossier des mails supprimés"
                 list={folderList}
+                type="deleted"
             />
             <OwnerFinderBoard
                 title="Sélectionner l'adresse associée à cette messagerie"
                 list={contactList}
+                type="owner"
             />
         </section>
     );
