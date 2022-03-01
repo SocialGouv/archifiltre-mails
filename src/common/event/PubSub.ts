@@ -4,9 +4,7 @@ import { v4 as randomUuid } from "uuid";
 import { IS_MAIN } from "../config";
 import { ipcMain, ipcRenderer } from "../ipc";
 import { IsomorphicService } from "../modules/ContainerModule";
-import type { Any, UnknownMapping } from "../utils/type";
 import type {
-    Event,
     EventKeyType,
     EventListener,
     EventType,
@@ -17,12 +15,13 @@ const PUBSUB_SUBSCRIBE_EVENT = "pubsub.event.subscribe";
 const PUBSUB_UNSUBSCRIBE_EVENT = "pubsub.event.unsubscribe";
 const PUBSUB_TRIGGER_EVENT = "pubsub.event.trigger";
 
+type EventKey = Exclude<keyof EventKeyType, "_">;
 declare module "../ipc/event" {
     interface DualAsyncIpcMapping {
         [PUBSUB_SUBSCRIBE_EVENT]: DualIpcConfig<
             typeof PUBSUB_TRIGGER_EVENT,
-            [id: UnknownMapping | keyof EventKeyType, uuid: string],
-            [id: UnknownMapping | keyof EventKeyType, event: Event]
+            [id: EventKey, uuid: string],
+            [id: EventKey, event: EventType<EventKey>]
         >;
     }
 
@@ -115,12 +114,10 @@ export class PubSub extends IsomorphicService {
      * - From renderer to main, will saves the listener but also send an ipc event
      * to main for it be able to calls back a trigger from main to renderer.
      */
-    public subscribe<
-        TKey extends UnknownMapping | keyof EventKeyType,
-        TListener extends EventListener<
-            TKey extends keyof EventKeyType ? TKey : Any
-        >
-    >(id: TKey | keyof EventKeyType, listener: TListener): Unsubscriber {
+    public subscribe<TKey extends EventKey>(
+        id: EventKey | TKey,
+        listener: EventListener<TKey>
+    ): Unsubscriber {
         let unsubscribe = noop;
         if (this.eventMap.has(id)) {
             this.eventMap.get(id)?.add(listener);
@@ -154,10 +151,10 @@ export class PubSub extends IsomorphicService {
     /**
      * Publish an event with the given mandatory event object.
      */
-    public publish<
-        TKey extends UnknownMapping | keyof EventKeyType,
-        TEvent extends TKey extends keyof EventKeyType ? EventType<TKey> : Any
-    >(id: TKey | keyof EventKeyType, event?: TEvent): void {
+    public publish<TKey extends EventKey>(
+        id: TKey,
+        event?: EventType<TKey>
+    ): void {
         this.eventMap.get(id)?.forEach((listener) => {
             listener(event);
         });

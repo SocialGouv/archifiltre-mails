@@ -18,7 +18,7 @@ sequenceDiagram
     note over PR: internal save listener<br>generate uuid<br>generate unsub function
     PR->>PR: save in renderer (uuid, unsub)
     PR-->>R: return unsub function
-    PR-)PM: ipc(PUBSUB_SUBSCRIBE_EVENT)<br>id, uuid
+    PR-)PM: ipc(PUBSUB_SUBSCRIBE_EVENT)<br>eventid, uuid
     note over PM: internal generate wrapped<br>listener and unsub functions
     note right of PM: listener wrap the ipc reply<br>with PUBSUB_TRIGGER_EVENT
     PM->>PM: save in main (uuid, unsub)

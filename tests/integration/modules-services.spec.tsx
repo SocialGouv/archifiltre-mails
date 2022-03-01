@@ -1,4 +1,4 @@
-import { loadModules } from "@common/lib/ModuleManager";
+import { loadModules, unloadModules } from "@common/lib/ModuleManager";
 import {
     containerModule,
     IsomorphicService,
@@ -22,11 +22,16 @@ jest.mock(
 );
 
 describe("Module and loader", () => {
-    it("should load a mocked module", async () => {
-        const flag = jest.fn().mockResolvedValue(void 0);
+    it("should load and unload a mocked module", async () => {
+        const flagInit = jest.fn().mockResolvedValue(void 0);
+        const flagUninit = jest.fn().mockResolvedValue(void 0);
         const MockModule = class extends IsomorphicModule {
             async init() {
-                await flag();
+                await flagInit();
+            }
+
+            async uninit() {
+                await flagUninit();
             }
         };
 
@@ -36,7 +41,10 @@ describe("Module and loader", () => {
         expect(mockModule).toStrictEqual(
             IsomorphicModuleFactory.getInstance(MockModule)
         );
-        expect(flag).toBeCalledTimes(1);
+        expect(flagInit).toBeCalledTimes(1);
+
+        await expect(unloadModules(mockModule)).resolves.not.toThrow();
+        expect(flagUninit).toBeCalledTimes(1);
     });
 });
 

@@ -148,7 +148,7 @@ export class UserConfigModule extends IsomorphicModule {
                     reply(CONFIG_UPDATE_EVENT, config);
                 }
                 this.pubSub.publish(
-                    "userconfig.updated",
+                    "event.userconfig.updated",
                     new UserConfigUpdatedEvent(config)
                 );
             });
