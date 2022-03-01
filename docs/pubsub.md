@@ -1,6 +1,6 @@
 # PubSub
 
-"Publier / Souscrire" est un service isomorphique global permettant à n'importe de s'abonner à n'importe quel type d'évènement à n'importe que endroit. Ce module permet simplement de s'abonner du `renderer` vers le `main`, du `renderer` vers le `renderer`, et du `main` vers le `main` .
+"Publier / Souscrire" est un service isomorphique global permettant à n'importe quoi de s'abonner à n'importe quel type d'évènement à n'importe quel endroit. Ce module permet simplement de s'abonner du `renderer` vers le `main`, du `renderer` vers le `renderer`, et du `main` vers le `main` .
 
 Lorsque qu'un évènement `main` survient, il est donc diffusé à l'ensemble des souscripteurs en même temps quelque soit leur *process* ou leur nombre.
 
@@ -11,8 +11,8 @@ sequenceDiagram
     participant R as Renderer
     participant PR as PubSub (Renderer)
     participant PM as PubSub (Main)
-    
-    rect rgb(191, 223, 255)
+
+    rect rgb(255, 255, 255, .1)
     note over R,PM: Subscribe
     R->>PR: subscribe(eventid, listener)
     note over PR: internal save listener<br>generate uuid<br>generate unsub function
@@ -24,7 +24,7 @@ sequenceDiagram
     PM->>PM: save in main (uuid, unsub)
     end
 
-    rect rgb(191, 223, 255)
+    rect rgb(255, 255, 255, .1)
     note over R,PM: Publish from main
     PM->>PM: publish localy (eventid, data)
     note right of PM: this includes wrapped listener
@@ -34,7 +34,7 @@ sequenceDiagram
     PR-->>R: listener(data)
     end
 
-    rect rgb(191, 223, 255)
+    rect rgb(255, 255, 255, .1)
     note over R,PM: Unsubscribe
     R->>PR: call unsub fn()
     PR->>PR: remove local listener
@@ -42,5 +42,4 @@ sequenceDiagram
     PM->>PM: remove local wrapped listener<br>remove in main (uuid, unsub)
     PM-->>R: return delete confirmation
     end
-    
 ```
