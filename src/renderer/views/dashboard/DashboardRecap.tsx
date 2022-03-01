@@ -11,6 +11,7 @@ import {
     MailSentPicto,
     TrashPicto,
 } from "../../components/common/pictos/picto";
+import { OwnerFinder } from "../../components/owner-finder/OwnerFinder";
 import { usePstStore } from "../../store/PSTStore";
 import {
     getPstListOfFolder,
@@ -168,7 +169,10 @@ export const DashboardRecap: FC = () => {
                     </div>
                 </div>
             ) : (
-                <DashboardRecapSelectFolder switchView={switchView} />
+                <>
+                    <OwnerFinder />
+                    <DashboardRecapSelectFolder switchView={switchView} />
+                </>
             )}
         </Card>
     );

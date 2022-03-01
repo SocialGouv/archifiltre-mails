@@ -1,0 +1,32 @@
+.finder {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  z-index: 10;
+  display: flex;
+
+  &__item {
+    width: 50vw;
+    position: relative;
+
+    h1 {
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: center;
+      padding: 2.5rem 0 0;
+    }
+
+    &:first-child {
+      &::after {
+        content: " ";
+        height: 50%;
+        width: 1px;
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translate(0, -50%);
+        background: #ddd;
+      }
+    }
+  }
+}
