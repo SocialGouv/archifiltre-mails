@@ -16,7 +16,7 @@
     "dist:mac-local": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
     "dist:linux": "electron-builder --linux AppImage",
     "start": "electron dist/main/main.js",
-    "start:mac": "open -n electron/dist/mac-x64/mac/archifiltre-mails.app",
+    "start:mac": "open -n 'electron/dist/mac/mac/Mails par Archifiltre.app'",
     "lint": "eslint src/",
     "lint:fix": "eslint --fix src/",
     "lint:test": "eslint -c tests/.eslintrc.json 'tests/**/*.ts*'",
