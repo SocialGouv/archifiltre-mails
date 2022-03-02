@@ -26,8 +26,8 @@ const dashboardImpactData: DashboardImpactItemProps[] = [
 
 interface DashboardImpactItemProps {
     img: string;
-    impactNumber: string;
     impactInfo: string;
+    impactNumber: string;
 }
 const DashboardImpactItem: FC<DashboardImpactItemProps> = ({
     img,

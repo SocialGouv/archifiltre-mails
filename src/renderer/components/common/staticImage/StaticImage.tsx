@@ -11,8 +11,8 @@ export const getStatic = (relativePath: string): string =>
         : new URL(relativePath, window.location.origin).toString();
 
 interface StaticImageProps extends ImgHTMLAttributes<HTMLImageElement> {
-    src: string;
     alt: string;
+    src: string;
 }
 
 /**

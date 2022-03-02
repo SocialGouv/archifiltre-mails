@@ -20,6 +20,7 @@ const typescriptConfig = {
         project: tsconfigPath,
         sourceType: "module",
     },
+    plugins: ["typescript-sort-keys"],
     rules: {
         "@typescript-eslint/consistent-type-imports": "error",
         "@typescript-eslint/no-misused-promises": "off",
@@ -29,6 +30,8 @@ const typescriptConfig = {
         "no-console": "warn",
         "no-unused-vars": "off",
         "prefer-template": "warn",
+        "typescript-sort-keys/interface": "error",
+        "typescript-sort-keys/string-enum": "error",
         "unused-imports/no-unused-imports": "error",
         "unused-imports/no-unused-vars": [
             "warn",

@@ -4,8 +4,8 @@ export const DEFAULT_LOCALE: Locale = "fr-FR";
 
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 export interface LocaleFileResources {
-    translation: typeof import("../../../static/locales/fr-FR/translation.json");
     common: typeof import("../../../static/locales/fr-FR/common.json");
+    translation: typeof import("../../../static/locales/fr-FR/translation.json");
 }
 /* eslint-enable @typescript-eslint/consistent-type-imports */
 export type Namespace = keyof LocaleFileResources;

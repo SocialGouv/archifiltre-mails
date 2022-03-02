@@ -17,21 +17,21 @@ import type { PstExtractorMainService } from "./PstExtractorModule";
  */
 export interface ArchifiltreMailsMenu {
     /**
-     * Retrieve the electron {@link MenuItem} representation
+     * Enable of disable the menu
      */
-    item: MenuItem;
+    enabled?: boolean;
     /**
      * Id used for searching in whole menu
      */
     readonly id: string;
     /**
+     * Retrieve the electron {@link MenuItem} representation
+     */
+    item: MenuItem;
+    /**
      * Show or hide the menu (**when hidden, shortcuts are still active!**)
      */
     visible?: boolean;
-    /**
-     * Enable of disable the menu
-     */
-    enabled?: boolean;
 }
 
 type ReloadMenuFunction = typeof MenuModule["prototype"]["reloadMenu"];

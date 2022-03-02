@@ -3,16 +3,16 @@ import type { SetStateAction } from "react";
 import { useCallback } from "react";
 
 export interface UseTagManagerStore {
-    markedToDelete: string[];
-    setMarkedToDelete: (update: SetStateAction<string[]>) => void;
-    markedToKeep: string[];
-    setMarkedToKeep: (update: SetStateAction<string[]>) => void;
-    hoveredId: string;
-    setHoveredId: (update: SetStateAction<string>) => void;
-    addMarkedToDelete: () => void;
-    addMarkedToKeep: () => void;
     addChildrenMarkedToDelete: (idsToDelete: string[]) => void;
     addChildrenMarkedToKeep: (idsToKeep: string[]) => void;
+    addMarkedToDelete: () => void;
+    addMarkedToKeep: () => void;
+    hoveredId: string;
+    markedToDelete: string[];
+    markedToKeep: string[];
+    setHoveredId: (update: SetStateAction<string>) => void;
+    setMarkedToDelete: (update: SetStateAction<string[]>) => void;
+    setMarkedToKeep: (update: SetStateAction<string[]>) => void;
 }
 
 const markedToDeleteAtom = atom<string[]>([""]);

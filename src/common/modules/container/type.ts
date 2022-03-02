@@ -10,10 +10,10 @@ import type { UserConfigService } from "../UserConfigModule";
  * Be aware that isomorphic and dedicated services have no difference here.
  */
 export interface ServicesKeyType {
-    userConfigService: UserConfigService;
-    i18nService: I18nService;
     fileExporterService: FileExporterService;
+    i18nService: I18nService;
     pubSub: PubSub;
+    userConfigService: UserConfigService;
 }
 
 export type ServiceKeys = keyof ServicesKeyType;
@@ -25,16 +25,16 @@ export type ServiceKeys = keyof ServicesKeyType;
  */
 export interface Service {
     /**
-     * Given name. Recommended to be `constructor.name`
-     */
-    name: string;
-
-    /**
      * Init a service once when the app starts (main) or when a window opens (renderer).
      *
      * If needed, a private `inited` property flag can be used to ensure this method is called once.
      */
     init?: () => Promise<void>;
+
+    /**
+     * Given name. Recommended to be `constructor.name`
+     */
+    name: string;
 
     /**
      * Uninit a service once when the app close (main) or when a window closes (renderer).

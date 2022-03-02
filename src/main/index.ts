@@ -47,8 +47,6 @@ const createMainWindow = async () => {
         },
     });
 
-    mainWindow.setFullScreen(true);
-
     if (!IS_PACKAGED()) mainWindow.webContents.openDevTools();
 
     await mainWindow.loadURL(INDEX_URL);
@@ -83,7 +81,8 @@ app.on("ready", async () => {
         new AppModule(
             mainWindowRetriever,
             consoleToRendererService,
-            containerModule.get("i18nService")
+            containerModule.get("i18nService"),
+            containerModule.get("userConfigService")
         ),
         new DevToolsModule(),
         new PstExtractorModule(containerModule.get("userConfigService")),

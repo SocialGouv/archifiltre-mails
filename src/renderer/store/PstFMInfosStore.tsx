@@ -16,11 +16,11 @@ export const isMailMainInfos = (
     isMailViewerObject(mainInfos.data);
 
 export interface UsePstMainInfosStore {
+    cancelFocus: () => void;
+    isInfoFocus: boolean;
     mainInfos: MainInfos | undefined;
     setMainInfos: (update?: SetStateAction<MainInfos | undefined>) => void;
     startFocus: () => void;
-    cancelFocus: () => void;
-    isInfoFocus: boolean;
 }
 
 const pstMainInfosAtom = atom<MainInfos | undefined>(undefined);

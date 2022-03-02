@@ -6,7 +6,7 @@ import type { ConsoleToRendererService } from "./ConsoleToRendererService";
 declare module "@common/modules/container/type" {
     interface ServicesKeyType {
         consoleToRendererService: ConsoleToRendererService;
-        pstExtractorMainService: PstExtractorMainService;
         mainWindowRetriever: MainWindowRetriever;
+        pstExtractorMainService: PstExtractorMainService;
     }
 }

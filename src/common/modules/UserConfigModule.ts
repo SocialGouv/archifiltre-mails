@@ -38,8 +38,9 @@ declare module "../event/type" {
  */
 interface UserConfigV1 {
     collectData: boolean;
-    locale: Locale;
     extractProgressDelay: number;
+    fullscreen: boolean;
+    locale: Locale;
 }
 
 /**
@@ -107,6 +108,7 @@ export class UserConfigModule extends IsomorphicModule {
                 defaults: {
                     collectData: true,
                     extractProgressDelay: 1500,
+                    fullscreen: true,
                     locale: validLocale(app.getLocale()),
                 },
                 name: IS_PACKAGED() ? "config" : appName,
@@ -119,6 +121,10 @@ export class UserConfigModule extends IsomorphicModule {
                         default: 1500,
                         minimum: 500,
                         type: "integer",
+                    },
+                    fullscreen: {
+                        default: true,
+                        type: "boolean",
                     },
                     locale: {
                         default: DEFAULT_LOCALE,

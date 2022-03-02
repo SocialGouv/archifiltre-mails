@@ -35,10 +35,10 @@ import {
 } from "../utils/dashboard-viewer-dym";
 
 export interface UseDomainsYearMailsProps {
-    currentView?: ViewState<DefaultViewerObject<string>>;
     computeNextView: (node: ComputedDatum<DefaultViewerObject<string>>) => void;
-    restartView: () => void;
     computePreviousView: () => void;
+    currentView?: ViewState<DefaultViewerObject<string>>;
+    restartView: () => void;
 }
 
 export type ViewType =

@@ -27,6 +27,16 @@ import type {
 } from "./event";
 
 interface IpcMain extends BaseIpcMain {
+    handle: <T extends AsyncIpcKeys | UnknownMapping>(
+        channel: AsyncIpcChannel<T>,
+        listener: (
+            event: IpcMainInvokeEvent,
+            ...args: GetAsyncIpcConfig<T>["args"]
+        ) =>
+            | GetAsyncIpcConfig<T>["returnValue"]
+            | Promise<GetAsyncIpcConfig<T>["returnValue"]>
+    ) => void;
+
     on: <T extends DualAsyncIpcKeys | SyncIpcKeys | UnknownMapping>(
         channel: DualAsyncIpcChannel<T> | SyncIpcChannel<T>,
         listener: (
@@ -37,28 +47,8 @@ interface IpcMain extends BaseIpcMain {
                 : GetDualAsyncIpcConfig<T>["args"]
         ) => void
     ) => this;
-
-    handle: <T extends AsyncIpcKeys | UnknownMapping>(
-        channel: AsyncIpcChannel<T>,
-        listener: (
-            event: IpcMainInvokeEvent,
-            ...args: GetAsyncIpcConfig<T>["args"]
-        ) =>
-            | GetAsyncIpcConfig<T>["returnValue"]
-            | Promise<GetAsyncIpcConfig<T>["returnValue"]>
-    ) => void;
 }
 interface IpcRenderer extends BaseIpcRenderer {
-    sendSync: <T extends SyncIpcKeys | UnknownMapping>(
-        channel: SyncIpcChannel<T>,
-        ...args: GetSyncIpcConfig<T>["args"]
-    ) => GetSyncIpcConfig<T>["returnValue"];
-
-    send: <T extends DualAsyncIpcKeys | UnknownMapping>(
-        channel: DualAsyncIpcChannel<T>,
-        ...args: GetDualAsyncIpcConfig<T>["args"]
-    ) => void;
-
     invoke: <T extends AsyncIpcKeys | UnknownMapping>(
         channel: AsyncIpcChannel<T>,
         ...args: GetAsyncIpcConfig<T>["args"]
@@ -71,6 +61,16 @@ interface IpcRenderer extends BaseIpcRenderer {
             ...args: GetRepliedDualAsyncIpcConfig<T>["args"]
         ) => void
     ) => this;
+
+    send: <T extends DualAsyncIpcKeys | UnknownMapping>(
+        channel: DualAsyncIpcChannel<T>,
+        ...args: GetDualAsyncIpcConfig<T>["args"]
+    ) => void;
+
+    sendSync: <T extends SyncIpcKeys | UnknownMapping>(
+        channel: SyncIpcChannel<T>,
+        ...args: GetSyncIpcConfig<T>["args"]
+    ) => GetSyncIpcConfig<T>["returnValue"];
 }
 
 export const ipcMain = baseIpcMain as IpcMain;

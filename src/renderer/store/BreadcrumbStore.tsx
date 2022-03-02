@@ -10,14 +10,14 @@ export type BreadcrumbId = {
 }[keyof LocaleFileResources["translation"]];
 
 export interface BreadcrumbObject {
-    id: BreadcrumbId;
     history?: string[];
+    id: BreadcrumbId;
 }
 
 export interface UseBreadcrumbStore {
     breadcrumb: BreadcrumbObject;
-    setPreviousBreadcrumb: (id: BreadcrumbId) => void;
     setBreadcrumb: (update: SetStateAction<BreadcrumbObject>) => void;
+    setPreviousBreadcrumb: (id: BreadcrumbId) => void;
 }
 
 const breadcrumbAtom = atom<BreadcrumbObject>({

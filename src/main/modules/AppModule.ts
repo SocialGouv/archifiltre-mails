@@ -1,5 +1,6 @@
 import { IS_E2E } from "@common/config";
 import type { I18nService } from "@common/modules/I18nModule";
+import type { UserConfigService } from "@common/modules/UserConfigModule";
 import { dialog } from "electron";
 import type { ProgressInfo, UpdateInfo } from "electron-updater";
 import { autoUpdater } from "electron-updater";
@@ -15,7 +16,8 @@ export class AppModule extends MainModule {
     constructor(
         private readonly mainWindowRetriever: MainWindowRetriever,
         private readonly consoleToRendererService: ConsoleToRendererService,
-        private readonly i18nService: I18nService
+        private readonly i18nService: I18nService,
+        private readonly userConfigService: UserConfigService
     ) {
         super();
     }
@@ -23,6 +25,14 @@ export class AppModule extends MainModule {
     public async init(): Promise<void> {
         // can't await because mainWindow is created after this init
         void this.mainWindowRetriever().then(async (mainWindow) => {
+            await this.userConfigService.wait();
+            mainWindow.setFullScreen(this.userConfigService.get("fullscreen"));
+            mainWindow.on("enter-full-screen", () => {
+                this.userConfigService.set("fullscreen", true);
+            });
+            mainWindow.on("leave-full-screen", () => {
+                this.userConfigService.set("fullscreen", false);
+            });
             // prevent navigation
             mainWindow.webContents.on("will-navigate", (event) => {
                 event.preventDefault();

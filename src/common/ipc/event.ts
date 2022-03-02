@@ -101,24 +101,24 @@ export type ReplyDualAsyncIpcChannel<
 
 // -- augments
 interface CustomSyncIpcMainEvent<T> extends IpcMainEvent {
-    returnValue: GetSyncIpcConfig<T>["returnValue"];
     /**
      * Sync event comming from `ipcRenderer.sendSync`. Use `ipcRenderer.send` to return a sync value.
      * @deprecated
      */
     reply: never;
+    returnValue: GetSyncIpcConfig<T>["returnValue"];
 }
 
 interface CustomAsyncIpcMainEvent<T> extends IpcMainEvent {
+    reply: (
+        replyChannel: GetDualAsyncIpcConfig<T>["replyKey"],
+        ...args: GetDualAsyncIpcConfig<T>["returnValue"]
+    ) => void;
     /**
      * Async event comming from `ipcRenderer.send`. Use `ipcRenderer.sendSync` to return a sync value.
      * @deprecated
      */
     returnValue: never;
-    reply: (
-        replyChannel: GetDualAsyncIpcConfig<T>["replyKey"],
-        ...args: GetDualAsyncIpcConfig<T>["returnValue"]
-    ) => void;
 }
 
 export type CustomIpcMainEvent<T> = T extends SyncIpcKeys
