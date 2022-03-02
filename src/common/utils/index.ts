@@ -50,7 +50,7 @@ export const notImplemented = (..._args: Any[]): Any | Promise<Any> => {
 };
 
 export const getPercentage = (current: number, total: number): number =>
-    (current / total) * 100;
+    +((current / total) * 100).toFixed(2);
 
 export const bytesToMegabytes = (bytes: number): number =>
     +(bytes / 1.0e6).toFixed(1);

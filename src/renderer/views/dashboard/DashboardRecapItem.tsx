@@ -9,7 +9,7 @@ export interface DashboardRecapItemProps {
     title: string;
     mails?: number | undefined;
     attachements?: number;
-    percentage?: string;
+    percentage?: number;
     contact?: number;
 }
 

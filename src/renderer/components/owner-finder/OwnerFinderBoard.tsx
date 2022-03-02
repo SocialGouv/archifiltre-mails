@@ -29,8 +29,6 @@ export const OwnerFinderBoard: React.FC<OwnerFinderBoardProps> = ({
         item.name.toLowerCase().includes(compareValue)
     );
 
-    console.log({ compareValueId });
-
     return (
         <div className={style.finder__item}>
             <h1>{title}</h1>

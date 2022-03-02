@@ -1,6 +1,7 @@
 import React from "react";
 
 import { usePstStore } from "../../store/PSTStore";
+import { useSynthesisStore } from "../../store/SynthesisStore";
 import type { FolderListItem } from "../../utils/dashboard-recap";
 import { getPstListOfFolder } from "../../utils/dashboard-recap";
 import style from "./OwnerFinder.module.scss";
@@ -12,6 +13,7 @@ export interface OwnerFinderProps {
 
 export const OwnerFinder: React.FC<OwnerFinderProps> = ({ switchFinder }) => {
     const { pstFile, extractTables } = usePstStore();
+    const { ownerId, deletedFolderId } = useSynthesisStore();
     if (!pstFile || !extractTables) return null;
 
     const folderList = getPstListOfFolder(pstFile.children);
@@ -36,7 +38,11 @@ export const OwnerFinder: React.FC<OwnerFinderProps> = ({ switchFinder }) => {
                 list={contactList}
                 type="owner"
             />
-            <button className={style.finder__validate} onClick={switchFinder}>
+            <button
+                className={style.finder__validate}
+                onClick={switchFinder}
+                disabled={!ownerId || !deletedFolderId}
+            >
                 Valider mon choix
             </button>
         </section>

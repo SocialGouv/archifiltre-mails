@@ -66,15 +66,11 @@
       &__line {
         height: 50px;
         background: #fff;
-        // background: #ddd;
         padding: 0 20px;
         margin: 0;
         display: flex;
         align-items: center;
-
-        &:nth-child(2n) {
-          background-color: #fff;
-        }
+        cursor: pointer;
       }
 
       &__line__active {
@@ -107,6 +103,9 @@
     font-size: 1rem;
     transform: translate3d(-50%, 0, 0);
     border-radius: 10px;
+    &:disabled {
+      opacity: .25;
+    }
   }
 
   &__landing {
