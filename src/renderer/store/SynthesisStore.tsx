@@ -5,21 +5,41 @@ import create from "zustand/vanilla";
 import type { OwnerFinderBoardProps } from "../components/owner-finder/OwnerFinderBoard";
 
 export const synthesisStore = create(() => ({
-    deletedFolder: "",
+    deletedFolderId: "",
+    deletedFolderName: "",
     deletedMail: 0,
-    owner: "",
+    ownerId: "",
+    ownerName: "",
     receivedMail: 0,
     sentMail: 0,
 }));
 
 const { setState } = synthesisStore;
 
-export const setMailBoxOwner = (owner: string): void => {
-    setState({ owner });
+export const setMailBoxOwner = (ownerName: string): void => {
+    setState({ ownerName });
 };
 
-export const setDeletedFolder = (deletedFolder: string): void => {
-    setState({ deletedFolder });
+export const setDeletedFolder = (deletedFolderName: string): void => {
+    setState({ deletedFolderName });
+};
+
+export const setMailBoxOwnerId = (ownerId: string): void => {
+    setState({ ownerId });
+};
+
+export const setDeletedFolderId = (deletedFolderId: string): void => {
+    setState({ deletedFolderId });
+};
+
+export const synthesisIdHandler = (
+    event: React.MouseEvent<HTMLParagraphElement, MouseEvent>,
+    type: OwnerFinderBoardProps["type"]
+): void => {
+    const target = event.target as HTMLElement;
+    const handler = type === "deleted" ? setDeletedFolderId : setMailBoxOwnerId;
+
+    handler(target.id);
 };
 
 export const synthesisInputHandler = (

@@ -61,10 +61,12 @@
       margin: 0 auto;
       overflow: scroll;
       border-radius: 20px;
+      border: solid 1px #ddd;
 
       &__line {
         height: 50px;
-        background: #ddd;
+        background: #fff;
+        // background: #ddd;
         padding: 0 20px;
         margin: 0;
         display: flex;
@@ -75,10 +77,16 @@
         }
       }
 
+      &__line__active {
+        background: #c5dbff;
+        height: 50px;
+        padding: 0 20px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+      }
+
       &__empty__state {
-        // position: absolute;
-        // top: 50%;
-        // left: 50%;
         width: 100%;
         height: 100%;
         background: #eee;
@@ -87,6 +95,25 @@
         justify-content: center;
         align-items: center;
       }
+    }
+  }
+
+  &__validate {
+    position: absolute;
+    left: 50%;
+    bottom: 2vh;
+    padding: 18px;
+    background: #b0f0e2;
+    font-size: 1rem;
+    transform: translate3d(-50%, 0, 0);
+    border-radius: 10px;
+  }
+
+  &__landing {
+    button {
+      margin: 0 auto;
+      display: block;
+      font-weight: 600;
     }
   }
 }

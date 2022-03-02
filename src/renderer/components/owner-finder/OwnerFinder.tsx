@@ -6,7 +6,11 @@ import { getPstListOfFolder } from "../../utils/dashboard-recap";
 import style from "./OwnerFinder.module.scss";
 import { OwnerFinderBoard } from "./OwnerFinderBoard";
 
-export const OwnerFinder: React.FC = () => {
+export interface OwnerFinderProps {
+    switchFinder: () => void;
+}
+
+export const OwnerFinder: React.FC<OwnerFinderProps> = ({ switchFinder }) => {
     const { pstFile, extractTables } = usePstStore();
     if (!pstFile || !extractTables) return null;
 
@@ -14,7 +18,7 @@ export const OwnerFinder: React.FC = () => {
     const contactList = [...extractTables.contacts.keys()].map(
         (contact) =>
             ({
-                id: "",
+                id: contact,
                 name: contact,
                 type: "",
             } as FolderListItem)
@@ -32,6 +36,9 @@ export const OwnerFinder: React.FC = () => {
                 list={contactList}
                 type="owner"
             />
+            <button className={style.finder__validate} onClick={switchFinder}>
+                Valider mon choix
+            </button>
         </section>
     );
 };

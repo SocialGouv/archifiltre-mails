@@ -12,6 +12,7 @@ import {
     TrashPicto,
 } from "../../components/common/pictos/picto";
 import { OwnerFinder } from "../../components/owner-finder/OwnerFinder";
+import { OwnerFinderLanding } from "../../components/owner-finder/OwnerFinderLanding";
 import { usePstStore } from "../../store/PSTStore";
 import {
     getPstListOfFolder,
@@ -26,16 +27,20 @@ import {
 import { getExtremeMailsDates } from "../../utils/pst-extractor";
 import style from "./Dashboard.module.scss";
 import { DashboardRecapItem } from "./DashboardRecapItem";
-import { DashboardRecapSelectFolder } from "./DashboardRecapSelectFolder";
 
 // TODO: pas toujours de dossiers "supprimés" ou "envoyés" // Will be done in the associate PR
 export const DashboardRecap: FC = () => {
     const { t } = useTranslation();
     const [isRecapReady, setIsRecapReady] = useState(false);
+    const [isFinder, setIsFinder] = useState(false);
 
-    const switchView = useCallback(() => {
+    const switchRecapOn = useCallback(() => {
         setIsRecapReady(true);
     }, []);
+
+    const switchFinder = useCallback(() => {
+        setIsFinder(!isFinder);
+    }, [isFinder]);
 
     const { pstFile, deletedFolder, extractTables } = usePstStore();
 
@@ -168,11 +173,10 @@ export const DashboardRecap: FC = () => {
                         </div>
                     </div>
                 </div>
+            ) : isFinder ? (
+                <OwnerFinder switchFinder={switchRecapOn} />
             ) : (
-                <>
-                    <OwnerFinder />
-                    <DashboardRecapSelectFolder switchView={switchView} />
-                </>
+                <OwnerFinderLanding switchView={switchFinder} />
             )}
         </Card>
     );

@@ -1,6 +1,9 @@
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React from "react";
 
 import {
+    synthesisIdHandler,
     synthesisInputHandler,
     useSynthesisStore,
 } from "../../store/SynthesisStore";
@@ -18,12 +21,15 @@ export const OwnerFinderBoard: React.FC<OwnerFinderBoardProps> = ({
     list,
     type,
 }) => {
-    const { owner, deletedFolder } = useSynthesisStore();
-    const compareValue = type === "deleted" ? deletedFolder : owner;
-
+    const { ownerName, deletedFolderName, deletedFolderId, ownerId } =
+        useSynthesisStore();
+    const compareValue = type === "deleted" ? deletedFolderName : ownerName;
+    const compareValueId = type === "deleted" ? deletedFolderId : ownerId;
     const filteredList = list.filter((item) =>
         item.name.toLowerCase().includes(compareValue)
     );
+
+    console.log({ compareValueId });
 
     return (
         <div className={style.finder__item}>
@@ -41,7 +47,15 @@ export const OwnerFinderBoard: React.FC<OwnerFinderBoardProps> = ({
                 {filteredList.length ? (
                     filteredList.map((item, index) => (
                         <p
-                            className={style.finder__item__board__line}
+                            className={
+                                item.id === compareValueId
+                                    ? style.finder__item__board__line__active
+                                    : style.finder__item__board__line
+                            }
+                            id={item.id}
+                            onClick={(event) => {
+                                synthesisIdHandler(event, type);
+                            }}
                             key={index}
                         >
                             {item.name}
