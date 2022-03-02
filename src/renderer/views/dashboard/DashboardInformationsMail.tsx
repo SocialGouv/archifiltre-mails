@@ -5,8 +5,12 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 
 import { usePstFileSizeStore } from "../../store/PstFileSizeStore";
+import { usePstStore } from "../../store/PSTStore";
 import { AVERAGE_MAIL_SIZE_IN_KO } from "../../utils/constants";
-import { sanitizeMailDate } from "../../utils/dashboard-viewer";
+import {
+    getParentFolderName,
+    sanitizeMailDate,
+} from "../../utils/dashboard-viewer";
 import type { MailViewerObject } from "../../utils/dashboard-viewer-dym";
 import { getFileSizeByMail } from "../../utils/dashboard-viewer-dym";
 import style from "./Dashboard.module.scss";
@@ -16,11 +20,13 @@ export const DashboardInformationsMail: FC<{
 }> = ({ mainInfos }) => {
     const { t } = useTranslation();
     const { totalFileSize } = usePstFileSizeStore();
+    const { pstFile } = usePstStore();
 
     const volumeTotal =
         bytesToKilobytes(getFileSizeByMail(mainInfos.data.email.attachements)) +
         AVERAGE_MAIL_SIZE_IN_KO;
 
+    if (!pstFile) return null;
     return (
         <div className={style.dashboard__informations__wrapper__mail}>
             <div>
@@ -38,6 +44,10 @@ export const DashboardInformationsMail: FC<{
             <div>
                 <strong>{t("dashboard.informations.receivedDate")} </strong>{" "}
                 {sanitizeMailDate(mainInfos.data.email.receivedDate!)}
+            </div>
+            <div>
+                <strong>{t("dashboard.informations.parentFolder")}</strong>
+                {getParentFolderName(pstFile, mainInfos.data.email.id)}
             </div>
             <div>
                 <strong>{t("dashboard.informations.attachedCount")} </strong>{" "}

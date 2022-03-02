@@ -1,4 +1,8 @@
-import type { PstContent } from "@common/modules/pst-extractor/type";
+import type {
+    PstContent,
+    PstElement,
+} from "@common/modules/pst-extractor/type";
+import { isPstEmail, isPstFolder } from "@common/modules/pst-extractor/type";
 import { Object } from "@common/utils/overload";
 import type {
     CirclePackingSvgProps,
@@ -91,4 +95,27 @@ export const handleFocusItemBorderColor = (
     if (mainInfos && isInfoFocus && node.data.id === mainInfos.id)
         return COLORS.BLACK;
     return COLORS.TRANSPARENT;
+};
+
+export const getParentFolderName = (
+    pstFile: PstContent,
+    emailId: string
+): string => {
+    let path = "";
+    let finalPath = "";
+
+    const rec = (pst: PstElement) => {
+        if (isPstFolder(pst)) {
+            path = pst.name;
+            pst.children?.forEach((child) => {
+                rec(child);
+            });
+        } else if (isPstEmail(pst) && pst.id === emailId) {
+            finalPath = path;
+        }
+    };
+
+    rec(pstFile);
+
+    return finalPath;
 };

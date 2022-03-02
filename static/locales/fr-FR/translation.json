@@ -28,6 +28,7 @@
   "dashboard.informations.percentage": "Volume occupé :",
   "dashboard.informations.receivedDate": "Date de réception",
   "dashboard.informations.sentDate": "Date d'envoi",
+  "dashboard.informations.parentFolder": "Dossier parent",
   "dashboard.informations.title": "Titre",
   "dashboard.informations.to": "Destinataire(s)",
   "dashboard.informations.type": "Type",
