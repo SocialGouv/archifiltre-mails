@@ -13,7 +13,7 @@
   "dashboard.impact.kiloEq_one": "Soit {{ count }} Kilos eq. CO2",
   "dashboard.impact.kiloEq_other": "Soit {{ count }} Kilos eq. CO2",
   "dashboard.impact.kiloEq_zero": "Soit {{ count }} Kilo eq. CO2",
-  "dashboard.impact.totalSize": "Volume total de la messagerie",
+  "dashboard.impact.totalSize": "Volume total des pièces jointes",
   "dashboard.informations.allDomains": "tous les domaines",
   "dashboard.informations.attachedCount": "Nombre de PJ :",
   "dashboard.informations.attachedTitles": "Nom(s) des PJ",

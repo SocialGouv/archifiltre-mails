@@ -13,7 +13,7 @@
   "dashboard.impact.kiloEq_one": "{{ count }} Kilos eq. CO2",
   "dashboard.impact.kiloEq_other": "{{ count }} Kilos eq. CO2",
   "dashboard.impact.kiloEq_zero": "{{ count }} Kilo eq. CO2",
-  "dashboard.impact.totalSize": "Total messaging volume",
+  "dashboard.impact.totalSize": "Total attachements volume",
   "dashboard.informations.allDomains": "all the domains",
   "dashboard.informations.attachedCount": "Number of PCs:",
   "dashboard.informations.attachedTitles": "Name of PCs",
