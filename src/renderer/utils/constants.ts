@@ -65,3 +65,5 @@ export const AVERAGE_MAIL_SIZE_IN_KO = 5;
 
 export const ECOLOGIC_IMPACT_FACTOR = 19;
 export const ECOLOGIC_TRAIN_FACTOR = 578;
+
+export const MAILS_TO_EXPORT = "mailsToExport";

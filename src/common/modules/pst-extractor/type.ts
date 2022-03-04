@@ -66,6 +66,7 @@ export interface PstEmail extends PstElement {
     contentRTF: string;
     attachementCount: number;
     isFromMe: boolean;
+    tag?: string;
 }
 
 export const isPstEmail = (elt: PstElement): elt is PstEmail => {
