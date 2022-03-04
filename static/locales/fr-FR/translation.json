@@ -99,6 +99,7 @@
   "exporter.table.cc.email": "Adresses mails du ou des destinataire CC",
   "exporter.table.cc.name": "Noms du ou des destinataire CC",
   "exporter.table.content-text": "Contenu du message",
+  "exporter.table.element-path": "Chemin du dossier",
   "exporter.table.from.email": "Adresse mail de l'expéditeur",
   "exporter.table.from.name": "Nom de l'expéditeur",
   "exporter.table.id": "N° identifiant",

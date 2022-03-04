@@ -410,6 +410,7 @@ export const createMails = <TId extends string>(
             return {
                 email,
                 id: value.id,
+                ids: [value.id],
                 name,
                 size,
                 value: name,

@@ -19,6 +19,7 @@ export const formatEmailTable = (
         ccEmail: t("exporter.table.cc.email"),
         ccName: t("exporter.table.cc.name"),
         contentText: t("exporter.table.content-text"),
+        elementPath: t("exporter.table.element-path"),
         fromEmail: t("exporter.table.from.email"),
         fromName: t("exporter.table.from.name"),
         id: t("exporter.table.id"),
@@ -52,6 +53,7 @@ export const formatEmailTable = (
             .join(","),
         [tKeys.contentText]: email.contentText,
         [tKeys.tag]: email.tag,
+        [tKeys.elementPath]: email.elementPath,
     }));
 };
 

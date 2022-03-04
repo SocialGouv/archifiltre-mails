@@ -14,6 +14,7 @@ const impactStore = create<ImpactState>((set) => ({
     updateToDeleteImpact: (ids: string[], impact: "add" | "delete"): void => {
         set((state) => {
             ids.forEach((id) => state.toDeleteIDs[impact](id));
+
             if (!attachementMap) return;
             const totalDeletedSize = [...state.toDeleteIDs].reduce(
                 (acc, id) =>

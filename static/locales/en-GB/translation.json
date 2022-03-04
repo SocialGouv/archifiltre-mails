@@ -99,6 +99,7 @@
   "exporter.table.cc.email": "Email addresses of the CC recipient(s)",
   "exporter.table.cc.name": "Names of recipient(s) CC",
   "exporter.table.content-text": "Message content",
+  "exporter.table.element-path": "Folder path",
   "exporter.table.from.email": "Sender's email address",
   "exporter.table.from.name": "Sender's name",
   "exporter.table.id": "ID",
