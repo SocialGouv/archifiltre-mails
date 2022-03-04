@@ -14,7 +14,6 @@ import {
     LDAP_ORG,
     MAX_TRESHOLD,
     RATIO_FROM_MAX,
-    TRESHOLD_KEY,
 } from "./constants";
 
 interface BaseViewerObject<TId extends string> {
@@ -197,21 +196,23 @@ export const getAggregatedDomainCount = (
         );
     /* eslint-enable @typescript-eslint/naming-convention */
 
-    const threshold = getMailTreshold(mailCountPerDomain);
-    const thresholdify = (m: Map<string, number>): Map<string, number> => {
-        const out = new Map<string, number>();
-        for (const [k, v] of m) {
-            if (v < threshold) {
-                out.set(TRESHOLD_KEY, v + (out.get(TRESHOLD_KEY) ?? 0));
-            } else out.set(k, v);
-        }
+    // THRESHOLD LOGIC TO KEEP
+    //
+    // const threshold = getMailTreshold(mailCountPerDomain);
+    // const thresholdify = (m: Map<string, number>): Map<string, number> => {
+    //     const out = new Map<string, number>();
+    //     for (const [k, v] of m) {
+    //         if (v < threshold) {
+    //             out.set(TRESHOLD_KEY, v + (out.get(TRESHOLD_KEY) ?? 0));
+    //         } else out.set(k, v);
+    //     }
 
-        return out;
-    };
+    //     return out;
+    // };
 
-    const THERESULT = orderByValues(thresholdify(mailCountPerDomain));
+    // const THERESULT = orderByValues(thresholdify(mailCountPerDomain));
 
-    return toRecord(THERESULT);
+    return toRecord(orderByValues(mailCountPerDomain));
 };
 
 export const getUniqueCorrespondantsByDomain = (
