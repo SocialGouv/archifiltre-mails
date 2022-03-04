@@ -1,6 +1,7 @@
 import { getIsomorphicModules } from "@common/core/isomorphic";
 import { loadModules, unloadModules } from "@common/lib/ModuleManager";
 import type { Module } from "@common/modules/Module";
+import { MatomoProvider } from "@common/tracker/MatomoProvider";
 import React from "react";
 import { render } from "react-dom";
 
@@ -24,4 +25,8 @@ void (async () => {
     );
     await loadModules(...modules);
     render(<App />, document.querySelector("#app"));
+
+    const matomo = new MatomoProvider();
+    await matomo.init();
+    console.log({ matomo });
 })();

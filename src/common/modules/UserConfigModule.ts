@@ -7,9 +7,11 @@ import { IS_MAIN, IS_PACKAGED } from "../config";
 import type { PubSub } from "../event/PubSub";
 import type { Event } from "../event/type";
 import type { Locale } from "../i18n/raw";
-import { DEFAULT_LOCALE, SupportedLocales, validLocale } from "../i18n/raw";
+import { SupportedLocales, validLocale } from "../i18n/raw";
+import type { TrackAppId } from "../tracker/MatomoProvider";
 import { randomString } from "../utils";
 import type { SimpleObject, VoidFunction } from "../utils/type";
+import { unreadonly } from "../utils/type";
 import { WaitableTrait } from "../utils/WaitableTrait";
 import { IsomorphicService } from "./ContainerModule";
 import { IsomorphicModule } from "./Module";
@@ -37,6 +39,7 @@ declare module "../event/type" {
  * Config for `ArchifiltreMails@v1`
  */
 interface UserConfigV1 {
+    appId: TrackAppId;
     collectData: boolean;
     extractProgressDelay: number;
     fullscreen: boolean;
@@ -106,6 +109,7 @@ export class UserConfigModule extends IsomorphicModule {
             this.store = new Store<UserConfigV1>({
                 clearInvalidConfig: true,
                 defaults: {
+                    appId: (await import("uuid")).v4(),
                     collectData: true,
                     extractProgressDelay: 1500,
                     fullscreen: true,
@@ -113,22 +117,22 @@ export class UserConfigModule extends IsomorphicModule {
                 },
                 name: IS_PACKAGED() ? "config" : appName,
                 schema: {
+                    appId: {
+                        readOnly: true,
+                        type: "string",
+                    },
                     collectData: {
-                        default: true,
                         type: "boolean",
                     },
                     extractProgressDelay: {
-                        default: 1500,
                         minimum: 500,
                         type: "integer",
                     },
                     fullscreen: {
-                        default: true,
                         type: "boolean",
                     },
                     locale: {
-                        default: DEFAULT_LOCALE,
-                        enum: SupportedLocales as never,
+                        enum: unreadonly(SupportedLocales),
                     },
                 },
                 watch: true,

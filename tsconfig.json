@@ -24,6 +24,7 @@
   },
   "include": [
     "global.d.ts",
+    "types/**/*.d.ts",
     "src/**/*"
   ],
   "exclude": [

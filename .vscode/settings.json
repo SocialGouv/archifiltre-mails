@@ -48,5 +48,8 @@
   "i18n-ally.extract.autoDetect": false,
   "editor.suggest.showWords": false,
   "typescript.preferences.importModuleSpecifier": "project-relative",
-  "javascript.preferences.importModuleSpecifier": "project-relative"
+  "javascript.preferences.importModuleSpecifier": "project-relative",
+  "files.associations": {
+    ".env.dist": "dotenv"
+  }
 }

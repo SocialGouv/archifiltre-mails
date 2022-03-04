@@ -74,3 +74,13 @@ export type VoidFunction = () => void;
 export type VoidArgsFunction<TArgs extends Any[] = Any[]> = (
     ...args: TArgs
 ) => void;
+
+/**
+ * Hacky type to remove readonly on each property
+ */
+export type UnReadOnly<T> = {
+    -readonly [K in keyof T]: T[K];
+};
+
+// ===== Dummy type fonction and guards
+export const unreadonly = <T>(value: T): UnReadOnly<T> => value;

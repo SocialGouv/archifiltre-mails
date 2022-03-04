@@ -17,3 +17,10 @@ declare module "*.png" {
     const content: string;
     export default content;
 }
+
+declare namespace NodeJS {
+    interface ProcessEnv {
+        MATOMO_ID_SITE: string;
+        MATOMO_URL: string;
+    }
+}

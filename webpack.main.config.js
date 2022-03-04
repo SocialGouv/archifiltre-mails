@@ -1,6 +1,7 @@
 const path = require("path");
 const glob = require("glob");
 const webpack = require("webpack");
+require("dotenv").config();
 
 module.exports =
     /** @param {import("webpack").Configuration} config */ function (config) {
@@ -27,13 +28,19 @@ module.exports =
                 return acc;
             }, {});
 
-        if (config.mode === "production" && config.plugins) {
+        if (!config.plugins) {
+            config.plugins = [];
+        }
+        if (config.mode === "production") {
             for (const plugin of config.plugins) {
                 if (plugin instanceof webpack.BannerPlugin) {
                     plugin.options.exclude = /\.worker\.js$/i;
                 }
             }
         }
+        config.plugins.push(
+            new webpack.EnvironmentPlugin(["MATOMO_ID_SITE", "MATOMO_URL"])
+        );
 
         if (config.entry) {
             config.entry = {

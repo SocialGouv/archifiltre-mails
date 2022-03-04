@@ -1,4 +1,5 @@
 const path = require("path");
+const webpack = require("webpack");
 
 module.exports =
     /** @param {import("webpack").Configuration} config */ function (config) {
@@ -34,6 +35,12 @@ module.exports =
                 "event"
             );
         }
+        if (!config.plugins) {
+            config.plugins = [];
+        }
+        config.plugins.push(
+            new webpack.EnvironmentPlugin(["MATOMO_ID_SITE", "MATOMO_URL"])
+        );
 
         return config;
     };
