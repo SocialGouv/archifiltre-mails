@@ -163,14 +163,6 @@ export const CirclePacking: React.FC = () => {
     return (
         <>
             <div id="circle-packing" className={style["circle-packing"]}>
-                <div className={style.circlePackingActionsButton}>
-                    <button onClick={goToPreviousView}>
-                        {t("dashboard.viewer.previous")}
-                    </button>
-                    <button onClick={goToInitialView}>
-                        {t("dashboard.viewer.restart")}
-                    </button>
-                </div>
                 <ResponsiveCirclePacking
                     data={currentView.elements}
                     onClick={handleClick}
@@ -181,6 +173,14 @@ export const CirclePacking: React.FC = () => {
                     tooltip={(node) => <CirclePackingTooltip node={node} />}
                     {...commonProperties}
                 />
+                <div className={style.circlePackingActionsButton}>
+                    <button onClick={goToPreviousView}>
+                        {t("dashboard.viewer.previous")}
+                    </button>
+                    <button onClick={goToInitialView}>
+                        {t("dashboard.viewer.restart")}
+                    </button>
+                </div>
             </div>
             <CirclePackingCancellableFocusZone onBlur={handleLostFocus} />
             <Menu />

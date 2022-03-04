@@ -1,0 +1,118 @@
+.finder {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  z-index: 10;
+  display: flex;
+
+  &__item {
+    width: 50vw;
+    position: relative;
+
+    h1 {
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: center;
+      padding: 2.5rem 0 0;
+      margin: 0 0 3rem;
+    }
+
+    &:first-child {
+      &::after {
+        content: " ";
+        height: 50%;
+        width: 1px;
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translate(0, -50%);
+        background: #ddd;
+      }
+    }
+
+    &__search {
+      width: 80%;
+      margin: 0 auto 2vh;
+      display: flex;
+
+      input {
+        width: 100%;
+        display: inline-block;
+        height: 50px;
+        border-radius: 10px;
+        border: solid 1px #ddd;
+        margin: 0 auto 2vh;
+        padding: 0 20px;
+        font-size: 1rem;
+      }
+      
+      button {
+        height: 50px;
+        border-radius: 10px;
+        padding: 10px 20px;
+        background: #ddd;
+        margin-left: 10px;
+      }
+    }
+
+    &__board {
+      height: 70vh;
+      width: 80%;
+      margin: 0 auto;
+      overflow: scroll;
+      border-radius: 20px;
+      border: solid 1px #ddd;
+
+      &__line {
+        height: 50px;
+        background: #fff;
+        padding: 0 20px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      &__line__active {
+        background: #c5dbff;
+        height: 50px;
+        padding: 0 20px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+      }
+
+      &__empty__state {
+        width: 100%;
+        height: 100%;
+        background: #eee;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  }
+
+  &__validate {
+    position: absolute;
+    left: 50%;
+    bottom: 2vh;
+    padding: 18px;
+    background: #b0f0e2;
+    font-size: 1rem;
+    transform: translate3d(-50%, 0, 0);
+    border-radius: 10px;
+    &:disabled {
+      opacity: .25;
+    }
+  }
+
+  &__landing {
+    button {
+      margin: 0 auto;
+      display: block;
+      font-weight: 600;
+    }
+  }
+}

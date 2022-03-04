@@ -1,3 +1,4 @@
+import { getPercentage } from "@common/utils";
 import type { FC } from "react";
 import React, { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -11,64 +12,77 @@ import {
     MailSentPicto,
     TrashPicto,
 } from "../../components/common/pictos/picto";
+import { OwnerFinder } from "../../components/owner-finder/OwnerFinder";
+import { OwnerFinderLanding } from "../../components/owner-finder/OwnerFinderLanding";
+import { usePstFileSizeStore } from "../../store/PstFileSizeStore";
 import { usePstStore } from "../../store/PSTStore";
+import { useSynthesisStore } from "../../store/SynthesisStore";
 import {
+    getDeletedMails,
+    getDeletedMailsCount,
+    getMailsAttachementCount,
+    getMailsAttachementSize,
+    getMailsByStatus,
     getPstListOfFolder,
-    getPstMailsPercentage,
-    getPstTotalContacts,
-    getPstTotalDeletedMails,
-    getPstTotalReceivedAttachments,
-    getPstTotalReceivedMails,
-    getPstTotalSentAttachments,
-    getPstTotalSentMails,
 } from "../../utils/dashboard-recap";
 import { getExtremeMailsDates } from "../../utils/pst-extractor";
 import style from "./Dashboard.module.scss";
 import { DashboardRecapItem } from "./DashboardRecapItem";
-import { DashboardRecapSelectFolder } from "./DashboardRecapSelectFolder";
 
-// TODO: pas toujours de dossiers "supprimés" ou "envoyés" // Will be done in the associate PR
 export const DashboardRecap: FC = () => {
     const { t } = useTranslation();
     const [isRecapReady, setIsRecapReady] = useState(false);
+    const [isFinder, setIsFinder] = useState(false);
 
-    const switchView = useCallback(() => {
+    const { totalFileSize } = usePstFileSizeStore();
+    const { pstFile, extractTables } = usePstStore();
+    const { deletedFolderId, ownerId } = useSynthesisStore();
+
+    const switchRecapOn = useCallback(() => {
         setIsRecapReady(true);
     }, []);
 
-    const { pstFile, deletedFolder, extractTables } = usePstStore();
+    const switchFinder = useCallback(() => {
+        setIsFinder(!isFinder);
+    }, [isFinder]);
 
-    // mails received
-    const receivedMailsTotal = getPstTotalReceivedMails(extractTables);
-    const receivedAttachmentsTotal =
-        getPstTotalReceivedAttachments(extractTables);
-    const receivedPercentageMails = getPstMailsPercentage(
-        receivedMailsTotal,
-        extractTables?.emails
+    if (!pstFile || !extractTables) return null;
+
+    const sentMails = getMailsByStatus(ownerId, extractTables, "sent");
+    const sentMailsCount = sentMails.length;
+    const sentMailsAttachementCount = getMailsAttachementCount(sentMails);
+    const sentMailsAttachementSize = getMailsAttachementSize(sentMails);
+    const sentMailsAttachementPercentage = getPercentage(
+        sentMailsAttachementSize,
+        totalFileSize
     );
 
-    // mails sent
-    const sentMailsTotal = getPstTotalSentMails(extractTables);
-    const sentAttachmentsTotal = getPstTotalSentAttachments(extractTables);
-    const sentPercentageMails = getPstMailsPercentage(
-        sentMailsTotal,
-        extractTables?.emails
+    const receivedMails = getMailsByStatus(ownerId, extractTables, "received");
+    const receivedMailsCount = receivedMails.length;
+    const receivedMailAttachmentCount = getMailsAttachementCount(receivedMails);
+    const receivedMailsAttachementSize = getMailsAttachementSize(receivedMails);
+    const receivedMailsAttachementPercentage = getPercentage(
+        receivedMailsAttachementSize,
+        totalFileSize
     );
 
-    // mails deleted
-    const deletedMailsTotal =
-        pstFile && getPstTotalDeletedMails(pstFile, deletedFolder);
+    const deletedMails = getDeletedMails(pstFile, deletedFolderId);
+    const {
+        deletedMailsCount,
+        deletedMailsAttachmentCount,
+        deletedMailsAttachementSize,
+    } = getDeletedMailsCount(deletedMails);
+    const deletedMailsAttachementPercentage = getPercentage(
+        deletedMailsAttachementSize,
+        totalFileSize
+    );
 
-    // contact
-    const contactTotal = getPstTotalContacts(extractTables?.contacts);
+    const contactsCount = [...extractTables.contacts].flat().length;
 
-    if (!pstFile) return null;
-
-    // folders
     const totalFolderSize = getPstListOfFolder(pstFile.children).length;
 
-    // dates extrêmes
-    const { minDate, maxDate } = getExtremeMailsDates(extractTables!);
+    const { minDate, maxDate } = getExtremeMailsDates(extractTables);
+
     // TODO: move to default config (?)
     const extremeDateFormatParam: Intl.DateTimeFormatOptions = {
         dateStyle: "full",
@@ -79,27 +93,28 @@ export const DashboardRecap: FC = () => {
                 <div className={style.dashboard__recap}>
                     <DashboardRecapItem
                         title={t("dashboard.recap.receivedMessages")}
-                        mails={receivedMailsTotal}
-                        attachements={receivedAttachmentsTotal}
-                        percentage={receivedPercentageMails}
+                        mails={receivedMailsCount}
+                        attachements={receivedMailAttachmentCount}
+                        percentage={receivedMailsAttachementPercentage}
                         picto={<MailPicto />}
                     />
                     <DashboardRecapItem
                         title={t("dashboard.recap.sentMessages")}
-                        mails={sentMailsTotal}
-                        attachements={sentAttachmentsTotal}
-                        percentage={sentPercentageMails}
+                        mails={sentMailsCount}
+                        attachements={sentMailsAttachementCount}
+                        percentage={sentMailsAttachementPercentage}
                         picto={<MailSentPicto />}
                     />
                     <DashboardRecapItem
                         title={t("dashboard.recap.deletedMessages")}
-                        mails={deletedMailsTotal}
-                        attachements={0}
+                        mails={deletedMailsCount}
+                        attachements={deletedMailsAttachmentCount}
+                        percentage={deletedMailsAttachementPercentage}
                         picto={<TrashPicto />}
                     />
                     <DashboardRecapItem
                         title={t("dashboard.recap.contactsTitle")}
-                        contact={contactTotal}
+                        contact={contactsCount}
                         picto={<ContactPicto />}
                     />
                     <div className={style.dashboard__recap__item}>
@@ -166,8 +181,10 @@ export const DashboardRecap: FC = () => {
                         </div>
                     </div>
                 </div>
+            ) : isFinder ? (
+                <OwnerFinder switchFinder={switchRecapOn} />
             ) : (
-                <DashboardRecapSelectFolder switchView={switchView} />
+                <OwnerFinderLanding switchView={switchFinder} />
             )}
         </Card>
     );
