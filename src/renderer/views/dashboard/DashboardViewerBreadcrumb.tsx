@@ -16,7 +16,13 @@ export const DashboardViewerBreadcrumb: React.FC = () => {
     return (
         <div className={style.dashboard__viewer__breadcrumb}>
             <div className={style.dashboard__viewer__breadcrumb__item}>
-                {t("dashboard.viewer.breadcrumb.level")}:&nbsp;
+                <span
+                    className={style.dashboard__viewer__breadcrumb__item__level}
+                    style={{ fontWeight: 600 }}
+                >
+                    {t("dashboard.viewer.breadcrumb.level")}
+                </span>
+                &nbsp;
                 {t(`dashboard.viewer.breadcrumb.id.${breadcrumb.id}`, {
                     history: convertHistory(breadcrumb.history ?? []),
                 })}

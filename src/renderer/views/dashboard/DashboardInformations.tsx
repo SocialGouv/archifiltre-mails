@@ -21,7 +21,7 @@ export const DashboardInformations: FC<DashboardComponentProps> = ({
     return (
         <Card
             title={t("dashboard.informations.cardTitle")}
-            color="green" // TODO: const
+            color="orange" // TODO: const
             className={className}
         >
             <div className={style.dashboard__informations}>

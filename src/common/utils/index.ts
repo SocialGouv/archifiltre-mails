@@ -49,11 +49,17 @@ export const notImplemented = (..._args: Any[]): Any | Promise<Any> => {
     throw new Error("Not implemented");
 };
 
+// TODO do propre things ...
+export const toOneDecimalsFloat = (n: number): number =>
+    Math.round(n * 10) / 10;
+export const toTwoDecimalsFloat = (n: number): number =>
+    Math.round(n * 100) / 100;
+
 export const getPercentage = (current: number, total: number): number =>
-    (current / total) * 100;
+    toTwoDecimalsFloat((current / total) * 100);
 
 export const bytesToMegabytes = (bytes: number): number =>
-    +(bytes / 1.0e6).toFixed(1);
+    toOneDecimalsFloat(bytes / 1.0e6);
 
 export const bytesToKilobytes = (bytes: number): number =>
-    +(bytes / 1000).toFixed(1);
+    toOneDecimalsFloat(bytes / 1000);

@@ -1,4 +1,8 @@
-import { bytesToKilobytes, getPercentage } from "@common/utils";
+import {
+    bytesToKilobytes,
+    getPercentage,
+    toTwoDecimalsFloat,
+} from "@common/utils";
 import type { ComputedDatum } from "@nivo/circle-packing";
 import type { FC } from "react";
 import React from "react";
@@ -31,7 +35,7 @@ export const DashboardInformationsMail: FC<{
                 {t("dashboard.informations.id.mail")}
             </div>
             <div>
-                <strong>{t("dashboard.informations.title")} </strong>
+                <strong>{t("dashboard.informations.object")} </strong>
                 {mainInfos.data.email.subject}
             </div>
             <div>
@@ -89,12 +93,12 @@ export const DashboardInformationsMail: FC<{
             )}
             <div>
                 <strong>{t("dashboard.informations.percentage")} </strong>
-                {volumeTotal.toFixed(2)}Ko (
-                {getPercentage(volumeTotal / 1000, totalFileSize).toFixed(2)}%)
+                {toTwoDecimalsFloat(volumeTotal)}Ko (
+                {getPercentage(volumeTotal / 1000, totalFileSize)}%)
             </div>
             <div>
                 <strong>{t("dashboard.informations.mailFocus")}</strong>
-                <div style={{ maxHeight: 200, overflow: "scroll" }}>
+                <div style={{ maxHeight: 150, overflow: "scroll" }}>
                     <p style={{ wordBreak: "break-word" }}>
                         {mainInfos.data.email.contentText}
                     </p>
