@@ -27,7 +27,7 @@ import {
     createDomain,
     createMails,
     createYears,
-    getAggregatedDomainCount,
+    getAggregatedDomains,
     getMailsByDym,
     getTotalLevelMail,
     getUniqueCorrespondantsByDomain,
@@ -82,10 +82,10 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
         useState<ViewState<DefaultViewerObject<string>>>();
 
     const createInitialView = useCallback(() => {
-        const aggregatedDomainCount = getAggregatedDomainCount(pstFile!);
+        const aggregatedDomain = getAggregatedDomains(pstFile!);
 
         const computedInitialView = {
-            elements: createDomain(aggregatedDomainCount),
+            elements: createDomain(aggregatedDomain),
             type: DOMAIN as ViewType,
         };
 
@@ -146,6 +146,7 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
                 uniqueCorrespondantsByDomain,
                 node.id
             );
+
             const totalLevelMails = getTotalLevelMail(elements);
             setTotalMailPerLevel(totalLevelMails);
 

@@ -53,7 +53,7 @@ export const DashboardInformationsFolder: FC<{
                     </span>
                 </div>
                 <div>
-                    <span>{t("dashboard.informations.attachedCount")} </span>
+                    <span>{t("dashboard.informations.attachementCount")} </span>
                     <span>
                         {attachmentPerLevel[attachmentPerLevel.length - 1]}
                     </span>
@@ -64,7 +64,7 @@ export const DashboardInformationsFolder: FC<{
                     {getPercentage(
                         fileSizePerLevel[fileSizePerLevel.length - 1] ?? 0,
                         totalFileSize
-                    ).toFixed(2)}
+                    )}
                     %)
                 </div>
             </div>

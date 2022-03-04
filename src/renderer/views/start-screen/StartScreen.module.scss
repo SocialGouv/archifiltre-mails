@@ -15,8 +15,8 @@
 }
 
 .startscreen__progress {
-  width: 300px;
-  height: 100px;
+  width: 350px;
+  height: 200px;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -25,7 +25,7 @@
   border-bottom-right-radius: 20px;
 
   background-color: #6ecaff;
-  transform: translate(-50%, calc(-50% + 150px));
+  transform: translate(-50%, calc(-50% + 100px));
   transition: transform 350ms linear;
 
   ul {
@@ -37,26 +37,28 @@
     li {
       font-size: 12px;
       color: #fff;
+      margin-bottom: 10px;
       span {
         width: 150px;
         display: inline-block;
       }
 
       span:first-child {
-        padding-left: 65px;
+        padding-left: 40px;
         font-weight: 600;
+        text-align: left;
       }
 
       span:last-child {
-        padding-right: 65px;
+        padding-right: 40px;
         text-align: end;
-        font-weight: 600;
+        font-weight: 300;
       }
     }
   }
 
   &.active {
-    transform: translate(-50%, calc(-50% + 250px));
+    transform: translate(-50%, calc(-50% + 300px));
   }
 }
 

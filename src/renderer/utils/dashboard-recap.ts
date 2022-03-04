@@ -55,7 +55,13 @@ export const getDeletedMails = (
     pstFile: PstElement,
     deletedFolderId: string
 ): PstElement => {
-    let found: PstElement = { id: "", name: "", size: 0, type: "folder" };
+    let found: PstElement = {
+        elementPath: "",
+        id: "",
+        name: "",
+        size: 0,
+        type: "folder",
+    };
 
     const rec = (pst: PstElement) => {
         if (pst.id !== deletedFolderId) {
