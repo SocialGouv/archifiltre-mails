@@ -2,7 +2,7 @@ import type React from "react";
 import createHook from "zustand/index";
 import create from "zustand/vanilla";
 
-import type { OwnerFinderBoardProps } from "../components/owner-finder/OwnerFinderBoard";
+export type SynthesisType = "deleted" | "owner";
 
 export const synthesisStore = create(() => ({
     deletedFolderId: "",
@@ -34,7 +34,7 @@ export const setDeletedFolderId = (deletedFolderId: string): void => {
 
 export const synthesisIdHandler = (
     event: React.MouseEvent<HTMLParagraphElement, MouseEvent>,
-    type: OwnerFinderBoardProps["type"]
+    type: SynthesisType
 ): void => {
     const target = event.target as HTMLElement;
     const handler = type === "deleted" ? setDeletedFolderId : setMailBoxOwnerId;
@@ -44,7 +44,7 @@ export const synthesisIdHandler = (
 
 export const synthesisInputHandler = (
     event: React.ChangeEvent<HTMLInputElement>,
-    type: OwnerFinderBoardProps["type"]
+    type: SynthesisType
 ): void => {
     const handler = type === "deleted" ? setDeletedFolder : setMailBoxOwner;
     handler(event.target.value.toLowerCase());

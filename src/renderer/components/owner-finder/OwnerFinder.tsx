@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import { usePstStore } from "../../store/PSTStore";
 import { useSynthesisStore } from "../../store/SynthesisStore";
@@ -14,6 +15,7 @@ export interface OwnerFinderProps {
 export const OwnerFinder: React.FC<OwnerFinderProps> = ({ switchFinder }) => {
     const { pstFile, extractTables } = usePstStore();
     const { ownerId, deletedFolderId } = useSynthesisStore();
+    const { t } = useTranslation();
     if (!pstFile || !extractTables) return null;
 
     const folderList = getPstListOfFolder(pstFile.children);
@@ -29,12 +31,12 @@ export const OwnerFinder: React.FC<OwnerFinderProps> = ({ switchFinder }) => {
     return (
         <section className={style.finder}>
             <OwnerFinderBoard
-                title="Sélectionner le dossier des mails supprimés"
+                title={t("dashboard.ownerfinder.board.deleted.title")}
                 list={folderList}
                 type="deleted"
             />
             <OwnerFinderBoard
-                title="Sélectionner l'adresse associée à cette messagerie"
+                title={t("dashboard.ownerfinder.board.owner.title")}
                 list={contactList}
                 type="owner"
             />
@@ -43,7 +45,7 @@ export const OwnerFinder: React.FC<OwnerFinderProps> = ({ switchFinder }) => {
                 onClick={switchFinder}
                 disabled={!ownerId || !deletedFolderId}
             >
-                Valider mon choix
+                {t("dashboard.ownerfinder.board.validate")}
             </button>
         </section>
     );

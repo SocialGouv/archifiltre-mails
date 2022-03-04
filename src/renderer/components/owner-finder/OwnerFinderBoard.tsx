@@ -1,7 +1,9 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React from "react";
+import { useTranslation } from "react-i18next";
 
+import type { SynthesisType } from "../../store/SynthesisStore";
 import {
     synthesisIdHandler,
     synthesisInputHandler,
@@ -13,7 +15,7 @@ import style from "./OwnerFinder.module.scss";
 export interface OwnerFinderBoardProps {
     title: string;
     list: FolderListItem[];
-    type: "deleted" | "owner";
+    type: SynthesisType;
 }
 
 export const OwnerFinderBoard: React.FC<OwnerFinderBoardProps> = ({
@@ -21,6 +23,7 @@ export const OwnerFinderBoard: React.FC<OwnerFinderBoardProps> = ({
     list,
     type,
 }) => {
+    const { t } = useTranslation();
     const { ownerName, deletedFolderName, deletedFolderId, ownerId } =
         useSynthesisStore();
     const compareValue = type === "deleted" ? deletedFolderName : ownerName;
@@ -39,7 +42,7 @@ export const OwnerFinderBoard: React.FC<OwnerFinderBoardProps> = ({
                     }}
                     value={compareValue}
                 />
-                <button>Rechercher</button>
+                <button>{t("dashboard.ownerfinder.board.search")}</button>
             </div>
             <div className={style.finder__item__board}>
                 {filteredList.length ? (
@@ -61,7 +64,7 @@ export const OwnerFinderBoard: React.FC<OwnerFinderBoardProps> = ({
                     ))
                 ) : (
                     <p className={style.finder__item__board__empty__state}>
-                        Aucun élément
+                        {t("dashboard.ownerfinder.board.noElement")}
                     </p>
                 )}
             </div>
