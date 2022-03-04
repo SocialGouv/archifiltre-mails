@@ -105,6 +105,7 @@ export const createBaseMail = (): PstEmail => ({
     contentHTML: "",
     contentRTF: "",
     contentText: "",
+    elementPath: "",
     from: {
         name: "",
     },

@@ -53,7 +53,7 @@ export const DashboardInformationsFolder: FC<{
                     </span>
                 </div>
                 <div>
-                    <span>{t("dashboard.informations.attachedCount")} </span>
+                    <span>{t("dashboard.informations.attachementCount")} </span>
                     <span>
                         {attachmentPerLevel[attachmentPerLevel.length - 1]}
                     </span>

@@ -7,10 +7,7 @@ import { useTranslation } from "react-i18next";
 import { usePstFileSizeStore } from "../../store/PstFileSizeStore";
 import { usePstStore } from "../../store/PSTStore";
 import { AVERAGE_MAIL_SIZE_IN_KO } from "../../utils/constants";
-import {
-    getParentFolderName,
-    sanitizeMailDate,
-} from "../../utils/dashboard-viewer";
+import { sanitizeMailDate } from "../../utils/dashboard-viewer";
 import type { MailViewerObject } from "../../utils/dashboard-viewer-dym";
 import { getFileSizeByMail } from "../../utils/dashboard-viewer-dym";
 import style from "./Dashboard.module.scss";
@@ -39,6 +36,7 @@ export const DashboardInformationsMail: FC<{
             </div>
             <div>
                 <strong>{t("dashboard.informations.sentDate")} </strong>{" "}
+                {/* TODO: change sanitize with i18n */}
                 {sanitizeMailDate(mainInfos.data.email.sentTime!)}
             </div>
             <div>
@@ -47,15 +45,17 @@ export const DashboardInformationsMail: FC<{
             </div>
             <div>
                 <strong>{t("dashboard.informations.parentFolder")}</strong>
-                {getParentFolderName(pstFile, mainInfos.data.email.id)}
+                {mainInfos.data.email.elementPath}
             </div>
             <div>
-                <strong>{t("dashboard.informations.attachedCount")} </strong>{" "}
+                <strong>{t("dashboard.informations.attachementCount")} </strong>{" "}
                 {mainInfos.data.email.attachementCount}
             </div>
 
             <div>
-                <strong>{t("dashboard.informations.attachedTitles")} </strong>{" "}
+                <strong>
+                    {t("dashboard.informations.attachementTitles")}{" "}
+                </strong>{" "}
                 {mainInfos.data.email.attachements.map(
                     ({ filename }, index: number) => (
                         <span key={index}>{filename}</span>
