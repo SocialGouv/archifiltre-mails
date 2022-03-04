@@ -151,9 +151,11 @@ if (parentPort) {
 function processFolder(
     folder: PSTFolder,
     progressState: PstProgressState,
-    pstExtractTables: PstExtractTables
+    pstExtractTables: PstExtractTables,
+    parentPath = ""
 ): PstFolder {
     const content: PstFolder = {
+        elementPath: parentPath,
         emailCount: folder.emailCount,
         folderType:
             ["Generic", "Root", "Search"][folder.folderType] ?? "Generic",
@@ -177,7 +179,14 @@ function processFolder(
             progressState.countFolder++;
             progressState.countTotal++;
             content.children.push(
-                processFolder(childFolder, progressState, pstExtractTables)
+                processFolder(
+                    childFolder,
+                    progressState,
+                    pstExtractTables,
+                    folder.displayName
+                        ? `${content.elementPath}/${folder.displayName}`
+                        : ""
+                )
             );
         }
     }
@@ -206,6 +215,8 @@ function processFolder(
                 contentHTML: email.bodyHTML,
                 contentRTF: email.bodyRTF,
                 contentText: email.body,
+                elementPath: parentPath,
+
                 from: {
                     email: email.senderEmailAddress,
                     name: email.senderName,
