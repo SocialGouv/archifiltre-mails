@@ -5,6 +5,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 
 import { usePstFileSizeStore } from "../../store/PstFileSizeStore";
+import { usePstStore } from "../../store/PSTStore";
 import { AVERAGE_MAIL_SIZE_IN_KO } from "../../utils/constants";
 import { sanitizeMailDate } from "../../utils/dashboard-viewer";
 import type { MailViewerObject } from "../../utils/dashboard-viewer-dym";
@@ -16,11 +17,13 @@ export const DashboardInformationsMail: FC<{
 }> = ({ mainInfos }) => {
     const { t } = useTranslation();
     const { totalFileSize } = usePstFileSizeStore();
+    const { pstFile } = usePstStore();
 
     const volumeTotal =
         bytesToKilobytes(getFileSizeByMail(mainInfos.data.email.attachements)) +
         AVERAGE_MAIL_SIZE_IN_KO;
 
+    if (!pstFile) return null;
     return (
         <div className={style.dashboard__informations__wrapper__mail}>
             <div>
@@ -33,6 +36,7 @@ export const DashboardInformationsMail: FC<{
             </div>
             <div>
                 <strong>{t("dashboard.informations.sentDate")} </strong>{" "}
+                {/* TODO: change sanitize with i18n */}
                 {sanitizeMailDate(mainInfos.data.email.sentTime!)}
             </div>
             <div>
@@ -40,12 +44,18 @@ export const DashboardInformationsMail: FC<{
                 {sanitizeMailDate(mainInfos.data.email.receivedDate!)}
             </div>
             <div>
-                <strong>{t("dashboard.informations.attachedCount")} </strong>{" "}
+                <strong>{t("dashboard.informations.parentFolder")}</strong>
+                {mainInfos.data.email.elementPath}
+            </div>
+            <div>
+                <strong>{t("dashboard.informations.attachementCount")} </strong>{" "}
                 {mainInfos.data.email.attachementCount}
             </div>
 
             <div>
-                <strong>{t("dashboard.informations.attachedTitles")} </strong>{" "}
+                <strong>
+                    {t("dashboard.informations.attachementTitles")}{" "}
+                </strong>{" "}
                 {mainInfos.data.email.attachements.map(
                     ({ filename }, index: number) => (
                         <span key={index}>{filename}</span>

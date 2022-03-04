@@ -14,7 +14,6 @@ import {
     LDAP_ORG,
     MAX_TRESHOLD,
     RATIO_FROM_MAX,
-    TRESHOLD_KEY,
 } from "./constants";
 
 interface BaseViewerObject<TId extends string> {
@@ -107,6 +106,7 @@ export const createBaseMail = (): PstEmail => ({
     contentHTML: "",
     contentRTF: "",
     contentText: "",
+    elementPath: "",
     from: {
         name: "",
     },
@@ -161,38 +161,6 @@ export const isLdap = (mail: string): boolean => mail.includes(LDAP_ORG);
 export const isLdapDomain = (domain: string): boolean => !domain.includes("@");
 
 // ### GETTER ###
-
-/*
-
-DOMAIN => string[] => domainPstIDs[]
-YEAR => string[] => yearPstIDs[] => doublon
-CORR => same => correspondantPstIDs[]
-MAIL => string => 1 pstId
-
--
-
-const toDeleteIDs = new Set<string>();
-
--
-toDeleteIds =>
-DOMAIN =>
-    DELETE => toDeleteIDs.add(...domainPstIDs);
-    KEEP => toDeleteIDs.remove(...domainPstIDs);
-YEAR =>
-    DELETE => toDeleteIDs.add(...yearPstIDs);
-    KEEP => toDeleteIDs.remove(...yearPstIDs);
-CORR =>
-    DELETE => toDeleteIDs.add(...correspondantPstIDs);
-    KEEP => toDeleteIDs.remove(...correspondantPstIDs);
-MAIL =>
-    DELETE => toDeleteIDs.add(pstId);
-    KEEP => toDeleteIDs.remove(pstId);
-
-- mesure
-const totalDeletedSize = toDeleteIDs.reduce(id => extractTables.attachements.get(id).reduce(att => att.filesize, 0), 0)
-
-*/
-
 export const getAggregatedDomains = (
     initPst: PstElement
 ): Record<string, [number, string[]]> => {
@@ -232,27 +200,28 @@ export const getAggregatedDomains = (
         );
     /* eslint-enable @typescript-eslint/naming-convention */
 
-    const threshold = getMailTreshold(domains);
-    const thresholdify = (
-        m: Map<string, [number, string[]]>
-    ): Map<string, [number, string[]]> => {
-        const out = new Map<string, [number, string[]]>();
-        for (const [k, [count, ids]] of m) {
-            if (count < threshold) {
-                const domainOther = out.get(TRESHOLD_KEY) ?? [0, []];
-                out.set(TRESHOLD_KEY, [
-                    count + domainOther[0],
-                    [...ids, ...domainOther[1]],
-                ]);
-            } else out.set(k, [count, ids]);
-        }
+    // THRESHOLD LOGIC TO KEEP
+    // const threshold = getMailTreshold(domains);
+    // const thresholdify = (
+    //     m: Map<string, [number, string[]]>
+    // ): Map<string, [number, string[]]> => {
+    //     const out = new Map<string, [number, string[]]>();
+    //     for (const [k, [count, ids]] of m) {
+    //         if (count < threshold) {
+    //             const domainOther = out.get(TRESHOLD_KEY) ?? [0, []];
+    //             out.set(TRESHOLD_KEY, [
+    //                 count + domainOther[0],
+    //                 [...ids, ...domainOther[1]],
+    //             ]);
+    //         } else out.set(k, [count, ids]);
+    //     }
 
-        return out;
-    };
+    //     return out;
+    // };
 
-    const THERESULT = orderByValues(thresholdify(domains));
+    // const THERESULT = orderByValues(thresholdify(domains));
 
-    return toRecord(THERESULT);
+    return toRecord(orderByValues(domains));
 };
 
 export const getUniqueCorrespondantsByDomain = (
