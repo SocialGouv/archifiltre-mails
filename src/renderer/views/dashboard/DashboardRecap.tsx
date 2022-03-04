@@ -95,7 +95,6 @@ export const DashboardRecap: FC = () => {
                         title={t("dashboard.recap.deletedMessages")}
                         mails={deletedMailsTotal}
                         attachements={0}
-                        percentage={"0"}
                         picto={<TrashPicto />}
                     />
                     <DashboardRecapItem

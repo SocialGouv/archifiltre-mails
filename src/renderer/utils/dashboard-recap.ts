@@ -5,6 +5,7 @@ import type {
     PstFolder,
 } from "@common/modules/pst-extractor/type";
 import { isPstFolder } from "@common/modules/pst-extractor/type";
+import { toOneDecimalsFloat } from "@common/utils";
 
 export const getPstTotalReceivedMails = (
     extractTables: PstExtractTables | undefined
@@ -89,12 +90,12 @@ export const getPstTotalMails = (
 export const getPstMailsPercentage = (
     current: number,
     total: Map<string, PstEmail[]> | undefined
-): string => {
+): number => {
     const totalMails = getPstTotalMails(total);
     if (totalMails) {
-        return ((current / totalMails) * 100).toFixed(1);
+        return toOneDecimalsFloat((current / totalMails) * 100);
     }
-    return "0";
+    return 0;
 };
 
 interface FolderListItem {

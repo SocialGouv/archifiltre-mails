@@ -64,7 +64,7 @@ export const DashboardInformationsFolder: FC<{
                     {getPercentage(
                         fileSizePerLevel[fileSizePerLevel.length - 1] ?? 0,
                         totalFileSize
-                    ).toFixed(2)}
+                    )}
                     %)
                 </div>
             </div>

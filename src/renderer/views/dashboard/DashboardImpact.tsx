@@ -48,9 +48,10 @@ export const DashboardImpact: FC = () => {
     const cO2EqKgToTrain = (cO2eqKg: number) => cO2eqKg * ECOLOGIC_TRAIN_FACTOR;
 
     const computedImpactInMega = bytesToMegabytes(size);
-    const cO2EqKgToDelete =
-        +megabytesToCo2EqInKilo(computedImpactInMega).toFixed();
-    const cO2EqKgByTrainInKm = +cO2EqKgToTrain(cO2EqKgToDelete).toFixed();
+    const cO2EqKgToDelete = Math.round(
+        megabytesToCo2EqInKilo(computedImpactInMega)
+    );
+    const cO2EqKgByTrainInKm = Math.round(cO2EqKgToTrain(cO2EqKgToDelete));
 
     return (
         <div className={style.dashboard__impact}>
