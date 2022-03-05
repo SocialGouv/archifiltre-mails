@@ -47,5 +47,6 @@ export const setInitialFileSizePerLevel = (): void => {
 
 /**
  * Consume vanilla attachmentCount store in React scope with a hook.
+ * @returns totalFileSize: in Mo
  */
 export const usePstFileSizeStore = createHook(pstFileSizeStore);

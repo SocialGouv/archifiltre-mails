@@ -14,6 +14,7 @@ export type PstElementType =
 
 export interface PstElement {
     children?: PstElement[];
+    elementPath: string;
     id: string;
     name: string;
     other?: unknown[];

@@ -8,7 +8,7 @@ export interface DashboardRecapItemProps {
     attachements?: number;
     contact?: number;
     mails?: number | undefined;
-    percentage?: string;
+    percentage?: number;
     picto?: React.ReactElement;
     title: string;
 }

@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 import type { ComputedDatum } from "@nivo/circle-packing";
 import { ResponsiveCirclePacking } from "@nivo/circle-packing";
 import debounce from "lodash/debounce";
@@ -30,6 +28,7 @@ import {
 } from "../../utils/tag-manager";
 import { Menu } from "../menu/Menu";
 import style from "./CirclePacking.module.scss";
+import type { OnBlur } from "./CirclePackingCancellableFocusZone";
 import { CirclePackingCancellableFocusZone } from "./CirclePackingCancellableFocusZone";
 import { CirclePackingTooltip } from "./CirclePackingTooltip";
 
@@ -51,7 +50,7 @@ export const CirclePacking: React.FC = () => {
         usePstFMInfosStore();
 
     const {
-        setHoveredId,
+        setHoveredNode,
         addChildrenMarkedToKeep,
         addChildrenMarkedToDelete,
         markedToDelete,
@@ -113,7 +112,7 @@ export const CirclePacking: React.FC = () => {
         }
 
         setMainInfos(node);
-        setHoveredId(node.id);
+        setHoveredNode(node);
     }, 500);
 
     const handleMouseLeave: CirclePackingCommonProps["onMouseLeave"] = () => {
@@ -123,10 +122,29 @@ export const CirclePacking: React.FC = () => {
     };
 
     const handleClick: CirclePackingCommonProps["onClick"] = (node) => {
-        if (isMailViewerObject(node.data)) startFocus();
+        if (isMailViewerObject(node.data)) {
+            console.log({ node });
+            setMainInfos(node);
+            startFocus();
+        }
 
         computeNextView(node);
     };
+
+    const handleLostFocus = debounce<NonNullable<OnBlur["onBlur"]>>((evt) => {
+        const elt = document.elementFromPoint(evt.clientX, evt.clientY);
+
+        elt?.dispatchEvent(
+            new MouseEvent(
+                "click", // or "mousedown" if the canvas listens for such an event
+                {
+                    bubbles: true,
+                    clientX: evt.clientX,
+                    clientY: evt.clientY,
+                }
+            )
+        );
+    }, 200);
 
     const handleBorderColor: CirclePackingCommonProps["borderColor"] = (node) =>
         handleFocusItemBorderColor(node, mainInfos, isInfoFocus);
@@ -145,14 +163,6 @@ export const CirclePacking: React.FC = () => {
     return (
         <>
             <div id="circle-packing" className={style["circle-packing"]}>
-                <div className={style.circlePackingActionsButton}>
-                    <button onClick={goToPreviousView}>
-                        {t("dashboard.viewer.previous")}
-                    </button>
-                    <button onClick={goToInitialView}>
-                        {t("dashboard.viewer.restart")}
-                    </button>
-                </div>
                 <ResponsiveCirclePacking
                     data={currentView.elements}
                     onClick={handleClick}
@@ -163,8 +173,16 @@ export const CirclePacking: React.FC = () => {
                     tooltip={(node) => <CirclePackingTooltip node={node} />}
                     {...commonProperties}
                 />
+                <div className={style.circlePackingActionsButton}>
+                    <button onClick={goToPreviousView}>
+                        {t("dashboard.viewer.previous")}
+                    </button>
+                    <button onClick={goToInitialView}>
+                        {t("dashboard.viewer.restart")}
+                    </button>
+                </div>
             </div>
-            <CirclePackingCancellableFocusZone />
+            <CirclePackingCancellableFocusZone onBlur={handleLostFocus} />
             <Menu />
         </>
     );

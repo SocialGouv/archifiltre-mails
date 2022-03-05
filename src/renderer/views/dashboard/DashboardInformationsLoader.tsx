@@ -8,7 +8,7 @@ export const DashboardInformationsLoader: React.FC = () => {
     return (
         <Loader>
             <div style={{ margin: "0 0 1rem" }}>
-                <strong>{t("dashboard.informations.elementRollover")} :</strong>
+                <strong>{t("dashboard.informations.elementRollover")}</strong>
             </div>
             <p>{t("dashboard.informations.emptyInfos")}</p>
         </Loader>

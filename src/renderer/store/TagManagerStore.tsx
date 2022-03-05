@@ -1,46 +1,59 @@
+import type { ComputedDatum } from "@nivo/circle-packing";
 import { atom, useAtom } from "jotai/index";
 import type { SetStateAction } from "react";
 import { useCallback } from "react";
 
+import type { ViewerObject } from "../utils/dashboard-viewer-dym";
+import { useImpactStore } from "./ImpactStore";
+import { usePstStore } from "./PSTStore";
+
+type HoveredNode = ComputedDatum<ViewerObject<string>>;
 export interface UseTagManagerStore {
     addChildrenMarkedToDelete: (idsToDelete: string[]) => void;
     addChildrenMarkedToKeep: (idsToKeep: string[]) => void;
     addMarkedToDelete: () => void;
     addMarkedToKeep: () => void;
-    hoveredId: string;
+    hoveredNode: HoveredNode | null;
     markedToDelete: string[];
     markedToKeep: string[];
-    setHoveredId: (update: SetStateAction<string>) => void;
+    setHoveredNode: (update: SetStateAction<HoveredNode | null>) => void;
     setMarkedToDelete: (update: SetStateAction<string[]>) => void;
     setMarkedToKeep: (update: SetStateAction<string[]>) => void;
 }
 
-const markedToDeleteAtom = atom<string[]>([""]);
-const markedToKeepAtom = atom<string[]>([""]);
-const hoveredIdAtom = atom<string>("");
+const markedToDeleteAtom = atom<string[]>([]);
+const markedToKeepAtom = atom<string[]>([]);
+const hoveredNodeAtom = atom<HoveredNode | null>(null);
 
 export const useTagManagerStore = (): UseTagManagerStore => {
     const [markedToDelete, setMarkedToDelete] = useAtom(markedToDeleteAtom);
     const [markedToKeep, setMarkedToKeep] = useAtom(markedToKeepAtom);
-    const [hoveredId, setHoveredId] = useAtom(hoveredIdAtom);
+    const [hoveredNode, setHoveredNode] = useAtom(hoveredNodeAtom);
+    const { extractTables } = usePstStore();
+    const { updateToDeleteImpact } = useImpactStore(
+        extractTables?.attachements
+    );
 
     // DELETE LOGIC
     const addMarkedToDelete = useCallback(() => {
-        if (markedToKeep.includes(hoveredId)) {
+        if (!hoveredNode) return;
+        if (markedToKeep.includes(hoveredNode.id)) {
             const removeCurrentFromKeep = markedToKeep.filter(
-                (element) => element !== hoveredId
+                (elementId) => elementId !== hoveredNode.id
             );
             setMarkedToKeep(removeCurrentFromKeep);
         }
 
         const updatedMarkedToDelete = [
-            ...new Set([...markedToDelete, hoveredId]),
+            ...new Set([...markedToDelete, hoveredNode.id]),
         ];
         setMarkedToDelete(updatedMarkedToDelete);
+        updateToDeleteImpact(hoveredNode.data.ids, "add");
     }, [
-        hoveredId,
+        hoveredNode,
         markedToDelete,
         markedToKeep,
+        updateToDeleteImpact,
         setMarkedToDelete,
         setMarkedToKeep,
     ]);
@@ -59,19 +72,24 @@ export const useTagManagerStore = (): UseTagManagerStore => {
 
     // KEEP LOGIC
     const addMarkedToKeep = useCallback(() => {
-        if (markedToDelete.includes(hoveredId)) {
+        if (!hoveredNode) return;
+        if (markedToDelete.includes(hoveredNode.id)) {
             const removeCurrentFromDelete = markedToDelete.filter(
-                (element) => element !== hoveredId
+                (element) => element !== hoveredNode.id
             );
             setMarkedToDelete(removeCurrentFromDelete);
         }
 
-        const updatedMarkedToKeep = [...new Set([...markedToKeep, hoveredId])];
+        const updatedMarkedToKeep = [
+            ...new Set([...markedToKeep, hoveredNode.id]),
+        ];
         setMarkedToKeep(updatedMarkedToKeep);
+        updateToDeleteImpact(hoveredNode.data.ids, "delete");
     }, [
-        hoveredId,
+        hoveredNode,
         markedToDelete,
         markedToKeep,
+        updateToDeleteImpact,
         setMarkedToDelete,
         setMarkedToKeep,
     ]);
@@ -93,10 +111,10 @@ export const useTagManagerStore = (): UseTagManagerStore => {
         addChildrenMarkedToKeep,
         addMarkedToDelete,
         addMarkedToKeep,
-        hoveredId,
+        hoveredNode,
         markedToDelete,
         markedToKeep,
-        setHoveredId,
+        setHoveredNode,
         setMarkedToDelete,
         setMarkedToKeep,
     };
