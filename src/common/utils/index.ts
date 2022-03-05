@@ -58,6 +58,9 @@ export const toTwoDecimalsFloat = (n: number): number =>
 export const getPercentage = (current: number, total: number): number =>
     toTwoDecimalsFloat((current / total) * 100);
 
+export const bytesToGigabytes = (bytes: number): number =>
+    toOneDecimalsFloat(bytes / 1.0e9);
+
 export const bytesToMegabytes = (bytes: number): number =>
     toOneDecimalsFloat(bytes / 1.0e6);
 

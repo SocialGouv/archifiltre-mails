@@ -1,5 +1,5 @@
-import { default as FrontPostHog } from "posthog-js";
-import { default as NodeJsPostHog } from "posthog-node";
+import type FrontPostHog from "posthog-js";
+import type NodeJsPostHog from "posthog-node";
 
 import { IS_MAIN } from "../../config";
 import type {
@@ -18,7 +18,7 @@ export class PosthogProvider extends TrackerProvider {
 
     public async init(): Promise<void> {
         if (IS_MAIN) {
-            this.tracker = new NodeJsPostHog(
+            this.tracker = new (await import("posthog-node")).default(
                 process.env.TRACKER_POSTHOG_API_KEY,
                 {
                     enable: !this.disabled,
@@ -27,13 +27,15 @@ export class PosthogProvider extends TrackerProvider {
             );
         } else {
             return new Promise<void>((resolve) => {
-                FrontPostHog.init(process.env.TRACKER_POSTHOG_API_KEY, {
-                    // eslint-disable-next-line @typescript-eslint/naming-convention
-                    api_host: process.env.TRACKER_POSTHOG_URL,
-                    loaded: (posthog) => {
-                        this.tracker = posthog;
-                        resolve();
-                    },
+                void import("posthog-js").then(({ default: frontPostHog }) => {
+                    frontPostHog.init(process.env.TRACKER_POSTHOG_API_KEY, {
+                        // eslint-disable-next-line @typescript-eslint/naming-convention
+                        api_host: process.env.TRACKER_POSTHOG_URL,
+                        loaded: (posthog) => {
+                            this.tracker = posthog;
+                            resolve();
+                        },
+                    });
                 });
             });
         }

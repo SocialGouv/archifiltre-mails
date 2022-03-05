@@ -1,7 +1,10 @@
 import { Use } from "@lsagetlethias/tstrait";
 import { ipcMain, ipcRenderer } from "electron";
+import { stat } from "fs/promises";
 
 import { IS_MAIN } from "../config";
+import type { TrackerService } from "../tracker/TrackerModule";
+import { bytesToMegabytes } from "../utils";
 import { WaitableTrait } from "../utils/WaitableTrait";
 import { IsomorphicService } from "./ContainerModule";
 import { csvExporter } from "./exporters/CsvExporter";
@@ -35,6 +38,10 @@ export class FileExporterModule extends IsomorphicModule {
     private inited = false;
 
     private _service?: FileExporterService;
+
+    constructor(private readonly trackerService: TrackerService) {
+        super();
+    }
 
     public async init(): Promise<void> {
         if (this.inited) {
@@ -75,8 +82,14 @@ export class FileExporterModule extends IsomorphicModule {
                 "[FileExporterService] Can't export to desired type as the module is not inited."
             ); // TODO: proper ERROR management
         }
-        if (IS_MAIN) await exporters[type].export(obj, dest);
-        else
+        if (IS_MAIN) {
+            await exporters[type].export(obj, dest);
+
+            this.trackerService.getProvider().track("Export Generated", {
+                size: bytesToMegabytes((await stat(dest)).size),
+                type,
+            });
+        } else
             await ipcRenderer.invoke(FILE_EXPORTER_EXPORT_EVENT, [
                 type,
                 obj,

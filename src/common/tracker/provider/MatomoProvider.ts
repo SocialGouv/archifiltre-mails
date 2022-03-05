@@ -1,5 +1,5 @@
-import FrontMatomoTracker from "@datapunt/matomo-tracker-js";
-import { MatomoTracker as NodeJsMatomoTracker } from "matomo-tracker";
+import type FrontMatomoTracker from "@datapunt/matomo-tracker-js";
+import type { MatomoTracker as NodeJsMatomoTracker } from "matomo-tracker";
 
 import { IS_MAIN } from "../../config";
 import type { TrackEvent, TrackEventProps } from "../type";
@@ -13,12 +13,14 @@ export class MatomoProvider extends TrackerProvider {
 
     async init(): Promise<void> {
         if (IS_MAIN) {
-            this.tracker = new NodeJsMatomoTracker(
+            this.tracker = new (await import("matomo-tracker")).MatomoTracker(
                 +process.env.TRACKER_MATOMO_ID_SITE,
                 `${process.env.TRACKER_MATOMO_URL}/piwik.php`
             );
         } else {
-            this.tracker = new FrontMatomoTracker({
+            this.tracker = new (
+                await import("@datapunt/matomo-tracker-js")
+            ).default({
                 linkTracking: true,
                 siteId: +process.env.TRACKER_MATOMO_ID_SITE,
                 srcUrl: `${process.env.TRACKER_MATOMO_URL}/piwik.js`,

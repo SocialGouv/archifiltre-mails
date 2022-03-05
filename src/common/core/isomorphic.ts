@@ -26,19 +26,21 @@ export const getIsomorphicModules = <
         UserConfigModule,
         PubSub.getInstance()
     );
-    const i18nModule = IsomorphicModuleFactory.getInstance(
-        I18nModule,
-        userConfigModule.service,
-        PubSub.getInstance()
-    );
-    const fileExporterModule =
-        IsomorphicModuleFactory.getInstance(FileExporterModule);
-    const ipcModule = IsomorphicModuleFactory.getInstance(IpcModule);
     const trackerModule = IsomorphicModuleFactory.getInstance(
         TrackerModule,
         userConfigModule.service,
         PubSub.getInstance()
     );
+    const i18nModule = IsomorphicModuleFactory.getInstance(
+        I18nModule,
+        userConfigModule.service,
+        PubSub.getInstance()
+    );
+    const fileExporterModule = IsomorphicModuleFactory.getInstance(
+        FileExporterModule,
+        trackerModule.service
+    );
+    const ipcModule = IsomorphicModuleFactory.getInstance(IpcModule);
 
     containerModule.registerServices(
         ["pubSub", PubSub.getInstance()],

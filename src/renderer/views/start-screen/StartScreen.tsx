@@ -1,4 +1,3 @@
-import { useService } from "@common/modules/ContainerModule";
 import { toOneDecimalsFloat } from "@common/utils";
 import React, { useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -7,9 +6,6 @@ import { StaticImage } from "../../components/common/staticImage/StaticImage";
 import { Dropzone } from "../../components/dropzone/Dropzone";
 import { useRouteContext } from "../../context/RouterContext";
 import { usePstExtractor } from "../../hooks/usePstExtractor";
-import { useAttachmentCountStore } from "../../store/PstAttachmentCountStore";
-import { usePstFileSizeStore } from "../../store/PstFileSizeStore";
-import { useMailCountStore } from "../../store/PstMailCountStore";
 import { usePstStore } from "../../store/PSTStore";
 import { ACCEPTED_EXTENSION } from "../../utils/constants";
 import style from "./StartScreen.module.scss";
@@ -17,10 +13,6 @@ import style from "./StartScreen.module.scss";
 export const StartScreen: React.FC = () => {
     const { pstProgress, setPstFilePath } = usePstExtractor();
     const { pstFile } = usePstStore();
-    const { totalFileSize } = usePstFileSizeStore();
-    const { totalMail } = useMailCountStore();
-    const { attachmentTotal } = useAttachmentCountStore();
-    const tracker = useService("trackerService")?.getProvider();
 
     const { changeRoute } = useRouteContext();
 
@@ -34,25 +26,6 @@ export const StartScreen: React.FC = () => {
         },
         [setPstFilePath]
     );
-
-    useEffect(() => {
-        if (!pstProgress.progress && pstProgress.elapsed && totalMail) {
-            tracker?.track("PST Droped", {
-                attachementCount: attachmentTotal,
-                loadTime: pstProgress.elapsed,
-                mailCount: totalMail,
-                // size: Math.round(totalFileSize),
-                size: totalFileSize,
-            });
-        }
-    }, [
-        pstProgress.elapsed,
-        pstProgress.progress,
-        attachmentTotal,
-        totalMail,
-        totalFileSize,
-        tracker,
-    ]);
 
     useEffect(() => {
         if (pstFile) {

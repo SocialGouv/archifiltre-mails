@@ -17,15 +17,15 @@ export interface TrackCoreEventProps {
         currentVersion: string;
         oldVersion: string;
     };
-    "Export Generated": { appId: TrackAppId; type: ExporterType };
+    "Export Generated": { appId: TrackAppId; size: number; type: ExporterType };
     "NPS Answered": {
         appId: TrackAppId;
         responseId?: string;
         userEmail: string;
     };
-    "PST Droped": {
+    "PST Dropped": {
         appId: TrackAppId;
-        attachementCount: number;
+        attachmentCount: number;
         loadTime: number;
         mailCount: number;
         size: number;
@@ -92,7 +92,7 @@ export const eventCategoryMap: Record<TrackEvent, TrackEventCategory> = {
     "Feat(4.0) Detail Expanded": "Dataviz",
     "Feat(5.0) Element Marked": "Action",
     "NPS Answered": "NPS",
-    "PST Droped": "PST",
+    "PST Dropped": "PST",
     "Work Reloaded": "Export",
     "Work Saved": "Export",
 };

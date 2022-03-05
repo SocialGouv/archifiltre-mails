@@ -24,7 +24,7 @@ const pstProgressInitialState: PstProgressState = {
     countFolder: 0,
     countTotal: 0,
     elapsed: 0,
-    progress: false,
+    progress: true,
 };
 
 /**
@@ -39,7 +39,7 @@ export const usePstExtractor = (): UsePstExtractor => {
     );
     const pstExtractorService = useService("pstExtractorService");
 
-    const { setPstFile, setExtractTables } = usePstStore();
+    const { setPstFile, setExtractTables, setPstProgressState } = usePstStore();
 
     useEffect(() => {
         if (pstFilePath && pstExtractorService) {
@@ -65,7 +65,55 @@ export const usePstExtractor = (): UsePstExtractor => {
         }
     }, [pstExtractorService, pstFilePath, setExtractTables, setPstFile]);
 
-    pstExtractorService?.onProgress(setPstProgress);
+    // useEffect(() => {
+    //     return () => {
+    //         console.log("THE USE EFFECT", {
+    //             nogo:
+    //                 pstProgress.progress ||
+    //                 totalMailRef.current === -1 ||
+    //                 totalFileSizeRef.current === -1 ||
+    //                 totalAttachmentsRef.current === -1 ||
+    //                 !trackerService,
+    //             nogoProgress: pstProgress.progress,
+    //             nogoTotalAttachmentsRef: totalAttachmentsRef.current === -1,
+    //             nogoTotalFileSizeRef: totalFileSizeRef.current === -1,
+    //             nogoTotalMailRef: totalMailRef.current === -1,
+    //             nogoTrackerService: !trackerService,
+    //             progress: pstProgress.progress,
+    //             totalAttachmentsRef,
+    //             totalAttachmentsRefCurrent: totalAttachmentsRef.current,
+    //             totalFileSizeRef,
+    //             totalFileSizeRefCurrent: totalFileSizeRef.current,
+    //             totalMailRef,
+    //             totalMailRefCurrent: totalMailRef.current,
+    //         });
+    //         if (
+    //             pstProgress.progress ||
+    //             totalMailRef.current === -1 ||
+    //             totalFileSizeRef.current === -1 ||
+    //             totalAttachmentsRef.current === -1 ||
+    //             !trackerService
+    //         ) {
+    //             return;
+    //         }
+
+    //         trackerService.getProvider().track("PST Dropped", {
+    //             attachmentCount: totalAttachmentsRef.current,
+    //             loadTime: pstProgress.elapsed,
+    //             mailCount: totalMailRef.current,
+    //             size: bytesToGigabytes(totalFileSizeRef.current),
+    //         });
+    //     };
+    // }, [trackerService, pstProgress, totalMailRef]);
+
+    useEffect(() => {
+        pstExtractorService?.onProgress((p) => {
+            setPstProgress(p);
+            if (!p.progress) {
+                setPstProgressState(p);
+            }
+        });
+    }, [pstExtractorService, setPstProgress, setPstProgressState]);
 
     return { pstProgress, setPstFilePath };
 };
