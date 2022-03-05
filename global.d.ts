@@ -20,7 +20,10 @@ declare module "*.png" {
 
 declare namespace NodeJS {
     interface ProcessEnv {
-        MATOMO_ID_SITE: string;
-        MATOMO_URL: string;
+        TRACKER_MATOMO_ID_SITE: string;
+        TRACKER_MATOMO_URL: string;
+        TRACKER_POSTHOG_API_KEY: string;
+        TRACKER_POSTHOG_URL: string;
+        TRACKER_PROVIDER: string;
     }
 }

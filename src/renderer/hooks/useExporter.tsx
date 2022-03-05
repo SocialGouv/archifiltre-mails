@@ -13,6 +13,7 @@ interface UseExporter {
 
 export const useExporter = (): UseExporter => {
     const fileExporterService = useService("fileExporterService");
+    const tracker = useService("trackerService")?.getProvider();
     const { t } = useTranslation();
     const { extractTables } = usePstStore();
 
@@ -41,8 +42,11 @@ export const useExporter = (): UseExporter => {
 
             const mails = formatEmailTable(extractTables.emails);
             await fileExporterService.export(type, mails, dialogPath.filePath);
+            tracker?.track("Export Generated", {
+                type,
+            });
         },
-        [t, extractTables?.emails, fileExporterService]
+        [t, extractTables?.emails, fileExporterService, tracker]
     );
 
     return {

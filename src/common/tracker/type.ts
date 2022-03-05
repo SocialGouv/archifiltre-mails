@@ -6,8 +6,10 @@ export interface TrackCoreEventProps {
     // | "App Downloaded"
     "App First Opened": {
         appId: TrackAppId;
+        arch: string;
         date: Date;
-        os: "linux" | "macos" | "win";
+        os: NodeJS.Platform;
+        version: string;
     };
     "App Opened": { appId: TrackAppId; date: Date; version: string };
     "App Updated": {

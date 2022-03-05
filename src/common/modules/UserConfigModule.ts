@@ -2,14 +2,14 @@ import { Use } from "@lsagetlethias/tstrait";
 import { app, ipcMain, ipcRenderer } from "electron";
 import Store from "electron-store";
 
-import { name as appName } from "../../../package.json";
 import { IS_MAIN, IS_PACKAGED } from "../config";
 import type { PubSub } from "../event/PubSub";
 import type { Event } from "../event/type";
 import type { Locale } from "../i18n/raw";
 import { SupportedLocales, validLocale } from "../i18n/raw";
-import type { TrackAppId } from "../tracker/MatomoProvider";
+import type { TrackAppId } from "../tracker/type";
 import { randomString } from "../utils";
+import { name as appName } from "../utils/package";
 import type { SimpleObject, VoidFunction } from "../utils/type";
 import { unreadonly } from "../utils/type";
 import { WaitableTrait } from "../utils/WaitableTrait";
@@ -39,6 +39,7 @@ declare module "../event/type" {
  * Config for `ArchifiltreMails@v1`
  */
 interface UserConfigV1 {
+    _firstOpened: boolean;
     appId: TrackAppId;
     collectData: boolean;
     extractProgressDelay: number;
@@ -109,6 +110,7 @@ export class UserConfigModule extends IsomorphicModule {
             this.store = new Store<UserConfigV1>({
                 clearInvalidConfig: true,
                 defaults: {
+                    _firstOpened: true,
                     appId: (await import("uuid")).v4(),
                     collectData: true,
                     extractProgressDelay: 1500,
@@ -117,6 +119,9 @@ export class UserConfigModule extends IsomorphicModule {
                 },
                 name: IS_PACKAGED() ? "config" : appName,
                 schema: {
+                    _firstOpened: {
+                        type: "boolean",
+                    },
                     appId: {
                         readOnly: true,
                         type: "string",

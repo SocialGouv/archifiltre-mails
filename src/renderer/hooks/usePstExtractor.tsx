@@ -55,12 +55,11 @@ export const usePstExtractor = (): UsePstExtractor => {
                 const totalMail = getInitialTotalMail(extractTables);
                 setTotalMail(totalMail);
 
-                const totalAttachments: number =
+                const totalAttachments =
                     getInitialTotalAttachements(extractTables);
                 setAttachmentTotal(totalAttachments);
 
-                const totalFileSize: number =
-                    getInititalTotalFileSize(extractTables);
+                const totalFileSize = getInititalTotalFileSize(extractTables);
                 setTotalFileSize(totalFileSize);
             })();
         }

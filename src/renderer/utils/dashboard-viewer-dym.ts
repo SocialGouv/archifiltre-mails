@@ -93,7 +93,7 @@ export const getTotalLevelMail = (elements: ViewerObject<string>): number =>
     elements.children.flat().reduce((acc, curr) => acc + curr.size, 0);
 
 export const getFileSizeByMail = (attachments: PstAttachement[]): number =>
-    attachments.reduce((acc: number, { filesize }: { filesize: number }) => {
+    attachments.reduce((acc: number, { filesize }) => {
         return acc + filesize;
     }, 0);
 

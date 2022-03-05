@@ -42,6 +42,14 @@ declare module "matomo-tracker" {
 
          */
         _viewts?: number;
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        e_a?: string;
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        e_c?: string;
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        e_n?: string;
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        e_v?: number;
         /**
          * The current hour (local time).
          */

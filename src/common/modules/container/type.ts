@@ -1,4 +1,5 @@
 import type { PubSub } from "../../event/PubSub";
+import type { TrackerService } from "../../tracker/TrackerModule";
 import type { UnknownMapping } from "../../utils/type";
 import type { FileExporterService } from "../FileExporterModule";
 import type { I18nService } from "../I18nModule";
@@ -13,6 +14,7 @@ export interface ServicesKeyType {
     fileExporterService: FileExporterService;
     i18nService: I18nService;
     pubSub: PubSub;
+    trackerService: TrackerService;
     userConfigService: UserConfigService;
 }
 

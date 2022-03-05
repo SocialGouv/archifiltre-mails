@@ -76,13 +76,16 @@ app.on("ready", async () => {
         ["consoleToRendererService", consoleToRendererService],
         ["mainWindowRetriever", mainWindowRetriever]
     );
+    const trackerService = containerModule.get("trackerService");
     const modules: Module[] = [
         ...isomorphicModules,
         new AppModule(
             mainWindowRetriever,
             consoleToRendererService,
             containerModule.get("i18nService"),
-            containerModule.get("userConfigService")
+            containerModule.get("userConfigService"),
+            trackerService,
+            containerModule.get("pubSub")
         ),
         new DevToolsModule(),
         new PstExtractorModule(containerModule.get("userConfigService")),
@@ -94,8 +97,10 @@ app.on("ready", async () => {
             containerModule.get("userConfigService")
         ),
     ];
+
     app.on("will-quit", async (event) => {
         event.preventDefault();
+        trackerService.getProvider().track("App Closed", { date: new Date() });
         await unloadModules(...modules);
         process.exit();
     });

@@ -7,6 +7,7 @@ import { IpcModule } from "../modules/IpcModule";
 import type { Module } from "../modules/Module";
 import { IsomorphicModuleFactory } from "../modules/Module";
 import { UserConfigModule } from "../modules/UserConfigModule";
+import { TrackerModule } from "../tracker/TrackerModule";
 import type { UnknownMapping } from "../utils/type";
 
 /**
@@ -33,12 +34,18 @@ export const getIsomorphicModules = <
     const fileExporterModule =
         IsomorphicModuleFactory.getInstance(FileExporterModule);
     const ipcModule = IsomorphicModuleFactory.getInstance(IpcModule);
+    const trackerModule = IsomorphicModuleFactory.getInstance(
+        TrackerModule,
+        userConfigModule.service,
+        PubSub.getInstance()
+    );
 
     containerModule.registerServices(
         ["pubSub", PubSub.getInstance()],
         ["userConfigService", userConfigModule.service],
         ["i18nService", i18nModule.service],
         ["fileExporterService", fileExporterModule.service],
+        ["trackerService", trackerModule.service],
         ...additionalServices
     );
 

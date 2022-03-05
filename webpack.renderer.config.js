@@ -1,5 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
+require("dotenv").config();
 
 module.exports =
     /** @param {import("webpack").Configuration} config */ function (config) {
@@ -39,7 +40,13 @@ module.exports =
             config.plugins = [];
         }
         config.plugins.push(
-            new webpack.EnvironmentPlugin(["MATOMO_ID_SITE", "MATOMO_URL"])
+            new webpack.EnvironmentPlugin([
+                "TRACKER_MATOMO_ID_SITE",
+                "TRACKER_MATOMO_URL",
+                "TRACKER_PROVIDER",
+                "TRACKER_POSTHOG_API_KEY",
+                "TRACKER_POSTHOG_URL",
+            ])
         );
 
         return config;
