@@ -2,20 +2,11 @@ import type { PubSub } from "../event/PubSub";
 import { IsomorphicService } from "../modules/ContainerModule";
 import { IsomorphicModule } from "../modules/Module";
 import type { UserConfigService } from "../modules/UserConfigModule";
-import { DebugProvider } from "./provider/DebugProvider";
-import { MatomoProvider } from "./provider/MatomoProvider";
+import { DelegatingProvider } from "./provider/DelegatingProvider";
 import { NoopProvider } from "./provider/NoopProvider";
-import { PosthogProvider } from "./provider/PosthogProvider";
 import type { TrackerProvider } from "./provider/TrackerProvider";
-
-const providers = [
-    MatomoProvider,
-    PosthogProvider,
-    NoopProvider,
-    DebugProvider,
-] as const;
-
-type ProviderType = typeof providers[number]["trackerName"];
+import type { DelegatingName, ProviderType } from "./provider/utils";
+import { providers } from "./provider/utils";
 
 export class TrackerModule extends IsomorphicModule {
     public enableTracking = true;
@@ -38,33 +29,40 @@ export class TrackerModule extends IsomorphicModule {
             if (this.enableTracking) this.provider?.enable();
             else this.provider?.disable();
         });
+
+        await this.getProvider().init();
     }
 
     public async uninit(): Promise<void> {
         return Promise.resolve();
     }
 
-    public getProvider(name?: ProviderType): TrackerProvider {
+    public getProvider(): TrackerProvider {
         if (!this.provider) {
-            return (this.provider = this.findProvider());
-        }
-
-        if (
-            (this.provider.constructor as typeof TrackerProvider)
-                .trackerName !== process.env.TRACKER_PROVIDER
-        ) {
-            return this.findProvider();
+            return (this.provider = this.findProvider(
+                process.env.TRACKER_PROVIDER as ProviderType
+            ));
         }
 
         return this.provider;
     }
 
-    private findProvider(name = process.env.TRACKER_PROVIDER as ProviderType) {
+    private findProvider(name: ProviderType): TrackerProvider {
+        const appId = this.userConfigService.get("appId");
+        const disabled = !this.enableTracking;
+        if (name.startsWith("delegating")) {
+            const names = DelegatingProvider.parseQueryString(
+                name as DelegatingName
+            );
+
+            return new DelegatingProvider(
+                appId,
+                disabled,
+                names.map((n) => this.findProvider(n))
+            );
+        }
         return new (providers.find((p) => p.trackerName === name) ??
-            NoopProvider)(
-            this.userConfigService.get("appId"),
-            this.enableTracking
-        );
+            NoopProvider)(appId, disabled);
     }
 
     get service(): TrackerService {

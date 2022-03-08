@@ -75,6 +75,68 @@ export type VoidArgsFunction<TArgs extends Any[] = Any[]> = (
     ...args: TArgs
 ) => void;
 
+export interface FixedLengthArray<T, TLength extends number> extends Array<T> {
+    "0": T;
+    length: TLength;
+}
+
+/**
+ * When using abstract class, return a simulated extended class type without having to target a "real" sub class.
+ */
+export type ExtendedClass<T extends abstract new (...args: Any) => Any> =
+    T extends abstract new (...args: infer TArgs) => infer TInstance
+        ? new (...args: TArgs) => TInstance
+        : never;
+
+export type UnionToIntersection<TUnion> = (
+    TUnion extends Any ? (k: TUnion) => void : never
+) extends (k: infer I) => void
+    ? I
+    : never;
+type UnionToOverloads<TUnion> = UnionToIntersection<
+    TUnion extends Any ? (f: TUnion) => void : never
+>;
+export type PopUnion<TUnion> = UnionToOverloads<TUnion> extends (
+    a: infer A
+) => void
+    ? A
+    : never;
+
+export type UnionConcat<
+    TUnion extends string,
+    TSep extends string = ","
+> = PopUnion<TUnion> extends infer Self
+    ? Self extends string
+        ? Exclude<TUnion, Self> extends never
+            ? Self
+            :
+                  | Self
+                  | UnionConcat<Exclude<TUnion, Self>, TSep>
+                  | `${UnionConcat<Exclude<TUnion, Self>, TSep>}${TSep}${Self}`
+        : never
+    : never;
+
+/**
+ * Split literal strings with optional split char and return a tuple of literals.
+ *
+ * ```ts
+ * // default split char: ","
+ * type LitTuple1 = Split<"a,b,c,d"> // ["a","b","c","d"]
+ * // defined split char
+ * type LitTuple2 = Split<"a.b.c.d", "."> // ["a","b","c","d"]
+ * // missing split char
+ * type LitTuple3 = Split<"a.b.c.d"> // ["a.b.c.d"]
+ * ```
+ */
+export type Split<
+    T extends string,
+    TSep extends string = ","
+> = T extends `${infer Part}${TSep}${infer Rest}`
+    ? [Part, ...Split<Rest, TSep>]
+    : T extends string
+    ? [T]
+    : never;
+
 /**
  * Hacky type to remove readonly on each property
  */

@@ -1,3 +1,6 @@
+import { useService } from "@common/modules/ContainerModule";
+import type { TrackAppEventProps } from "@common/tracker/type";
+import { bytesToMegabytes } from "@common/utils";
 import type { ComputedDatum } from "@nivo/circle-packing";
 import { atom, useAtom } from "jotai/index";
 import type { SetStateAction } from "react";
@@ -33,6 +36,28 @@ export const useTagManagerStore = (): UseTagManagerStore => {
     const { updateToDeleteImpact } = useImpactStore(
         extractTables?.attachements
     );
+    const tracker = useService("trackerService")?.getProvider();
+    const trackTag = useCallback(
+        (
+            ids: string[],
+            markType: TrackAppEventProps["Feat(5.0) Element Marked"]["markType"]
+        ) => {
+            let elementSize = 0;
+            extractTables?.attachements.forEach((attachments, emailUuid) => {
+                if (ids.includes(emailUuid)) {
+                    elementSize += attachments.reduce(
+                        (acc, attachment) => acc + attachment.filesize,
+                        0
+                    );
+                }
+            });
+            tracker?.track("Feat(5.0) Element Marked", {
+                elementSize: bytesToMegabytes(elementSize),
+                markType,
+            });
+        },
+        [extractTables?.attachements, tracker]
+    );
 
     // DELETE LOGIC
     const addMarkedToDelete = useCallback(() => {
@@ -49,6 +74,7 @@ export const useTagManagerStore = (): UseTagManagerStore => {
         ];
         setMarkedToDelete(updatedMarkedToDelete);
         updateToDeleteImpact(hoveredNode.data.ids, "add");
+        trackTag(hoveredNode.data.ids, "delete");
     }, [
         hoveredNode,
         markedToDelete,
@@ -56,6 +82,7 @@ export const useTagManagerStore = (): UseTagManagerStore => {
         updateToDeleteImpact,
         setMarkedToDelete,
         setMarkedToKeep,
+        trackTag,
     ]);
 
     const addChildrenMarkedToDelete = (idsToDelete: string[]) => {
@@ -85,6 +112,7 @@ export const useTagManagerStore = (): UseTagManagerStore => {
         ];
         setMarkedToKeep(updatedMarkedToKeep);
         updateToDeleteImpact(hoveredNode.data.ids, "delete");
+        trackTag(hoveredNode.data.ids, "keep");
     }, [
         hoveredNode,
         markedToDelete,
@@ -92,6 +120,7 @@ export const useTagManagerStore = (): UseTagManagerStore => {
         updateToDeleteImpact,
         setMarkedToDelete,
         setMarkedToKeep,
+        trackTag,
     ]);
 
     const addChildrenMarkedToKeep = (idsToKeep: string[]) => {

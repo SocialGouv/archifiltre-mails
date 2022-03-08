@@ -1,18 +1,11 @@
 const path = require("path");
 const glob = require("glob");
 const webpack = require("webpack");
+const webpackCommonConfig = require("./webpack.common.config");
 require("dotenv").config();
 
 module.exports =
     /** @param {import("webpack").Configuration} config */ function (config) {
-        if (config.resolve) {
-            config.resolve.alias["@common"] = config.resolve.alias["common"];
-            config.resolve.alias["@event"] = path.resolve(
-                config.resolve.alias["@common"],
-                "event"
-            );
-        }
-
         const workers = glob
             .sync("./src/main/**/*.worker.ts")
             .map((filePath) => {
@@ -28,9 +21,6 @@ module.exports =
                 return acc;
             }, {});
 
-        if (!config.plugins) {
-            config.plugins = [];
-        }
         if (config.mode === "production") {
             for (const plugin of config.plugins) {
                 if (plugin instanceof webpack.BannerPlugin) {
@@ -38,15 +28,6 @@ module.exports =
                 }
             }
         }
-        config.plugins.push(
-            new webpack.EnvironmentPlugin([
-                "TRACKER_MATOMO_ID_SITE",
-                "TRACKER_MATOMO_URL",
-                "TRACKER_PROVIDER",
-                "TRACKER_POSTHOG_API_KEY",
-                "TRACKER_POSTHOG_URL",
-            ])
-        );
 
         if (config.entry) {
             config.entry = {
@@ -55,5 +36,5 @@ module.exports =
             };
         }
 
-        return config;
+        return webpackCommonConfig(config);
     };

@@ -3,15 +3,15 @@ import create from "zustand/vanilla";
 
 export const attachmentCountStore = create(() => ({
     attachmentPerLevel: [0],
-    attachmentTotal: 0,
+    totalAttachment: 0,
 }));
 
 const { setState } = attachmentCountStore;
 
-export const setAttachmentTotal = (attachmentTotal: number): void => {
+export const setTotalAttachment = (totalAttachment: number): void => {
     setState({
-        attachmentPerLevel: [attachmentTotal],
-        attachmentTotal,
+        attachmentPerLevel: [totalAttachment],
+        totalAttachment,
     });
 };
 

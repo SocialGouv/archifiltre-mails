@@ -23,9 +23,7 @@ void (async () => {
         unloadModules(...modules)
     );
     await loadModules(...modules);
-    render(<App />, document.querySelector("#app"));
+    // setupSentry();
 
-    // const matomo = new MatomoProvider();
-    // await matomo.init();
-    // console.log({ matomo });
+    render(<App />, document.querySelector("#app"));
 })();

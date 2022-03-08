@@ -33,29 +33,33 @@
   "electronWebpack": {
     "title": true,
     "main": {
-      "webpackConfig": "webpack.main.config.js"
+      "webpackConfig": "webpack.main.config.js",
+      "extraEntries": [
+        "@/preload.ts"
+      ]
     },
     "renderer": {
       "webpackConfig": "webpack.renderer.config.js"
     },
     "whiteListedModules": [
+      "@datapunt/matomo-tracker-js",
+      "@datapunt/matomo-tracker-react",
       "@lsagetlethias/tstrait",
       "@nivo/circle-packing",
       "@nivo/core",
       "@nivo/generators",
+      "@sentry/electron",
       "@socialgouv/archimail-pst-extractor",
       "d3",
+      "electron-store",
       "i18next",
       "jotai",
+      "lodash",
+      "posthog-js",
       "react-dropzone",
       "react-i18next",
-      "lodash",
-      "electron-store",
       "source-map-support",
-      "zustand",
-      "@datapunt/matomo-tracker-js",
-      "@datapunt/matomo-tracker-react",
-      "posthog-js"
+      "zustand"
     ]
   },
   "//build.extraResources": "Static should be set again because it is overwritten",
@@ -121,6 +125,7 @@
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
+    "@sentry/webpack-plugin": "^1.18.8",
     "@socialgouv/eslint-config-react": "^1.102.0",
     "@socialgouv/eslint-config-typescript": "^1.102.0",
     "@testing-library/jest-dom": "^5.16.1",
@@ -175,6 +180,7 @@
     "@nivo/circle-packing": "^0.79.0",
     "@nivo/core": "^0.79.0",
     "@nivo/generators": "^0.79.0",
+    "@sentry/electron": "^3.0.3",
     "@socialgouv/archimail-pst-extractor": "^0.0.2",
     "d3": "^7.3.0",
     "electron-store": "^8.0.1",

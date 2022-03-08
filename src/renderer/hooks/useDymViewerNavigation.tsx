@@ -1,3 +1,4 @@
+import { useService } from "@common/modules/ContainerModule";
 import type { ComputedDatum } from "@nivo/circle-packing/dist/types/types";
 import { useCallback, useEffect, useState } from "react";
 
@@ -80,6 +81,9 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
 
     const [yearView, setYearView] =
         useState<ViewState<DefaultViewerObject<string>>>();
+
+    console.log(`IN useDymViewerNavigation`);
+    const trackerService = useService("trackerService");
 
     const createInitialView = useCallback(() => {
         const aggregatedDomain = getAggregatedDomains(pstFile!);
@@ -212,6 +216,15 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
                 type: MAILS,
             });
         }
+
+        trackerService?.getProvider().track("Feat(3.0) Element Traversed", {
+            viewType:
+                currentView?.type === DOMAIN
+                    ? CORRESPONDANTS
+                    : currentView?.type === CORRESPONDANTS
+                    ? YEAR
+                    : MAILS,
+        });
 
         return;
     };

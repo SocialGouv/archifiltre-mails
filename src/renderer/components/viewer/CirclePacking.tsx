@@ -123,9 +123,9 @@ export const CirclePacking: React.FC = () => {
 
     const handleClick: CirclePackingCommonProps["onClick"] = (node) => {
         if (isMailViewerObject(node.data)) {
-            console.log({ node });
             setMainInfos(node);
             startFocus();
+            return;
         }
 
         computeNextView(node);

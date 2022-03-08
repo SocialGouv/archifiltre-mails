@@ -98,6 +98,12 @@ export class DebugMenu implements ArchifiltreMailsMenu {
                         ),
                     })),
                 },
+                {
+                    click: () => {
+                        throw new Error("Test Error !");
+                    },
+                    label: "ERROR",
+                },
             ],
             visible: this.visible,
         });

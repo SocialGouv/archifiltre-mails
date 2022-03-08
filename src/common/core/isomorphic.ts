@@ -54,6 +54,7 @@ export const getIsomorphicModules = <
     return [
         containerModule,
         userConfigModule,
+        trackerModule,
         i18nModule,
         fileExporterModule,
         ipcModule,

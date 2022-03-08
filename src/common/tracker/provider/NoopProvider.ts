@@ -1,12 +1,11 @@
-import type {
-    TrackAppEventProps,
-    TrackCoreEventProps,
-    TrackEventProps,
-} from "../type";
+import type { TrackEvent } from "../type";
+import type { TrackArgs } from "./TrackerProvider";
 import { TrackerProvider } from "./TrackerProvider";
 
 export class NoopProvider extends TrackerProvider {
     static trackerName = "noop" as const;
+
+    public inited = true;
 
     private flagConsole = false;
 
@@ -14,9 +13,7 @@ export class NoopProvider extends TrackerProvider {
         return Promise.resolve();
     }
 
-    public track<
-        TEvent extends keyof TrackAppEventProps | keyof TrackCoreEventProps
-    >(_event: TEvent, _props: TrackEventProps[TEvent]): void {
+    public track<TEvent extends TrackEvent>(..._args: TrackArgs<TEvent>): void {
         this.warn();
     }
 

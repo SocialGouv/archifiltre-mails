@@ -1,5 +1,5 @@
-const path = require("path");
-const webpack = require("webpack");
+const webpackCommonConfig = require("./webpack.common.config");
+
 require("dotenv").config();
 
 module.exports =
@@ -29,25 +29,5 @@ module.exports =
             }
         });
 
-        if (config.resolve) {
-            config.resolve.alias["@common"] = config.resolve.alias["common"];
-            config.resolve.alias["@event"] = path.resolve(
-                config.resolve.alias["@common"],
-                "event"
-            );
-        }
-        if (!config.plugins) {
-            config.plugins = [];
-        }
-        config.plugins.push(
-            new webpack.EnvironmentPlugin([
-                "TRACKER_MATOMO_ID_SITE",
-                "TRACKER_MATOMO_URL",
-                "TRACKER_PROVIDER",
-                "TRACKER_POSTHOG_API_KEY",
-                "TRACKER_POSTHOG_URL",
-            ])
-        );
-
-        return config;
+        return webpackCommonConfig(config);
     };

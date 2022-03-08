@@ -18,6 +18,8 @@ export type MainWindowRetriever = () => Promise<BrowserWindow>;
 // enable hot reload when needed
 module.hot?.accept();
 
+// setupSentry();
+
 Menu.setApplicationMenu(null);
 
 /**
@@ -28,6 +30,10 @@ const INDEX_URL = IS_PACKAGED()
     : IS_E2E || IS_DIST_MODE
     ? `file://${path.join(__dirname, "/../renderer/index.html")}`
     : `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`;
+
+const PRELOAD_PATH = IS_PACKAGED()
+    ? path.resolve(__dirname, "preload.ts")
+    : path.resolve(__dirname, "preload.js").replace("/src/", "/dist/");
 /**
  * Global reference.
  *
@@ -44,6 +50,8 @@ const createMainWindow = async () => {
             defaultEncoding: "UTF-8",
             nodeIntegration: true,
             nodeIntegrationInWorker: true,
+            // preload: PRELOAD_PATH,
+            webSecurity: false,
         },
     });
 
