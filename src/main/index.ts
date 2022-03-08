@@ -1,5 +1,5 @@
 import { IS_DIST_MODE, IS_E2E, IS_PACKAGED } from "@common/config";
-import { getIsomorphicModules } from "@common/core/isomorphic";
+import { getIsomorphicModules } from "@common/lib/core/isomorphic";
 import { loadModules, unloadModules } from "@common/lib/ModuleManager";
 import { containerModule } from "@common/modules/ContainerModule";
 import type { Module } from "@common/modules/Module";

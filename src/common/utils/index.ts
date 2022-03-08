@@ -50,19 +50,26 @@ export const notImplemented = (..._args: Any[]): Any | Promise<Any> => {
 };
 
 // TODO do propre things ...
+export const toDecimalsFloat = (n: number, decimals: number): number => {
+    const mult = Math.pow(10, decimals);
+    return Math.round(n * mult) / mult;
+};
 export const toOneDecimalsFloat = (n: number): number =>
     Math.round(n * 10) / 10;
 export const toTwoDecimalsFloat = (n: number): number =>
     Math.round(n * 100) / 100;
 
-export const getPercentage = (current: number, total: number): number =>
-    toTwoDecimalsFloat((current / total) * 100);
+export const getPercentage = (
+    current: number,
+    total: number,
+    decimals = 2
+): number => toDecimalsFloat((current / total) * 100, decimals);
 
-export const bytesToGigabytes = (bytes: number): number =>
-    toOneDecimalsFloat(bytes / 1.0e9);
+export const bytesToGigabytes = (bytes: number, decimals = 1): number =>
+    toDecimalsFloat(bytes / 1.0e9, decimals);
 
-export const bytesToMegabytes = (bytes: number): number =>
-    toOneDecimalsFloat(bytes / 1.0e6);
+export const bytesToMegabytes = (bytes: number, decimals = 1): number =>
+    toDecimalsFloat(bytes / 1.0e6, decimals);
 
-export const bytesToKilobytes = (bytes: number): number =>
-    toOneDecimalsFloat(bytes / 1000);
+export const bytesToKilobytes = (bytes: number, decimals = 1): number =>
+    toDecimalsFloat(bytes / 1000, decimals);

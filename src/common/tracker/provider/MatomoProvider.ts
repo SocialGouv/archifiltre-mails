@@ -1,7 +1,7 @@
-import type FrontMatomoTracker from "@datapunt/matomo-tracker-js";
-import type { MatomoTracker as NodeJsMatomoTracker } from "matomo-tracker";
+import type MatomoTracker from "@datapunt/matomo-tracker-js";
 
 import { IS_MAIN } from "../../config";
+import { MatomoClient } from "../matomo/MatomoClient";
 import type { TrackEvent } from "../type";
 import { eventCategoryMap } from "../type";
 import type { TrackArgs } from "./TrackerProvider";
@@ -12,15 +12,15 @@ export class MatomoProvider extends TrackerProvider {
 
     public inited = false;
 
-    private tracker?: FrontMatomoTracker | NodeJsMatomoTracker;
+    private tracker?: MatomoClient | MatomoTracker;
 
     async init(): Promise<void> {
         if (this.inited) {
             console.warn("[MatomoProvider] Already inited.");
         }
         if (IS_MAIN) {
-            this.tracker = new (await import("matomo-tracker")).MatomoTracker(
-                +process.env.TRACKER_MATOMO_ID_SITE,
+            this.tracker = new MatomoClient(
+                process.env.TRACKER_MATOMO_ID_SITE,
                 `${process.env.TRACKER_MATOMO_URL}/piwik.php`
             );
             this.inited = true;
@@ -51,17 +51,20 @@ export class MatomoProvider extends TrackerProvider {
         if (this.isMain(this.tracker)) {
             /* eslint-disable @typescript-eslint/naming-convention */
             this.tracker.track({
+                _id: this.appId,
                 e_a: event,
                 e_c: category,
                 e_n: payload,
                 e_v: 1,
                 uid: this.appId,
+                url: process.env.TRACKER_MATOMO_FAKE_HREF,
             });
             /* eslint-enable @typescript-eslint/naming-convention */
         } else {
             this.tracker.trackEvent({
                 action: event,
                 category,
+                href: process.env.TRACKER_MATOMO_FAKE_HREF,
                 name: payload,
                 value: 1,
             });
@@ -84,7 +87,7 @@ export class MatomoProvider extends TrackerProvider {
         this.disabled = true;
     }
 
-    private isMain(_: typeof this.tracker): _ is NodeJsMatomoTracker {
+    private isMain(_: typeof this.tracker): _ is MatomoClient {
         return IS_MAIN;
     }
 }

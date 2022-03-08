@@ -70,7 +70,7 @@ export const usePstExtractor = (): UsePstExtractor => {
                     attachmentCount: totalAttachments,
                     loadTime,
                     mailCount: totalMail,
-                    size: bytesToGigabytes(totalFileSize),
+                    size: bytesToGigabytes(totalFileSize, 2),
                 });
             })();
         }

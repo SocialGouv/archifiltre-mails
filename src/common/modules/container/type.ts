@@ -1,4 +1,4 @@
-import type { PubSub } from "../../event/PubSub";
+import type { PubSub } from "../../lib/event/PubSub";
 import type { TrackerService } from "../../tracker/TrackerModule";
 import type { UnknownMapping } from "../../utils/type";
 import type { FileExporterService } from "../FileExporterModule";

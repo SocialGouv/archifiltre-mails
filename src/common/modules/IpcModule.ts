@@ -2,10 +2,10 @@ import type { Dialog, Shell } from "electron";
 import { dialog, shell } from "electron";
 
 import { IS_MAIN } from "../config";
-import { ipcMain } from "../ipc";
+import { ipcMain } from "../lib/ipc";
 import { IsomorphicModule } from "./Module";
 
-declare module "../ipc/event" {
+declare module "../lib/ipc/event" {
     interface AsyncIpcMapping {
         "dialog.showOpenDialog": IpcConfig<
             Parameters<Dialog["showOpenDialog"]>,

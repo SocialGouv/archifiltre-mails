@@ -3,10 +3,10 @@ import { app, ipcMain, ipcRenderer } from "electron";
 import Store from "electron-store";
 
 import { IS_MAIN, IS_PACKAGED } from "../config";
-import type { PubSub } from "../event/PubSub";
-import type { Event } from "../event/type";
 import type { Locale } from "../i18n/raw";
 import { SupportedLocales, validLocale } from "../i18n/raw";
+import type { PubSub } from "../lib/event/PubSub";
+import type { Event } from "../lib/event/type";
 import type { TrackAppId } from "../tracker/type";
 import { randomString } from "../utils";
 import { name as appName } from "../utils/package";
@@ -29,7 +29,7 @@ export class UserConfigEvent<T = SimpleObject>
 }
 export class UserConfigUpdatedEvent extends UserConfigEvent {}
 
-declare module "../event/type" {
+declare module "../lib/event/type" {
     interface EventKeyType {
         "event.userconfig.updated": UserConfigUpdatedEvent;
     }

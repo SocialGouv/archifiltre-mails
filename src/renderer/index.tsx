@@ -1,4 +1,4 @@
-import { getIsomorphicModules } from "@common/core/isomorphic";
+import { getIsomorphicModules } from "@common/lib/core/isomorphic";
 import { loadModules, unloadModules } from "@common/lib/ModuleManager";
 import type { Module } from "@common/modules/Module";
 import React from "react";

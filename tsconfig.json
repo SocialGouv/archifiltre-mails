@@ -15,7 +15,7 @@
     "baseUrl": ".",
     "paths": {
       "@event/*": [
-        "src/common/event/*"
+        "src/common/lib/event/*"
       ],
       "@common/*": [
         "src/common/*"

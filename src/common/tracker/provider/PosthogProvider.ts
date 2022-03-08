@@ -71,18 +71,22 @@ export class PosthogProvider extends TrackerProvider {
     }
 
     public track<TEvent extends TrackEvent>(...args: TrackArgs<TEvent>): void {
-        const [event, properties] = args;
+        const [event, props] = args;
         if (!this.tracker || this.disabled) return;
         if (this.isMain(this.tracker)) {
             this.tracker.capture({
                 distinctId: this.appId,
                 event,
-                properties,
+                properties: { ...props },
             });
         } else {
-            this.tracker.capture(event, properties, {
-                transport: "sendBeacon",
-            });
+            this.tracker.capture(
+                event,
+                { ...props },
+                {
+                    transport: "sendBeacon",
+                }
+            );
         }
     }
 

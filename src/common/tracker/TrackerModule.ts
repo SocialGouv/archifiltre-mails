@@ -1,4 +1,4 @@
-import type { PubSub } from "../event/PubSub";
+import type { PubSub } from "../lib/event/PubSub";
 import { IsomorphicService } from "../modules/ContainerModule";
 import { IsomorphicModule } from "../modules/Module";
 import type { UserConfigService } from "../modules/UserConfigModule";

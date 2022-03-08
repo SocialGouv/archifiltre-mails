@@ -112,5 +112,5 @@
   "startscreen.importInfo.folders": "Folders",
   "startscreen.importInfo.seconds": "{{seconds}}sec",
   "startscreen.importInfo.totalFiles": "Total",
-  "startscreen.importInfo.totalTime": "Total time (in seconds)"
+  "startscreen.importInfo.totalTime": "Total time"
 }

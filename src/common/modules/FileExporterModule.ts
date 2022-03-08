@@ -86,7 +86,7 @@ export class FileExporterModule extends IsomorphicModule {
             await exporters[type].export(obj, dest);
 
             this.trackerService.getProvider().track("Export Generated", {
-                size: bytesToMegabytes((await stat(dest)).size),
+                size: bytesToMegabytes((await stat(dest)).size, 2),
                 type,
             });
         } else

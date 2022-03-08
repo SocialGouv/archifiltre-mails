@@ -8,8 +8,6 @@ import i18next from "i18next";
 import path from "path";
 
 import { IS_MAIN, STATIC_PATH } from "../config";
-import type { PubSub } from "../event/PubSub";
-import type { Event, Unsubscriber } from "../event/type";
 import type { Locale, Namespace } from "../i18n/raw";
 import {
     DEFAULT_LOCALE,
@@ -17,6 +15,8 @@ import {
     SupportedLocales,
     validLocale,
 } from "../i18n/raw";
+import type { PubSub } from "../lib/event/PubSub";
+import type { Event, Unsubscriber } from "../lib/event/type";
 import { WaitableTrait } from "../utils/WaitableTrait";
 import { IsomorphicService } from "./ContainerModule";
 import { IsomorphicModule } from "./Module";
@@ -47,7 +47,7 @@ export class I18nLanguageChangedEvent extends I18nEvent<I18nLanguageChangedState
 
 export type LanguageChangedListener = (evt: I18nLanguageChangedEvent) => void;
 
-declare module "../event/type" {
+declare module "../lib/event/type" {
     interface EventKeyType {
         "event.i18n.languageChanged": I18nLanguageChangedEvent;
     }

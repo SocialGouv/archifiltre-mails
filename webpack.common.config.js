@@ -19,6 +19,7 @@ module.exports =
         if (!config.plugins) {
             config.plugins = [];
         }
+        const project = `${packageJson.name}${isProd ? "" : "-dev"}`;
         config.plugins.push(
             new webpack.EnvironmentPlugin([
                 "TRACKER_MATOMO_ID_SITE",
@@ -29,7 +30,12 @@ module.exports =
                 "SENTRY_ORG",
                 "SENTRY_DSN",
                 "SENTRY_URL",
-            ])
+            ]),
+            new webpack.DefinePlugin({
+                "process.env.TRACKER_MATOMO_FAKE_HREF": JSON.stringify(
+                    `https://${project}`
+                ),
+            })
         );
 
         config.devtool = "source-map";

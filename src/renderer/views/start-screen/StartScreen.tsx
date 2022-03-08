@@ -1,4 +1,4 @@
-import { toOneDecimalsFloat } from "@common/utils";
+import { toDecimalsFloat } from "@common/utils";
 import React, { useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -67,7 +67,7 @@ export const StartScreen: React.FC = () => {
                     <li>
                         <span>{t("startscreen.importInfo.totalTime")}:</span>
                         <span>
-                            {toOneDecimalsFloat(pstProgress.elapsed / 1000)}
+                            {toDecimalsFloat(pstProgress.elapsed / 1000, 2)}s
                         </span>
                     </li>
                 </ul>
