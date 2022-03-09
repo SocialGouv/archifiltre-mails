@@ -1,6 +1,7 @@
 import { getIsomorphicModules } from "@common/lib/core/isomorphic";
 import { loadModules, unloadModules } from "@common/lib/ModuleManager";
 import type { Module } from "@common/modules/Module";
+import { setupSentry } from "@common/monitoring/sentry";
 import React from "react";
 import { render } from "react-dom";
 
@@ -9,6 +10,8 @@ import { ConsoleFromMainModule } from "./modules/ConsoleFromMainModule";
 import { pstExtractorService } from "./services/PstExtractorService";
 
 module.hot?.accept();
+// get integrations setup callback
+const setupSentryIntegrations = setupSentry();
 
 void (async () => {
     const isomorphicModules = getIsomorphicModules([
@@ -23,7 +26,7 @@ void (async () => {
         unloadModules(...modules)
     );
     await loadModules(...modules);
-    // setupSentry();
+    setupSentryIntegrations();
 
     render(<App />, document.querySelector("#app"));
 })();

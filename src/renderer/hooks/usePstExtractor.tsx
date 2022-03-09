@@ -71,6 +71,7 @@ export const usePstExtractor = (): UsePstExtractor => {
                     loadTime,
                     mailCount: totalMail,
                     size: bytesToGigabytes(totalFileSize, 2),
+                    sizeRaw: totalFileSize,
                 });
             })();
         }

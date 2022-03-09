@@ -13,6 +13,15 @@ export class TrackerModule extends IsomorphicModule {
 
     public provider?: TrackerProvider;
 
+    private readonly userConfigUnsub = this.pubSub.subscribe(
+        "event.userconfig.updated",
+        (event) => {
+            this.enableTracking = event.state.collectData;
+            if (this.enableTracking) this.provider?.enable();
+            else this.provider?.disable();
+        }
+    );
+
     constructor(
         private readonly userConfigService: UserConfigService,
         private readonly pubSub: PubSub
@@ -24,17 +33,12 @@ export class TrackerModule extends IsomorphicModule {
         await this.userConfigService.wait();
         this.enableTracking = this.userConfigService.get("collectData");
 
-        this.pubSub.subscribe("event.userconfig.updated", (event) => {
-            this.enableTracking = event.state.collectData;
-            if (this.enableTracking) this.provider?.enable();
-            else this.provider?.disable();
-        });
-
         await this.getProvider().init();
     }
 
     public async uninit(): Promise<void> {
-        return Promise.resolve();
+        this.userConfigUnsub();
+        await this.getProvider().uninit();
     }
 
     public getProvider(): TrackerProvider {

@@ -42,18 +42,19 @@ export const useTagManagerStore = (): UseTagManagerStore => {
             ids: string[],
             markType: TrackAppEventProps["Feat(5.0) Element Marked"]["markType"]
         ) => {
-            let elementSize = 0;
+            let sizeRaw = 0;
             extractTables?.attachements.forEach((attachments, emailUuid) => {
                 if (ids.includes(emailUuid)) {
-                    elementSize += attachments.reduce(
+                    sizeRaw += attachments.reduce(
                         (acc, attachment) => acc + attachment.filesize,
                         0
                     );
                 }
             });
             tracker?.track("Feat(5.0) Element Marked", {
-                elementSize: bytesToMegabytes(elementSize),
                 markType,
+                size: bytesToMegabytes(sizeRaw),
+                sizeRaw,
             });
         },
         [extractTables?.attachements, tracker]

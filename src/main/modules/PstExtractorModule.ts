@@ -4,6 +4,7 @@ import {
     PST_PROGRESS_SUBSCRIBE_EVENT,
     PST_STOP_EXTRACT_EVENT,
 } from "@common/constant/event";
+import { AppError } from "@common/lib/error/AppError";
 import type { Service } from "@common/modules/container/type";
 import { containerModule } from "@common/modules/ContainerModule";
 import type {
@@ -25,6 +26,8 @@ import {
     PST_DONE_WORKER_EVENT,
     PST_PROGRESS_WORKER_EVENT,
 } from "./pst-extractor/pst-extractor.worker";
+
+export class PstExtractorError extends AppError {}
 
 const REGEXP_PST = /\.pst$/i;
 
@@ -93,11 +96,11 @@ export class PstExtractorModule extends MainModule {
         options: ExtractOptions
     ): Promise<[PstContent, PstExtractTables]> {
         if (this.working) {
-            throw new Error("[PstExtractorService] Extractor already working.");
+            throw new PstExtractorError("Extractor already working.");
         }
         if (!REGEXP_PST.test(options.pstFilePath)) {
-            throw new Error(
-                `[PstExtractorService] Cannot extract PST from an unknown path or file. Got "${options.pstFilePath}"`
+            throw new PstExtractorError(
+                `Cannot extract PST from an unknown path or file. Got "${options.pstFilePath}"`
             );
         }
 
@@ -178,7 +181,11 @@ export class PstExtractorModule extends MainModule {
                     if (exitCode === 1) {
                         if (this.manuallyStoped) {
                             this.manuallyStoped = false;
-                            reject(new Error("Manually stoped by user."));
+                            reject(
+                                new PstExtractorError(
+                                    "Manually stoped by user."
+                                )
+                            );
                         } else reject("Worker stoped for unknown reason.");
                     }
                 });

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { IS_PACKAGED } from "../config";
+import { AppError } from "../lib/error/AppError";
 import type { UnknownMapping } from "../utils/type";
 import type {
     ReturnServiceType,
@@ -12,7 +13,17 @@ import type {
     // eslint-disable-next-line unused-imports/no-unused-imports -- Used in doc
     ServicesKeyType,
 } from "./container/type";
-import { IsomorphicModule } from "./Module";
+import { IsomorphicModule, ModuleError } from "./Module";
+
+export class ContainerError extends AppError {
+    constructor(
+        message: string,
+        public serviceName?: string,
+        previousError?: Error | unknown
+    ) {
+        super(message, previousError);
+    }
+}
 
 /**
  * An isomorphic service can be loaded both in main AND rederer processes.
@@ -60,7 +71,10 @@ class ContainerModule extends IsomorphicModule {
 
     public async init(): Promise<void> {
         if (this.inited && IS_PACKAGED()) {
-            throw new Error("ContainerModule has already been inited.");
+            throw new ModuleError(
+                "ContainerModule has already been inited.",
+                this
+            );
         }
 
         await Promise.all(
@@ -82,7 +96,7 @@ class ContainerModule extends IsomorphicModule {
 
     public async uninit(): Promise<void> {
         if (!this.inited && IS_PACKAGED()) {
-            throw new Error("ContainerModule not yet inited.");
+            throw new ModuleError("ContainerModule not yet inited.", this);
         }
 
         await Promise.all(
@@ -120,8 +134,9 @@ class ContainerModule extends IsomorphicModule {
                 isomorphicServiceMap.clear();
                 serviceMap.clear();
             } else {
-                throw new Error(
-                    "Cannot register a service when the container is already inited."
+                throw new ContainerError(
+                    "Cannot register a service when the container is already inited.",
+                    name
                 );
             }
         }

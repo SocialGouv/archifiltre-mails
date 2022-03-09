@@ -41,7 +41,6 @@ export const StartScreen: React.FC = () => {
 
     return (
         <div className={style.startscreen}>
-            <button onClick={() => JSON.parse("{aze")}>ERR0R</button>
             <StaticImage className={style.logo} alt="logo" src="img/logo.png" />
             <Dropzone onDrop={onDrop} accept={ACCEPTED_EXTENSION} />
             <div className={progressClassName}>

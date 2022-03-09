@@ -5,6 +5,7 @@ import Store from "electron-store";
 import { IS_MAIN, IS_PACKAGED } from "../config";
 import type { Locale } from "../i18n/raw";
 import { SupportedLocales, validLocale } from "../i18n/raw";
+import { AppError } from "../lib/error/AppError";
 import type { PubSub } from "../lib/event/PubSub";
 import type { Event } from "../lib/event/type";
 import type { TrackAppId } from "../tracker/type";
@@ -15,6 +16,16 @@ import { unreadonly } from "../utils/type";
 import { WaitableTrait } from "../utils/WaitableTrait";
 import { IsomorphicService } from "./ContainerModule";
 import { IsomorphicModule } from "./Module";
+
+export class UserConfigError extends AppError {
+    constructor(
+        message: string,
+        public readonly store?: UserConfigV1,
+        previousError?: Error | unknown
+    ) {
+        super(message, previousError);
+    }
+}
 
 export class UserConfigEvent<T = SimpleObject>
     implements Event<T & UserConfigV1>
@@ -228,9 +239,10 @@ export class UserConfigModule extends IsomorphicModule {
         if (IS_MAIN) {
             this.store.set(key, value);
         } else
-            throw new Error(
-                "[UserConfigModule] Can't direct set config outside of main process."
-            ); // TODO: proper ERROR management
+            throw new UserConfigError(
+                "Can't direct set config outside of main process.",
+                this.store.store
+            );
     };
 
     /**
@@ -241,15 +253,17 @@ export class UserConfigModule extends IsomorphicModule {
         if (IS_MAIN) {
             this.store.clear();
         } else
-            throw new Error(
-                "[UserConfigModule] Can't clear config outside of main process."
-            ); // TODO: proper ERROR management
+            throw new UserConfigError(
+                "Can't clear config outside of main process.",
+                this.store.store
+            );
     };
 
     private ensureInited(): asserts this {
         if (!this.inited) {
-            throw new Error(
-                "[UserConfigModule] Can't set config outside if not inited."
+            throw new UserConfigError(
+                "Config is not inited.",
+                this.store.store
             );
         }
     }

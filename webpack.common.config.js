@@ -32,26 +32,24 @@ module.exports =
                 "SENTRY_URL",
             ]),
             new webpack.DefinePlugin({
-                "process.env.TRACKER_MATOMO_FAKE_HREF": JSON.stringify(
+                "process.env.TRACKER_FAKE_HREF": JSON.stringify(
                     `https://${project}`
                 ),
             })
         );
 
-        config.devtool = "source-map";
-
-        // TODO: enable source-map upload to Sentry
-        // by adding (not legacy) github integration to Sentry
-        // config.plugins.push(
-        //     new SentryWebpackPlugin({
-        //         authToken: process.env.SENTRY_AUTH_TOKEN,
-        //         dryRun: !isProd,
-        //         include: "./dist",
-        //         // project: `${packageJson.name}${isProd ? "" : "-dev"}`,
-        //         project: `${packageJson.name}-dev`,
-        //         release: `${packageJson.name}@${packageJson.version}`,
-        //     })
-        // );
+        if (isProd) {
+            config.devtool = "source-map";
+            // TODO: enable source association by adding (not legacy) github integration to Sentry
+            config.plugins.push(
+                new SentryWebpackPlugin({
+                    authToken: process.env.SENTRY_AUTH_TOKEN,
+                    include: ["dist/"],
+                    project,
+                    release: `${packageJson.name}@${packageJson.version}`,
+                })
+            );
+        }
 
         return config;
     };

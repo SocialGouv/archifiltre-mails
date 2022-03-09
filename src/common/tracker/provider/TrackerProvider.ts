@@ -19,6 +19,11 @@ export abstract class TrackerProvider {
         return [];
     }
 
+    public async uninit(): Promise<void> {
+        this.inited = false;
+        return Promise.resolve();
+    }
+
     public abstract init(): Promise<void>;
 
     public abstract track<TEvent extends TrackEvent>(

@@ -82,7 +82,6 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
     const [yearView, setYearView] =
         useState<ViewState<DefaultViewerObject<string>>>();
 
-    console.log(`IN useDymViewerNavigation`);
     const trackerService = useService("trackerService");
 
     const createInitialView = useCallback(() => {

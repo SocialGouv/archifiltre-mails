@@ -3,6 +3,8 @@ import { getIsomorphicModules } from "@common/lib/core/isomorphic";
 import { loadModules, unloadModules } from "@common/lib/ModuleManager";
 import { containerModule } from "@common/modules/ContainerModule";
 import type { Module } from "@common/modules/Module";
+import { setupSentry } from "@common/monitoring/sentry";
+import { sleep } from "@common/utils";
 import type { Any } from "@common/utils/type";
 import { app, BrowserWindow, Menu } from "electron";
 import path from "path";
@@ -18,7 +20,8 @@ export type MainWindowRetriever = () => Promise<BrowserWindow>;
 // enable hot reload when needed
 module.hot?.accept();
 
-// setupSentry();
+// get integrations setup callback
+const setupSentryIntegrations = setupSentry();
 
 Menu.setApplicationMenu(null);
 
@@ -32,8 +35,10 @@ const INDEX_URL = IS_PACKAGED()
     : `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`;
 
 const PRELOAD_PATH = IS_PACKAGED()
-    ? path.resolve(__dirname, "preload.ts")
-    : path.resolve(__dirname, "preload.js").replace("/src/", "/dist/");
+    ? path.resolve(process.resourcesPath, "preload.js") // prod
+    : IS_DIST_MODE
+    ? path.resolve(__dirname, "preload.js") // dist / e2e
+    : path.resolve(__dirname, "preload.js").replace("/src/", "/dist/"); // dev
 /**
  * Global reference.
  *
@@ -50,7 +55,7 @@ const createMainWindow = async () => {
             defaultEncoding: "UTF-8",
             nodeIntegration: true,
             nodeIntegrationInWorker: true,
-            // preload: PRELOAD_PATH,
+            preload: PRELOAD_PATH,
             webSecurity: false,
         },
     });
@@ -109,11 +114,13 @@ app.on("ready", async () => {
     app.on("will-quit", async (event) => {
         event.preventDefault();
         trackerService.getProvider().track("App Closed", { date: new Date() });
+        await sleep(1000);
         await unloadModules(...modules);
         process.exit();
     });
     // load "main-process" modules
     await loadModules(...modules);
+    setupSentryIntegrations();
     // create actual main BrowserWindow
     await createMainWindow();
     app.emit(MAIN_WINDOW_CREATED_APP_EVENT);

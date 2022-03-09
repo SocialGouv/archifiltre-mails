@@ -87,6 +87,9 @@ export type ExtendedClass<T extends abstract new (...args: Any) => Any> =
     T extends abstract new (...args: infer TArgs) => infer TInstance
         ? new (...args: TArgs) => TInstance
         : never;
+export type ImplementedClass<T> =
+    | (abstract new (...args: Any[]) => T)
+    | (new (...args: Any[]) => T);
 
 export type UnionToIntersection<TUnion> = (
     TUnion extends Any ? (k: TUnion) => void : never

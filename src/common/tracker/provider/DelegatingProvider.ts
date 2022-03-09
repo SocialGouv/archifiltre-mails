@@ -1,3 +1,5 @@
+import type { Integration } from "@sentry/types";
+
 import type { Split, UnionConcat } from "../../utils/type";
 import type { TrackAppId, TrackEvent } from "../type";
 import type { TrackArgs } from "./TrackerProvider";
@@ -29,6 +31,19 @@ export class DelegatingProvider extends TrackerProvider {
             this.providers.map(async (provider) => provider.init())
         );
         this.inited = this.providers.every((provider) => provider.inited);
+    }
+
+    public async uninit(): Promise<void> {
+        await Promise.allSettled(
+            this.providers.map(async (provider) => provider.uninit())
+        );
+        this.inited = this.providers.every((provider) => !provider.inited);
+    }
+
+    public getSentryIntegations(): Integration[] {
+        return this.providers
+            .map((provider) => provider.getSentryIntegations())
+            .flat();
     }
 
     public track<TEvent extends TrackEvent>(...args: TrackArgs<TEvent>): void {

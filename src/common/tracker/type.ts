@@ -15,7 +15,7 @@ export interface TrackCoreEventProps {
         currentVersion: string;
         oldVersion: string;
     };
-    "Export Generated": { size: number; type: ExporterType };
+    "Export Generated": { size: number; sizeRaw: number; type: ExporterType };
     "NPS Answered": {
         responseId?: string;
         userEmail: string;
@@ -25,6 +25,7 @@ export interface TrackCoreEventProps {
         loadTime: number;
         mailCount: number;
         size: number;
+        sizeRaw: number;
     };
     // | "Site Viewed"
     "Work Reloaded": { workHash: TrackWorkHash };
@@ -48,8 +49,9 @@ export interface TrackAppEventProps {
     };
     "Feat(4.0) Detail Expanded": never;
     "Feat(5.0) Element Marked": {
-        elementSize: number;
         markType: "delete" | "keep";
+        size: number;
+        sizeRaw: number;
     };
 }
 

@@ -1,5 +1,6 @@
 import { randomBytes } from "crypto";
 
+import { AppError } from "../lib/error/AppError";
 import type { Any } from "./type";
 
 /**
@@ -42,22 +43,22 @@ export const chunkString = (input: string, length: number): string[] => {
     return result;
 };
 
+export const sleep = async (ms: number): Promise<void> =>
+    new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+
 /**
  * Stub function to use like "noop" but as a safe guard when a feature is not implemented.
  */
 export const notImplemented = (..._args: Any[]): Any | Promise<Any> => {
-    throw new Error("Not implemented");
+    throw new AppError("Not implemented");
 };
 
-// TODO do propre things ...
 export const toDecimalsFloat = (n: number, decimals: number): number => {
     const mult = Math.pow(10, decimals);
     return Math.round(n * mult) / mult;
 };
-export const toOneDecimalsFloat = (n: number): number =>
-    Math.round(n * 10) / 10;
-export const toTwoDecimalsFloat = (n: number): number =>
-    Math.round(n * 100) / 100;
 
 export const getPercentage = (
     current: number,

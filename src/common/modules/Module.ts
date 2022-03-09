@@ -1,3 +1,5 @@
+import { AppError } from "../lib/error/AppError";
+
 /**
  * A module is self contained group of capabilities that can refer to a business domain.
  *
@@ -59,17 +61,30 @@ export const IsomorphicModuleFactory = {
             try {
                 instance = Reflect.construct(klass, deps);
                 if (!instance) {
-                    throw new Error(
-                        `${klass.name} instanciation returned nothing.`
+                    throw new ModuleError(
+                        `${klass.name} instanciation returned nothing.`,
+                        void 0
                     );
                 }
                 factory.set(klass.name, instance);
             } catch (error: unknown) {
-                throw new Error(
-                    `Error during isomorphic module instanciation. ${klass.name} cannot be instancied.\n${error}`
+                throw new ModuleError(
+                    `Error during isomorphic module instanciation. ${klass.name} cannot be instancied.`,
+                    void 0,
+                    error
                 );
             }
         }
         return instance as T;
     },
 } as const;
+
+export class ModuleError extends AppError {
+    constructor(
+        message: string,
+        public readonly mod?: Module,
+        previousError?: Error | unknown
+    ) {
+        super(message, previousError);
+    }
+}
