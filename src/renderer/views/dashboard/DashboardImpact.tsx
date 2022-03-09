@@ -8,8 +8,8 @@ import { useImpactStore } from "../../store/ImpactStore";
 import { usePstFileSizeStore } from "../../store/PstFileSizeStore";
 import { usePstStore } from "../../store/PSTStore";
 import {
+    ECOLOGIC_AIRPLANE_FACTOR,
     ECOLOGIC_IMPACT_FACTOR,
-    ECOLOGIC_TRAIN_FACTOR,
 } from "../../utils/constants";
 import style from "./Dashboard.module.scss";
 
@@ -45,7 +45,8 @@ export const DashboardImpact: FC = () => {
     const megabytesToCo2EqInKilo = (totalInMo: number) =>
         (totalInMo * ECOLOGIC_IMPACT_FACTOR) / 1000;
 
-    const cO2EqKgToTrain = (cO2eqKg: number) => cO2eqKg * ECOLOGIC_TRAIN_FACTOR;
+    const cO2EqKgToTrain = (cO2eqKg: number) =>
+        cO2eqKg * ECOLOGIC_AIRPLANE_FACTOR;
 
     const computedImpactInMega = bytesToMegabytes(size);
     const cO2EqKgToDelete = Math.round(
@@ -55,6 +56,7 @@ export const DashboardImpact: FC = () => {
 
     return (
         <div className={style.dashboard__impact}>
+            <p>{t("dashboard.recap.title")}</p>
             <div className={style.dashboard__impact__inner}>
                 <DashboardImpactItem
                     img={"img/pictos/globe.png"}
@@ -64,7 +66,7 @@ export const DashboardImpact: FC = () => {
                 <DashboardImpactItem
                     img={"img/pictos/airplane.png"}
                     impactNumber={`${t(
-                        "dashboard.impact.ecologicImpactByTrain",
+                        "dashboard.impact.ecologicImpactByAirplane",
                         {
                             count: cO2EqKgByTrainInKm,
                         }
