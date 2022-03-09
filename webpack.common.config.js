@@ -38,7 +38,11 @@ module.exports =
             })
         );
 
-        if (isProd) {
+        const skipSentry =
+            process.env.SKIP_SENTRY_UPLOAD === 1 ||
+            process.env.SKIP_SENTRY_UPLOAD === "1";
+
+        if (isProd && !skipSentry) {
             config.devtool = "source-map";
             // TODO: enable source association by adding (not legacy) github integration to Sentry
             config.plugins.push(
