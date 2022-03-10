@@ -128,6 +128,8 @@
     "node": ">=16"
   },
   "devDependencies": {
+    "@octokit/graphql": "^4.8.0",
+    "@octokit/graphql-schema": "^10.73.0",
     "@playwright/test": "^1.17.2",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/exec": "^6.0.3",
