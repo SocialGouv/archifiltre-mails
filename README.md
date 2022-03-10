@@ -12,6 +12,8 @@
 yarn install
 ```
 
+**Ne pas oublier de copier le fichier `.env.dist` vers un `.env`.**
+
 ## Développement
 ### Installation des devtools (unix seulement)
 ```sh
