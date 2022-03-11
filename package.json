@@ -140,7 +140,7 @@
     "@testing-library/react": "^12.1.2",
     "@tsconfig/node16": "^1.0.2",
     "@types/d3": "^7.1.0",
-    "@types/eslint": "^7",
+    "@types/eslint": "^8",
     "@types/glob": "^7.2.0",
     "@types/jest": "^27.4.0",
     "@types/json2csv": "^5.0.3",
