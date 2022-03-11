@@ -1,7 +1,10 @@
 import { Use } from "@lsagetlethias/tstrait";
 import { ipcMain, ipcRenderer } from "electron";
+import { stat } from "fs/promises";
 
 import { IS_MAIN } from "../config";
+import { AppError } from "../lib/error/AppError";
+import { bytesToMegabytes } from "../utils";
 import { WaitableTrait } from "../utils/WaitableTrait";
 import { IsomorphicService } from "./ContainerModule";
 import { csvExporter } from "./exporters/CsvExporter";
@@ -9,6 +12,9 @@ import type { Exporter } from "./exporters/Exporter";
 import { jsonExporter } from "./exporters/JsonExporter";
 import { xlsxExporter } from "./exporters/XslxExporter";
 import { IsomorphicModule } from "./Module";
+import type { TrackerService } from "./TrackerModule";
+
+export class FileExporterError extends AppError {}
 
 const exporterTypes = ["csv", "json", "xlsx"] as const;
 export type ExporterType = typeof exporterTypes[number];
@@ -36,6 +42,10 @@ export class FileExporterModule extends IsomorphicModule {
 
     private _service?: FileExporterService;
 
+    constructor(private readonly trackerService: TrackerService) {
+        super();
+    }
+
     public async init(): Promise<void> {
         if (this.inited) {
             return;
@@ -55,6 +65,11 @@ export class FileExporterModule extends IsomorphicModule {
         return Promise.resolve();
     }
 
+    public async uninit(): Promise<void> {
+        this.inited = false;
+        return Promise.resolve();
+    }
+
     public get service(): FileExporterService {
         return (
             this._service ??
@@ -66,12 +81,20 @@ export class FileExporterModule extends IsomorphicModule {
 
     private readonly export: ExportFunction = async (type, obj, dest) => {
         if (!this.inited) {
-            throw new Error(
-                "[FileExporterService] Can't export to desired type as the module is not inited."
-            ); // TODO: proper ERROR management
+            throw new FileExporterError(
+                "Can't export to desired type as the module is not inited."
+            );
         }
-        if (IS_MAIN) await exporters[type].export(obj, dest);
-        else
+        if (IS_MAIN) {
+            await exporters[type].export(obj, dest);
+
+            const sizeRaw = (await stat(dest)).size;
+            this.trackerService.getProvider().track("Export Generated", {
+                size: bytesToMegabytes(sizeRaw, 2),
+                sizeRaw,
+                type,
+            });
+        } else
             await ipcRenderer.invoke(FILE_EXPORTER_EXPORT_EVENT, [
                 type,
                 obj,

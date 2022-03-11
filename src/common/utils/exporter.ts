@@ -1,6 +1,6 @@
 import { t } from "i18next";
 
-import type { PstExtractTables } from "../modules/pst-extractor/type";
+import type { PstEmail, PstExtractTables } from "../modules/pst-extractor/type";
 import type { SimpleObject } from "./type";
 
 /**
@@ -18,12 +18,14 @@ export const formatEmailTable = (
         ccEmail: t("exporter.table.cc.email"),
         ccName: t("exporter.table.cc.name"),
         contentText: t("exporter.table.content-text"),
+        elementPath: t("exporter.table.element-path"),
         fromEmail: t("exporter.table.from.email"),
         fromName: t("exporter.table.from.name"),
         id: t("exporter.table.id"),
         receivedDate: t("exporter.table.received-date"),
         sentTime: t("exporter.table.send-time"),
         subject: t("exporter.table.subject"),
+        tag: t("exporter.table.tag"),
         toEmail: t("exporter.table.to.email"),
         toName: t("exporter.table.to.name"),
     };
@@ -49,5 +51,28 @@ export const formatEmailTable = (
             .map((attachement) => attachement.filename)
             .join(","),
         [tKeys.contentText]: email.contentText,
+        [tKeys.tag]: email.tag,
+        [tKeys.elementPath]: email.elementPath,
     }));
 };
+
+const MAILS_TO_EXPORT = "mailsToExport";
+export const getMarkedTagForExport = (
+    deletedIDs: Set<string>,
+    id: string
+): string =>
+    [...deletedIDs].includes(id)
+        ? t("exporter.table.tag.delete")
+        : t("exporter.table.tag.untag");
+
+export const getMailsWithTag = (
+    emails: PstExtractTables["emails"],
+    deletedIds: Set<string>
+): PstExtractTables["emails"] =>
+    new Map<string, PstEmail[]>().set(
+        MAILS_TO_EXPORT,
+        [...emails.values()].flat().map((mail) => ({
+            ...mail,
+            tag: getMarkedTagForExport(deletedIds, mail.id),
+        }))
+    );

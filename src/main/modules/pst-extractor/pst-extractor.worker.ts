@@ -38,8 +38,8 @@ export type PstWorkerMessageType<
     TEvent extends PstWorkerEvent = PstWorkerEvent
 > = TEvent extends PstWorkerEvent
     ? {
-          event: TEvent;
           data: EventDataMapping[TEvent];
+          event: TEvent;
       }
     : never;
 
@@ -77,9 +77,9 @@ const getRecipientFromDisplay = (
  * WorkerData - Initial worker arguments
  */
 export interface PstWorkerData {
-    pstFilePath: string;
-    progressInterval?: number;
     depth?: number;
+    progressInterval?: number;
+    pstFilePath: string;
 }
 
 let starTime = Date.now();

@@ -9,8 +9,8 @@ import React, {
 import type { RouteName } from "../views";
 
 interface RouteContextInterface {
-    route: RouteName;
     changeRoute: (nextRoute: RouteName) => void;
+    route: RouteName;
 }
 
 const initialRouteState: RouteContextInterface = {

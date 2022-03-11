@@ -20,6 +20,8 @@ Les modules communs (présents dans common) sont par définition isomorphiques.
 - [UserConfigModule](../src/common/modules/UserConfigModule.ts) : charge la configuration utilisateur sauvegardée
 - [I18nModule](../src/common/modules/I18nModule.ts) : charge le moteur de traduction
 - [IpcModule](../src/common/modules/IpcModule.ts) : rend accessible des fonctionnalités `main` à travers le protocole IPC
+- [FileExporterModule](../src/common/modules/FileExporterModule.ts) : expose différents types d'`exporter` pour convertir des données dans un format de fichier choisi. (`json`, `csv`, `xlsx`, ...)
+- [TrackerModule](../src/common/modules/TrackerModule.ts) : expose le système de *tracking* configuré pour l'application. La configuration s'effectue dans le fichier `.env` en développement, et en variables d'environnement en production.
 
 **Main** :
 - [DevToolsModule](../src/main/modules/DevToolsModule.ts) : récupère et injecte les extensions de dev tools
@@ -37,6 +39,9 @@ Pour ajouter un menu, il suffit d'implémenter l'interface `ArchifiltreMailsMenu
 
 ### i18n
 Le `I18nModule` est un wrapper autour du package `i18next` permettant d'en exposer tout le moteur de traduction que ce soit dans le `main` ou dans le `renderer`. (cf [i18n](./i18n.md))
+
+### Tracking
+TODO
 
 ## ContainerModule et Services
 Le `ContainerModule` est responsable de regrouper, charger, et distribuer les services dans l'application. Il peut être considéré comme étant une `Map` où les clés sont les noms des services, et les valeurs les services eux mêmes. Au début de l'application, le container va essayer de d"*init* tous les services en parallèle (seulement si la méthode `init` est disponible ; un service pouvant aussi par exemple être une simple constante/valeur), une fois ce chargement effectué, il n'est plus possible d'ajouter de nouveaux services dans le container.  

@@ -1,7 +1,7 @@
 export interface ExtractOptions {
-    pstFilePath: string;
     depth?: number;
     noProgress?: boolean;
+    pstFilePath: string;
 }
 
 export type PstElementType =
@@ -13,19 +13,19 @@ export type PstElementType =
     | "rootFolder";
 
 export interface PstElement {
-    type: PstElementType;
     children?: PstElement[];
+    elementPath: string;
+    id: string;
+    name: string;
     other?: unknown[];
     size: number;
-    name: string;
-    id: string;
-    elementPath: string;
+    type: PstElementType;
 }
 
 export interface PstFolder extends PstElement {
-    type: "folder" | "rootFolder";
     emailCount: number;
     folderType: string;
+    type: "folder" | "rootFolder";
 }
 
 export const isPstFolder = (elt: PstElement): elt is PstFolder => {
@@ -33,39 +33,40 @@ export const isPstFolder = (elt: PstElement): elt is PstFolder => {
 };
 
 export interface PstContent extends PstFolder {
-    type: "rootFolder";
     children: PstFolder[];
+    type: "rootFolder";
 }
 
 export interface PstContact extends PstElement {
-    type: "contact";
-    name: string;
+    email: string;
     firstname: string;
     lastname: string;
-    email: string;
+    name: string;
+    type: "contact";
 }
 
 export interface PstEmailRecipient {
-    name: string;
     email?: string;
+    name: string;
 }
 
 export interface PstEmail extends PstElement {
-    type: "email";
+    attachementCount: number;
     attachements: PstAttachement[];
-    size: 1;
-    sentTime: Date | null;
-    receivedDate: Date | null;
-    from: PstEmailRecipient;
-    to: PstEmailRecipient[];
-    cc: PstEmailRecipient[];
     bcc: PstEmailRecipient[];
-    subject: string;
-    contentText: string;
+    cc: PstEmailRecipient[];
     contentHTML: string;
     contentRTF: string;
-    attachementCount: number;
+    contentText: string;
+    from: PstEmailRecipient;
     isFromMe: boolean;
+    receivedDate: Date | null;
+    sentTime: Date | null;
+    size: 1;
+    subject: string;
+    tag?: string;
+    to: PstEmailRecipient[];
+    type: "email";
 }
 
 export const isPstEmail = (elt: PstElement): elt is PstEmail => {
@@ -73,21 +74,21 @@ export const isPstEmail = (elt: PstElement): elt is PstEmail => {
 };
 
 export interface PstAttachement {
-    mimeType: string;
     filename: string;
     filesize: number;
+    mimeType: string;
 }
 
 /**
  * State object on each progress tick (one tick per extracted email).
  */
 export interface PstProgressState {
-    progress: boolean;
-    countTotal: number;
+    countAttachement: number;
     countEmail: number;
     countFolder: number;
-    countAttachement: number;
+    countTotal: number;
     elapsed: number;
+    progress: boolean;
 }
 
 /**

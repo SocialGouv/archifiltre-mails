@@ -1,2 +1,3 @@
 @function make-card-width($col: 1) {
-  @return (100 / 3) * $col; }
+  @return (100 / 3) * $col;
+}

@@ -18,10 +18,10 @@ import {
 
 interface BaseViewerObject<TId extends string> {
     id: TId;
+    ids: string[];
     name: string;
     size: number;
     value: string;
-    ids: string[];
 }
 
 export type ViewerObjectChild = Omit<BaseViewerObject<string>, "value"> &
@@ -143,7 +143,7 @@ export const createDomain = (
 export const getDomain = (element: string): string =>
     element.substring(element.indexOf("@"));
 
-const getMailTreshold = (
+const _getMailTreshold = (
     base: Map<string, [number, string[]]> | Record<string, [number, string[]]>
 ): number => {
     const maxMail = (
@@ -409,7 +409,8 @@ export const createMails = <TId extends string>(
             const { name, size, ...email } = value;
             return {
                 email,
-                id: randomUUID(),
+                id: value.id,
+                ids: [value.id],
                 name,
                 size,
                 value: name,

@@ -15,8 +15,8 @@ import style from "./Dashboard.module.scss";
 
 interface DashboardImpactItemProps {
     img: string;
-    impactNumber: string;
     impactInfo: string;
+    impactNumber: string;
 }
 const DashboardImpactItem: FC<DashboardImpactItemProps> = ({
     img,

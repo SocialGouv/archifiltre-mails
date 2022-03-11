@@ -49,6 +49,7 @@ export const pstExtractorService: PstExtractorService = {
     name: "PstExtractorService",
 
     onProgress(callback: ProgressCallback) {
+        ipcRenderer.removeAllListeners(PST_PROGRESS_EVENT);
         ipcRenderer.on(
             PST_PROGRESS_EVENT,
             (_event, ...[progressState]: [PstProgressState]) => {

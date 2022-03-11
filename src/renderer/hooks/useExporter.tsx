@@ -1,9 +1,10 @@
 import { useService } from "@common/modules/ContainerModule";
 import type { ExporterType } from "@common/modules/FileExporterModule";
-import { formatEmailTable } from "@common/utils/exporter";
+import { formatEmailTable, getMailsWithTag } from "@common/utils/exporter";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
+import { useImpactStore } from "../store/ImpactStore";
 import { usePstStore } from "../store/PSTStore";
 import { dialog } from "../utils/electron";
 
@@ -14,6 +15,7 @@ interface UseExporter {
 export const useExporter = (): UseExporter => {
     const fileExporterService = useService("fileExporterService");
     const { t } = useTranslation();
+    const { toDeleteIDs } = useImpactStore();
     const { extractTables } = usePstStore();
 
     const openSaveDialog = useCallback(
@@ -21,6 +23,11 @@ export const useExporter = (): UseExporter => {
             if (!fileExporterService || !extractTables?.emails) {
                 return;
             }
+
+            const mailsWithTags = getMailsWithTag(
+                extractTables.emails,
+                toDeleteIDs
+            );
 
             const dialogPath = await dialog.showSaveDialog({
                 filters: [
@@ -39,10 +46,10 @@ export const useExporter = (): UseExporter => {
                 return;
             }
 
-            const mails = formatEmailTable(extractTables.emails);
+            const mails = formatEmailTable(mailsWithTags);
             await fileExporterService.export(type, mails, dialogPath.filePath);
         },
-        [t, extractTables?.emails, fileExporterService]
+        [t, extractTables?.emails, fileExporterService, toDeleteIDs]
     );
 
     return {

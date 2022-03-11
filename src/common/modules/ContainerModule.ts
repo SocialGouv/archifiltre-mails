@@ -1,6 +1,7 @@
-import { IS_DEV } from "@common/config";
 import { useEffect, useState } from "react";
 
+import { IS_PACKAGED } from "../config";
+import { AppError } from "../lib/error/AppError";
 import type { UnknownMapping } from "../utils/type";
 import type {
     ReturnServiceType,
@@ -12,7 +13,17 @@ import type {
     // eslint-disable-next-line unused-imports/no-unused-imports -- Used in doc
     ServicesKeyType,
 } from "./container/type";
-import { IsomorphicModule } from "./Module";
+import { IsomorphicModule, ModuleError } from "./Module";
+
+export class ContainerError extends AppError {
+    constructor(
+        message: string,
+        public serviceName?: string,
+        previousError?: Error | unknown
+    ) {
+        super(message, previousError);
+    }
+}
 
 /**
  * An isomorphic service can be loaded both in main AND rederer processes.
@@ -41,8 +52,8 @@ export const isService = (service: unknown): service is Service => {
     const suppose = service as Service;
     return (
         "name" in suppose &&
-        "init" in suppose &&
-        typeof suppose.init === "function"
+        (typeof suppose.init === "function" ||
+            typeof suppose.uninit === "function")
     );
 };
 
@@ -59,8 +70,11 @@ class ContainerModule extends IsomorphicModule {
     private inited = false;
 
     public async init(): Promise<void> {
-        if (this.inited && !IS_DEV) {
-            throw new Error("ContainerModule has already been inited.");
+        if (this.inited && IS_PACKAGED()) {
+            throw new ModuleError(
+                "ContainerModule has already been inited.",
+                this
+            );
         }
 
         await Promise.all(
@@ -80,6 +94,28 @@ class ContainerModule extends IsomorphicModule {
         this.inited = true;
     }
 
+    public async uninit(): Promise<void> {
+        if (!this.inited && IS_PACKAGED()) {
+            throw new ModuleError("ContainerModule not yet inited.", this);
+        }
+
+        await Promise.all(
+            [...isomorphicServiceMap.values(), ...serviceMap.values()]
+                .map((service) => {
+                    console.warn(
+                        `[ContainerModule] ${
+                            (service as Service).name
+                        } unloading !`
+                    );
+                    if (isService(service)) {
+                        return service.uninit?.();
+                    }
+                })
+                .filter((promise) => promise)
+        );
+        this.inited = false;
+    }
+
     /**
      * Register a single service to be loaded.
      *
@@ -94,12 +130,13 @@ class ContainerModule extends IsomorphicModule {
         service?: ServiceConfigType<T>
     ): this {
         if (this.inited) {
-            if (IS_DEV) {
+            if (!IS_PACKAGED()) {
                 isomorphicServiceMap.clear();
                 serviceMap.clear();
             } else {
-                throw new Error(
-                    "Cannot register a service when the container is already inited."
+                throw new ContainerError(
+                    "Cannot register a service when the container is already inited.",
+                    name
                 );
             }
         }

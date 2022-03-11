@@ -1,3 +1,7 @@
+const webpackCommonConfig = require("./webpack.common.config");
+
+require("dotenv").config();
+
 module.exports =
     /** @param {import("webpack").Configuration} config */ function (config) {
         const styleRules = config.module.rules.filter((rule) =>
@@ -25,9 +29,5 @@ module.exports =
             }
         });
 
-        if (config.resolve) {
-            config.resolve.alias["@common"] = config.resolve.alias["common"];
-        }
-
-        return config;
+        return webpackCommonConfig(config);
     };

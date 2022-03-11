@@ -1,14 +1,15 @@
 import { IS_DEV } from "@common/config";
-import type { Module } from "@common/modules/Module";
 import { session } from "electron";
 import { existsSync } from "fs";
 import { join } from "path";
 
+import { MainModule } from "./MainModule";
+
 /**
  * Module to load wanted extensions to dev tools.
  */
-export class DevToolsModule implements Module {
-    async init(): Promise<void> {
+export class DevToolsModule extends MainModule {
+    public async init(): Promise<void> {
         if (IS_DEV) {
             const REACT_DEVTOOLS_PATH = join(
                 process.cwd(),
