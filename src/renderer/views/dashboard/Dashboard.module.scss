@@ -110,7 +110,7 @@ $dashboard-card-width: calc(50vw - 0.5rem);
 }
 
 .dashboard__actions__bar {
-  min-width: 300px;
+  min-width: 100px;
   height: $dashboard-actions-bar;
   display: flex;
   align-items: center;
@@ -140,25 +140,26 @@ $dashboard-card-width: calc(50vw - 0.5rem);
     width: auto;
 
     button {
-      height: 45px;
+      height: 95px;
       display: flex;
       align-items: center;
-      color: #fff;
+      flex-direction: column;
+      justify-content: center;
+      color: #000;
       font-size: 0.75rem;
       font-weight: 600;
-      background: #4991f7;
       border-radius: 10px;
       padding: 1rem;
 
       svg {
-        width: 15px;
-        margin-right: 0.75rem;
+        width: 30px;
+        margin: 0 0 0.5rem;
       }
     }
   }
 
   .dashboard__actions__exporter {
-    width: 110px;
+    width: 80px;
     position: absolute;
     display: flex;
     justify-content: center;
@@ -170,7 +171,7 @@ $dashboard-card-width: calc(50vw - 0.5rem);
     z-index: 999;
     border-radius: 10px;
     color: #fff;
-    background: #4991f7;
+    background: #0a2243fa;
     opacity: 0;
     pointer-events: none;
     transition: opacity 100ms ease;
@@ -305,12 +306,25 @@ $dashboard-card-width: calc(50vw - 0.5rem);
   border-bottom: solid 1px #e7e7e7;
   width: 100%;
   align-items: center;
+  position: relative;
+
+
+  &__color {
+    width: 12px;
+    height: 28px;
+    position: absolute;
+    top: 2.45rem;
+    left: 2.05rem;
+    background: #79a46f;
+    border-radius: 3px;
+  }
 
   > p {
     font-size: 14px;
     font-weight: 600;
     text-align: center;
-    margin: 0 50px;
+    margin: 0 3.5rem;
+    font-size: 1.2rem;
   }
 
   .dashboard__impact__inner { 
@@ -320,14 +334,14 @@ $dashboard-card-width: calc(50vw - 0.5rem);
     align-items: center;
     height: 100%;
     justify-content: space-between;
-    padding-right: 50px;
   }
 
 
   .dashboard__impact__item {
     display: flex;
     align-items: center;
-    margin-right: 1rem;
+    justify-content: center;
+    flex-grow: 1;
 
     .dashboard__impact__item__picto {
       margin-right: 1.5rem;

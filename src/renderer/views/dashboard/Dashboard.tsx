@@ -15,8 +15,8 @@ export const Dashboard: React.FC = () => {
     return (
         <div className={style.dashboard}>
             <div className={style.dashboard__header}>
-                <DashboardActions />
                 <DashboardImpact />
+                <DashboardActions />
             </div>
             <div className={style.dashboard__cards}>
                 <DashboardViewer />

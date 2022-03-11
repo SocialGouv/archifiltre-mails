@@ -202,37 +202,21 @@ export const FilterPicto: React.FC = () => (
 );
 export const ExportPicto: React.FC = () => (
     <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
         height="24"
         viewBox="0 0 24 24"
-        width="24"
-        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
     >
         <path
-            d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"
-            fill="none"
-            stroke="#fff"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
+            d="M17 10.5C17.2652 10.5 17.5196 10.6054 17.7071 10.7929C17.8946 10.9804 18 11.2348 18 11.5V20.5C18 20.7652 17.8946 21.0196 17.7071 21.2071C17.5196 21.3946 17.2652 21.5 17 21.5H7C6.73478 21.5 6.48043 21.3946 6.29289 21.2071C6.10536 21.0196 6 20.7652 6 20.5V11.5C6 11.2348 6.10536 10.9804 6.29289 10.7929C6.48043 10.6054 6.73478 10.5 7 10.5H17Z"
+            fill="#66E1FF"
         />
-        <polyline
-            fill="none"
-            points="16 6 12 2 8 6"
-            stroke="#fff"
+        <path
+            d="M7.5 5L12 0.5L16.5 5M15 8.5H19C19.2652 8.5 19.5196 8.60536 19.7071 8.79289C19.8946 8.98043 20 9.23478 20 9.5V22.5C20 22.7652 19.8946 23.0196 19.7071 23.2071C19.5196 23.3946 19.2652 23.5 19 23.5H5C4.73478 23.5 4.48043 23.3946 4.29289 23.2071C4.10536 23.0196 4 22.7652 4 22.5V9.5C4 9.23478 4.10536 8.98043 4.29289 8.79289C4.48043 8.60536 4.73478 8.5 5 8.5H9H15ZM12 13.5V0.5V13.5Z"
+            stroke="#191919"
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeWidth="2"
-        />
-        <line
-            fill="none"
-            stroke="#fff"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            x1="12"
-            x2="12"
-            y1="2"
-            y2="15"
         />
     </svg>
 );

@@ -56,6 +56,7 @@ export const DashboardImpact: FC = () => {
 
     return (
         <div className={style.dashboard__impact}>
+            <div className={style.dashboard__impact__color} />
             <p>{t("dashboard.recap.title")}</p>
             <div className={style.dashboard__impact__inner}>
                 <DashboardImpactItem
