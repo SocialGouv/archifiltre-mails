@@ -106,7 +106,7 @@
   "exporter.table.received-date": "Date and time of reception",
   "exporter.table.send-time": "Date and time of sending",
   "exporter.table.subject": "Subject of the mail",
-  "exporter.table.tag": "",
+  "exporter.table.tag": "Element tag",
   "exporter.table.tag.delete": "to delete",
   "exporter.table.tag.untag": "unmarked",
   "exporter.table.to.email": "Email addresses of recipient(s) A",

@@ -1,7 +1,6 @@
 import { t } from "i18next";
 
 import type { PstEmail, PstExtractTables } from "../modules/pst-extractor/type";
-import { MAILS_TO_EXPORT } from "./../../renderer/utils/constants";
 import type { SimpleObject } from "./type";
 
 /**
@@ -57,6 +56,7 @@ export const formatEmailTable = (
     }));
 };
 
+const MAILS_TO_EXPORT = "mailsToExport";
 export const getMarkedTagForExport = (
     deletedIDs: Set<string>,
     id: string
