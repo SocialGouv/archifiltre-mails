@@ -1,9 +1,8 @@
 import { IS_E2E } from "@common/config";
 import type { I18nService } from "@common/modules/I18nModule";
+import type { TrackerService } from "@common/modules/TrackerModule";
 import type { UserConfigService } from "@common/modules/UserConfigModule";
-import type { TrackerService } from "@common/tracker/TrackerModule";
 import { version } from "@common/utils/package";
-import type { PubSub } from "@event/PubSub";
 import { dialog } from "electron";
 import type { ProgressInfo, UpdateInfo } from "electron-updater";
 import { autoUpdater } from "electron-updater";
@@ -21,8 +20,7 @@ export class AppModule extends MainModule {
         private readonly consoleToRendererService: ConsoleToRendererService,
         private readonly i18nService: I18nService,
         private readonly userConfigService: UserConfigService,
-        private readonly trackerService: TrackerService,
-        private readonly pubSub: PubSub
+        private readonly trackerService: TrackerService
     ) {
         super();
     }

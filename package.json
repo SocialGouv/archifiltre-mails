@@ -43,7 +43,6 @@
     },
     "whiteListedModules": [
       "@datapunt/matomo-tracker-js",
-      "@datapunt/matomo-tracker-react",
       "@lsagetlethias/tstrait",
       "@nivo/circle-packing",
       "@nivo/core",
@@ -186,7 +185,6 @@
   },
   "dependencies": {
     "@datapunt/matomo-tracker-js": "^0.5.1",
-    "@datapunt/matomo-tracker-react": "^0.5.1",
     "@lsagetlethias/tstrait": "^2.0.2",
     "@nivo/circle-packing": "^0.79.0",
     "@nivo/core": "^0.79.0",

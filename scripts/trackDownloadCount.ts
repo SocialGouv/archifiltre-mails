@@ -73,7 +73,7 @@ void (async () => {
         batch.push(...(releases.nodes ?? []));
 
         if (releases.pageInfo.hasNextPage) {
-            await fetchReleases(releases.pageInfo.endCursor as string);
+            await fetchReleases(releases.pageInfo.endCursor!);
         }
     }
 

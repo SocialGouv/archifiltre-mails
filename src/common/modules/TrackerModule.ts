@@ -1,12 +1,12 @@
 import type { PubSub } from "../lib/event/PubSub";
-import { IsomorphicService } from "../modules/ContainerModule";
-import { IsomorphicModule } from "../modules/Module";
-import type { UserConfigService } from "../modules/UserConfigModule";
-import { DelegatingProvider } from "./provider/DelegatingProvider";
-import { NoopProvider } from "./provider/NoopProvider";
-import type { TrackerProvider } from "./provider/TrackerProvider";
-import type { DelegatingName, ProviderType } from "./provider/utils";
-import { providers } from "./provider/utils";
+import { DelegatingProvider } from "../tracker/provider/DelegatingProvider";
+import { NoopProvider } from "../tracker/provider/NoopProvider";
+import type { TrackerProvider } from "../tracker/provider/TrackerProvider";
+import type { DelegatingName, ProviderType } from "../tracker/provider/utils";
+import { providers } from "../tracker/provider/utils";
+import { IsomorphicService } from "./ContainerModule";
+import { IsomorphicModule } from "./Module";
+import type { UserConfigService } from "./UserConfigModule";
 
 /**
  * This is the main entry point for the tracking system.

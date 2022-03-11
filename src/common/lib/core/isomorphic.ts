@@ -5,8 +5,8 @@ import { I18nModule } from "../../modules/I18nModule";
 import { IpcModule } from "../../modules/IpcModule";
 import type { Module } from "../../modules/Module";
 import { IsomorphicModuleFactory } from "../../modules/Module";
+import { TrackerModule } from "../../modules/TrackerModule";
 import { UserConfigModule } from "../../modules/UserConfigModule";
-import { TrackerModule } from "../../tracker/TrackerModule";
 import type { UnknownMapping } from "../../utils/type";
 import { PubSub } from "../event/PubSub";
 

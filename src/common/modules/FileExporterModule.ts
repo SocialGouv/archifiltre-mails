@@ -4,7 +4,6 @@ import { stat } from "fs/promises";
 
 import { IS_MAIN } from "../config";
 import { AppError } from "../lib/error/AppError";
-import type { TrackerService } from "../tracker/TrackerModule";
 import { bytesToMegabytes } from "../utils";
 import { WaitableTrait } from "../utils/WaitableTrait";
 import { IsomorphicService } from "./ContainerModule";
@@ -13,6 +12,7 @@ import type { Exporter } from "./exporters/Exporter";
 import { jsonExporter } from "./exporters/JsonExporter";
 import { xlsxExporter } from "./exporters/XslxExporter";
 import { IsomorphicModule } from "./Module";
+import type { TrackerService } from "./TrackerModule";
 
 export class FileExporterError extends AppError {}
 

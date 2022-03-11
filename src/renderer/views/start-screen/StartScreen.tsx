@@ -33,8 +33,6 @@ export const StartScreen: React.FC = () => {
         }
     }, [pstFile, changeRoute]);
 
-    // useTrackPstDropped();
-
     const progressClassName = pstProgress.elapsed
         ? `${style.startscreen__progress} ${style.active}`
         : `${style.startscreen__progress}`;
@@ -46,25 +44,23 @@ export const StartScreen: React.FC = () => {
             <div className={progressClassName}>
                 <ul>
                     <li>
-                        <span>{t("startscreen.importInfo.emails")}:</span>
+                        <span>{t("startscreen.importInfo.emails")}</span>
                         <span>{pstProgress.countEmail}</span>
                     </li>
                     <li>
-                        <span>{t("startscreen.importInfo.folders")}:</span>
+                        <span>{t("startscreen.importInfo.folders")}</span>
                         <span>{pstProgress.countFolder}</span>
                     </li>
                     <li>
-                        <span>
-                            {t("startscreen.importInfo.attachedCount")}:
-                        </span>
+                        <span>{t("startscreen.importInfo.attachedCount")}</span>
                         <span>{pstProgress.countAttachement}</span>
                     </li>
                     <li>
-                        <span>{t("startscreen.importInfo.totalFiles")}:</span>
+                        <span>{t("startscreen.importInfo.totalFiles")}</span>
                         <span>{pstProgress.countTotal}</span>
                     </li>
                     <li>
-                        <span>{t("startscreen.importInfo.totalTime")}:</span>
+                        <span>{t("startscreen.importInfo.totalTime")}</span>
                         <span>
                             {toDecimalsFloat(pstProgress.elapsed / 1000, 2)}s
                         </span>

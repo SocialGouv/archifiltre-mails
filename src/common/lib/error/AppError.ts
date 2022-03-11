@@ -8,7 +8,7 @@ export class AppError extends Error {
 
     public readonly isDev = IS_PACKAGED();
 
-    public isMain = IS_MAIN;
+    public readonly isMain = IS_MAIN;
 
     constructor(message: string, public previousError?: Error | unknown) {
         super(message);

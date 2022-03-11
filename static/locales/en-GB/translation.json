@@ -107,10 +107,10 @@
   "exporter.table.subject": "Subject of the mail",
   "exporter.table.to.email": "Email addresses of recipient(s) A",
   "exporter.table.to.name": "Name of recipient(s) A",
-  "startscreen.importInfo.attachedCount": "Attached count",
-  "startscreen.importInfo.emails": "Emails",
-  "startscreen.importInfo.folders": "Folders",
+  "startscreen.importInfo.attachedCount": "Attached count:",
+  "startscreen.importInfo.emails": "Emails:",
+  "startscreen.importInfo.folders": "Folders:",
   "startscreen.importInfo.seconds": "{{seconds}}sec",
-  "startscreen.importInfo.totalFiles": "Total",
-  "startscreen.importInfo.totalTime": "Total time"
+  "startscreen.importInfo.totalFiles": "Total:",
+  "startscreen.importInfo.totalTime": "Total time:"
 }

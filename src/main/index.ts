@@ -97,8 +97,7 @@ app.on("ready", async () => {
             consoleToRendererService,
             containerModule.get("i18nService"),
             containerModule.get("userConfigService"),
-            trackerService,
-            containerModule.get("pubSub")
+            trackerService
         ),
         new DevToolsModule(),
         new PstExtractorModule(containerModule.get("userConfigService")),
