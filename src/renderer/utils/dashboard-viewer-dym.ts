@@ -18,10 +18,10 @@ import {
 
 interface BaseViewerObject<TId extends string> {
     id: TId;
+    ids: string[];
     name: string;
     size: number;
     value: string;
-    ids: string[];
 }
 
 export type ViewerObjectChild = Omit<BaseViewerObject<string>, "value"> &

@@ -111,10 +111,10 @@
   "exporter.table.tag.untag": "non marqué",
   "exporter.table.to.email": "Adresses mails du ou des destinataire A",
   "exporter.table.to.name": "Noms du ou des destinataire A",
-  "startscreen.importInfo.attachedCount": "Pièces jointes",
-  "startscreen.importInfo.emails": "Emails",
-  "startscreen.importInfo.folders": "Dossiers",
+  "startscreen.importInfo.attachedCount": "Pièces jointes :",
+  "startscreen.importInfo.emails": "Emails :",
+  "startscreen.importInfo.folders": "Dossiers :",
   "startscreen.importInfo.seconds": "{{seconds}}s",
-  "startscreen.importInfo.totalFiles": "Total",
-  "startscreen.importInfo.totalTime": "Temps total (en secondes)"
+  "startscreen.importInfo.totalFiles": "Total :",
+  "startscreen.importInfo.totalTime": "Temps total :"
 }

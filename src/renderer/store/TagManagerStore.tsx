@@ -1,3 +1,6 @@
+import { useService } from "@common/modules/ContainerModule";
+import type { TrackAppEventProps } from "@common/tracker/type";
+import { bytesToMegabytes } from "@common/utils";
 import type { ComputedDatum } from "@nivo/circle-packing";
 import { atom, useAtom } from "jotai/index";
 import type { SetStateAction } from "react";
@@ -9,16 +12,16 @@ import { usePstStore } from "./PSTStore";
 
 type HoveredNode = ComputedDatum<ViewerObject<string>>;
 export interface UseTagManagerStore {
-    markedToDelete: string[];
-    setMarkedToDelete: (update: SetStateAction<string[]>) => void;
-    markedToKeep: string[];
-    setMarkedToKeep: (update: SetStateAction<string[]>) => void;
-    hoveredNode: HoveredNode | null;
-    setHoveredNode: (update: SetStateAction<HoveredNode | null>) => void;
-    addMarkedToDelete: () => void;
-    addMarkedToKeep: () => void;
     addChildrenMarkedToDelete: (idsToDelete: string[]) => void;
     addChildrenMarkedToKeep: (idsToKeep: string[]) => void;
+    addMarkedToDelete: () => void;
+    addMarkedToKeep: () => void;
+    hoveredNode: HoveredNode | null;
+    markedToDelete: string[];
+    markedToKeep: string[];
+    setHoveredNode: (update: SetStateAction<HoveredNode | null>) => void;
+    setMarkedToDelete: (update: SetStateAction<string[]>) => void;
+    setMarkedToKeep: (update: SetStateAction<string[]>) => void;
 }
 
 const markedToDeleteAtom = atom<string[]>([]);
@@ -32,6 +35,29 @@ export const useTagManagerStore = (): UseTagManagerStore => {
     const { extractTables } = usePstStore();
     const { updateToDeleteImpact } = useImpactStore(
         extractTables?.attachements
+    );
+    const tracker = useService("trackerService")?.getProvider();
+    const trackTag = useCallback(
+        (
+            ids: string[],
+            markType: TrackAppEventProps["Feat(5.0) Element Marked"]["markType"]
+        ) => {
+            let sizeRaw = 0;
+            extractTables?.attachements.forEach((attachments, emailUuid) => {
+                if (ids.includes(emailUuid)) {
+                    sizeRaw += attachments.reduce(
+                        (acc, attachment) => acc + attachment.filesize,
+                        0
+                    );
+                }
+            });
+            tracker?.track("Feat(5.0) Element Marked", {
+                markType,
+                size: bytesToMegabytes(sizeRaw),
+                sizeRaw,
+            });
+        },
+        [extractTables?.attachements, tracker]
     );
 
     // DELETE LOGIC
@@ -50,6 +76,7 @@ export const useTagManagerStore = (): UseTagManagerStore => {
         setMarkedToDelete(updatedMarkedToDelete);
 
         updateToDeleteImpact(hoveredNode.data.ids, "add");
+        trackTag(hoveredNode.data.ids, "delete");
     }, [
         hoveredNode,
         markedToDelete,
@@ -57,6 +84,7 @@ export const useTagManagerStore = (): UseTagManagerStore => {
         updateToDeleteImpact,
         setMarkedToDelete,
         setMarkedToKeep,
+        trackTag,
     ]);
 
     const addChildrenMarkedToDelete = (idsToDelete: string[]) => {
@@ -86,6 +114,7 @@ export const useTagManagerStore = (): UseTagManagerStore => {
         ];
         setMarkedToKeep(updatedMarkedToKeep);
         updateToDeleteImpact(hoveredNode.data.ids, "delete");
+        trackTag(hoveredNode.data.ids, "keep");
     }, [
         hoveredNode,
         markedToDelete,
@@ -93,6 +122,7 @@ export const useTagManagerStore = (): UseTagManagerStore => {
         updateToDeleteImpact,
         setMarkedToDelete,
         setMarkedToKeep,
+        trackTag,
     ]);
 
     const addChildrenMarkedToKeep = (idsToKeep: string[]) => {

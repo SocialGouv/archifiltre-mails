@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: 0 1 * * 1-5 # every night before week day, at 1pm on dev
+    - cron: 0 1 * * 1-5 # every night before week day, at 1am on dev
 
 env:
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1

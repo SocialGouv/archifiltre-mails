@@ -3,7 +3,6 @@ import { _electron as electron, expect, test } from "@playwright/test";
 import path from "path";
 
 test.describe("App e2e", () => {
-    // eslint-disable-next-line @typescript-eslint/init-declarations
     let electronApp: ElectronApplication, win: Page;
     test.beforeEach(async () => {
         const main = path.resolve(

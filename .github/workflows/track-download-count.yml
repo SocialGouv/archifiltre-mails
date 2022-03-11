@@ -1,0 +1,21 @@
+name: Track Download Count
+on:
+  schedule:
+    - cron: 0 22 * * * # every night at 10pm
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: ./.github/actions/setup-node
+      - name: Yarn install
+        run: yarn --frozen-lockfile --perfer-offline
+      - name: Run track
+        run: yarn ts-node scripts/trackDownloadCount.ts
+        env:
+          TRACKER_POSTHOG_URL: ${{ secrets.TRACKER_POSTHOG_URL }}
+          TRACKER_POSTHOG_API_KEY: ${{ secrets.TRACKER_POSTHOG_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

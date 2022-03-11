@@ -13,7 +13,6 @@ const {
 } = COLORS;
 
 interface CardProps {
-    title: string;
     className?: string;
     color?:
         | typeof CARD_LABEL_BLUE
@@ -21,6 +20,7 @@ interface CardProps {
         | typeof CARD_LABEL_GREY
         | typeof CARD_LABEL_ORANGE
         | typeof CARD_LABEL_PURPLE;
+    title: string;
 }
 
 export const Card: FC<CardProps> = ({

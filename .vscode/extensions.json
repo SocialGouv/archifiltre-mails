@@ -4,6 +4,7 @@
     "editorconfig.editorconfig",
     "dbaeumer.vscode-eslint",
     "clinyong.vscode-css-modules",
+    "stylelint.vscode-stylelint",
     "lokalise.i18n-ally"
   ],
   "unwantedRecommendations": [

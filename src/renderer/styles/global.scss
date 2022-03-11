@@ -1,6 +1,7 @@
-@use "./font";
-@use "./column";
-@import "./colors";
+@use './font';
+@use './column';
+
+@import './colors';
 
 * {
   box-sizing: border-box;
@@ -13,10 +14,10 @@ html {
 }
 
 main {
-  width: 100vw;
-  height: 100vh;
   display: flex;
+  height: 100vh;
   overflow: hidden;
+  width: 100vw;
 }
 
 h1,
@@ -31,10 +32,10 @@ a {
 }
 
 button {
-  border: 0;
   background: none;
-  cursor: pointer;
+  border: 0;
   color: $color-text;
+  cursor: pointer;
 }
 
 ul {
@@ -60,7 +61,7 @@ li {
 }
 
 .label {
-  font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: 11px 'Helvetica Neue', Helvetica, Arial, sans-serif;
   text-anchor: middle;
   text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
 }

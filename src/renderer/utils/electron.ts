@@ -1,4 +1,4 @@
-import { ipcRenderer } from "@common/ipc";
+import { ipcRenderer } from "@common/lib/ipc";
 import { notImplemented } from "@common/utils";
 import type { Dialog, Shell } from "electron";
 
