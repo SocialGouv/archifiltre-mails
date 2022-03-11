@@ -82,7 +82,7 @@
       },
       {
         "from": "dist/main/",
-        "to": "/",
+        "to": "./",
         "filter": [
           "preload.js"
         ]
