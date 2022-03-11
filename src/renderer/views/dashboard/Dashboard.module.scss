@@ -6,21 +6,19 @@ $dashboard-card-padding: 2rem 3rem;
 
 $dashboard-card-width: calc(50vw - 0.5rem);
 
-
-
 .dashboard {
   width: 100%;
 }
 
-
 .dashboard__cards {
-  height: calc(100% - (75px + 2rem));
   display: flex;
+  height: calc(100% - (75px + 2rem));
   position: relative;
 
   >:nth-child(1) {
-    width: $dashboard-card-width;
     height: calc(100% - 1.25rem);
+    width: $dashboard-card-width;
+
     :first-child {
       margin: 0 0 2rem;
     }
@@ -28,26 +26,25 @@ $dashboard-card-width: calc(50vw - 0.5rem);
 
   .dashboard__infos {
     position: absolute;
-    width: $dashboard-card-width;
     right: 0;
     top: 0;
+    width: $dashboard-card-width;
+
     >:nth-child(1) {
       position: relative;
     }
-  
+
     >:nth-child(2) {
-      position: relative;
-      overflow: scroll;
       height: 500px;
+      overflow: scroll;
+      position: relative;
     }
 
     >:nth-child(3) {
-      position: relative;
       max-height: 250px;
+      position: relative;
     }
   }
-
-
 }
 
 .dashboard__header {
@@ -56,8 +53,9 @@ $dashboard-card-width: calc(50vw - 0.5rem);
 }
 
 .dashboard__select {
-  width: 100%;
   height: 100%;
+  width: 100%;
+
   .dashboard__select__item  {
     margin: 0 0 1rem;
 
@@ -65,6 +63,7 @@ $dashboard-card-width: calc(50vw - 0.5rem);
       font-size: 0.75rem;
     }
   }
+
   .dashboard__select__info  {
     font-weight: 300;
   }
@@ -80,17 +79,17 @@ $dashboard-card-width: calc(50vw - 0.5rem);
   flex-wrap: wrap;
 
   .dashboard__recap__item {
-    width: 50%;
     display: flex;
     margin: 0 0 0.5rem;
+    width: 50%;
 
     .dashboard__recap__picto {
-      width: 50px;
-      height: 50px;
-      display: flex;
-      justify-content: center;
       align-items: center;
+      display: flex;
+      height: 50px;
+      justify-content: center;
       margin-right: 1rem;
+      width: 50px;
 
       svg {
         stroke-width: 1.5px;
@@ -101,6 +100,7 @@ $dashboard-card-width: calc(50vw - 0.5rem);
       span {
         display: table;
         font-size: 0.8rem;
+
         &:first-child {
           font-weight: 600;
         }
@@ -110,29 +110,29 @@ $dashboard-card-width: calc(50vw - 0.5rem);
 }
 
 .dashboard__actions__bar {
-  min-width: 100px;
-  height: $dashboard-actions-bar;
-  display: flex;
   align-items: center;
-  justify-content: center;
   background: $background-color-white;
   border-bottom: solid 1px #e7e7e7;
   border-right: solid 1px #e7e7e7;
+  display: flex;
+  height: $dashboard-actions-bar;
+  justify-content: center;
+  min-width: 100px;
 
   .dashboard__actions__search {
-    min-width: 280px;
-    height: 45px;
-    display: flex;
     align-items: center;
-    border-radius: 10px;
     background: #f5f4f4;
+    border-radius: 10px;
     color: #ccc;
+    display: flex;
+    height: 45px;
     margin-left: 30px;
+    min-width: 280px;
     padding-left: 1rem;
 
     svg {
-      width: 13px;
       margin-right: 0.5rem;
+      width: 13px;
     }
   }
 
@@ -140,47 +140,48 @@ $dashboard-card-width: calc(50vw - 0.5rem);
     width: auto;
 
     button {
-      height: 95px;
-      display: flex;
       align-items: center;
-      flex-direction: column;
-      justify-content: center;
+      border-radius: 10px;
       color: #000;
+      display: flex;
+      flex-direction: column;
       font-size: 0.75rem;
       font-weight: 600;
-      border-radius: 10px;
+      height: 95px;
+      justify-content: center;
       padding: 1rem;
 
       svg {
-        width: 30px;
         margin: 0 0 0.5rem;
+        width: 30px;
       }
     }
   }
 
   .dashboard__actions__exporter {
-    width: 80px;
-    position: absolute;
-    display: flex;
-    justify-content: center;
     align-items: center;
-    margin: 0.3rem 0 0;
-    padding: 1rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    z-index: 999;
+    background: #0a2243fa;
     border-radius: 10px;
     color: #fff;
-    background: #0a2243fa;
+    display: flex;
+    font-size: 0.75rem;
+    font-weight: 600;
+    justify-content: center;
+    margin: 0.3rem 0 0;
     opacity: 0;
+    padding: 1rem;
     pointer-events: none;
+    position: absolute;
     transition: opacity 100ms ease;
+    width: 80px;
+    z-index: 999;
 
     &.active {
       display: flex;
       opacity: 1;
       pointer-events: inherit;
     }
+
     li {
       cursor: pointer;
       text-align: center;
@@ -195,32 +196,30 @@ $dashboard-card-width: calc(50vw - 0.5rem);
 .dashboard__viewer {
   min-width: 50%;
 
-
-
   .dashboard__viewer__breadcrumb {
-    height: $dashboard-breadcrumb-height;
-    display: flex;
     align-items: center;
-    margin: 0 0 2rem;
+    display: flex;
     font-size: 0.8rem;
+    height: $dashboard-breadcrumb-height;
+    margin: 0 0 2rem;
 
     .dashboard__viewer__breadcrumb__item__level {
       font-weight: 600;
     }
 
     .dashboard__viewer__breadcrumb__item {
-      position: relative;
       margin-right: 22.5px;
+      position: relative;
 
       &:not(:last-child) {
         color: #aaa;
 
         &::after {
-          content: ">";
-          position: absolute;
-          top: 1px;
-          right: -12.5px;
+          content: '>';
           font-size: 10px;
+          position: absolute;
+          right: -12.5px;
+          top: 1px;
         }
       }
     }
@@ -228,18 +227,19 @@ $dashboard-card-width: calc(50vw - 0.5rem);
 }
 
 .dashboard__informations {
-
   &__wrapper {
     display: flex;
-    flex-wrap: wrap;
     flex-direction: column;
+    flex-wrap: wrap;
     justify-content: space-between;
 
     &__mail {
       width: 100%;
+
       > div {
         margin: 0 0 0.4rem;
       }
+
       span {
         display: table;
       }
@@ -248,24 +248,27 @@ $dashboard-card-width: calc(50vw - 0.5rem);
     &__folder {
       display: flex;
       justify-content: space-between;
+
       &__item {
-        padding: 15px;
         border: solid 2px;
         border-radius: 10px;
-        width: 45%;
         min-height: 250px;
+        padding: 15px;
+        width: 45%;
 
         div {
           margin: 0 0 1rem;
         }
+
         &:first-child {
-          border-color: #bcd1ff
+          border-color: #bcd1ff;
         }
 
         &:last-child {
-          border-color: rgb(31, 120, 180);
+          border-color: rgb(31 120 180);
         }
       }
+
       span {
         display: table;
       }
@@ -273,27 +276,27 @@ $dashboard-card-width: calc(50vw - 0.5rem);
   }
 
   strong {
-    margin-right: 5px;
-    font-weight: 600;
     font-size: 14px;
+    font-weight: 600;
+    margin-right: 5px;
   }
 
   &__tag {
-    width: 75%;
     display: flex;
     justify-content: space-between;
     margin: 0 auto;
+    width: 75%;
+
     &__item {
-      width: 30%;
-      height: 35px;
-      border-radius: 35px;
-      display: flex;
-      justify-content: center;
       align-items: center;
       background-color: #4991f745;
+      border-radius: 35px;
+      display: flex;
+      height: 35px;
+      justify-content: center;
+      width: 30%;
 
-
-      &[data-tag="true"] {
+      &[data-tag='true'] {
         background-color: #4991f7;
       }
     }
@@ -301,47 +304,45 @@ $dashboard-card-width: calc(50vw - 0.5rem);
 }
 
 .dashboard__impact {
-  background: #fcfbfb;
-  display: flex;
-  border-bottom: solid 1px #e7e7e7;
-  width: 100%;
   align-items: center;
+  background: #fcfbfb;
+  border-bottom: solid 1px #e7e7e7;
+  display: flex;
   position: relative;
-
+  width: 100%;
 
   &__color {
-    width: 12px;
-    height: 28px;
-    position: absolute;
-    top: 2.45rem;
-    left: 2.05rem;
     background: #79a46f;
     border-radius: 3px;
+    height: 28px;
+    left: 2.05rem;
+    position: absolute;
+    top: 2.45rem;
+    width: 12px;
   }
 
   > p {
     font-size: 14px;
-    font-weight: 600;
-    text-align: center;
-    margin: 0 3.5rem;
     font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 3.5rem;
+    text-align: center;
   }
 
-  .dashboard__impact__inner { 
-    max-width: 860px;
-    width: 75%;
-    display: flex;
+  .dashboard__impact__inner {
     align-items: center;
+    display: flex;
     height: 100%;
     justify-content: space-between;
+    max-width: 860px;
+    width: 75%;
   }
 
-
   .dashboard__impact__item {
-    display: flex;
     align-items: center;
-    justify-content: center;
+    display: flex;
     flex-grow: 1;
+    justify-content: center;
 
     .dashboard__impact__item__picto {
       margin-right: 1.5rem;
@@ -350,6 +351,7 @@ $dashboard-card-width: calc(50vw - 0.5rem);
         width: 24px;
       }
     }
+
     .dashboard__impact__item__infos {
       span {
         display: table;
@@ -367,7 +369,7 @@ $dashboard-card-width: calc(50vw - 0.5rem);
 
 .dashboard__mail {
   div {
-    overflow: scroll;
     max-height: 100px;
+    overflow: scroll;
   }
 }
