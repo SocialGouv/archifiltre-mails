@@ -13,8 +13,8 @@ import type { FolderListItem } from "../../utils/dashboard-recap";
 import style from "./OwnerFinder.module.scss";
 
 export interface OwnerFinderBoardProps {
-    title: string;
     list: FolderListItem[];
+    title: string;
     type: SynthesisType;
 }
 

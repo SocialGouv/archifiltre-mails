@@ -7,13 +7,13 @@ import type { SetStateAction } from "react";
 
 export interface UsePstStore {
     deletedFolder: string;
-    setDeletedFolder: (update: SetStateAction<string>) => void;
-    pstFile: PstContent | undefined;
-    setPstFile: (update: SetStateAction<PstContent | undefined>) => void;
     extractTables: PstExtractTables | undefined;
+    pstFile: PstContent | undefined;
+    setDeletedFolder: (update: SetStateAction<string>) => void;
     setExtractTables: (
         update: SetStateAction<PstExtractTables | undefined>
     ) => void;
+    setPstFile: (update: SetStateAction<PstContent | undefined>) => void;
 }
 
 const deletedFolderAtom = atom("");

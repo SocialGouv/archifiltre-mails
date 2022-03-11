@@ -1,15 +1,18 @@
 # Mails par Archifiltre
-[![codecov](https://codecov.io/gh/SocialGouv/archifiltre-mails/branch/main/graph/badge.svg?token=JPCHQWKTKZ)](https://codecov.io/gh/SocialGouv/archifiltre-mails)
+`dev`: [![codecov](https://codecov.io/gh/SocialGouv/archifiltre-mails/branch/dev/graph/badge.svg?token=JPCHQWKTKZ)](https://codecov.io/gh/SocialGouv/archifiltre-mails)  
+`main`: [![codecov](https://codecov.io/gh/SocialGouv/archifiltre-mails/branch/main/graph/badge.svg?token=JPCHQWKTKZ)](https://codecov.io/gh/SocialGouv/archifiltre-mails)
 
 
 <p align="center">
-    <img src="static/img/mails_logo.png" alt="logo" width="500">
+    <img src="static/img/logo.png" alt="logo" width="500">
 </p>
 
 ## Initialisation
 ```sh
 yarn install
 ```
+
+**Ne pas oublier de copier le fichier `.env.dist` vers un `.env`.**
 
 ## Développement
 ### Installation des devtools (unix seulement)
@@ -79,29 +82,3 @@ Dans des cas de CI ou de noyau Linux "headless" (comme pour WSL2), il est import
 
 ## License
 Sous license [Apache-2.0](LICENSE)
-
-## TODO
-- [x] tests vs specs
-  - [x] jest component tests + snapshots (Storybook ? (for visual regression tests))
-  - [x] jest integration tests
-  - [x] playwright e2e tests
-  - [x] coverage + push result (https://dev.to/penx/combining-storybook-cypress-and-jest-code-coverage-4pa5)
-- [x] Sign + notarize + build + deploy
-  - [x] Release channels (stable, beta, canary)
-- [x] Auto update (electron-builder code pusher)
-- [x] CI
-  - [x] tests
-  - [x] coverage
-  - [x] generate build
-### Services
-- [ ] Logger (winston + sentry + console + "renderer transport to main")
-- [ ] Tracker (matomo) (le casse 🍒)
-- [x] global and user config (shared over ipc)
-- [x] i18n (i18next + react-i18next (start [here](./src/common/i18n/)))
-
-### Doc
-- [ ] Tech doc tool (docusaurus? next? jekyll?) + github pages
-- [x] CONTRIBUTING
-- [ ] README
-- [x] CHANGELOG tech (https://keepachangelog.com/en/1.0.0/)
-- [ ] UPGRADE

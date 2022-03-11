@@ -4,8 +4,8 @@ export const DEFAULT_LOCALE: Locale = "fr-FR";
 
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 export interface LocaleFileResources {
-    translation: typeof import("../../../static/locales/fr-FR/translation.json");
     common: typeof import("../../../static/locales/fr-FR/common.json");
+    translation: typeof import("../../../static/locales/fr-FR/translation.json");
 }
 /* eslint-enable @typescript-eslint/consistent-type-imports */
 export type Namespace = keyof LocaleFileResources;
@@ -29,5 +29,29 @@ export const validLocale = (locale: string): Locale =>
 declare module "react-i18next" {
     interface CustomTypeOptions {
         resources: LocaleFileResources;
+    }
+}
+
+// augment "i18next classic" TFunction
+type DefaultNamespace = "translation";
+type OtherNamespace = Exclude<Namespace, DefaultNamespace>;
+
+type ResourceKeys =
+    | {
+          [K in OtherNamespace]: `${OtherNamespace}:${keyof LocaleFileResources[OtherNamespace]}`;
+      }[OtherNamespace]
+    | keyof LocaleFileResources[DefaultNamespace];
+
+declare module "i18next" {
+    interface TFunction {
+        // eslint-disable-next-line @typescript-eslint/prefer-function-type
+        <
+            TResult extends TFunctionResult = string,
+            // eslint-disable-next-line @typescript-eslint/ban-types
+            TInterpolationMap extends object = StringMap
+        >(
+            key: ResourceKeys | ResourceKeys[],
+            options?: TOptions<TInterpolationMap> | string
+        ): TResult;
     }
 }

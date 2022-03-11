@@ -1,7 +1,10 @@
-import { IS_DEV, IS_DIST_MODE, IS_E2E, IS_PACKAGED } from "@common/config";
-import { getIsomorphicModules } from "@common/core/isomorphic";
-import { loadModules } from "@common/lib/ModuleManager";
+import { IS_DIST_MODE, IS_E2E, IS_PACKAGED } from "@common/config";
+import { getIsomorphicModules } from "@common/lib/core/isomorphic";
+import { loadModules, unloadModules } from "@common/lib/ModuleManager";
 import { containerModule } from "@common/modules/ContainerModule";
+import type { Module } from "@common/modules/Module";
+import { setupSentry } from "@common/monitoring/sentry";
+import { sleep } from "@common/utils";
 import type { Any } from "@common/utils/type";
 import { app, BrowserWindow, Menu } from "electron";
 import path from "path";
@@ -15,9 +18,10 @@ import { consoleToRendererService } from "./services/ConsoleToRendererService";
 export type MainWindowRetriever = () => Promise<BrowserWindow>;
 
 // enable hot reload when needed
-if (module.hot) {
-    module.hot.accept();
-}
+module.hot?.accept();
+
+// get integrations setup callback
+const setupSentryIntegrations = setupSentry();
 
 Menu.setApplicationMenu(null);
 
@@ -29,6 +33,12 @@ const INDEX_URL = IS_PACKAGED()
     : IS_E2E || IS_DIST_MODE
     ? `file://${path.join(__dirname, "/../renderer/index.html")}`
     : `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`;
+
+const PRELOAD_PATH = IS_PACKAGED()
+    ? path.resolve(process.resourcesPath, "preload.js") // prod
+    : IS_DIST_MODE
+    ? path.resolve(__dirname, "preload.js") // dist / e2e
+    : path.resolve(__dirname, "preload.js").replace("/src/", "/dist/"); // dev
 /**
  * Global reference.
  *
@@ -42,12 +52,15 @@ const createMainWindow = async () => {
     mainWindow = new BrowserWindow({
         webPreferences: {
             contextIsolation: false,
+            defaultEncoding: "UTF-8",
             nodeIntegration: true,
             nodeIntegrationInWorker: true,
+            preload: PRELOAD_PATH,
+            webSecurity: false,
         },
     });
 
-    if (IS_DEV) mainWindow.webContents.openDevTools();
+    if (!IS_PACKAGED()) mainWindow.webContents.openDevTools();
 
     await mainWindow.loadURL(INDEX_URL);
 };
@@ -59,12 +72,12 @@ app.on("window-all-closed", () => {
     app.quit();
 });
 
-const MAIN_WINDOW_CREATED_EVENT = "main-window-created";
+const MAIN_WINDOW_CREATED_APP_EVENT = "main-window-created";
 const mainWindowRetriever: MainWindowRetriever = async () =>
     mainWindow ??
     new Promise<BrowserWindow>((ok) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- Because custom event
-        app.on(MAIN_WINDOW_CREATED_EVENT as Any, () => {
+        app.on(MAIN_WINDOW_CREATED_APP_EVENT as Any, () => {
             ok(mainWindow!);
         });
     });
@@ -76,13 +89,15 @@ app.on("ready", async () => {
         ["consoleToRendererService", consoleToRendererService],
         ["mainWindowRetriever", mainWindowRetriever]
     );
-    // load "main-process" modules
-    await loadModules(
+    const trackerService = containerModule.get("trackerService");
+    const modules: Module[] = [
         ...isomorphicModules,
         new AppModule(
             mainWindowRetriever,
             consoleToRendererService,
-            containerModule.get("i18nService")
+            containerModule.get("i18nService"),
+            containerModule.get("userConfigService"),
+            trackerService
         ),
         new DevToolsModule(),
         new PstExtractorModule(containerModule.get("userConfigService")),
@@ -90,10 +105,22 @@ app.on("ready", async () => {
             consoleToRendererService,
             containerModule.get("pstExtractorMainService"),
             containerModule.get("i18nService"),
-            containerModule.get("fileExporterService")
-        )
-    );
+            containerModule.get("fileExporterService"),
+            containerModule.get("userConfigService")
+        ),
+    ];
+
+    app.on("will-quit", async (event) => {
+        event.preventDefault();
+        trackerService.getProvider().track("App Closed", { date: new Date() });
+        await sleep(1000);
+        await unloadModules(...modules);
+        process.exit();
+    });
+    // load "main-process" modules
+    await loadModules(...modules);
+    setupSentryIntegrations();
     // create actual main BrowserWindow
     await createMainWindow();
-    app.emit(MAIN_WINDOW_CREATED_EVENT);
+    app.emit(MAIN_WINDOW_CREATED_APP_EVENT);
 });

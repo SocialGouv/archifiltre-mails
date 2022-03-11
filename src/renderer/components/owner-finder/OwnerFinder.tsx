@@ -1,3 +1,4 @@
+import { useService } from "@common/modules/ContainerModule";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
@@ -15,6 +16,7 @@ export interface OwnerFinderProps {
 export const OwnerFinder: React.FC<OwnerFinderProps> = ({ switchFinder }) => {
     const { pstFile, extractTables } = usePstStore();
     const { ownerId, deletedFolderId } = useSynthesisStore();
+    const trackerService = useService("trackerService");
     const { t } = useTranslation();
     if (!pstFile || !extractTables) return null;
 
@@ -42,7 +44,12 @@ export const OwnerFinder: React.FC<OwnerFinderProps> = ({ switchFinder }) => {
             />
             <button
                 className={style.finder__validate}
-                onClick={switchFinder}
+                onClick={() => {
+                    const tracker = trackerService?.getProvider();
+                    tracker?.track("Feat(1.0) Delete Folder Selected");
+                    tracker?.track("Feat(2.0) Mailbox Owner Chosen");
+                    switchFinder();
+                }}
                 disabled={!ownerId || !deletedFolderId}
             >
                 {t("dashboard.ownerfinder.board.validate")}

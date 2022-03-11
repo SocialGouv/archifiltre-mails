@@ -3,5 +3,8 @@
   "exclude": [
     "../main/",
     "../renderer/",
-  ]
+  ],
+  "compilerOptions": {
+    "paths": {}
+  }
 }

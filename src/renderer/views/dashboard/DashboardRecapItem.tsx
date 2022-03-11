@@ -5,12 +5,12 @@ import { useTranslation } from "react-i18next";
 import style from "./Dashboard.module.scss";
 
 export interface DashboardRecapItemProps {
+    attachements?: number;
+    contact?: number;
+    mails?: number | undefined;
+    percentage?: number;
     picto?: React.ReactElement;
     title: string;
-    mails?: number | undefined;
-    attachements?: number;
-    percentage?: number;
-    contact?: number;
 }
 
 export const DashboardRecapItem: FC<DashboardRecapItemProps> = ({

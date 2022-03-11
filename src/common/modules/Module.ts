@@ -1,3 +1,5 @@
+import { AppError } from "../lib/error/AppError";
+
 /**
  * A module is self contained group of capabilities that can refer to a business domain.
  *
@@ -12,6 +14,11 @@ export interface Module {
      * If needed, a private `inited` property flag can be used to ensure this method is called once.
      */
     init: () => Promise<void>;
+
+    /**
+     * Uninit a module once when the app close (main) or when a window closes (renderer).
+     */
+    uninit: () => Promise<void>;
 }
 
 /**
@@ -33,6 +40,7 @@ export abstract class IsomorphicModule implements Module {
     // eslint-disable-next-line @typescript-eslint/no-useless-constructor, @typescript-eslint/no-empty-function -- abstract constructor signature
     constructor(..._args: unknown[]) {}
     public abstract init(): Promise<void>;
+    public abstract uninit(): Promise<void>;
 }
 
 const factory = new Map<string, IsomorphicModule>();
@@ -53,17 +61,30 @@ export const IsomorphicModuleFactory = {
             try {
                 instance = Reflect.construct(klass, deps);
                 if (!instance) {
-                    throw new Error(
-                        `${klass.name} instanciation returned nothing.`
+                    throw new ModuleError(
+                        `${klass.name} instanciation returned nothing.`,
+                        void 0
                     );
                 }
                 factory.set(klass.name, instance);
             } catch (error: unknown) {
-                throw new Error(
-                    `Error during isomorphic module instanciation. ${klass.name} cannot be instancied.\n${error}`
+                throw new ModuleError(
+                    `Error during isomorphic module instanciation. ${klass.name} cannot be instancied.`,
+                    void 0,
+                    error
                 );
             }
         }
         return instance as T;
     },
 } as const;
+
+export class ModuleError extends AppError {
+    constructor(
+        message: string,
+        public readonly mod?: Module,
+        previousError?: Error | unknown
+    ) {
+        super(message, previousError);
+    }
+}

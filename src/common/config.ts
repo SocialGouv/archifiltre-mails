@@ -24,7 +24,7 @@ export const IS_DIST_MODE =
     !IS_PACKAGED() && !process.env.ELECTRON_WEBPACK_WDS_PORT;
 
 export const STATIC_PATH = IS_PACKAGED()
-    ? __static
+    ? __static // prod
     : !process.env.ELECTRON_WEBPACK_WDS_PORT
-    ? path.resolve("../../static")
-    : __static;
+    ? path.resolve(__dirname, "../../static") // dist / e2e
+    : __static; // dev

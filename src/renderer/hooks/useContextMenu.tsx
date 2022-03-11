@@ -12,7 +12,7 @@ interface UseContextMenuType {
 }
 
 export const DELETE_ACTION_BUTTON_ID = "delete-action-btn";
-export const KEEP_ACTION_BUTTON_ID = "delete-action-btn";
+export const KEEP_ACTION_BUTTON_ID = "keep-action-btn";
 
 export const useContextMenu = (): UseContextMenuType => {
     const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
@@ -43,29 +43,25 @@ export const useContextMenu = (): UseContextMenuType => {
         setShow(void 0);
     }, [show]);
 
-    const menu = document.querySelector(CIRCLE_PACKING_ID);
+    const circlePackingViewer = document.querySelector(CIRCLE_PACKING_ID);
     const markedToDeleteBtn = document.querySelector(
         `#${DELETE_ACTION_BUTTON_ID}`
     );
     const markedToKeepBtn = document.querySelector(`#${KEEP_ACTION_BUTTON_ID}`);
 
     useEffect(() => {
-        menu?.addEventListener("click", handleClick);
-        menu?.addEventListener("contextmenu", handleContextMenu);
-        markedToDeleteBtn?.addEventListener("click", handleMarkedToDelete);
-        markedToKeepBtn?.addEventListener("click", handleMarkedToKeep);
+        circlePackingViewer?.addEventListener("click", handleClick);
+        circlePackingViewer?.addEventListener("contextmenu", handleContextMenu);
 
         return () => {
-            menu?.removeEventListener("click", handleClick);
-            menu?.removeEventListener("contextmenu", handleContextMenu);
-            markedToDeleteBtn?.removeEventListener(
-                "click",
-                handleMarkedToDelete
+            circlePackingViewer?.removeEventListener("click", handleClick);
+            circlePackingViewer?.removeEventListener(
+                "contextmenu",
+                handleContextMenu
             );
-            markedToKeepBtn?.removeEventListener("click", handleMarkedToKeep);
         };
     }, [
-        menu,
+        circlePackingViewer,
         markedToKeepBtn,
         markedToDeleteBtn,
         handleClick,

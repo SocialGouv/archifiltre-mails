@@ -1,9 +1,10 @@
 import { useService } from "@common/modules/ContainerModule";
 import type { PstProgressState } from "@common/modules/pst-extractor/type";
+import { bytesToGigabytes } from "@common/utils";
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 
-import { setAttachmentTotal } from "../store/PstAttachmentCountStore";
+import { setTotalAttachment } from "../store/PstAttachmentCountStore";
 import { setTotalFileSize } from "../store/PstFileSizeStore";
 import { setTotalMail } from "../store/PstMailCountStore";
 import { usePstStore } from "../store/PSTStore";
@@ -24,7 +25,7 @@ const pstProgressInitialState: PstProgressState = {
     countFolder: 0,
     countTotal: 0,
     elapsed: 0,
-    progress: false,
+    progress: true,
 };
 
 /**
@@ -38,16 +39,19 @@ export const usePstExtractor = (): UsePstExtractor => {
         pstProgressInitialState
     );
     const pstExtractorService = useService("pstExtractorService");
+    const trackerService = useService("trackerService");
 
     const { setPstFile, setExtractTables } = usePstStore();
 
     useEffect(() => {
-        if (pstFilePath && pstExtractorService) {
+        if (pstFilePath && pstExtractorService && trackerService) {
             void (async () => {
+                const beforeExtractTimestamp = Date.now();
                 const [pstExtractedFile, extractTables] =
                     await pstExtractorService.extract({
                         pstFilePath,
                     });
+                const loadTime = Date.now() - beforeExtractTimestamp;
 
                 setPstFile(pstExtractedFile);
                 setExtractTables(extractTables);
@@ -55,18 +59,33 @@ export const usePstExtractor = (): UsePstExtractor => {
                 const totalMail = getInitialTotalMail(extractTables);
                 setTotalMail(totalMail);
 
-                const totalAttachments: number =
+                const totalAttachments =
                     getInitialTotalAttachements(extractTables);
-                setAttachmentTotal(totalAttachments);
+                setTotalAttachment(totalAttachments);
 
-                const totalFileSize: number =
-                    getInititalTotalFileSize(extractTables);
+                const totalFileSize = getInititalTotalFileSize(extractTables);
                 setTotalFileSize(totalFileSize);
+
+                trackerService.getProvider().track("PST Dropped", {
+                    attachmentCount: totalAttachments,
+                    loadTime,
+                    mailCount: totalMail,
+                    size: bytesToGigabytes(totalFileSize, 2),
+                    sizeRaw: totalFileSize,
+                });
             })();
         }
-    }, [pstExtractorService, pstFilePath, setExtractTables, setPstFile]);
+    }, [
+        pstExtractorService,
+        pstFilePath,
+        setExtractTables,
+        setPstFile,
+        trackerService,
+    ]);
 
-    pstExtractorService?.onProgress(setPstProgress);
+    useEffect(() => {
+        pstExtractorService?.onProgress(setPstProgress);
+    }, [pstExtractorService, setPstProgress]);
 
     return { pstProgress, setPstFilePath };
 };

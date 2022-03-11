@@ -1,7 +1,7 @@
 import {
     bytesToKilobytes,
     getPercentage,
-    toTwoDecimalsFloat,
+    toDecimalsFloat,
 } from "@common/utils";
 import type { ComputedDatum } from "@nivo/circle-packing";
 import type { FC } from "react";
@@ -93,7 +93,7 @@ export const DashboardInformationsMail: FC<{
             )}
             <div>
                 <strong>{t("dashboard.informations.percentage")} </strong>
-                {toTwoDecimalsFloat(volumeTotal)}Ko (
+                {toDecimalsFloat(volumeTotal, 2)}Ko (
                 {getPercentage(volumeTotal / 1000, totalFileSize)}%)
             </div>
             <div>

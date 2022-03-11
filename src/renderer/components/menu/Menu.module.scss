@@ -1,17 +1,17 @@
 .menu {
-  width: 115px;
-  height: auto;
-  position: fixed;
-  padding: 15px 15px;
-  border-radius: 10px;
   background: #f5f4f4;
-  opacity: 1;
-  transition: opacity 0.5s linear;
+  border-radius: 10px;
   font-size: 14px;
+  height: auto;
+  opacity: 1;
+  padding: 15px;
+  position: fixed;
+  transition: opacity 0.5s linear;
+  width: 115px;
   z-index: 999;
 
   li:hover {
-    color: rgb(41, 37, 255);
+    color: rgb(41 37 255);
     cursor: pointer;
   }
 

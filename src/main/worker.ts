@@ -15,7 +15,6 @@ export class TSWorker<TMessageValue = unknown> extends BaseWorker {
         options?: Omit<WorkerOptions, "eval">
     ) {
         const _workerPath = getWorkerPath(mainRelativeWorkerPath);
-        console.log(_workerPath);
         super(_workerPath.endsWith(".js") ? _workerPath : WORKER_BRIDGE_PATH, {
             ...options,
             eval: false,

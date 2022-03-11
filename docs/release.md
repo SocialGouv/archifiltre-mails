@@ -25,10 +25,12 @@ Les noms de version produits sont itératifs au nombre de fois où une version n
 Évidemment, nous pouvons forcer une version majeure à tout moment pour raison de commercialisation ou d'identité produit.
 
 ## Systèmes d'opération ciblés
-`Mails` est aujourd'hui utilisable sur trois systèmes d'opérations : Windows, Linux et MacOS ; les prérequis étant d'être en 64 bit et d'avoir au minimum 4go de RAM sur sa machine.  
+`Mails` est aujourd'hui utilisable sur trois systèmes d'opérations : Windows, Linux et MacOS ; les prérequis étant d'être en **64 bit** et d'avoir au minimum **4go de RAM** sur sa machine.  
 
 ### Windows
 Trois types d'exécutables sont disponibles pour la plateforme Windows : `exe` portable (qui n'a pas besoin d'installation pour être lancé), `msi`, et `exe` auto installable.
+### OSX
+Pour un système sous OSX (Mac) deux versions sont disponibles : `zip` et `dmg`. Ces versions sont complémentaires car la version zippée est essentielle au bon fonctionnement des mise à jours automatiques. Il est toutefois préférable d'utiliser la version `dmg` pour une première installation.
 ## Mise à jour automatique
 L'application est capable de se mettre à jour automatiquement suivant la canal de distribution choisi. Il n'est en revanche pas possible de mettre à jour automatique d'un canal à l'autre que ce soit en montée ou en descente de version.  
 Sous Windows, uniquement la version `exe` auto installable est capable de se mettre à jour automatiquement, pour les autres il faudra obligatoirement télécharger les nouvelles version.

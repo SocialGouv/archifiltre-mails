@@ -2,7 +2,7 @@ import type { PstExtractorService } from "./PstExtractorService";
 
 // add "renderer-only" services for autocomplete
 declare module "@common/modules/container/type" {
-    export interface ServicesKeyType {
+    interface ServicesKeyType {
         pstExtractorService: PstExtractorService;
     }
 }

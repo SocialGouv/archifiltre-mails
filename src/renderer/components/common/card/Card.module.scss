@@ -6,31 +6,32 @@ $dashboard-card-padding: 2rem 3rem;
 $dashboard-card-font-text: 12px;
 
 .card {
+  background: $background-color-white;
+  border-radius: 10px;
+  font-size: $dashboard-card-font-text;
   margin: 10px;
   padding: $dashboard-card-padding;
-  border-radius: 10px;
-  background: $background-color-white;
   position: absolute;
-  font-size: $dashboard-card-font-text;
 
   .card__title {
-    margin: 0 0 2rem;
     font-size: 1.2rem;
     font-weight: 600;
+    margin: 0 0 2rem;
     position: relative;
   }
 
   .card__title__color {
-    width: 12px;
+    border-radius: 3px;
     height: 28px;
+    left: -1.55rem;
     position: absolute;
     top: -0.25rem;
-    left: -1.55rem;
-    border-radius: 3px;
+    width: 12px;
 
     &.purple {
       background: #cec6fb;
     }
+
     &.green {
       background: #c6e6d2;
     }

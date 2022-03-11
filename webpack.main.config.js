@@ -1,13 +1,11 @@
 const path = require("path");
 const glob = require("glob");
 const webpack = require("webpack");
+const webpackCommonConfig = require("./webpack.common.config");
+require("dotenv").config();
 
 module.exports =
     /** @param {import("webpack").Configuration} config */ function (config) {
-        if (config.resolve) {
-            config.resolve.alias["@common"] = config.resolve.alias["common"];
-        }
-
         const workers = glob
             .sync("./src/main/**/*.worker.ts")
             .map((filePath) => {
@@ -23,7 +21,7 @@ module.exports =
                 return acc;
             }, {});
 
-        if (config.mode === "production" && config.plugins) {
+        if (config.mode === "production") {
             for (const plugin of config.plugins) {
                 if (plugin instanceof webpack.BannerPlugin) {
                     plugin.options.exclude = /\.worker\.js$/i;
@@ -38,5 +36,5 @@ module.exports =
             };
         }
 
-        return config;
+        return webpackCommonConfig(config);
     };

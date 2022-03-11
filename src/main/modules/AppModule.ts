@@ -1,29 +1,60 @@
 import { IS_E2E } from "@common/config";
 import type { I18nService } from "@common/modules/I18nModule";
-import type { Module } from "@common/modules/Module";
+import type { TrackerService } from "@common/modules/TrackerModule";
+import type { UserConfigService } from "@common/modules/UserConfigModule";
+import { version } from "@common/utils/package";
 import { dialog } from "electron";
 import type { ProgressInfo, UpdateInfo } from "electron-updater";
 import { autoUpdater } from "electron-updater";
 
 import type { MainWindowRetriever } from "..";
 import type { ConsoleToRendererService } from "../services/ConsoleToRendererService";
+import { MainModule } from "./MainModule";
 
 /**
  * Module to handle almost all global app related stuff like closing, navigating.
  */
-export class AppModule implements Module {
+export class AppModule extends MainModule {
     constructor(
         private readonly mainWindowRetriever: MainWindowRetriever,
         private readonly consoleToRendererService: ConsoleToRendererService,
-        private readonly i18nService: I18nService
-    ) {}
+        private readonly i18nService: I18nService,
+        private readonly userConfigService: UserConfigService,
+        private readonly trackerService: TrackerService
+    ) {
+        super();
+    }
 
-    async init(): Promise<void> {
+    public async init(): Promise<void> {
         // can't await because mainWindow is created after this init
         void this.mainWindowRetriever().then(async (mainWindow) => {
+            await this.userConfigService.wait();
+            mainWindow.setFullScreen(this.userConfigService.get("fullscreen"));
+            mainWindow.on("enter-full-screen", () => {
+                this.userConfigService.set("fullscreen", true);
+            });
+            mainWindow.on("leave-full-screen", () => {
+                this.userConfigService.set("fullscreen", false);
+            });
             // prevent navigation
             mainWindow.webContents.on("will-navigate", (event) => {
                 event.preventDefault();
+            });
+
+            const firstOpened = this.userConfigService.get("_firstOpened");
+            if (firstOpened) {
+                this.trackerService.getProvider().track("App First Opened", {
+                    arch: process.arch,
+                    date: new Date(),
+                    os: process.platform,
+                    version,
+                });
+                this.userConfigService.set("_firstOpened", false);
+            }
+
+            this.trackerService.getProvider().track("App Opened", {
+                date: new Date(),
+                version,
             });
 
             if (!IS_E2E) {
@@ -51,7 +82,8 @@ export class AppModule implements Module {
                 });
             }
 
-            autoUpdater.on("check-for-update", (evt) => {
+            // TODO: more interactive auto-update
+            autoUpdater.on("checking-for-update", (evt) => {
                 this.consoleToRendererService.log(
                     mainWindow,
                     "[UPDATE] Check for update",
@@ -89,6 +121,18 @@ export class AppModule implements Module {
                     "[UPDATE] Progress...",
                     progress
                 );
+            });
+
+            autoUpdater.on("update-downloaded", (info: UpdateInfo) => {
+                this.consoleToRendererService.log(
+                    mainWindow,
+                    "[UPDATE] Update downloaded",
+                    info
+                );
+                this.trackerService.getProvider().track("App Updated", {
+                    currentVersion: info.version,
+                    oldVersion: version,
+                });
             });
 
             const log = this.consoleToRendererService.log.bind(

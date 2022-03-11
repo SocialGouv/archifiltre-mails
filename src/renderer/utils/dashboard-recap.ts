@@ -8,9 +8,9 @@ import { isPstEmail, isPstFolder } from "@common/modules/pst-extractor/type";
 import { bytesToMegabytes } from "@common/utils";
 
 export interface FolderListItem {
+    id: string;
     name: string;
     type: string;
-    id: string;
 }
 
 export const getPstListOfFolder = (pst: PstFolder[]): FolderListItem[] => {
