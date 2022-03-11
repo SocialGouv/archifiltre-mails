@@ -78,6 +78,11 @@ export interface OptionalUserInfoTrackOptions {
     uid?: string;
 }
 
+/**
+ * Basic {@link axios} client for Matomo tracking system.
+ *
+ * @deprecated
+ */
 export class MatomoClient {
     constructor(
         private readonly matomoIdSite = process.env.TRACKER_MATOMO_ID_SITE,

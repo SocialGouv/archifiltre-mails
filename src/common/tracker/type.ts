@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { ExporterType } from "../modules/FileExporterModule";
 
+/**
+ * Tracking Plan props representation.
+ */
 export interface TrackCoreEventProps {
     "App Closed": { date: Date };
     // | "App Downloaded"

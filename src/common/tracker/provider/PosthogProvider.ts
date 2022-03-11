@@ -22,12 +22,13 @@ const DEFAULT_$SET_ONCE = {
     $initial_pathname: "",
     $pathname: "",
 };
-export class PosthogProvider extends TrackerProvider {
+export class PosthogProvider extends TrackerProvider<
+    typeof FrontPostHog,
+    NodeJsPostHog
+> {
     static trackerName = "posthog" as const;
 
     public inited = false;
-
-    private tracker?: NodeJsPostHog | typeof FrontPostHog;
 
     public async init(): Promise<void> {
         if (this.inited) {

@@ -6,6 +6,9 @@ import type { TrackArgs } from "./TrackerProvider";
 import { TrackerProvider } from "./TrackerProvider";
 import type { ProviderName } from "./utils";
 
+/**
+ * Delegate the tracking behaviour to multiple configured sub provider.
+ */
 export class DelegatingProvider extends TrackerProvider {
     static trackerName = "delegating" as const;
 

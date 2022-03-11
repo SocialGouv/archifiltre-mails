@@ -8,10 +8,13 @@ import type { TrackerProvider } from "./provider/TrackerProvider";
 import type { DelegatingName, ProviderType } from "./provider/utils";
 import { providers } from "./provider/utils";
 
+/**
+ * This is the main entry point for the tracking system.
+ */
 export class TrackerModule extends IsomorphicModule {
     public enableTracking = true;
 
-    public provider?: TrackerProvider;
+    private provider?: TrackerProvider;
 
     private readonly userConfigUnsub = this.pubSub.subscribe(
         "event.userconfig.updated",
@@ -41,6 +44,9 @@ export class TrackerModule extends IsomorphicModule {
         await this.getProvider().uninit();
     }
 
+    /**
+     * Return the currently configured provider.
+     */
     public getProvider(): TrackerProvider {
         if (!this.provider) {
             return (this.provider = this.findProvider(
@@ -66,7 +72,7 @@ export class TrackerModule extends IsomorphicModule {
             );
         }
         return new (providers.find((p) => p.trackerName === name) ??
-            NoopProvider)(appId, disabled);
+            NoopProvider)(appId, disabled) as TrackerProvider;
     }
 
     get service(): TrackerService {

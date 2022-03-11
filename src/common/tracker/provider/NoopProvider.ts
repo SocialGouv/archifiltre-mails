@@ -2,6 +2,10 @@ import type { TrackEvent } from "../type";
 import type { TrackArgs } from "./TrackerProvider";
 import { TrackerProvider } from "./TrackerProvider";
 
+/**
+ * Fallback provider that act as "noop" functions when no
+ * provider is set or found with the associated config.
+ */
 export class NoopProvider extends TrackerProvider {
     static trackerName = "noop" as const;
 

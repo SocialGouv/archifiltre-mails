@@ -7,12 +7,18 @@ import { eventCategoryMap } from "../type";
 import type { TrackArgs } from "./TrackerProvider";
 import { TrackerProvider } from "./TrackerProvider";
 
-export class MatomoProvider extends TrackerProvider {
+/**
+ * Enable a tracking provider associated to Matomo.
+ *
+ * @deprecated
+ */
+export class MatomoProvider extends TrackerProvider<
+    MatomoTracker,
+    MatomoClient
+> {
     static trackerName = "matomo" as const;
 
     public inited = false;
-
-    private tracker?: MatomoClient | MatomoTracker;
 
     async init(): Promise<void> {
         if (this.inited) {

@@ -1,5 +1,8 @@
 import { IS_MAIN, IS_PACKAGED } from "../../config";
 
+/**
+ * Global error object. Must be the top most error in a stacktrace.
+ */
 export class AppError extends Error {
     public readonly name = this.constructor.name;
 
@@ -11,12 +14,18 @@ export class AppError extends Error {
         super(message);
     }
 
+    /**
+     * Return a full proper stack trace with previous wrapped errors.
+     */
     public appErrorStack(): string[] {
         return this.appErrorList().map(
-            (e) => e.stack ?? `${e.name} has not stack`
+            (e) => e.stack ?? `${e.name} has no stack`
         );
     }
 
+    /**
+     * Return all previously wrapped errors.
+     */
     public appErrorList(): Error[] {
         const errors: Error[] = [this];
         if (this.previousError) {

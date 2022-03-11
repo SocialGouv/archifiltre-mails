@@ -8,7 +8,12 @@ import { name, version } from "../utils/package";
 import type { VoidFunction } from "../utils/type";
 
 /**
- * @returns Setup tracker integration callback
+ * Setup sentry in main or renderer and return a "post setup"
+ * callback to be used after {@link containerModule} loading.
+ *
+ * The first setup should be set at the top most of the process.
+ *
+ * @returns "Post setup" tracker integration callback
  */
 export const setupSentry = (): VoidFunction => {
     if (!IS_PACKAGED()) return () => void 0;
