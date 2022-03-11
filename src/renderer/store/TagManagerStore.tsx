@@ -74,6 +74,7 @@ export const useTagManagerStore = (): UseTagManagerStore => {
             ...new Set([...markedToDelete, hoveredNode.id]),
         ];
         setMarkedToDelete(updatedMarkedToDelete);
+
         updateToDeleteImpact(hoveredNode.data.ids, "add");
         trackTag(hoveredNode.data.ids, "delete");
     }, [

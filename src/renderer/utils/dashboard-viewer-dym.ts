@@ -143,7 +143,7 @@ export const createDomain = (
 export const getDomain = (element: string): string =>
     element.substring(element.indexOf("@"));
 
-const getMailTreshold = (
+const _getMailTreshold = (
     base: Map<string, [number, string[]]> | Record<string, [number, string[]]>
 ): number => {
     const maxMail = (
@@ -409,7 +409,8 @@ export const createMails = <TId extends string>(
             const { name, size, ...email } = value;
             return {
                 email,
-                id: randomUUID(),
+                id: value.id,
+                ids: [value.id],
                 name,
                 size,
                 value: name,

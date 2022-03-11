@@ -64,6 +64,7 @@ export interface PstEmail extends PstElement {
     sentTime: Date | null;
     size: 1;
     subject: string;
+    tag?: string;
     to: PstEmailRecipient[];
     type: "email";
 }
