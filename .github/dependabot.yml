@@ -40,6 +40,9 @@ updates:
       - dependency-name: "eslint"
         versions:
           - ">=8"
+      - dependency-name: "@types/eslint"
+        versions:
+          - ">=8"
       - dependency-name: "eslint-plugin-unused-imports"
         versions:
           - ">=2"
