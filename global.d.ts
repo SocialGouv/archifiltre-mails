@@ -23,7 +23,7 @@ declare namespace NodeJS {
         SENTRY_DSN: string;
         SENTRY_ORG: string;
         SENTRY_URL: string;
-        TRACKER_FAKE_HREF: string;
+        TRACKER_FAKE_HREF?: string;
         TRACKER_MATOMO_ID_SITE: string;
         TRACKER_MATOMO_URL: string;
         TRACKER_POSTHOG_API_KEY: string;

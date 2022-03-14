@@ -20,23 +20,25 @@ module.exports =
             config.plugins = [];
         }
         const project = `${packageJson.name}${isProd ? "" : "-dev"}`;
-        config.plugins.push(
-            new webpack.EnvironmentPlugin([
-                "TRACKER_MATOMO_ID_SITE",
-                "TRACKER_MATOMO_URL",
-                "TRACKER_PROVIDER",
-                "TRACKER_POSTHOG_API_KEY",
-                "TRACKER_POSTHOG_URL",
-                "SENTRY_ORG",
-                "SENTRY_DSN",
-                "SENTRY_URL",
-            ]),
-            new webpack.DefinePlugin({
-                "process.env.TRACKER_FAKE_HREF": JSON.stringify(
-                    `https://${project}`
-                ),
-            })
-        );
+        if (isProd) {
+            config.plugins.push(
+                new webpack.EnvironmentPlugin([
+                    "TRACKER_MATOMO_ID_SITE",
+                    "TRACKER_MATOMO_URL",
+                    "TRACKER_PROVIDER",
+                    "TRACKER_POSTHOG_API_KEY",
+                    "TRACKER_POSTHOG_URL",
+                    "SENTRY_ORG",
+                    "SENTRY_DSN",
+                    "SENTRY_URL",
+                ]),
+                new webpack.DefinePlugin({
+                    "process.env.TRACKER_FAKE_HREF": JSON.stringify(
+                        `https://${project}`
+                    ),
+                })
+            );
+        }
 
         const skipSentry =
             process.env.SKIP_SENTRY_UPLOAD === 1 ||

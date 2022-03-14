@@ -1,11 +1,13 @@
 import { IS_DIST_MODE, IS_E2E, IS_PACKAGED } from "@common/config";
 import { getIsomorphicModules } from "@common/lib/core/isomorphic";
+import { AppError } from "@common/lib/error/AppError";
 import { loadModules, unloadModules } from "@common/lib/ModuleManager";
 import { containerModule } from "@common/modules/ContainerModule";
 import type { Module } from "@common/modules/Module";
 import { setupSentry } from "@common/monitoring/sentry";
 import { sleep } from "@common/utils";
 import type { Any } from "@common/utils/type";
+import Sentry from "@sentry/electron";
 import { app, BrowserWindow, Menu } from "electron";
 import path from "path";
 
@@ -84,43 +86,61 @@ const mainWindowRetriever: MainWindowRetriever = async () =>
 
 // when electron is ready
 app.on("ready", async () => {
-    // load shared/common modules
-    const isomorphicModules = getIsomorphicModules(
-        ["consoleToRendererService", consoleToRendererService],
-        ["mainWindowRetriever", mainWindowRetriever]
-    );
-    const trackerService = containerModule.get("trackerService");
-    const modules: Module[] = [
-        ...isomorphicModules,
-        new AppModule(
-            mainWindowRetriever,
-            consoleToRendererService,
-            containerModule.get("i18nService"),
-            containerModule.get("userConfigService"),
-            trackerService
-        ),
-        new DevToolsModule(),
-        new PstExtractorModule(containerModule.get("userConfigService")),
-        new MenuModule(
-            consoleToRendererService,
-            containerModule.get("pstExtractorMainService"),
-            containerModule.get("i18nService"),
-            containerModule.get("fileExporterService"),
-            containerModule.get("userConfigService")
-        ),
-    ];
+    try {
+        // load shared/common modules
+        const isomorphicModules = getIsomorphicModules(
+            ["consoleToRendererService", consoleToRendererService],
+            ["mainWindowRetriever", mainWindowRetriever]
+        );
+        const trackerService = containerModule.get("trackerService");
+        const modules: Module[] = [
+            ...isomorphicModules,
+            new AppModule(
+                mainWindowRetriever,
+                consoleToRendererService,
+                containerModule.get("i18nService"),
+                containerModule.get("userConfigService"),
+                trackerService
+            ),
+            new DevToolsModule(),
+            new PstExtractorModule(containerModule.get("userConfigService")),
+            new MenuModule(
+                consoleToRendererService,
+                containerModule.get("pstExtractorMainService"),
+                containerModule.get("i18nService"),
+                containerModule.get("fileExporterService"),
+                containerModule.get("userConfigService")
+            ),
+        ];
 
-    app.on("will-quit", async (event) => {
-        event.preventDefault();
-        trackerService.getProvider().track("App Closed", { date: new Date() });
-        await sleep(1000);
-        await unloadModules(...modules);
-        process.exit();
-    });
-    // load "main-process" modules
-    await loadModules(...modules);
-    setupSentryIntegrations();
-    // create actual main BrowserWindow
-    await createMainWindow();
-    app.emit(MAIN_WINDOW_CREATED_APP_EVENT);
+        app.on("will-quit", async (event) => {
+            event.preventDefault();
+            trackerService
+                .getProvider()
+                .track("App Closed", { date: new Date() });
+            await sleep(1000);
+            await unloadModules(...modules);
+            process.exit();
+        });
+        // load "main-process" modules
+        await loadModules(...modules);
+        setupSentryIntegrations();
+        // create actual main BrowserWindow
+        await createMainWindow();
+        app.emit(MAIN_WINDOW_CREATED_APP_EVENT);
+    } catch (error: unknown) {
+        if (error instanceof AppError) {
+            console.error("Error during app lauching");
+            if (IS_PACKAGED())
+                Sentry.addBreadcrumb({
+                    data: {
+                        previousErrors: error.appErrorList(),
+                        stack: error.appErrorStack(),
+                    },
+                    type: "info",
+                });
+            else console.error(error.appErrorStack());
+        }
+        throw error;
+    }
 });

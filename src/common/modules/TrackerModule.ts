@@ -57,10 +57,10 @@ export class TrackerModule extends IsomorphicModule {
         return this.provider;
     }
 
-    private findProvider(name: ProviderType): TrackerProvider {
+    private findProvider(name?: ProviderType): TrackerProvider {
         const appId = this.userConfigService.get("appId");
         const disabled = !this.enableTracking;
-        if (name.startsWith("delegating")) {
+        if (name?.startsWith("delegating")) {
             const names = DelegatingProvider.parseQueryString(
                 name as DelegatingName
             );

@@ -7,7 +7,7 @@ import type { TrackEvent } from "../type";
 import type { TrackArgs } from "./TrackerProvider";
 import { TrackerProvider } from "./TrackerProvider";
 
-const TRACKER_FAKE_HOST = process.env.TRACKER_FAKE_HREF.split("//")[1]!;
+const TRACKER_FAKE_HOST = (process.env.TRACKER_FAKE_HREF ?? "").split("//")[1]!;
 
 const DEFAULT_$SET = {
     // eslint-disable-next-line @typescript-eslint/naming-convention
