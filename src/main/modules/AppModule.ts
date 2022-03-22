@@ -1,4 +1,4 @@
-import { IS_E2E } from "@common/config";
+import { IS_E2E, IS_MAC } from "@common/config";
 import type { I18nService } from "@common/modules/I18nModule";
 import type { TrackerService } from "@common/modules/TrackerModule";
 import type { UserConfigService } from "@common/modules/UserConfigModule";
@@ -29,13 +29,22 @@ export class AppModule extends MainModule {
         // can't await because mainWindow is created after this init
         void this.mainWindowRetriever().then(async (mainWindow) => {
             await this.userConfigService.wait();
-            mainWindow.setFullScreen(this.userConfigService.get("fullscreen"));
-            mainWindow.on("enter-full-screen", () => {
+            // on window or linux, fullscreen means "borderless" fullscreen (like F11)
+            if (this.userConfigService.get("fullscreen")) {
+                if (IS_MAC) mainWindow.setFullScreen(true);
+                else mainWindow.maximize();
+            }
+            const onEnterFullScreen = () => {
                 this.userConfigService.set("fullscreen", true);
-            });
-            mainWindow.on("leave-full-screen", () => {
+            };
+            const onLeaveFullScreen = () => {
                 this.userConfigService.set("fullscreen", false);
-            });
+            };
+            if (IS_MAC) mainWindow.on("enter-full-screen", onEnterFullScreen);
+            else mainWindow.on("maximize", onEnterFullScreen);
+            if (IS_MAC) mainWindow.on("leave-full-screen", onLeaveFullScreen);
+            else mainWindow.on("unmaximize", onLeaveFullScreen);
+
             // prevent navigation
             mainWindow.webContents.on("will-navigate", (event) => {
                 event.preventDefault();
