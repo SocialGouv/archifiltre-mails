@@ -1,7 +1,7 @@
 name: CI
 on:
   push:
-    branches: [main, dev, beta]
+    branches: [main, dev, beta, temp]
   pull_request:
     branches: [main, dev]
 
@@ -15,32 +15,32 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Node
-        uses: ./.github/actions/setup-node
-      - name: Yarn install
-        run: |
-          yarn config set network-timeout 300000
-          yarn --frozen-lockfile --perfer-offline
+    #   - name: Setup Node
+    #     uses: ./.github/actions/setup-node
+    # - name: Yarn install
+    #   run: |
+    #     yarn config set network-timeout 300000
+    #     yarn --frozen-lockfile --perfer-offline
 
-      - name: Test if code compile
-        run: yarn compile --no-progress --display-error-details
-        env:
-          SKIP_SENTRY_UPLOAD: 1
-          TRACKER_MATOMO_ID_SITE: ${{ secrets.TRACKER_MATOMO_ID_SITE }}
-          TRACKER_MATOMO_URL: ${{ secrets.TRACKER_MATOMO_URL }}
-          TRACKER_PROVIDER: ${{ secrets.TRACKER_PROVIDER }}
-          TRACKER_POSTHOG_API_KEY: ${{ secrets.TRACKER_POSTHOG_API_KEY }}
-          TRACKER_POSTHOG_URL: ${{ secrets.TRACKER_POSTHOG_URL }}
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_URL: ${{ secrets.SENTRY_URL }}
+    # - name: Test if code compile
+    #   run: yarn compile --no-progress --display-error-details
+    #   env:
+    #     SKIP_SENTRY_UPLOAD: 1
+    #     TRACKER_MATOMO_ID_SITE: ${{ secrets.TRACKER_MATOMO_ID_SITE }}
+    #     TRACKER_MATOMO_URL: ${{ secrets.TRACKER_MATOMO_URL }}
+    #     TRACKER_PROVIDER: ${{ secrets.TRACKER_PROVIDER }}
+    #     TRACKER_POSTHOG_API_KEY: ${{ secrets.TRACKER_POSTHOG_API_KEY }}
+    #     TRACKER_POSTHOG_URL: ${{ secrets.TRACKER_POSTHOG_URL }}
+    #     SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+    #     SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+    #     SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+    #     SENTRY_URL: ${{ secrets.SENTRY_URL }}
 
-      - name: Lint
-        run: yarn lint && yarn lint:test
+    # - name: Lint
+    #   run: yarn lint && yarn lint:test
 
-      - name: Unit tests
-        run: yarn test --ci --coverage
+    # - name: Unit tests
+    #   run: yarn test --ci --coverage
 
-      - name: Send test coverage to codecov
-        uses: codecov/codecov-action@v2
+    # - name: Send test coverage to codecov
+    #   uses: codecov/codecov-action@v2

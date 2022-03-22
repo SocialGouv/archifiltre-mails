@@ -2,10 +2,36 @@
 const releaseMode = process.env.ARCHIFILTRE_RELEASE_MODE ?? "normal";
 const binName = require("./package.json").name;
 
-console.info("Release script ----- Branch", process.env.GITHUB_REF);
+console.info("Release script ----- Branch", {
+    originalRef: process.env.GITHUB_REF,
+    override: process.env.GITHUB_REF_OVERRIDE,
+});
+/** @type {import("semantic-release").Options["branches"]} */
+const branches = [
+    "main",
+    {
+        channel: "next",
+        name: "dev",
+        prerelease: "next",
+    },
+    {
+        name: "beta",
+        prerelease: true,
+    },
+    {
+        name: "temp",
+        prerelease: true,
+    },
+];
 const isPreRealse = process.env.GITHUB_REF
-    ? ["refs/heads/dev", "refs/heads/beta"].includes(process.env.GITHUB_REF)
+    ? branches.some(
+          (branche) =>
+              branche.prerelease &&
+              `refs/heads/${branche.name}` === process.env.GITHUB_REF
+      )
     : true;
+
+console.log({ isPreRealse });
 
 /** @type {import("semantic-release").Options["plugins"]} */
 const plugins = [
@@ -66,18 +92,7 @@ if (releaseMode === "normal") {
 
 /** @type {import("semantic-release").Options} */
 const config = {
-    branches: [
-        "main",
-        {
-            channel: "next",
-            name: "dev",
-            prerelease: "next",
-        },
-        {
-            name: "beta",
-            prerelease: true,
-        },
-    ],
+    branches,
     plugins,
 };
 
