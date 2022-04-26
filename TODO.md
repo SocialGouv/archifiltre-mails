@@ -23,6 +23,7 @@
 - [ ] Isomorphic electron mock ?
 - [ ] Use preload + sandbox
 - [ ] move common electron + Archifiltre code to 3rd party package
+- [ ] migrate from jotai to zustand 4 
 
 ## Doc
 - [ ] Tech doc tool (docusaurus? next? jekyll?) + github pages
