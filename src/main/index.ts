@@ -26,6 +26,9 @@ module.hot?.accept();
 const setupSentryIntegrations = setupSentry();
 
 Menu.setApplicationMenu(null);
+if (!IS_PACKAGED()) {
+    app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors");
+}
 
 /**
  * Stub index.html url for main window. As E2E is not packaged, it needs a direct access to generated file. In dev mode, calling localhost let the dev server handling the file.
@@ -62,7 +65,7 @@ const createMainWindow = async () => {
         },
     });
 
-    if (!IS_PACKAGED()) mainWindow.webContents.openDevTools();
+    if (!IS_PACKAGED() && !IS_E2E) mainWindow.webContents.openDevTools();
 
     await mainWindow.loadURL(INDEX_URL);
 };
