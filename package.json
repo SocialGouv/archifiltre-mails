@@ -17,7 +17,7 @@
     "dist:linux": "electron-builder --linux AppImage",
     "start": "electron dist/main/main.js",
     "start:mac": "open -n 'electron/dist/mac/mac/Mails par Archifiltre.app'",
-    "lint": "eslint src/",
+    "lint": "eslint src/ && stylelint src/",
     "lint:fix": "eslint --fix src/ && stylelint --fix src/",
     "lint:test": "eslint -c tests/.eslintrc.json 'tests/**/*.ts*'",
     "lint:fix-test": "eslint --fix -c tests/.eslintrc.json 'tests/**/*.ts*'",
