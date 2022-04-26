@@ -21,6 +21,9 @@
 - [ ] send bug
 - [ ] check for update
 - [ ] Isomorphic electron mock ?
+- [ ] Use preload + sandbox
+- [ ] move common electron + Archifiltre code to 3rd party package
+- [ ] migrate from jotai to zustand 4 
 
 ## Doc
 - [ ] Tech doc tool (docusaurus? next? jekyll?) + github pages
@@ -30,8 +33,8 @@
 
 ## Recette
 - [x] Issue template
-- [ ] beta branch usage
-- [ ] ownership
+- [x] beta branch usage
+- [x] ownership
 
 ## Infra / Archi
 - [ ] change build system to vite-electron-builder (https://github.com/cawa-93/vite-electron-builder)

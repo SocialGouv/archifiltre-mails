@@ -21,13 +21,11 @@ const branches = [
 ];
 const isPreRealse = process.env.GITHUB_REF
     ? branches.some(
-          (branche) =>
-              branche.prerelease &&
-              `refs/heads/${branche.name}` === process.env.GITHUB_REF
+          (branch) =>
+              branch.prerelease &&
+              `refs/heads/${branch.name}` === process.env.GITHUB_REF
       )
     : true;
-
-console.log({ isPreRealse });
 
 /** @type {import("semantic-release").Options["plugins"]} */
 const plugins = [
