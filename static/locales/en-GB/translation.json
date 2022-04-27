@@ -1,4 +1,5 @@
 {
+  "actionBar.action.config-panel": "",
   "actionBar.action.export": "Export",
   "actionBar.action.filter": "Filter",
   "actionBar.action.import": "Import",
@@ -116,5 +117,11 @@
   "startscreen.importInfo.folders": "Folders:",
   "startscreen.importInfo.seconds": "{{seconds}}sec",
   "startscreen.importInfo.totalFiles": "Total:",
-  "startscreen.importInfo.totalTime": "Total time:"
+  "startscreen.importInfo.totalTime": "Total time:",
+  "user-config.panel.close": "Close",
+  "user-config.panel.title": "Control Panel",
+  "user-config.select.choose": "Select a language:",
+  "user-config.select.english": "English",
+  "user-config.select.french": "French",
+  "user-config.select.german": "German"
 }
