@@ -194,7 +194,7 @@
     "@socialgouv/archimail-pst-extractor": "^0.0.2",
     "d3": "^7.3.0",
     "electron-store": "^8.0.1",
-    "electron-updater": "^4.6.1",
+    "electron-updater": "^5.0.1",
     "electron-util": "^0.17.2",
     "i18next": "^21.6.6",
     "jotai": "^1.5.3",
