@@ -1,5 +1,5 @@
 import { Use } from "@lsagetlethias/tstrait";
-import { app, ipcMain, ipcRenderer } from "electron";
+import { app } from "electron";
 import Store from "electron-store";
 
 import { IS_MAIN, IS_PACKAGED } from "../config";
@@ -8,6 +8,7 @@ import { SupportedLocales, validLocale } from "../i18n/raw";
 import { AppError } from "../lib/error/AppError";
 import type { PubSub } from "../lib/event/PubSub";
 import type { Event } from "../lib/event/type";
+import { ipcMain, ipcRenderer } from "../lib/ipc";
 import type { TrackAppId } from "../tracker/type";
 import { randomString } from "../utils";
 import { name as appName } from "../utils/package";
@@ -50,13 +51,20 @@ declare module "../lib/event/type" {
  * Config for `ArchifiltreMails@v1`
  */
 interface UserConfigV1 {
-    _firstOpened: boolean;
-    appId: TrackAppId;
+    readonly _firstOpened: boolean;
+    readonly appId: TrackAppId;
     collectData: boolean;
     extractProgressDelay: number;
     fullscreen: boolean;
     locale: Locale;
 }
+
+export type UserConfigObject = UserConfigV1;
+
+type WritableUserConfigV1Keys = Exclude<
+    keyof UserConfigV1,
+    "_firstOpened" | "appId"
+>;
 
 /**
  * Define how to get a config value
@@ -66,11 +74,16 @@ type UserConfigGetter = <TKey extends keyof UserConfigV1>(
 ) => UserConfigV1[TKey];
 
 /**
+ * Define how to get a all config
+ */
+type UserConfigGetterAll = () => UserConfigV1;
+
+/**
  * Define how to set a config value
  */
 type UserConfigSetter = <TKey extends keyof UserConfigV1>(
     key: TKey,
-    value?: UserConfigV1[TKey]
+    value: UserConfigV1[TKey]
 ) => void;
 
 declare global {
@@ -85,6 +98,34 @@ const CONFIG_INIT_EVENT = "config.event.init";
 const CONFIG_UPDATE_EVENT = "config.event.update";
 const CONFIG_ASK_UPDATE_EVENT = "config.event.askUpdate";
 const CONFIG_UNSUB_UPDATE_EVENT = "config.event.unsubUpdate";
+const CONFIG_SET_EVENT = "config.event.set";
+
+declare module "../lib/ipc/event" {
+    interface DualAsyncIpcMapping {
+        [CONFIG_ASK_UPDATE_EVENT]: DualIpcConfig<
+            typeof CONFIG_UPDATE_EVENT,
+            [id: string],
+            [config: Readonly<UserConfigV1>]
+        >;
+    }
+
+    interface SyncIpcMapping {
+        [CONFIG_UNSUB_UPDATE_EVENT]: IpcConfig<[id: string], boolean>;
+    }
+
+    interface AsyncIpcMapping {
+        [CONFIG_INIT_EVENT]: IpcConfig<[], UserConfigV1>;
+        [CONFIG_SET_EVENT]: {
+            [K in keyof UserConfigV1]: IpcConfig<
+                [key: K, value: UserConfigV1[K]],
+                void
+            >;
+        }[keyof UserConfigV1];
+        // [CONFIG_SET_EVENT]:
+        //     | IpcConfig<[key: "_firstOpened", value: boolean], void>
+        //     | IpcConfig<[key: "appId", value: TrackAppId], void>;
+    }
+}
 
 /**
  * Isomorphic module handling user config. Use `electron-store` under the hood on main side.
@@ -158,15 +199,22 @@ export class UserConfigModule extends IsomorphicModule {
             ipcMain.handle(CONFIG_INIT_EVENT, () => this.store.store);
             const rendererConfigRepliers = new Map<
                 string,
-                (channel: string, value: unknown) => void
+                (
+                    replyChannel: typeof CONFIG_UPDATE_EVENT,
+                    config: Readonly<UserConfigV1>
+                ) => void
             >();
             // add a renderer process as a subscriber to the update event
             ipcMain.on(CONFIG_ASK_UPDATE_EVENT, (event, id) => {
-                rendererConfigRepliers.set(id as string, event.reply as never);
+                rendererConfigRepliers.set(id, event.reply);
             });
             // remove a renderer process from being aware of config changes
             ipcMain.on(CONFIG_UNSUB_UPDATE_EVENT, (event, id) => {
-                event.returnValue = rendererConfigRepliers.delete(id as string);
+                event.returnValue = rendererConfigRepliers.delete(id);
+            });
+            // triggered when manual set is done from renderer
+            ipcMain.handle(CONFIG_SET_EVENT, (_, key, value) => {
+                this.store.set(key, value);
             });
             this.store.onDidAnyChange((config) => {
                 if (!config) return;
@@ -208,6 +256,7 @@ export class UserConfigModule extends IsomorphicModule {
             this._service ??
             (this._service = new InnerUserConfigService(
                 this.get,
+                this.getAll,
                 this.set,
                 this.clear
             ) as UserConfigService)
@@ -227,6 +276,17 @@ export class UserConfigModule extends IsomorphicModule {
     };
 
     /**
+     * Return this whole config object. The default implementation of this function must not be called from main process.
+     *
+     * @returns The full config object
+     */
+    private readonly getAll: UserConfigGetterAll = () => {
+        this.ensureInited();
+        if (IS_MAIN) return { ...this.store.store };
+        else return this.localConfigCopy;
+    };
+
+    /**
      * Set a value associated with the provided key. Only works from main. Setting undefined will delete the key.
      *
      * @todo set from renderer
@@ -238,11 +298,9 @@ export class UserConfigModule extends IsomorphicModule {
         this.ensureInited();
         if (IS_MAIN) {
             this.store.set(key, value);
-        } else
-            throw new UserConfigError(
-                "Can't direct set config outside of main process.",
-                this.store.store
-            );
+        } else {
+            void ipcRenderer.invoke(CONFIG_SET_EVENT, key, value as never);
+        }
     };
 
     /**
@@ -278,6 +336,10 @@ class InnerUserConfigService extends IsomorphicService {
          * Get a config by its name.
          */
         public readonly get: UserConfigGetter,
+        /**
+         * Get a whole config.
+         */
+        public readonly getAll: UserConfigGetterAll,
         /**
          * Set a config by its name and value.
          */
