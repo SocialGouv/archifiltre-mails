@@ -61,7 +61,7 @@ interface UserConfigV1 {
 
 export type UserConfigObject = UserConfigV1;
 
-type WritableUserConfigV1Keys = Exclude<
+export type WritableUserConfigV1Keys = Exclude<
     keyof UserConfigV1,
     "_firstOpened" | "appId"
 >;

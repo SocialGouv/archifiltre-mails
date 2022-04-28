@@ -1,3 +1,5 @@
+/* stylelint-disable max-line-length */
+/* stylelint-disable selector-class-pattern */
 .userconfig {
   background: #f5f4f4;
   height: 100vh;
@@ -27,5 +29,70 @@
     position: absolute;
     right: 2rem;
     top: 3rem;
+  }
+
+  &__controller {
+    margin: 0 0 2rem;
+  }
+
+  &__toggle {
+    border-radius: 5px;
+    margin-top: 1rem;
+
+    input {
+      &.userconfig__toggle__input {
+        opacity: 0; // hides checkbox
+        position: absolute;
+
+        + label {
+          border: 1px solid #e4e4e4;
+          border-radius: 60px;
+          display: inline-block;
+          height: 30px;
+          position: relative;
+          -webkit-tap-highlight-color: transparent;
+          transition: 0.4s ease;
+          user-select: none;
+          width: 50px;
+
+          &::before {
+            border-radius: 30px;
+            content: '';
+            display: block;
+            height: 30px;
+            left: 0;
+            position: absolute;
+            top: 0;
+            transition: 0.2s cubic-bezier(0.24, 0, 0.5, 1);
+            width: 51px;
+          }
+
+          &::after {
+            background: rgb(245 245 245);
+            border-radius: 60px;
+            box-shadow: 0 0 0 1px hsl(0deg 0% 0% / 10%), 0 4px 0 0 hsl(0deg 0% 0% / 4%), 0 4px 9px hsl(0deg 0% 0% / 13%), 0 3px 3px hsl(0deg 0% 0% / 5%);
+            content: '';
+            display: block;
+            height: 28px;
+            left: 0;
+            position: absolute;
+            top: 1px;
+            transition: 0.35s cubic-bezier(0.54, 1.6, 0.5, 1);
+            width: 28px;
+          }
+        }
+        // When Active
+        &:checked {
+          + label::before {
+            background: #2ecc71; // Active Color
+            transition: width 0.2s cubic-bezier(0, 0, 0, 0.1);
+          }
+
+          + label::after {
+            left: 54px - 30px;
+          }
+        }
+      }
+    }
   }
 }

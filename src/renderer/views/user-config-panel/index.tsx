@@ -1,7 +1,7 @@
 import type { Locale } from "@common/i18n/raw";
+import { SupportedLocales } from "@common/i18n/raw";
 import { useService } from "@common/modules/ContainerModule";
-import type { UserConfigObject } from "@common/modules/UserConfigModule";
-import { Object } from "@common/utils/overload";
+import type { WritableUserConfigV1Keys } from "@common/modules/UserConfigModule";
 import type { ReactNode } from "react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -11,37 +11,21 @@ import {
     OnOffUserConfigPanel,
 } from "../../store/UserConfigPanelStore";
 import style from "./UserConfigPanel.module.scss";
+import { UserConfigPanelCheckbox } from "./UserConfigPanelCheckbox";
+import { UserConfigPanelNumber } from "./UserConfigPanelNumber";
+import { UserConfigPanelSelect } from "./UserConfigPanelSelect";
 
 export interface UserConfigPanelProps {
     children: ReactNode;
 }
 
-interface CommonConfigComponentProps {
-    value: any;
-}
-const configComponents = {
-    bigint: ({ value }: CommonConfigComponentProps) => <></>,
-    boolean: ({ value }: CommonConfigComponentProps) => (
-        <input type="checkbox" value={value} />
-    ),
-    function: ({ value }: CommonConfigComponentProps) => <></>,
-    number: ({ value }: CommonConfigComponentProps) => <></>,
-    object: ({ value }: CommonConfigComponentProps) => <></>,
-    string: ({ value }: CommonConfigComponentProps) => (
-        <input type="text" value={value} />
-    ),
-    symbol: ({ value }: CommonConfigComponentProps) => <></>,
-    undefined: ({ value }: CommonConfigComponentProps) => <></>,
-};
+type ReactChangeEvent<TElement> = React.ChangeEvent<TElement>;
 
-const userConfigTemplate: UserConfigObject = {
-    _firstOpened: true,
-    appId: "",
-    collectData: true,
-    extractProgressDelay: 0,
-    fullscreen: true,
-    locale: "fr-FR",
-};
+export interface UserConfigPanelBaseProps<TElement> {
+    id: string;
+    label: string;
+    setter: (event: ReactChangeEvent<TElement>) => void;
+}
 
 export const UserConfigPanel: React.FC = () => {
     const { t } = useTranslation();
@@ -53,32 +37,63 @@ export const UserConfigPanel: React.FC = () => {
 
     const config = userConfigService.getAll();
 
-    const selectLang = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectLocale = (event: ReactChangeEvent<HTMLSelectElement>) => {
         const lang = event.target.value;
         userConfigService.set("locale", lang as Locale);
     };
 
+    const localeOptions = SupportedLocales.map((local) => ({
+        label: local,
+        value: local,
+    }));
+
+    const switcher = (
+        event: ReactChangeEvent<HTMLInputElement>,
+        service: WritableUserConfigV1Keys
+    ) => {
+        const checked = event.target.checked;
+        userConfigService.set(service, checked);
+    };
+
+    const switcherNumber = (event: ReactChangeEvent<HTMLInputElement>) => {
+        const extractProgressDelay = +event.target.value;
+        userConfigService.set("extractProgressDelay", extractProgressDelay);
+    };
+
     return (
         <div className={style.userconfig}>
-            {Object.keys(userConfigTemplate).map((k) => {
-                const type = typeof userConfigTemplate[k];
-                return configComponents[type]({ value });
-            })}
             <h1>{t("user-config.panel.title")}</h1>
-            <label htmlFor="userconfig__lang__selector">
-                {t("user-config.select.choose")}
-            </label>
 
-            <select
-                onChange={selectLang}
-                name="lang"
-                id="userconfig__lang__selector"
+            <UserConfigPanelSelect
                 defaultValue={config.locale}
-            >
-                <option value="fr-FR">{t("user-config.select.french")}</option>
-                <option value="en-GB">{t("user-config.select.english")}</option>
-                <option value="de-DE">{t("user-config.select.german")}</option>
-            </select>
+                id="userconfig__lang__selector"
+                options={localeOptions}
+                label={t("user-config.select.choose")}
+                setter={selectLocale}
+            />
+            <UserConfigPanelNumber
+                id="userconfig__progress"
+                label={t("user-config.input.progress")}
+                currentValue={config.extractProgressDelay}
+                setter={switcherNumber}
+            />
+            <UserConfigPanelCheckbox
+                checked={config.fullscreen}
+                id="userconfig__fullscreen"
+                label={t("user-config.input.fullscreen")}
+                setter={(event) => {
+                    switcher(event, "fullscreen");
+                }}
+            />
+            <UserConfigPanelCheckbox
+                checked={config.fullscreen}
+                id="userconfig__collect"
+                label={t("user-config.input.collectData")}
+                setter={(event) => {
+                    switcher(event, "collectData");
+                }}
+            />
+
             <button
                 className={style.userconfig__close}
                 onClick={OnOffUserConfigPanel}

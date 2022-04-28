@@ -123,5 +123,8 @@
   "user-config.select.choose": "Sélectionner une langue :",
   "user-config.select.english": "Anglais",
   "user-config.select.french": "Français",
-  "user-config.select.german": "Allemand"
+  "user-config.select.german": "Allemand",
+  "user-config.input.fullscreen": "Plein écran",
+  "user-config.input.progress": "Suivi de la progression (en ms)",
+  "user-config.input.collectData": "Collecte des données"
 }

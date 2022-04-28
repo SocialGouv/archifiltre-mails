@@ -1,7 +1,7 @@
 import create from "zustand";
 
 export const userConfigPanelStore = create(() => ({
-    isOpen: false,
+    isOpen: true,
 }));
 
 const { setState, getState } = userConfigPanelStore;
