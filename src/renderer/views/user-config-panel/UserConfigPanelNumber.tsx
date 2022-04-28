@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import React from "react";
 
 import type { UserConfigPanelBaseProps } from ".";
@@ -9,12 +8,12 @@ interface UserConfigPanelNumberProps
     currentValue: number;
 }
 
-export const UserConfigPanelNumber = ({
+export const UserConfigPanelNumber: React.FC<UserConfigPanelNumberProps> = ({
     setter,
     id,
     label,
     currentValue,
-}: UserConfigPanelNumberProps): ReactNode => (
+}) => (
     <div className={style.userconfig__controller}>
         <div className={style.userconfig__number}>
             <label htmlFor={id}>{label}</label>

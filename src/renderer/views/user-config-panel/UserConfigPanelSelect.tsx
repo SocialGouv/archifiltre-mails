@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import React from "react";
 
 import type { UserConfigPanelBaseProps } from ".";
@@ -15,13 +14,13 @@ interface UserConfigPanelSelectProps
     options: UserConfigPanelSelectOptions[];
 }
 
-export const UserConfigPanelSelect = ({
+export const UserConfigPanelSelect: React.FC<UserConfigPanelSelectProps> = ({
     setter,
     defaultValue,
     options,
     id,
     label,
-}: UserConfigPanelSelectProps): ReactNode => (
+}) => (
     <div className={style.userconfig__controller}>
         <label htmlFor={id}>{label}</label>
 

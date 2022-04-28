@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import React from "react";
 
 import type { UserConfigPanelBaseProps } from ".";
@@ -9,12 +8,9 @@ interface UserConfigPanelCheckboxProps
     checked: boolean;
 }
 
-export const UserConfigPanelCheckbox = ({
-    setter,
-    id,
-    label,
-    checked,
-}: UserConfigPanelCheckboxProps): ReactNode => (
+export const UserConfigPanelCheckbox: React.FC<
+    UserConfigPanelCheckboxProps
+> = ({ setter, id, label, checked }) => (
     <div className={style.userconfig__controller}>
         <div className={style.userconfig__toggle}>
             <label>{label}</label>

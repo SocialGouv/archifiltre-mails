@@ -1,7 +1,12 @@
 import type { Locale } from "@common/i18n/raw";
 import { SupportedLocales } from "@common/i18n/raw";
 import { useService } from "@common/modules/ContainerModule";
-import type { WritableUserConfigV1Keys } from "@common/modules/UserConfigModule";
+import { schema } from "@common/modules/user-config/schema";
+import type {
+    UserConfigTypedKeys,
+    WritableUserConfigKeys,
+} from "@common/modules/user-config/type";
+import { Object } from "@common/utils/overload";
 import type { ReactNode } from "react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -49,7 +54,7 @@ export const UserConfigPanel: React.FC = () => {
 
     const switcher = (
         event: ReactChangeEvent<HTMLInputElement>,
-        service: WritableUserConfigV1Keys
+        service: WritableUserConfigKeys
     ) => {
         const checked = event.target.checked;
         userConfigService.set(service, checked);
@@ -63,6 +68,30 @@ export const UserConfigPanel: React.FC = () => {
     return (
         <div className={style.userconfig}>
             <h1>{t("user-config.panel.title")}</h1>
+
+            {Object.keys(schema).map((valueName) => {
+                const valueSchema = schema[valueName];
+                switch (valueSchema.type) {
+                    case "boolean":
+                        valueName = valueName as UserConfigTypedKeys<boolean>;
+                        return (
+                            <UserConfigPanelCheckbox
+                                checked={config[valueName]}
+                                id={`userconfig__${valueName}`}
+                                key={`userconfig__${valueName}`}
+                                label={t(`user-config.input.${valueName}`)}
+                                setter={(event) => {
+                                    userConfigService.set(
+                                        valueName,
+                                        event.target.checked
+                                    );
+                                }}
+                            />
+                        );
+                    default:
+                        return null;
+                }
+            })}
 
             <UserConfigPanelSelect
                 defaultValue={config.locale}

@@ -3,25 +3,24 @@ import { app } from "electron";
 import Store from "electron-store";
 
 import { IS_MAIN, IS_PACKAGED } from "../config";
-import type { Locale } from "../i18n/raw";
-import { SupportedLocales, validLocale } from "../i18n/raw";
+import { validLocale } from "../i18n/raw";
 import { AppError } from "../lib/error/AppError";
 import type { PubSub } from "../lib/event/PubSub";
 import type { Event } from "../lib/event/type";
 import { ipcMain, ipcRenderer } from "../lib/ipc";
-import type { TrackAppId } from "../tracker/type";
 import { randomString } from "../utils";
 import { name as appName } from "../utils/package";
 import type { SimpleObject, VoidFunction } from "../utils/type";
-import { unreadonly } from "../utils/type";
 import { WaitableTrait } from "../utils/WaitableTrait";
 import { IsomorphicService } from "./ContainerModule";
 import { IsomorphicModule } from "./Module";
+import { schema } from "./user-config/schema";
+import type { UserConfigObject } from "./user-config/type";
 
 export class UserConfigError extends AppError {
     constructor(
         message: string,
-        public readonly store?: UserConfigV1,
+        public readonly store?: UserConfigObject,
         previousError?: Error | unknown
     ) {
         super(message, previousError);
@@ -29,13 +28,13 @@ export class UserConfigError extends AppError {
 }
 
 export class UserConfigEvent<T = SimpleObject>
-    implements Event<T & UserConfigV1>
+    implements Event<T & UserConfigObject>
 {
-    public readonly state: Readonly<T & UserConfigV1>;
+    public readonly state: Readonly<T & UserConfigObject>;
 
     public readonly namespace = "event.userconfig" as const;
 
-    constructor(state: T & UserConfigV1) {
+    constructor(state: T & UserConfigObject) {
         this.state = { ...state };
     }
 }
@@ -48,42 +47,23 @@ declare module "../lib/event/type" {
 }
 
 /**
- * Config for `ArchifiltreMails@v1`
- */
-interface UserConfigV1 {
-    readonly _firstOpened: boolean;
-    readonly appId: TrackAppId;
-    collectData: boolean;
-    extractProgressDelay: number;
-    fullscreen: boolean;
-    locale: Locale;
-}
-
-export type UserConfigObject = UserConfigV1;
-
-export type WritableUserConfigV1Keys = Exclude<
-    keyof UserConfigV1,
-    "_firstOpened" | "appId"
->;
-
-/**
  * Define how to get a config value
  */
-type UserConfigGetter = <TKey extends keyof UserConfigV1>(
+type UserConfigGetter = <TKey extends keyof UserConfigObject>(
     key: TKey
-) => UserConfigV1[TKey];
+) => UserConfigObject[TKey];
 
 /**
  * Define how to get a all config
  */
-type UserConfigGetterAll = () => UserConfigV1;
+type UserConfigGetterAll = () => UserConfigObject;
 
 /**
  * Define how to set a config value
  */
-type UserConfigSetter = <TKey extends keyof UserConfigV1>(
+type UserConfigSetter = <TKey extends keyof UserConfigObject>(
     key: TKey,
-    value: UserConfigV1[TKey]
+    value: UserConfigObject[TKey]
 ) => void;
 
 declare global {
@@ -105,7 +85,7 @@ declare module "../lib/ipc/event" {
         [CONFIG_ASK_UPDATE_EVENT]: DualIpcConfig<
             typeof CONFIG_UPDATE_EVENT,
             [id: string],
-            [config: Readonly<UserConfigV1>]
+            [config: Readonly<UserConfigObject>]
         >;
     }
 
@@ -114,16 +94,13 @@ declare module "../lib/ipc/event" {
     }
 
     interface AsyncIpcMapping {
-        [CONFIG_INIT_EVENT]: IpcConfig<[], UserConfigV1>;
+        [CONFIG_INIT_EVENT]: IpcConfig<[], UserConfigObject>;
         [CONFIG_SET_EVENT]: {
-            [K in keyof UserConfigV1]: IpcConfig<
-                [key: K, value: UserConfigV1[K]],
+            [K in keyof UserConfigObject]: IpcConfig<
+                [key: K, value: UserConfigObject[K]],
                 void
             >;
-        }[keyof UserConfigV1];
-        // [CONFIG_SET_EVENT]:
-        //     | IpcConfig<[key: "_firstOpened", value: boolean], void>
-        //     | IpcConfig<[key: "appId", value: TrackAppId], void>;
+        }[keyof UserConfigObject];
     }
 }
 
@@ -138,10 +115,10 @@ export class UserConfigModule extends IsomorphicModule {
     private inited = false;
 
     // bang because only used on main process
-    private store!: Store<UserConfigV1>;
+    private store!: Store<UserConfigObject>;
 
     // bang because only used on renderer process
-    private localConfigCopy!: UserConfigV1;
+    private localConfigCopy!: UserConfigObject;
 
     private _service?: UserConfigService;
 
@@ -159,7 +136,7 @@ export class UserConfigModule extends IsomorphicModule {
         }
 
         if (IS_MAIN) {
-            this.store = new Store<UserConfigV1>({
+            this.store = new Store<UserConfigObject>({
                 clearInvalidConfig: true,
                 defaults: {
                     _firstOpened: true,
@@ -170,28 +147,7 @@ export class UserConfigModule extends IsomorphicModule {
                     locale: validLocale(app.getLocale()),
                 },
                 name: IS_PACKAGED() ? "config" : appName,
-                schema: {
-                    _firstOpened: {
-                        type: "boolean",
-                    },
-                    appId: {
-                        readOnly: true,
-                        type: "string",
-                    },
-                    collectData: {
-                        type: "boolean",
-                    },
-                    extractProgressDelay: {
-                        minimum: 500,
-                        type: "integer",
-                    },
-                    fullscreen: {
-                        type: "boolean",
-                    },
-                    locale: {
-                        enum: unreadonly(SupportedLocales),
-                    },
-                },
+                schema,
                 watch: true,
             });
 
@@ -201,7 +157,7 @@ export class UserConfigModule extends IsomorphicModule {
                 string,
                 (
                     replyChannel: typeof CONFIG_UPDATE_EVENT,
-                    config: Readonly<UserConfigV1>
+                    config: Readonly<UserConfigObject>
                 ) => void
             >();
             // add a renderer process as a subscriber to the update event
