@@ -2,10 +2,7 @@ import type { Locale } from "@common/i18n/raw";
 import { SupportedLocales } from "@common/i18n/raw";
 import { useService } from "@common/modules/ContainerModule";
 import { schema } from "@common/modules/user-config/schema";
-import type {
-    UserConfigTypedKeys,
-    WritableUserConfigKeys,
-} from "@common/modules/user-config/type";
+import type { UserConfigTypedKeys } from "@common/modules/user-config/type";
 import { Object } from "@common/utils/overload";
 import type { ReactNode } from "react";
 import React from "react";
@@ -42,28 +39,10 @@ export const UserConfigPanel: React.FC = () => {
 
     const config = userConfigService.getAll();
 
-    const selectLocale = (event: ReactChangeEvent<HTMLSelectElement>) => {
-        const lang = event.target.value;
-        userConfigService.set("locale", lang as Locale);
-    };
-
     const localeOptions = SupportedLocales.map((local) => ({
         label: local,
         value: local,
     }));
-
-    const switcher = (
-        event: ReactChangeEvent<HTMLInputElement>,
-        service: WritableUserConfigKeys
-    ) => {
-        const checked = event.target.checked;
-        userConfigService.set(service, checked);
-    };
-
-    const switcherNumber = (event: ReactChangeEvent<HTMLInputElement>) => {
-        const extractProgressDelay = +event.target.value;
-        userConfigService.set("extractProgressDelay", extractProgressDelay);
-    };
 
     return (
         <div className={style.userconfig}>
@@ -73,6 +52,7 @@ export const UserConfigPanel: React.FC = () => {
                 const valueSchema = schema[valueName];
                 switch (valueSchema.type) {
                     case "boolean":
+                        if (valueName === "_firstOpened") return null;
                         valueName = valueName as UserConfigTypedKeys<boolean>;
                         return (
                             <UserConfigPanelCheckbox
@@ -88,40 +68,46 @@ export const UserConfigPanel: React.FC = () => {
                                 }}
                             />
                         );
+
+                    case "integer":
+                        valueName = valueName as UserConfigTypedKeys<number>;
+                        return (
+                            <UserConfigPanelNumber
+                                id={`userconfig__${valueName}`}
+                                label={t("user-config.input.progress")}
+                                currentValue={config[valueName]}
+                                key={`userconfig__${valueName}`}
+                                setter={(event) => {
+                                    userConfigService.set(
+                                        valueName,
+                                        +event.target.value
+                                    );
+                                }}
+                            />
+                        );
+
+                    case undefined:
+                        valueName = valueName as UserConfigTypedKeys<Locale>;
+
+                        return (
+                            <UserConfigPanelSelect
+                                defaultValue={config[valueName]}
+                                id={`userconfig__${valueName}`}
+                                options={localeOptions}
+                                label={t("user-config.select.choose")}
+                                setter={(event) => {
+                                    userConfigService.set(
+                                        valueName,
+                                        event.target.value
+                                    );
+                                }}
+                            />
+                        );
+
                     default:
                         return null;
                 }
             })}
-
-            <UserConfigPanelSelect
-                defaultValue={config.locale}
-                id="userconfig__lang__selector"
-                options={localeOptions}
-                label={t("user-config.select.choose")}
-                setter={selectLocale}
-            />
-            <UserConfigPanelNumber
-                id="userconfig__progress"
-                label={t("user-config.input.progress")}
-                currentValue={config.extractProgressDelay}
-                setter={switcherNumber}
-            />
-            <UserConfigPanelCheckbox
-                checked={config.fullscreen}
-                id="userconfig__fullscreen"
-                label={t("user-config.input.fullscreen")}
-                setter={(event) => {
-                    switcher(event, "fullscreen");
-                }}
-            />
-            <UserConfigPanelCheckbox
-                checked={config.fullscreen}
-                id="userconfig__collect"
-                label={t("user-config.input.collectData")}
-                setter={(event) => {
-                    switcher(event, "collectData");
-                }}
-            />
 
             <button
                 className={style.userconfig__close}

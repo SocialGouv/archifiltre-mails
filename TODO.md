@@ -17,7 +17,7 @@
 - [x] global and user config (shared over ipc)
 - [x] i18n (i18next + react-i18next (start [here](./src/common/i18n/)))
 - [x] pub/sub
-- [ ] config view
+- [x] config view
 - [ ] send bug
 - [ ] check for update
 - [ ] Isomorphic electron mock ?
