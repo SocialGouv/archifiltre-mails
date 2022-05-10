@@ -1,12 +1,12 @@
 import create from "zustand";
 
 export const userConfigPanelStore = create(() => ({
-    isOpen: true,
+    isOpen: false,
 }));
 
-const { setState, getState } = userConfigPanelStore;
+const { setState } = userConfigPanelStore;
 
-export const OnOffUserConfigPanel = (): void => {
+export const toggleUserConfigPanel = (): void => {
     setState((state) => ({ isOpen: !state.isOpen }));
 };
 

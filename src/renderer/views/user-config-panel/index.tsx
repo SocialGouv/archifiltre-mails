@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 
 import {
     isUserConfigPanelOpen,
-    OnOffUserConfigPanel,
+    toggleUserConfigPanel,
 } from "../../store/UserConfigPanelStore";
 import style from "./UserConfigPanel.module.scss";
 import { UserConfigPanelCheckbox } from "./UserConfigPanelCheckbox";
@@ -111,7 +111,7 @@ export const UserConfigPanel: React.FC = () => {
 
             <button
                 className={style.userconfig__close}
-                onClick={OnOffUserConfigPanel}
+                onClick={toggleUserConfigPanel}
             >
                 {t("user-config.panel.close")}
             </button>

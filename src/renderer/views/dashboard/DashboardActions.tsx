@@ -3,7 +3,7 @@ import React, { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { ExportPicto } from "../../components/common/pictos/picto";
-import { OnOffUserConfigPanel } from "../../store/UserConfigPanelStore";
+import { toggleUserConfigPanel } from "../../store/UserConfigPanelStore";
 import style from "./Dashboard.module.scss";
 import { DashboardActionsExporter } from "./DashboardActionsExporter";
 
@@ -26,7 +26,7 @@ export const DashboardActions: FC = () => {
                 <DashboardActionsExporter isExporterOpen={exporter} />
             </div>
             <div className={style.dashboard__actions__bar__btn}>
-                <button onClick={OnOffUserConfigPanel}>
+                <button onClick={toggleUserConfigPanel}>
                     <ExportPicto />
                     {t("actionBar.action.config-panel")}
                 </button>
