@@ -1,14 +1,13 @@
 import React from "react";
 
-import type { UserConfigPanelBaseProps } from ".";
-import style from "./UserConfigPanel.module.scss";
+import type { UserConfigPanelBaseProps } from "../type";
+import style from "../UserConfigPanel.module.scss";
 
-interface UserConfigPanelNumberProps
-    extends UserConfigPanelBaseProps<HTMLInputElement> {
+interface NumberProps extends UserConfigPanelBaseProps<HTMLInputElement> {
     currentValue: number;
 }
 
-export const UserConfigPanelNumber: React.FC<UserConfigPanelNumberProps> = ({
+export const Number: React.FC<NumberProps> = ({
     setter,
     id,
     label,

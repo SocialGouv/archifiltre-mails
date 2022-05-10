@@ -1,5 +1,4 @@
 import type { Locale } from "@common/i18n/raw";
-import { SupportedLocales } from "@common/i18n/raw";
 import { useService } from "@common/modules/ContainerModule";
 import { schema } from "@common/modules/user-config/schema";
 import type { UserConfigTypedKeys } from "@common/modules/user-config/type";
@@ -12,21 +11,11 @@ import {
     isUserConfigPanelOpen,
     toggleUserConfigPanel,
 } from "../../store/UserConfigPanelStore";
+import { Checkbox, Number, Select } from "./inputs";
 import style from "./UserConfigPanel.module.scss";
-import { UserConfigPanelCheckbox } from "./UserConfigPanelCheckbox";
-import { UserConfigPanelNumber } from "./UserConfigPanelNumber";
-import { UserConfigPanelSelect } from "./UserConfigPanelSelect";
 
 export interface UserConfigPanelProps {
     children: ReactNode;
-}
-
-type ReactChangeEvent<TElement> = React.ChangeEvent<TElement>;
-
-export interface UserConfigPanelBaseProps<TElement> {
-    id: string;
-    label: string;
-    setter: (event: ReactChangeEvent<TElement>) => void;
 }
 
 export const UserConfigPanel: React.FC = () => {
@@ -39,23 +28,22 @@ export const UserConfigPanel: React.FC = () => {
 
     const config = userConfigService.getAll();
 
-    const localeOptions = SupportedLocales.map((local) => ({
-        label: local,
-        value: local,
-    }));
-
     return (
         <div className={style.userconfig}>
             <h1>{t("user-config.panel.title")}</h1>
 
             {Object.keys(schema).map((valueName) => {
                 const valueSchema = schema[valueName];
+                if (valueSchema.enum) {
+                    valueSchema.type = "array";
+                }
+
                 switch (valueSchema.type) {
                     case "boolean":
                         if (valueName === "_firstOpened") return null;
                         valueName = valueName as UserConfigTypedKeys<boolean>;
                         return (
-                            <UserConfigPanelCheckbox
+                            <Checkbox
                                 checked={config[valueName]}
                                 id={`userconfig__${valueName}`}
                                 key={`userconfig__${valueName}`}
@@ -72,7 +60,7 @@ export const UserConfigPanel: React.FC = () => {
                     case "integer":
                         valueName = valueName as UserConfigTypedKeys<number>;
                         return (
-                            <UserConfigPanelNumber
+                            <Number
                                 id={`userconfig__${valueName}`}
                                 label={t("user-config.input.progress")}
                                 currentValue={config[valueName]}
@@ -86,14 +74,15 @@ export const UserConfigPanel: React.FC = () => {
                             />
                         );
 
-                    case undefined:
+                    case "array":
                         valueName = valueName as UserConfigTypedKeys<Locale>;
 
                         return (
-                            <UserConfigPanelSelect
+                            <Select
                                 defaultValue={config[valueName]}
                                 id={`userconfig__${valueName}`}
-                                options={localeOptions}
+                                key={`userconfig__${valueName}`}
+                                enumOptions={valueSchema.enum!}
                                 label={t("user-config.select.choose")}
                                 setter={(event) => {
                                     userConfigService.set(

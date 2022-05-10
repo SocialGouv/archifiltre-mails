@@ -1,16 +1,18 @@
 import React from "react";
 
-import type { UserConfigPanelBaseProps } from ".";
-import style from "./UserConfigPanel.module.scss";
+import type { UserConfigPanelBaseProps } from "../type";
+import style from "../UserConfigPanel.module.scss";
 
-interface UserConfigPanelCheckboxProps
-    extends UserConfigPanelBaseProps<HTMLInputElement> {
+interface CheckboxProps extends UserConfigPanelBaseProps<HTMLInputElement> {
     checked: boolean;
 }
 
-export const UserConfigPanelCheckbox: React.FC<
-    UserConfigPanelCheckboxProps
-> = ({ setter, id, label, checked }) => (
+export const Checkbox: React.FC<CheckboxProps> = ({
+    setter,
+    id,
+    label,
+    checked,
+}) => (
     <div className={style.userconfig__controller}>
         <div className={style.userconfig__toggle}>
             <label>{label}</label>

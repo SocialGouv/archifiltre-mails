@@ -1,23 +1,28 @@
 import React from "react";
 
-import type { UserConfigPanelBaseProps } from ".";
-import style from "./UserConfigPanel.module.scss";
+import type { UserConfigPanelBaseProps } from "../type";
+import style from "../UserConfigPanel.module.scss";
 
-interface UserConfigPanelSelectOptions {
+interface SelectOption {
     label: number | string;
     value: number | string;
 }
 
-interface UserConfigPanelSelectProps
-    extends UserConfigPanelBaseProps<HTMLSelectElement> {
+interface SelectProps extends UserConfigPanelBaseProps<HTMLSelectElement> {
     defaultValue: number | string;
-    options: UserConfigPanelSelectOptions[];
+    enumOptions: string[];
 }
 
-export const UserConfigPanelSelect: React.FC<UserConfigPanelSelectProps> = ({
+const enumToOptions = (anyEnum: string[]): SelectOption[] =>
+    anyEnum.map((local) => ({
+        label: local,
+        value: local,
+    }));
+
+export const Select: React.FC<SelectProps> = ({
     setter,
     defaultValue,
-    options,
+    enumOptions,
     id,
     label,
 }) => (
@@ -25,7 +30,7 @@ export const UserConfigPanelSelect: React.FC<UserConfigPanelSelectProps> = ({
         <label htmlFor={id}>{label}</label>
 
         <select onChange={setter} id={id} defaultValue={defaultValue}>
-            {options.map((option, index) => (
+            {enumToOptions(enumOptions).map((option, index) => (
                 <option value={option.value} key={index}>
                     {option.label}
                 </option>
