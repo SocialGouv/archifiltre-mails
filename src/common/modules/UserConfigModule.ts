@@ -181,7 +181,7 @@ export class UserConfigModule extends IsomorphicModule {
         } else {
             // ask main for initial config
             this.localConfigCopy = await ipcRenderer.invoke(CONFIG_INIT_EVENT);
-            // subscribe to any udpate
+            // subscribe to any udpates
             ipcRenderer.on(CONFIG_UPDATE_EVENT, (_event, arg) => {
                 this.localConfigCopy = arg;
             });
