@@ -1,26 +1,26 @@
 import { Use } from "@lsagetlethias/tstrait";
-import { app, ipcMain, ipcRenderer } from "electron";
+import { app } from "electron";
 import Store from "electron-store";
 
 import { IS_MAIN, IS_PACKAGED } from "../config";
-import type { Locale } from "../i18n/raw";
-import { SupportedLocales, validLocale } from "../i18n/raw";
+import { validLocale } from "../i18n/raw";
 import { AppError } from "../lib/error/AppError";
 import type { PubSub } from "../lib/event/PubSub";
 import type { Event } from "../lib/event/type";
-import type { TrackAppId } from "../tracker/type";
+import { ipcMain, ipcRenderer } from "../lib/ipc";
 import { randomString } from "../utils";
 import { name as appName } from "../utils/package";
 import type { SimpleObject, VoidFunction } from "../utils/type";
-import { unreadonly } from "../utils/type";
 import { WaitableTrait } from "../utils/WaitableTrait";
 import { IsomorphicService } from "./ContainerModule";
 import { IsomorphicModule } from "./Module";
+import { schema } from "./user-config/schema";
+import type { UserConfigObject } from "./user-config/type";
 
 export class UserConfigError extends AppError {
     constructor(
         message: string,
-        public readonly store?: UserConfigV1,
+        public readonly store?: UserConfigObject,
         previousError?: Error | unknown
     ) {
         super(message, previousError);
@@ -28,13 +28,13 @@ export class UserConfigError extends AppError {
 }
 
 export class UserConfigEvent<T = SimpleObject>
-    implements Event<T & UserConfigV1>
+    implements Event<T & UserConfigObject>
 {
-    public readonly state: Readonly<T & UserConfigV1>;
+    public readonly state: Readonly<T & UserConfigObject>;
 
     public readonly namespace = "event.userconfig" as const;
 
-    constructor(state: T & UserConfigV1) {
+    constructor(state: T & UserConfigObject) {
         this.state = { ...state };
     }
 }
@@ -47,30 +47,23 @@ declare module "../lib/event/type" {
 }
 
 /**
- * Config for `ArchifiltreMails@v1`
- */
-interface UserConfigV1 {
-    _firstOpened: boolean;
-    appId: TrackAppId;
-    collectData: boolean;
-    extractProgressDelay: number;
-    fullscreen: boolean;
-    locale: Locale;
-}
-
-/**
  * Define how to get a config value
  */
-type UserConfigGetter = <TKey extends keyof UserConfigV1>(
+type UserConfigGetter = <TKey extends keyof UserConfigObject>(
     key: TKey
-) => UserConfigV1[TKey];
+) => UserConfigObject[TKey];
+
+/**
+ * Define how to get a all config
+ */
+type UserConfigGetterAll = () => UserConfigObject;
 
 /**
  * Define how to set a config value
  */
-type UserConfigSetter = <TKey extends keyof UserConfigV1>(
+type UserConfigSetter = <TKey extends keyof UserConfigObject>(
     key: TKey,
-    value?: UserConfigV1[TKey]
+    value: UserConfigObject[TKey]
 ) => void;
 
 declare global {
@@ -85,6 +78,31 @@ const CONFIG_INIT_EVENT = "config.event.init";
 const CONFIG_UPDATE_EVENT = "config.event.update";
 const CONFIG_ASK_UPDATE_EVENT = "config.event.askUpdate";
 const CONFIG_UNSUB_UPDATE_EVENT = "config.event.unsubUpdate";
+const CONFIG_SET_EVENT = "config.event.set";
+
+declare module "../lib/ipc/event" {
+    interface DualAsyncIpcMapping {
+        [CONFIG_ASK_UPDATE_EVENT]: DualIpcConfig<
+            typeof CONFIG_UPDATE_EVENT,
+            [id: string],
+            [config: Readonly<UserConfigObject>]
+        >;
+    }
+
+    interface SyncIpcMapping {
+        [CONFIG_UNSUB_UPDATE_EVENT]: IpcConfig<[id: string], boolean>;
+    }
+
+    interface AsyncIpcMapping {
+        [CONFIG_INIT_EVENT]: IpcConfig<[], UserConfigObject>;
+        [CONFIG_SET_EVENT]: {
+            [K in keyof UserConfigObject]: IpcConfig<
+                [key: K, value: UserConfigObject[K]],
+                void
+            >;
+        }[keyof UserConfigObject];
+    }
+}
 
 /**
  * Isomorphic module handling user config. Use `electron-store` under the hood on main side.
@@ -97,10 +115,10 @@ export class UserConfigModule extends IsomorphicModule {
     private inited = false;
 
     // bang because only used on main process
-    private store!: Store<UserConfigV1>;
+    private store!: Store<UserConfigObject>;
 
     // bang because only used on renderer process
-    private localConfigCopy!: UserConfigV1;
+    private localConfigCopy!: UserConfigObject;
 
     private _service?: UserConfigService;
 
@@ -118,7 +136,7 @@ export class UserConfigModule extends IsomorphicModule {
         }
 
         if (IS_MAIN) {
-            this.store = new Store<UserConfigV1>({
+            this.store = new Store<UserConfigObject>({
                 clearInvalidConfig: true,
                 defaults: {
                     _firstOpened: true,
@@ -129,28 +147,7 @@ export class UserConfigModule extends IsomorphicModule {
                     locale: validLocale(app.getLocale()),
                 },
                 name: IS_PACKAGED() ? "config" : appName,
-                schema: {
-                    _firstOpened: {
-                        type: "boolean",
-                    },
-                    appId: {
-                        readOnly: true,
-                        type: "string",
-                    },
-                    collectData: {
-                        type: "boolean",
-                    },
-                    extractProgressDelay: {
-                        minimum: 500,
-                        type: "integer",
-                    },
-                    fullscreen: {
-                        type: "boolean",
-                    },
-                    locale: {
-                        enum: unreadonly(SupportedLocales),
-                    },
-                },
+                schema,
                 watch: true,
             });
 
@@ -158,15 +155,22 @@ export class UserConfigModule extends IsomorphicModule {
             ipcMain.handle(CONFIG_INIT_EVENT, () => this.store.store);
             const rendererConfigRepliers = new Map<
                 string,
-                (channel: string, value: unknown) => void
+                (
+                    replyChannel: typeof CONFIG_UPDATE_EVENT,
+                    config: Readonly<UserConfigObject>
+                ) => void
             >();
             // add a renderer process as a subscriber to the update event
             ipcMain.on(CONFIG_ASK_UPDATE_EVENT, (event, id) => {
-                rendererConfigRepliers.set(id as string, event.reply as never);
+                rendererConfigRepliers.set(id, event.reply);
             });
             // remove a renderer process from being aware of config changes
             ipcMain.on(CONFIG_UNSUB_UPDATE_EVENT, (event, id) => {
-                event.returnValue = rendererConfigRepliers.delete(id as string);
+                event.returnValue = rendererConfigRepliers.delete(id);
+            });
+            // triggered when manual set is done from renderer
+            ipcMain.handle(CONFIG_SET_EVENT, (_, key, value) => {
+                this.store.set(key, value);
             });
             this.store.onDidAnyChange((config) => {
                 if (!config) return;
@@ -208,6 +212,7 @@ export class UserConfigModule extends IsomorphicModule {
             this._service ??
             (this._service = new InnerUserConfigService(
                 this.get,
+                this.getAll,
                 this.set,
                 this.clear
             ) as UserConfigService)
@@ -227,6 +232,17 @@ export class UserConfigModule extends IsomorphicModule {
     };
 
     /**
+     * Return this whole config object. The default implementation of this function must not be called from main process.
+     *
+     * @returns The full config object
+     */
+    private readonly getAll: UserConfigGetterAll = () => {
+        this.ensureInited();
+        if (IS_MAIN) return { ...this.store.store };
+        else return this.localConfigCopy;
+    };
+
+    /**
      * Set a value associated with the provided key. Only works from main. Setting undefined will delete the key.
      *
      * @todo set from renderer
@@ -238,11 +254,9 @@ export class UserConfigModule extends IsomorphicModule {
         this.ensureInited();
         if (IS_MAIN) {
             this.store.set(key, value);
-        } else
-            throw new UserConfigError(
-                "Can't direct set config outside of main process.",
-                this.store.store
-            );
+        } else {
+            void ipcRenderer.invoke(CONFIG_SET_EVENT, key, value as never);
+        }
     };
 
     /**
@@ -278,6 +292,10 @@ class InnerUserConfigService extends IsomorphicService {
          * Get a config by its name.
          */
         public readonly get: UserConfigGetter,
+        /**
+         * Get a whole config.
+         */
+        public readonly getAll: UserConfigGetterAll,
         /**
          * Set a config by its name and value.
          */
