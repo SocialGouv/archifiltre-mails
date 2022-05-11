@@ -2,11 +2,13 @@ import { toDecimalsFloat } from "@common/utils";
 import React, { useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
+import { CogPicto } from "../../components/common/pictos/picto";
 import { StaticImage } from "../../components/common/staticImage/StaticImage";
 import { Dropzone } from "../../components/dropzone/Dropzone";
 import { useRouteContext } from "../../context/RouterContext";
 import { usePstExtractor } from "../../hooks/usePstExtractor";
 import { usePstStore } from "../../store/PSTStore";
+import { toggleUserConfigPanel } from "../../store/UserConfigPanelStore";
 import { ACCEPTED_EXTENSION } from "../../utils/constants";
 import style from "./StartScreen.module.scss";
 
@@ -39,6 +41,12 @@ export const StartScreen: React.FC = () => {
 
     return (
         <div className={style.startscreen}>
+            <button
+                className={style.startscreen__open__config}
+                onClick={toggleUserConfigPanel}
+            >
+                <CogPicto />
+            </button>
             <StaticImage className={style.logo} alt="logo" src="img/logo.png" />
             <Dropzone onDrop={onDrop} accept={ACCEPTED_EXTENSION} />
             <div className={progressClassName}>

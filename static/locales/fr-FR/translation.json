@@ -2,6 +2,7 @@
   "actionBar.action.export": "Exporter",
   "actionBar.action.filter": "Filtrer",
   "actionBar.action.import": "Importer",
+  "actionBar.action.config-panel": "Configuration",
   "app.quit.detail": "Données non sauvegardées !",
   "app.quit.leave": "Quitter ?",
   "app.quit.title": "Quitter l'application",
@@ -116,5 +117,14 @@
   "startscreen.importInfo.folders": "Dossiers :",
   "startscreen.importInfo.seconds": "{{seconds}}s",
   "startscreen.importInfo.totalFiles": "Total :",
-  "startscreen.importInfo.totalTime": "Temps total :"
+  "startscreen.importInfo.totalTime": "Temps total :",
+  "user-config.panel.title" : "Panneau de configuration",
+  "user-config.panel.close": "Fermer",
+  "user-config.select.choose": "Sélectionner une langue :",
+  "user-config.select.english": "Anglais",
+  "user-config.select.french": "Français",
+  "user-config.select.german": "Allemand",
+  "user-config.input.fullscreen": "Plein écran",
+  "user-config.input.progress": "Suivi de la progression (en ms)",
+  "user-config.input.collectData": "Collecte des données"
 }
