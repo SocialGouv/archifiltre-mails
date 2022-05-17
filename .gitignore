@@ -5,6 +5,8 @@ tmpws/
 coverage/
 chromedriverlog.txt
 bin/
+*.p12
+.secrets
 
 ##
 ## Should be global, but it's an open source project
