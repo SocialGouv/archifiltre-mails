@@ -58,6 +58,7 @@ if (releaseMode === "normal") {
                     `bin/**/${binName}*.@(exe|dmg|AppImage|msi|zip)`,
                     `bin/**/${binName}*.sha512`,
                     `bin/**/${binName}*.blockmap`,
+                    `bin/**/latest*.yml`,
                 ],
                 releasedLabels: false,
                 successComment: false,

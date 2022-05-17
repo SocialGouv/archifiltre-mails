@@ -18,6 +18,8 @@ declare module "*.png" {
     export default content;
 }
 
+declare module "source-map-support";
+
 declare namespace NodeJS {
     interface ProcessEnv {
         SENTRY_DSN: string;

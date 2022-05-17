@@ -117,7 +117,9 @@
       "artifactName": "${name}-${os}.${ext}"
     },
     "nsis": {
-      "artifactName": "${name}-${os}-setup.${ext}"
+      "artifactName": "${name}-${os}-setup.${ext}",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
     },
     "linux": {
       "category": "Office",
@@ -155,8 +157,8 @@
     "axios": "^0.26.1",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.0",
-    "electron": "^18.1.0",
-    "electron-builder": "^22.14.5",
+    "electron": "^18.2.3",
+    "electron-builder": "^23.0.3",
     "electron-notarize": "^1.1.1",
     "electron-webpack": "^2.8.2",
     "electron-webpack-ts": "^4.0.1",
