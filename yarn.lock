@@ -2763,15 +2763,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.34.tgz#3b0b6a50ff797280b8d000c6281d229f9c538cef"
   integrity sha512-XImEz7XwTvDBtzlTnm8YvMqGW/ErMWBsKZ+hMTvnDIjGCKxwK5Xpc+c/oQjOauwq8M4OS11hEkpjX8rrI/eEgA==
 
-"@types/node@^16":
+"@types/node@^16", "@types/node@^16.11.26":
   version "16.11.36"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.36.tgz#9ab9f8276987132ed2b225cace2218ba794fc751"
   integrity sha512-FR5QJe+TaoZ2GsMHkjuwoNabr+UrJNRr2HNOo+r/7vhcuntM6Ee/pRPOnRhhL2XE9OOvX9VLEq+BcXl3VjNoWA==
-
-"@types/node@^16.11.26":
-  version "16.11.29"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.29.tgz#2422b0bf46afb2568dc71df903afa36f56bab8ea"
-  integrity sha512-9dDdonLyPJQJ/kdOlDxAah+bTI+u2ccF3k62FErhquDuggoCX6piWez7j7o6yNE+rP2IRcZVQ6Tw4N0P38+rWA==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -6406,9 +6401,9 @@ electron-webpack@^2.8.2:
     yargs "^15.3.1"
 
 electron@^18.2.3:
-  version "18.2.3"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-18.2.3.tgz#36bcb8f71e41631e6b11179eeff291c8228bfd6a"
-  integrity sha512-DJWX03hCRKTscsfXxmW4gmgFuseop+g+m4ml7NfOMfankD8uYyr2Xyi3Ui02inL9qZOlbLMeLVCu6jKCKs8p/w==
+  version "18.2.4"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-18.2.4.tgz#3ea3392f008ea4bdf66b0e3b2e1769e04370323c"
+  integrity sha512-wSjU2N6kBGyGKb2GgBhujpfKtnmNr+gDaZZ6fMmlVMoPJ+GvuW0Zr1ImKPdb5zPXopPYmaURDSvHuAfSd4oHFA==
   dependencies:
     "@electron/get" "^1.13.0"
     "@types/node" "^16.11.26"
