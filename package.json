@@ -156,7 +156,7 @@
     "axios": "^0.26.1",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.0",
-    "electron": "^18.2.3",
+    "electron": "^19.0.1",
     "electron-builder": "^23.0.3",
     "electron-notarize": "^1.1.1",
     "electron-webpack": "^2.8.2",
