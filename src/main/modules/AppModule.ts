@@ -92,11 +92,10 @@ export class AppModule extends MainModule {
             }
 
             // TODO: more interactive auto-update
-            autoUpdater.on("checking-for-update", (evt) => {
+            autoUpdater.on("checking-for-update", () => {
                 this.consoleToRendererService.log(
                     mainWindow,
-                    "[UPDATE] Check for update",
-                    evt
+                    "[UPDATE] Check for update"
                 );
             });
 

@@ -49,3 +49,6 @@ updates:
       - dependency-name: "eslint-plugin-playwright"
         versions:
           - ">=0.7.0"
+      - dependency-name: "typescript"
+        versions:
+          - ">=4.7"
