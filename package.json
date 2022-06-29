@@ -157,7 +157,7 @@
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.0",
     "electron": "^19.0.6",
-    "electron-builder": "^23.1.0",
+    "electron-builder": "23.0.3",
     "electron-notarize": "^1.1.1",
     "electron-webpack": "^2.8.2",
     "electron-webpack-ts": "^4.0.1",
