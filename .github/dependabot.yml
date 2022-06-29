@@ -52,3 +52,6 @@ updates:
       - dependency-name: "typescript"
         versions:
           - ">=4.7"
+      - dependency-name: "electron-builder"
+        versions:
+          - ">23.0.3"
