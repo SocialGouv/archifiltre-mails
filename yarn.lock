@@ -1912,11 +1912,11 @@
     universal-user-agent "^6.0.0"
 
 "@octokit/graphql-schema@^10.73.0":
-  version "10.74.0"
-  resolved "https://registry.yarnpkg.com/@octokit/graphql-schema/-/graphql-schema-10.74.0.tgz#890a3e1db9b5baa8df853c7e5870bb3cfb1a0d31"
-  integrity sha512-WMGXndu2zk2oHijwW3zMvjLNmOwroFi//prVD7d6GcJiwbXZKN9hVY6aVBS3XBINV0+xnjKLwSCFkb8RrgBxKg==
+  version "10.74.2"
+  resolved "https://registry.yarnpkg.com/@octokit/graphql-schema/-/graphql-schema-10.74.2.tgz#3f2f02bd44fa1abca6517c6f2f7411f64a3deef2"
+  integrity sha512-PG6zZvFyOi4aRsfWwBji8GjJRHF6U9gUjqonVa0N6kpGae6Uhc75GDXOLX0x+/b+Kws82pug3+17tmgZ/o7HfQ==
   dependencies:
-    graphql "^15.0.0"
+    graphql "^16.0.0"
     graphql-tag "^2.10.3"
 
 "@octokit/graphql@^4.5.8", "@octokit/graphql@^4.8.0":
@@ -7951,10 +7951,10 @@ graphql-tag@^2.10.3:
   dependencies:
     tslib "^2.1.0"
 
-graphql@^15.0.0:
-  version "15.8.0"
-  resolved "https://registry.yarnpkg.com/graphql/-/graphql-15.8.0.tgz#33410e96b012fa3bdb1091cc99a94769db212b38"
-  integrity sha512-5gghUc24tP9HRznNpV2+FIoq3xKkj5dTQqf4v0CpdPbFVwFkWoxOM+o+2OC9ZSvjEMTjfmG9QT+gcvggTwW1zw==
+graphql@^16.0.0:
+  version "16.5.0"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.5.0.tgz#41b5c1182eaac7f3d47164fb247f61e4dfb69c85"
+  integrity sha512-qbHgh8Ix+j/qY+a/ZcJnFQ+j8ezakqPiHwPiZhV/3PgGlgf96QMBB5/f2rkiC9sgLoy/xvT6TSiaf2nTHJh5iA==
 
 handle-thing@^2.0.0:
   version "2.0.1"
