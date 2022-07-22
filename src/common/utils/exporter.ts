@@ -43,11 +43,11 @@ export const formatEmailTable = (
         [tKeys.bccName]: email.bcc.map((bcc) => bcc.name).join(","),
         [tKeys.bccEmail]: email.bcc.map((bcc) => bcc.email).join(","),
         [tKeys.subject]: email.subject,
-        [tKeys.attachmentCount]: email.attachementCount,
-        [tKeys.attachmentsFilesize]: email.attachements
+        [tKeys.attachmentCount]: email.attachmentCount,
+        [tKeys.attachmentsFilesize]: email.attachments
             .map((attachement) => attachement.filesize)
             .join(","),
-        [tKeys.attachmentsFilename]: email.attachements
+        [tKeys.attachmentsFilename]: email.attachments
             .map((attachement) => attachement.filename)
             .join(","),
         [tKeys.contentText]: email.contentText,

@@ -24,13 +24,22 @@ export interface PstElement {
 
 export interface PstFolder extends PstElement {
     emailCount: number;
-    folderType: string;
     type: "folder" | "rootFolder";
 }
 
 export const isPstFolder = (elt: PstElement): elt is PstFolder => {
     return elt.type === "folder" || elt.type === "rootFolder";
 };
+
+export type PstMailIndex = number[];
+export type PstMailIndexEntries = [string, PstMailIndex][];
+export type PstMailIdsEntries = [string, string[]][];
+export type PstAttachmentEntries = [string, PstAttachment[]][];
+
+export interface PstAttachementIndex {
+    index: number;
+    mailIndex: PstMailIndex;
+}
 
 export interface PstContent extends PstFolder {
     children: PstFolder[];
@@ -51,8 +60,8 @@ export interface PstEmailRecipient {
 }
 
 export interface PstEmail extends PstElement {
-    attachementCount: number;
-    attachements: PstAttachement[];
+    attachmentCount: number;
+    attachments: PstAttachment[];
     bcc: PstEmailRecipient[];
     cc: PstEmailRecipient[];
     contentHTML: string;
@@ -73,7 +82,7 @@ export const isPstEmail = (elt: PstElement): elt is PstEmail => {
     return elt.type === "email";
 };
 
-export interface PstAttachement {
+export interface PstAttachment {
     filename: string;
     filesize: number;
     mimeType: string;
@@ -83,7 +92,7 @@ export interface PstAttachement {
  * State object on each progress tick (one tick per extracted email).
  */
 export interface PstProgressState {
-    countAttachement: number;
+    countAttachment: number;
     countEmail: number;
     countFolder: number;
     countTotal: number;
@@ -98,7 +107,7 @@ export interface PstExtractTables {
     /**
      * Attachement list stored by email uuid
      */
-    attachements: Map<string, PstAttachement[]>;
+    attachements: Map<string, PstAttachment[]>;
     /**
      * Contact list associated with list of corresponding email uuid
      */
@@ -107,4 +116,12 @@ export interface PstExtractTables {
      * Email list stored by folder uuid
      */
     emails: Map<string, PstEmail[]>;
+}
+
+export interface PstExtractDatas {
+    attachments: Map<string, PstAttachment[]>;
+    domain: Map<string, string[]>;
+    indexes: Map<string, PstMailIndex>;
+    recipient: Map<string, string[]>;
+    year: Map<string, string[]>;
 }

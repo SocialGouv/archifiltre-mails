@@ -11,7 +11,7 @@ export type StartScreenLoaderProps = Pick<
 export const StartScreenLoader: React.FC<StartScreenLoaderProps> = ({
     countEmail,
     countFolder,
-    countAttachement,
+    countAttachment: countAttachement,
     countTotal,
 }) => (
     <>

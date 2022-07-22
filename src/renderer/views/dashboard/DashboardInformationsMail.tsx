@@ -24,7 +24,7 @@ export const DashboardInformationsMail: FC<{
     const { pstFile } = usePstStore();
 
     const volumeTotal =
-        bytesToKilobytes(getFileSizeByMail(mainInfos.data.email.attachements)) +
+        bytesToKilobytes(getFileSizeByMail(mainInfos.data.email.attachments)) +
         AVERAGE_MAIL_SIZE_IN_KO;
 
     if (!pstFile) return null;
@@ -32,7 +32,7 @@ export const DashboardInformationsMail: FC<{
         <div className={style.dashboard__informations__wrapper__mail}>
             <div>
                 <strong>{t("dashboard.informations.type")} </strong>
-                {t("dashboard.informations.id.mail")}
+                {t("dashboard.informations.mailCount")}
             </div>
             <div>
                 <strong>{t("dashboard.informations.object")} </strong>
@@ -53,14 +53,14 @@ export const DashboardInformationsMail: FC<{
             </div>
             <div>
                 <strong>{t("dashboard.informations.attachementCount")} </strong>{" "}
-                {mainInfos.data.email.attachementCount}
+                {mainInfos.data.email.attachmentCount}
             </div>
 
             <div>
                 <strong>
                     {t("dashboard.informations.attachementTitles")}{" "}
                 </strong>{" "}
-                {mainInfos.data.email.attachements.map(
+                {mainInfos.data.email.attachments.map(
                     ({ filename }, index: number) => (
                         <span key={index}>{filename}</span>
                     )

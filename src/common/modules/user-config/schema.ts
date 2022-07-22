@@ -25,4 +25,18 @@ export const schema: Schema<UserConfigObject> = {
     locale: {
         enum: unreadonly(SupportedLocales),
     },
+    viewConfigs: {
+        items: {
+            properties: {
+                groupBy: {
+                    type: "string",
+                },
+                type: {
+                    type: "string",
+                },
+            },
+            type: "object",
+        },
+        type: "array",
+    },
 } as const;

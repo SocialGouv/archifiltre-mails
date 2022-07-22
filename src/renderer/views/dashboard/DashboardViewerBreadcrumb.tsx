@@ -1,6 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
+import { useDymViewerNavigation } from "../../hooks/useDymViewerNavigation";
+import type { BreadcrumbId } from "../../store/BreadcrumbStore";
 import { useBreadcrumbStore } from "../../store/BreadcrumbStore";
 import style from "./Dashboard.module.scss";
 
@@ -13,6 +15,7 @@ const convertHistory = (history: string[]) => ({
 export const DashboardViewerBreadcrumb: React.FC = () => {
     const { t } = useTranslation();
     const { breadcrumb } = useBreadcrumbStore();
+    const { viewList, currentViewIndex } = useDymViewerNavigation();
     return (
         <div className={style.dashboard__viewer__breadcrumb}>
             <div className={style.dashboard__viewer__breadcrumb__item}>
@@ -23,9 +26,14 @@ export const DashboardViewerBreadcrumb: React.FC = () => {
                     {t("dashboard.viewer.breadcrumb.level")}
                 </span>
                 &nbsp;
-                {t(`dashboard.viewer.breadcrumb.id.${breadcrumb.id}`, {
-                    history: convertHistory(breadcrumb.history ?? []),
-                })}
+                {t(
+                    `dashboard.viewer.breadcrumb.id.${
+                        breadcrumb.id as BreadcrumbId
+                    }`,
+                    {
+                        history: convertHistory(breadcrumb.history ?? []),
+                    }
+                )}
             </div>
         </div>
     );

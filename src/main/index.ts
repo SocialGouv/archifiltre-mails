@@ -106,7 +106,10 @@ app.on("ready", async () => {
                 trackerService
             ),
             new DevToolsModule(),
-            new PstExtractorModule(containerModule.get("userConfigService")),
+            new PstExtractorModule(
+                containerModule.get("userConfigService"),
+                consoleToRendererService
+            ),
             new MenuModule(
                 consoleToRendererService,
                 containerModule.get("pstExtractorMainService"),

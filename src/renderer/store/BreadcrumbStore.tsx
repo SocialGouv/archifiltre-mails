@@ -1,3 +1,4 @@
+import type { UnknownMapping } from "@common/utils/type";
 import { atom, useAtom } from "jotai/index";
 import type { SetStateAction } from "react";
 
@@ -11,23 +12,23 @@ export type BreadcrumbId = {
 
 export interface BreadcrumbObject {
     history?: string[];
-    id: BreadcrumbId;
+    id: BreadcrumbId | UnknownMapping;
 }
 
 export interface UseBreadcrumbStore {
     breadcrumb: BreadcrumbObject;
     setBreadcrumb: (update: SetStateAction<BreadcrumbObject>) => void;
-    setPreviousBreadcrumb: (id: BreadcrumbId) => void;
+    setPreviousBreadcrumb: (id: BreadcrumbObject["id"]) => void;
 }
 
 const breadcrumbAtom = atom<BreadcrumbObject>({
-    id: "domain",
+    id: "domain", // TODO: custom
 });
 
 export const useBreadcrumbStore = (): UseBreadcrumbStore => {
     const [breadcrumb, setBreadcrumb] = useAtom(breadcrumbAtom);
 
-    const setPreviousBreadcrumb = (id: BreadcrumbId) => {
+    const setPreviousBreadcrumb = (id: BreadcrumbObject["id"]) => {
         setBreadcrumb((prevBreadcrumb) => {
             const history = prevBreadcrumb.history;
             history?.pop();

@@ -40,12 +40,12 @@ export const getMailsByStatus = (
         );
 
 export const getMailsAttachementCount = (mails: PstEmail[]): number =>
-    mails.reduce((prev, curr) => (prev += curr.attachementCount), 0);
+    mails.reduce((prev, curr) => (prev += curr.attachmentCount), 0);
 
 export const getMailsAttachementSize = (mails: PstEmail[]): number =>
     bytesToMegabytes(
         mails
-            .map((mail) => mail.attachements)
+            .map((mail) => mail.attachments)
             .filter((mail) => mail.length)
             .flat()
             .reduce((prev, curr) => (prev += curr.filesize), 0)
@@ -94,9 +94,9 @@ export const getDeletedMailsCount = (
                 rec(child);
             });
         } else if (isPstEmail(pst)) {
-            deletedMailsAttachmentCount += pst.attachementCount;
+            deletedMailsAttachmentCount += pst.attachmentCount;
             deletedMailsCount++;
-            deletedMailsAttachementSize += pst.attachements.reduce(
+            deletedMailsAttachementSize += pst.attachments.reduce(
                 (prev, curr) => prev + curr.filesize,
                 0
             );

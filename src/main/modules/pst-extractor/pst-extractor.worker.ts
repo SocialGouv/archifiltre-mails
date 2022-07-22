@@ -1,30 +1,39 @@
 import type {
-    PstAttachement,
-    PstContent,
-    PstEmail,
-    PstEmailRecipient,
-    PstExtractTables,
-    PstFolder,
+    PstAttachment as PstAttachment,
+    PstAttachmentEntries,
+    PstMailIdsEntries,
+    PstMailIndex,
+    PstMailIndexEntries,
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
-import type {
-    PSTFolder,
-    PSTRecipient,
-} from "@socialgouv/archimail-pst-extractor";
+import { getDomain, getLdapDomain, isLdap } from "@common/modules/views/utils";
+import type { PSTFolder } from "@socialgouv/archimail-pst-extractor";
 import { PSTFile } from "@socialgouv/archimail-pst-extractor";
-import { randomUUID } from "crypto";
+import { Level } from "level";
 import path from "path";
 import { parentPort, workerData } from "worker_threads";
+
+// import { randomUUID } from "crypto";
+let ID = 0;
+function randomUUID() {
+    return `${ID++}`;
+}
 
 // Events - Worker => Parent
 export const PST_PROGRESS_WORKER_EVENT = "pstExtractor.worker.event.progress";
 export const PST_DONE_WORKER_EVENT = "pstExtractor.worker.event.done";
 
+/*
+1/ tester le switch randomUUID vs incremental id
+2/ 4012 => [ 0, 1, 4, 0, 11, 180 ] == index de stockage global (baseIndex)
+3/ créer des index de recherche par id : Set([id1, id2, id3]) pour tous les domaines, toutes les années, tous les correspondants
+4/ effectuer des instersections e.g. (domaine(beta.gouv) + année(2018))
+5/ stocker en cache le résultat
+*/
+
 interface EventDataMapping {
     [PST_DONE_WORKER_EVENT]: {
-        content: PstContent;
         progressState: PstProgressState;
-        pstExtractTables: PstExtractTables;
     };
     [PST_PROGRESS_WORKER_EVENT]: PstProgressState;
 }
@@ -53,30 +62,11 @@ function postMessage<TEvent extends PstWorkerEvent>(
     parentPort?.postMessage({ data, event } as PstWorkerMessageType);
 }
 
-const getRecipientFromDisplay = (
-    display: string,
-    recipients: PSTRecipient[]
-): PstEmailRecipient[] =>
-    display
-        .split(";")
-        .map((name) => name.trim())
-        .filter((name) => name)
-        .map((name) => {
-            const found = recipients.find(
-                (recipient) => recipient.displayName === name
-            );
-            return {
-                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- Handle empty string
-                email: found?.smtpAddress || found?.emailAddress,
-                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- Handle empty string
-                name: found?.recipientDisplayName || found?.displayName || name,
-            };
-        });
-
 /**
  * WorkerData - Initial worker arguments
  */
 export interface PstWorkerData {
+    cachePath: string;
     depth?: number;
     progressInterval?: number;
     pstFilePath: string;
@@ -88,17 +78,19 @@ let nextTimeTick = starTime;
 let definedDepth = Infinity;
 let root = true;
 let currentDepth = 0;
+let currentFolderIndexes = [0];
 
 if (parentPort) {
     const {
         pstFilePath,
         progressInterval: pi,
         depth,
+        cachePath,
     } = workerData as PstWorkerData;
     progressInterval = Math.abs(pi ?? progressInterval);
     definedDepth = Math.abs(depth ?? definedDepth);
     const progressState: PstProgressState = {
-        countAttachement: 0,
+        countAttachment: 0,
         countEmail: 0,
         countFolder: 0,
         countTotal: 0,
@@ -106,11 +98,12 @@ if (parentPort) {
         progress: true,
     };
 
-    const pstExtractTables: PstExtractTables = {
-        attachements: new Map(),
-        contacts: new Map(),
-        emails: new Map(),
-    };
+    const mailIndexes = new Map<string, PstMailIndex>();
+    const attachments = new Map<string, PstAttachment[]>();
+    // TODO: prepare from given view config
+    const domainIds = new Map<string, string[]>();
+    const recipientIds = new Map<string, string[]>();
+    const yearIds = new Map<string, string[]>();
 
     postMessage(PST_PROGRESS_WORKER_EVENT, progressState);
     const pstFile = new PSTFile(path.resolve(pstFilePath));
@@ -121,19 +114,55 @@ if (parentPort) {
     currentDepth = 0;
     starTime = Date.now();
     nextTimeTick = starTime;
+    currentFolderIndexes = [-1];
     //
 
-    const content = {
-        ...processFolder(rootFolder, progressState, pstExtractTables),
-        type: "rootFolder",
-    } as PstContent;
-    content.name = pstFile.getMessageStore().displayName;
-
-    progressState.elapsed = Date.now() - starTime;
-    postMessage(PST_DONE_WORKER_EVENT, {
-        content,
+    // const content = {
+    //     ...
+    processFolder(
+        rootFolder,
         progressState,
-        pstExtractTables,
+        // pstExtractTables,
+        mailIndexes,
+        domainIds,
+        yearIds,
+        recipientIds,
+        attachments
+    );
+    //,
+    //     type: "rootFolder",
+    // } as PstContent;
+    // content.name = pstFile.getMessageStore().displayName;
+
+    // const db = new Level<string, PstMailIndex>(path.resolve(cachePath, "db"));
+
+    void (async () => {
+        const db = new Level<string, PstMailIndexEntries>(
+            "/Users/lsagetlethias/source/SocialGouv/archimail/db",
+            { valueEncoding: "json" }
+        );
+        await db.clear();
+        const idDb = db.sublevel<string, PstMailIdsEntries>("ids", {
+            valueEncoding: "json",
+        });
+        const attachmentDb = db.sublevel<string, PstAttachmentEntries>(
+            "attachment",
+            {
+                valueEncoding: "json",
+            }
+        );
+
+        await db.put("index", [...mailIndexes.entries()]);
+        await idDb.put("domain", [...domainIds.entries()]);
+        await idDb.put("year", [...yearIds.entries()]);
+        await idDb.put("recipient", [...recipientIds.entries()]);
+        await attachmentDb.put("_", [...attachments.entries()]);
+        await db.close();
+    })().then(() => {
+        progressState.elapsed = Date.now() - starTime;
+        postMessage(PST_DONE_WORKER_EVENT, {
+            progressState,
+        });
     });
 }
 
@@ -143,146 +172,141 @@ if (parentPort) {
  * Process a "raw" folder from the PST and extract sub folders, emails, and attachements.
  *
  * The progress state is updated for every item found and sent to any listener on every emails.
- *
- * @param folder The folder to process
- * @param progressState The current progress state to update
- * @returns The extracted content
  */
 function processFolder(
     folder: PSTFolder,
     progressState: PstProgressState,
-    pstExtractTables: PstExtractTables,
-    parentPath = ""
-): PstFolder {
-    const content: PstFolder = {
-        elementPath: parentPath,
-        emailCount: folder.emailCount,
-        folderType:
-            ["Generic", "Root", "Search"][folder.folderType] ?? "Generic",
-        id: randomUUID(),
-        name: folder.displayName,
-        size: Math.abs(folder.emailCount) || 1,
-        type: "folder",
-    };
-
+    mailIndexes: Map<string, PstMailIndex>,
+    domainIndexes: Map<string, string[]>,
+    yearIndexes: Map<string, string[]>,
+    recipientIndexes: Map<string, string[]>,
+    attachments: Map<string, PstAttachment[]>
+): void {
     if (root) {
         root = false;
     } else {
+        currentFolderIndexes[currentDepth] ??= -1;
+        currentFolderIndexes = currentFolderIndexes.slice(0, currentDepth + 1);
+        currentFolderIndexes[currentDepth]++;
         currentDepth++;
     }
 
     if (currentDepth <= definedDepth && folder.hasSubfolders) {
         for (const childFolder of folder.getSubFolders()) {
-            if (!content.children) {
-                content.children = [];
-            }
             progressState.countFolder++;
             progressState.countTotal++;
-            content.children.push(
-                processFolder(
-                    childFolder,
-                    progressState,
-                    pstExtractTables,
-                    folder.displayName
-                        ? `${content.elementPath}/${folder.displayName}`
-                        : ""
-                )
+            if (
+                childFolder.containerClass !== "" && // root or system folder
+                childFolder.containerClass !== "IPF.Note" // message folder
+            ) {
+                continue;
+            }
+            processFolder(
+                childFolder,
+                progressState,
+                mailIndexes,
+                domainIndexes,
+                yearIndexes,
+                recipientIndexes,
+                attachments
             );
         }
     }
 
     if (folder.contentCount) {
+        let mailIndex = 0;
         for (const email of folder.childrenIterator()) {
-            if (!content.children) {
-                content.children = [];
-            }
-
             if (email.messageClass !== "IPM.Note") {
-                if (!content.other) {
-                    content.other = [];
-                }
-                content.other.push(email.messageClass);
                 continue;
             }
 
-            const recipients = email.getRecipients();
+            // const recipients = email.getRecipients();
 
-            const emailContent: PstEmail = {
-                attachementCount: email.numberOfAttachments,
-                attachements: [],
-                bcc: getRecipientFromDisplay(email.displayBCC, recipients),
-                cc: getRecipientFromDisplay(email.displayCC, recipients),
-                contentHTML: email.bodyHTML,
-                contentRTF: email.bodyRTF,
-                contentText: email.body,
-                elementPath: parentPath,
+            // TODO: use group functions instead
+            const emailId = randomUUID();
+            const emailAddress = email.senderEmailAddress;
+            const domainKey = isLdap(emailAddress)
+                ? getLdapDomain(emailAddress)
+                : getDomain(emailAddress);
+            const recipientKey = email.senderName;
+            const year = email.messageDeliveryTime?.getFullYear();
+            const yearKey = year ? `${year}` : "";
 
-                from: {
-                    email: email.senderEmailAddress,
-                    name: email.senderName,
-                },
+            const domainIds = domainIndexes.get(domainKey) ?? [];
+            domainIndexes.set(domainKey, [...domainIds, emailId]);
+            const recipientIds = recipientIndexes.get(recipientKey) ?? [];
+            recipientIndexes.set(recipientKey, [...recipientIds, emailId]);
 
-                id: randomUUID(),
-                // TODO: change name
-                isFromMe: email.isFromMe,
-                name: `${email.senderName} ${email.originalSubject}`,
-                receivedDate: email.messageDeliveryTime,
-                sentTime: email.clientSubmitTime,
-                size: 1,
-                subject: email.subject,
-                to: getRecipientFromDisplay(email.displayTo, recipients),
-                type: "email",
-            };
+            if (yearKey) {
+                const yearIds = yearIndexes.get(yearKey) ?? [];
+                yearIndexes.set(yearKey, [...yearIds, emailId]);
+            }
+            // const emailContent: PstEmail = {
+            //     attachementCount: email.numberOfAttachments,
+            //     attachements: [],
+            //     bcc: getRecipientFromDisplay(email.displayBCC, recipients),
+            //     cc: getRecipientFromDisplay(email.displayCC, recipients),
+            //     contentHTML: email.bodyHTML,
+            //     contentRTF: email.bodyRTF,
+            //     contentText: email.body,
+            //     elementPath: parentPath,
 
-            [
-                ...emailContent.bcc,
-                ...emailContent.cc,
-                emailContent.from,
-                ...emailContent.to,
-            ].forEach((recipient) => {
-                const contactKey = recipient.email ?? recipient.name;
-                if (!pstExtractTables.contacts.has(contactKey))
-                    pstExtractTables.contacts.set(contactKey, [
-                        emailContent.id,
-                    ]);
-                else
-                    pstExtractTables.contacts
-                        .get(contactKey)
-                        ?.push(emailContent.id);
-            });
+            //     from: {
+            //         email: email.senderEmailAddress,
+            //         name: email.senderName,
+            //     },
+
+            //     id: emailId,
+            //     // TODO: change name
+            //     isFromMe: email.isFromMe,
+            //     name: `${email.senderName} ${email.originalSubject}`,
+            //     receivedDate: email.messageDeliveryTime,
+            //     sentTime: email.clientSubmitTime,
+            //     size: 1,
+            //     subject: email.subject,
+            //     to: getRecipientFromDisplay(email.displayTo, recipients),
+            //     type: "email",
+            // };
+
+            // [
+            //     ...emailContent.bcc,
+            //     ...emailContent.cc,
+            //     emailContent.from,
+            //     ...emailContent.to,
+            // ].forEach((recipient) => {
+            //     const contactKey = recipient.email ?? recipient.name;
+            //     if (!pstExtractTables.contacts.has(contactKey))
+            //         pstExtractTables.contacts.set(contactKey, [
+            //             emailContent.id,
+            //         ]);
+            //     else
+            //         pstExtractTables.contacts
+            //             .get(contactKey)
+            //             ?.push(emailContent.id);
+            // });
 
             if (email.hasAttachments) {
-                emailContent.attachements = [];
                 for (let i = 0; i < email.numberOfAttachments; i++) {
-                    const attachement = email.getAttachment(i);
-                    progressState.countAttachement++;
+                    const attachment = email.getAttachment(i);
+                    progressState.countAttachment++;
                     progressState.countTotal++;
-                    const attachementContent: PstAttachement = {
+                    const attachmentContent: PstAttachment = {
                         // TODO: change name
-                        filename: attachement.displayName,
-                        filesize: attachement.filesize,
-                        mimeType: attachement.mimeTag,
+                        filename: attachment.displayName,
+                        filesize: attachment.filesize,
+                        mimeType: attachment.mimeTag,
                     };
-                    emailContent.attachements.push(attachementContent);
 
-                    if (!pstExtractTables.attachements.has(emailContent.id))
-                        pstExtractTables.attachements.set(emailContent.id, [
-                            attachementContent,
-                        ]);
-                    else
-                        pstExtractTables.attachements
-                            .get(emailContent.id)
-                            ?.push(attachementContent);
+                    if (!attachments.has(emailId))
+                        attachments.set(emailId, [attachmentContent]);
+                    else attachments.get(emailId)?.push(attachmentContent);
                 }
             }
 
-            if (!pstExtractTables.emails.has(content.id))
-                pstExtractTables.emails.set(content.id, [emailContent]);
-            else pstExtractTables.emails.get(content.id)?.push(emailContent);
+            mailIndexes.set(emailId, [...currentFolderIndexes, mailIndex++]);
 
             progressState.countEmail++;
             progressState.countTotal++;
-            content.children.push(emailContent);
 
             // update progress only when interval ms is reached
             const now = Date.now();
@@ -294,6 +318,5 @@ function processFolder(
             }
         }
     }
-
-    return content;
+    currentDepth--;
 }

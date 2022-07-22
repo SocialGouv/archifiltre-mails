@@ -1,36 +1,19 @@
-import type {
-    PstContent,
-    PstExtractTables,
-} from "@common/modules/pst-extractor/type";
-import { atom, useAtom } from "jotai/index";
-import type { SetStateAction } from "react";
+import type { PstExtractDatas } from "@common/modules/pst-extractor/type";
+import create from "zustand";
 
-export interface UsePstStore {
+export interface PstStore {
     deletedFolder: string;
-    extractTables: PstExtractTables | undefined;
-    pstFile: PstContent | undefined;
-    setDeletedFolder: (update: SetStateAction<string>) => void;
-    setExtractTables: (
-        update: SetStateAction<PstExtractTables | undefined>
-    ) => void;
-    setPstFile: (update: SetStateAction<PstContent | undefined>) => void;
+    extractDatas?: PstExtractDatas;
+    setDeletedFolder: (deletedFolder: PstStore["deletedFolder"]) => void;
+    setExtractDatas: (extractDatas: PstStore["extractDatas"]) => void;
 }
 
-const deletedFolderAtom = atom("");
-const pstFileAtom = atom<PstContent | undefined>(void 0);
-const pstExtractTablesAtom = atom<PstExtractTables | undefined>(undefined);
-
-export const usePstStore = (): UsePstStore => {
-    const [deletedFolder, setDeletedFolder] = useAtom(deletedFolderAtom);
-    const [pstFile, setPstFile] = useAtom(pstFileAtom);
-    const [extractTables, setExtractTables] = useAtom(pstExtractTablesAtom);
-
-    return {
-        deletedFolder,
-        extractTables,
-        pstFile,
-        setDeletedFolder,
-        setExtractTables,
-        setPstFile,
-    };
-};
+export const usePstStore = create<PstStore>((set) => ({
+    deletedFolder: "",
+    setDeletedFolder(deletedFolder) {
+        set({ deletedFolder });
+    },
+    setExtractDatas(extractDatas) {
+        set({ extractDatas });
+    },
+}));

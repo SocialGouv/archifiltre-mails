@@ -1,4 +1,5 @@
 import { Use } from "@lsagetlethias/tstrait";
+import { randomUUID } from "crypto";
 import { app } from "electron";
 import Store from "electron-store";
 
@@ -16,6 +17,7 @@ import { IsomorphicService } from "./ContainerModule";
 import { IsomorphicModule } from "./Module";
 import { schema } from "./user-config/schema";
 import type { UserConfigObject } from "./user-config/type";
+import { builtInViewConfigs } from "./views/setup";
 
 export class UserConfigError extends AppError {
     constructor(
@@ -140,11 +142,12 @@ export class UserConfigModule extends IsomorphicModule {
                 clearInvalidConfig: true,
                 defaults: {
                     _firstOpened: true,
-                    appId: (await import("uuid")).v4(),
+                    appId: randomUUID(),
                     collectData: true,
                     extractProgressDelay: 1500,
                     fullscreen: true,
                     locale: validLocale(app.getLocale()),
+                    viewConfigs: builtInViewConfigs,
                 },
                 name: IS_PACKAGED() ? "config" : appName,
                 schema,
