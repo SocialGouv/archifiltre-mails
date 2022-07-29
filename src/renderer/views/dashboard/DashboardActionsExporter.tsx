@@ -26,18 +26,21 @@ export const DashboardActionsExporter: FC<{ isExporterOpen: boolean }> = ({
     return (
         <div className={className}>
             <ul>
-                <li onClick={async () => emlExport()}>EML TEST</li>
+                <li onClick={async () => emlExport()}>EML</li>
                 {fileExporterService.exporterTypes.map(
-                    (exporterType, index) => (
-                        <li
-                            onClick={() => {
-                                openSaveDialog(exporterType);
-                            }}
-                            key={index}
-                        >
-                            {exporterType.toUpperCase()}
-                        </li>
-                    )
+                    (exporterType, index) => {
+                        const exporter =
+                            exporterType === "eml"
+                                ? async () => emlExport()
+                                : () => {
+                                      openSaveDialog(exporterType);
+                                  };
+                        return (
+                            <li onClick={exporter} key={index}>
+                                {exporterType.toUpperCase()}
+                            </li>
+                        );
+                    }
                 )}
             </ul>
         </div>
