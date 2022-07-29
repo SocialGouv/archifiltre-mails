@@ -8,6 +8,7 @@ import { bytesToMegabytes } from "../utils";
 import { WaitableTrait } from "../utils/WaitableTrait";
 import { IsomorphicService } from "./ContainerModule";
 import { csvExporter } from "./exporters/CsvExporter";
+import { emlExporter } from "./exporters/EmlExporter";
 import type { Exporter } from "./exporters/Exporter";
 import { jsonExporter } from "./exporters/JsonExporter";
 import { xlsxExporter } from "./exporters/XslxExporter";
@@ -16,11 +17,12 @@ import type { TrackerService } from "./TrackerModule";
 
 export class FileExporterError extends AppError {}
 
-const exporterTypes = ["csv", "json", "xlsx"] as const;
+const exporterTypes = ["csv", "json", "xlsx", "eml"] as const;
 export type ExporterType = typeof exporterTypes[number];
 
 const exporters: Record<ExporterType, Exporter> = {
     csv: csvExporter,
+    eml: emlExporter,
     json: jsonExporter,
     xlsx: xlsxExporter,
 };

@@ -1,7 +1,17 @@
+import { mkdir, writeFile } from "fs/promises";
+import { outputFile } from "fs-extra";
 import { t } from "i18next";
 
 import type { PstEmail, PstExtractTables } from "../modules/pst-extractor/type";
 import type { SimpleObject } from "./type";
+
+export const BACK_LINE = " \n";
+export const EML_EXTENSION = ".eml";
+export const EML_FROM = "From: "
+export const EML_TO = "To: "
+export const EML_SUBJECT = "Subject: "
+export const EML_HEADERS = "X-Unset: "
+export const EML_CONTENT_TYPE = "Content-Type: text/html"
 
 /**
  * Format the given emails table into a "readable" JSON for exporters to use.
@@ -76,3 +86,56 @@ export const getMailsWithTag = (
             tag: getMarkedTagForExport(deletedIds, mail.id),
         }))
     );
+
+export const createDir = async (
+    dirPath: string
+): Promise<string | undefined> => {
+    return mkdir(dirPath, { recursive: true });
+};
+
+export interface EmlFile {
+    from?: string,
+    to: string,
+    isSent: number,
+    subject: string,
+    body: string
+}
+
+/**
+ * Create a file with a parent wrapper folder and file name as a title.
+ */
+export const createEmlFile = async (
+    filePath: string,
+    fileContent: EmlFile
+): Promise<void> => outputFile(filePath + EML_EXTENSION, generateEml(fileContent));
+
+// TODO  EML format considéré comme un MIME Type donc pas besoin de librairie tierce pour le recréer. Attention aux headers.
+/**
+ * Generate an EML from the given object.
+ *
+ * @param {string} from
+ * @param {string} to
+ * @param {string} type
+ * @param {number} isSent
+ * @param {string} subject
+ * @param {string} body
+ */
+export const generateEml = (
+mailContent: EmlFile
+): string => {
+    const mailFrom = EML_FROM + mailContent.from + BACK_LINE;
+    const mailTo = EML_TO + mailContent.to + BACK_LINE;
+    const mailType = EML_CONTENT_TYPE + BACK_LINE;
+    const mailHeadersSentState = EML_HEADERS + mailContent.isSent + BACK_LINE;
+    const mailSubject = EML_SUBJECT + mailContent.subject + BACK_LINE;
+    const mailBody = BACK_LINE + "<!DOCTYPE html><html><head></head><body style='background-color: black; color: red'><p>" + `${mailContent.body}<p></body></html>`
+
+    return (
+        mailFrom +
+        mailTo +
+        mailType +
+        mailHeadersSentState +
+        mailSubject +
+        mailBody
+    );
+};

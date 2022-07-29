@@ -17,7 +17,7 @@ export const DashboardActionsExporter: FC<{ isExporterOpen: boolean }> = ({
 
     const fileExporterService = useService("fileExporterService");
 
-    const { openSaveDialog } = useExporter();
+    const { openSaveDialog, emlExport } = useExporter();
 
     if (!fileExporterService) {
         return null;
@@ -26,6 +26,7 @@ export const DashboardActionsExporter: FC<{ isExporterOpen: boolean }> = ({
     return (
         <div className={className}>
             <ul>
+                <li onClick={async () => emlExport()}>EML TEST</li>
                 {fileExporterService.exporterTypes.map(
                     (exporterType, index) => (
                         <li

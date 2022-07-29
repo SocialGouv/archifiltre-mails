@@ -9,6 +9,7 @@ import { usePstStore } from "../store/PSTStore";
 import { dialog } from "../utils/electron";
 
 interface UseExporter {
+    emlExport: () => Promise<void>;
     openSaveDialog: (type: ExporterType) => void;
 }
 
@@ -16,7 +17,7 @@ export const useExporter = (): UseExporter => {
     const fileExporterService = useService("fileExporterService");
     const { t } = useTranslation();
     const { toDeleteIDs } = useImpactStore();
-    const { extractTables } = usePstStore();
+    const { extractTables, pstFile } = usePstStore();
 
     const openSaveDialog = useCallback(
         async (type: ExporterType) => {
@@ -52,7 +53,18 @@ export const useExporter = (): UseExporter => {
         [t, extractTables?.emails, fileExporterService, toDeleteIDs]
     );
 
+    const emlExport = useCallback(async () => {
+        if (!fileExporterService || !pstFile) return;
+
+        const result = await dialog.showOpenDialog({
+            properties: ["openDirectory"],
+        });
+
+        await fileExporterService.export("eml", pstFile, result.filePaths[0]);
+    }, [fileExporterService, pstFile]);
+
     return {
+        emlExport,
         openSaveDialog,
     };
 };
