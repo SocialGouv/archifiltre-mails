@@ -18,7 +18,16 @@ import type { TrackerService } from "./TrackerModule";
 export class FileExporterError extends AppError {}
 
 const exporterTypes = ["csv", "json", "xlsx", "eml"] as const;
+export const exporterAsFolder = ["eml"] as const;
 export type ExporterType = typeof exporterTypes[number];
+export type ExporterAsFolderType = typeof exporterAsFolder[number];
+export type ExporterAsFileType = Exclude<ExporterType, ExporterAsFolderType>;
+
+export const isExporterAsFolderType = (
+    value: ExporterType
+): value is ExporterAsFolderType => {
+    return exporterAsFolder.includes(value as ExporterAsFolderType);
+};
 
 const exporters: Record<ExporterType, Exporter> = {
     csv: csvExporter,

@@ -2,6 +2,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 
 import { useService } from "@common/modules/ContainerModule";
+import { isExporterAsFolderType } from "@common/modules/FileExporterModule";
 import type { FC } from "react";
 import React from "react";
 
@@ -17,7 +18,7 @@ export const DashboardActionsExporter: FC<{ isExporterOpen: boolean }> = ({
 
     const fileExporterService = useService("fileExporterService");
 
-    const { openSaveDialog, emlExport } = useExporter();
+    const { openSaveFileDialog, openSaveFolderDialog } = useExporter();
 
     if (!fileExporterService) {
         return null;
@@ -26,15 +27,12 @@ export const DashboardActionsExporter: FC<{ isExporterOpen: boolean }> = ({
     return (
         <div className={className}>
             <ul>
-                <li onClick={async () => emlExport()}>EML</li>
                 {fileExporterService.exporterTypes.map(
                     (exporterType, index) => {
-                        const exporter =
-                            exporterType === "eml"
-                                ? async () => emlExport()
-                                : () => {
-                                      openSaveDialog(exporterType);
-                                  };
+                        const exporter = isExporterAsFolderType(exporterType)
+                            ? async () => openSaveFolderDialog(exporterType)
+                            : async () => openSaveFileDialog(exporterType);
+
                         return (
                             <li onClick={exporter} key={index}>
                                 {exporterType.toUpperCase()}
