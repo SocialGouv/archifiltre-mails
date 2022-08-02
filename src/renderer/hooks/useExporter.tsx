@@ -1,5 +1,8 @@
 import { useService } from "@common/modules/ContainerModule";
-import type { ExporterType } from "@common/modules/FileExporterModule";
+import type {
+    ExporterAsFileType,
+    ExporterAsFolderType,
+} from "@common/modules/FileExporterModule";
 import { formatEmailTable, getMailsWithTag } from "@common/utils/exporter";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
@@ -9,17 +12,18 @@ import { usePstStore } from "../store/PSTStore";
 import { dialog } from "../utils/electron";
 
 interface UseExporter {
-    openSaveDialog: (type: ExporterType) => void;
+    openSaveFileDialog: (type: ExporterAsFileType) => Promise<void>;
+    openSaveFolderDialog: (type: ExporterAsFolderType) => Promise<void>;
 }
 
 export const useExporter = (): UseExporter => {
     const fileExporterService = useService("fileExporterService");
     const { t } = useTranslation();
     const { toDeleteIDs } = useImpactStore();
-    const { extractTables } = usePstStore();
+    const { extractTables, pstFile } = usePstStore();
 
-    const openSaveDialog = useCallback(
-        async (type: ExporterType) => {
+    const openSaveFileDialog = useCallback(
+        async (type: ExporterAsFileType) => {
             if (!fileExporterService || !extractTables?.emails) {
                 return;
             }
@@ -52,7 +56,27 @@ export const useExporter = (): UseExporter => {
         [t, extractTables?.emails, fileExporterService, toDeleteIDs]
     );
 
+    const openSaveFolderDialog = useCallback(
+        async (type: ExporterAsFolderType) => {
+            if (!fileExporterService || !pstFile) return;
+
+            const result = await dialog.showOpenDialog({
+                properties: ["openDirectory"],
+            });
+
+            const chosenFile = result.filePaths[0];
+            if (!chosenFile) {
+                // TODO: handle error maybe?
+                return;
+            }
+
+            await fileExporterService.export(type, pstFile, chosenFile);
+        },
+        [fileExporterService, pstFile]
+    );
+
     return {
-        openSaveDialog,
+        openSaveFileDialog,
+        openSaveFolderDialog,
     };
 };

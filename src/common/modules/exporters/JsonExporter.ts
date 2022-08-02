@@ -1,12 +1,16 @@
 import { writeFile } from "fs/promises";
 
-import type { Exporter } from "./Exporter";
+import type { SimpleObject } from "../../utils/type";
+import type { JsonExporter } from "./Exporter";
 
 /**
  * Export JSON to .json file.
  */
-export const jsonExporter: Exporter = {
-    async export<T>(obj: T[], dest: string): Promise<void> {
+export const jsonExporter: JsonExporter = {
+    async export<T extends SimpleObject>(
+        obj: T[],
+        dest: string
+    ): Promise<void> {
         const data = JSON.stringify(obj, null, 2);
 
         await writeFile(dest, data, {
