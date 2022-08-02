@@ -1,67 +1,103 @@
-import type { AnyFunction, SimpleObject } from "@common/utils/type";
+import type { Nothing, SimpleObject } from "@common/utils/type";
 import { parentPort } from "worker_threads";
 
 import { TSWorker } from "./worker";
 
-interface WorkerCommand<TParam extends unknown[] = unknown[]> {
+interface WorkerCommand<TParam extends SimpleObject = SimpleObject> {
     param: TParam;
 }
 
-interface WorkerQuery<TReturn = unknown, TParam extends unknown[] = unknown[]> {
+interface WorkerQuery<
+    TReturn = unknown,
+    TParam extends SimpleObject = SimpleObject
+> {
     param: TParam;
     returnType: TReturn;
 }
 
-interface WorkerEvent<TReturn = unknown> {
+interface WorkerEventListener<TReturn = unknown> {
     returnType: TReturn;
 }
 
 type WorkerCommands = Record<string, WorkerCommand>;
 type WorkerQueries = Record<string, WorkerQuery>;
-type WorkerEvents = Record<string, WorkerEvent>;
+type WorkerEventListeners = Record<string, WorkerEventListener>;
 
 type WorkerCommandsBuilder<T extends WorkerCommands> = T;
 type WorkerQueriesBuilder<T extends WorkerQueries> = T;
-type WorkerEventsBuilder<T extends WorkerEvents> = T;
+type WorkerEventListenersBuilder<T extends WorkerEventListeners> = T;
 
 type CommandFunction<TCommands extends WorkerCommands> = <
     TCommandName extends keyof TCommands
 >(
-    name: TCommandName,
-    ...param: TCommands[TCommandName]["param"]
+    ...args: TCommands[TCommandName]["param"] extends Nothing
+        ? [name: TCommandName]
+        : [name: TCommandName, param: TCommands[TCommandName]["param"]]
 ) => Promise<void>;
 
 type QueryFunction<TQueries extends WorkerQueries> = <
     TQueryName extends keyof TQueries
 >(
-    name: TQueryName,
-    ...param: TQueries[TQueryName]["param"]
+    ...args: TQueries[TQueryName]["param"] extends Nothing
+        ? [name: TQueryName]
+        : [name: TQueryName, param: TQueries[TQueryName]["param"]]
 ) => Promise<TQueries[TQueryName]["returnType"]>;
 
-type EventFunction<TEvents extends WorkerEvents> = <
+type EventListenerFunction<TEvents extends WorkerEventListeners> = <
     TEventName extends keyof TEvents
 >(
     name: TEventName,
     listener: (value: TEvents[TEventName]["returnType"]) => Promise<void> | void
 ) => void;
 
-type MethodsName<T> = {
-    [M in keyof T]: T[M] extends AnyFunction ? M : never;
-}[keyof T];
+export type PostMessageWorkerArgs<
+    TCommands extends WorkerCommands,
+    TQueries extends WorkerQueries,
+    TInputEvent extends keyof TCommands | keyof TQueries =
+        | keyof TCommands
+        | keyof TQueries
+> = TInputEvent extends keyof TCommands
+    ? TCommands[TInputEvent]["param"] extends Nothing
+        ? [event: TInputEvent]
+        : [event: TInputEvent, data: TCommands[TInputEvent]["param"]]
+    : TInputEvent extends keyof TQueries
+    ? TQueries[TInputEvent]["param"] extends Nothing
+        ? [event: TInputEvent]
+        : [event: TInputEvent, data: TQueries[TInputEvent]["param"]]
+    : [event: TInputEvent];
+
+export type PostMessageParentArgs<
+    TEventListeners extends WorkerEventListeners,
+    TQueries extends WorkerQueries,
+    TOutputEvent extends keyof TEventListeners | keyof TQueries =
+        | keyof TEventListeners
+        | keyof TQueries
+> = TOutputEvent extends keyof TEventListeners
+    ? TEventListeners[TOutputEvent]["returnType"] extends Nothing
+        ? [event: TOutputEvent]
+        : [
+              event: TOutputEvent,
+              data: TEventListeners[TOutputEvent]["returnType"]
+          ]
+    : TOutputEvent extends keyof TQueries
+    ? TQueries[TOutputEvent]["returnType"] extends Nothing
+        ? [event: TOutputEvent]
+        : [event: TOutputEvent, data: TQueries[TOutputEvent]["returnType"]]
+    : [event: TOutputEvent];
 
 export abstract class WorkerClient<
     TData extends SimpleObject,
     TCommands extends WorkerCommands,
     TQueries extends WorkerQueries = never,
-    TEvents extends WorkerEvents = never
+    TEvents extends WorkerEventListeners = never
 > {
-    private readonly worker!: TSWorker;
+    protected readonly worker!: TSWorker;
 
     public abstract command: CommandFunction<TCommands>;
 
     public abstract query: QueryFunction<TQueries>;
 
-    public abstract addEventListener?: EventFunction<TEvents>;
+    public abstract addEventListener?: EventListenerFunction<TEvents>;
 
     public constructor(
         protected workerPath: string,
@@ -82,22 +118,50 @@ export abstract class WorkerClient<
         return !!parentPort;
     }
 
-    protected abstract init(): Record<string, MethodsName<this>>;
+    public postMessageWorker<
+        TInputEvent extends keyof TCommands | keyof TQueries
+    >(...args: PostMessageWorkerArgs<TCommands, TQueries, TInputEvent>): void {
+        if (!WorkerClient.isWorker()) {
+            this.worker.postMessage({
+                data: args[1],
+                event: args[0],
+            });
+        }
+    }
+
+    public postMessageParent<
+        TInputEvent extends keyof TCommands | keyof TQueries
+    >(...args: PostMessageWorkerArgs<TCommands, TQueries, TInputEvent>): void {
+        if (WorkerClient.isWorker()) {
+            parentPort!.postMessage({
+                data: args[1],
+                event: args[0],
+            });
+        }
+    }
+
+    protected init() {}
 }
 
 type TestWorkerClientCommands = WorkerCommandsBuilder<{
     cmdaze: {
-        param: [tototo: boolean];
+        param: { tatata: number; tototo: boolean };
     };
     maCommande: {
-        param: [];
+        param: never;
     };
 }>;
 
 type TestWorkerClientQueries = WorkerQueriesBuilder<{
     maQ: {
-        param: [];
+        param: never;
         returnType: string;
+    };
+}>;
+
+type TestWorkerClientEvents = WorkerEventListenersBuilder<{
+    monEvent: {
+        returnType: number;
     };
 }>;
 
@@ -106,7 +170,7 @@ class TestWC extends WorkerClient<
     TestWorkerClientCommands,
     TestWorkerClientQueries
 > {
-    public addEventListener?: EventFunction<never>;
+    public addEventListener?: EventListenerFunction<never>;
 
     public command: CommandFunction<TestWorkerClientCommands> = async (
         name,
@@ -124,9 +188,11 @@ class TestWC extends WorkerClient<
         throw new Error("Method not implemented.");
     };
 
-    protected init(): Record<string, MethodsName<this>> {
-        const binding: [string, MethodsName<this>] = ["", ""];
+    protected init() {
+        this.postMessageWorker("maQ");
     }
 }
 
-void new TestWC("").query("maQ");
+// call client
+const client = new TestWC("");
+void client.command("maCmmande");
