@@ -67,7 +67,7 @@ export abstract class WorkerClient<
         protected workerPath: string,
         protected workerData: TData = {} as TData
     ) {
-        if (this.isWorker()) {
+        if (WorkerClient.isWorker()) {
             // in worker
             this.init();
         } else {
@@ -78,13 +78,7 @@ export abstract class WorkerClient<
         }
     }
 
-    protected ensureIsWorker(): asserts this {
-        if (!this.isWorker()) {
-            throw new Error("Not in worker");
-        }
-    }
-
-    protected isWorker(): boolean {
+    protected static isWorker(): boolean {
         return !!parentPort;
     }
 
