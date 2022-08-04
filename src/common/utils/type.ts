@@ -23,8 +23,6 @@ export type Nothing = never | 0 | null | undefined;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Any = any;
 
-export type AnyFunction = (...args: Any[]) => Any;
-
 /**
  * Force expand a type for debug purpose. Don't work on every type.
  * @deprecated
@@ -71,11 +69,17 @@ export type DirectOrUnpackedChainedSubKeyOf<T> = {
 
 export type KeyAndSubKeyOf<T> = DirectOrUnpackedChainedSubKeyOf<T> | keyof T;
 
-export type SimpleObject = Record<string, unknown>;
+export type SimpleObject<T = unknown> = Record<string, T>;
+export type AnyFunction = (...args: unknown[]) => unknown;
+export type EveryFunction = (...args: Any[]) => Any;
 export type VoidFunction = () => void;
 export type VoidArgsFunction<TArgs extends Any[] = Any[]> = (
     ...args: TArgs
 ) => void;
+
+export type StringKeyOf<T> = {
+    [K in keyof T]: K extends string ? K : never;
+}[keyof T];
 
 export interface FixedLengthArray<T, TLength extends number> extends Array<T> {
     "0": T;

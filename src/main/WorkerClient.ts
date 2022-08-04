@@ -1,5 +1,10 @@
-import type { Nothing, SimpleObject } from "@common/utils/type";
-import { parentPort } from "worker_threads";
+import type {
+    Nothing,
+    SimpleObject,
+    StringKeyOf,
+    VoidArgsFunction,
+} from "@common/utils/type";
+import { isMainThread, parentPort } from "worker_threads";
 
 import { TSWorker } from "./worker";
 
@@ -19,16 +24,16 @@ interface WorkerEventListener<TReturn = unknown> {
     returnType: TReturn;
 }
 
-type WorkerCommands = Record<string, WorkerCommand>;
-type WorkerQueries = Record<string, WorkerQuery>;
-type WorkerEventListeners = Record<string, WorkerEventListener>;
+type WorkerCommands = SimpleObject<WorkerCommand>;
+type WorkerQueries = SimpleObject<WorkerQuery>;
+type WorkerEventListeners = SimpleObject<WorkerEventListener>;
 
 type WorkerCommandsBuilder<T extends WorkerCommands> = T;
 type WorkerQueriesBuilder<T extends WorkerQueries> = T;
 type WorkerEventListenersBuilder<T extends WorkerEventListeners> = T;
 
 type CommandFunction<TCommands extends WorkerCommands> = <
-    TCommandName extends keyof TCommands
+    TCommandName extends StringKeyOf<TCommands>
 >(
     ...args: TCommands[TCommandName]["param"] extends Nothing
         ? [name: TCommandName]
@@ -36,7 +41,7 @@ type CommandFunction<TCommands extends WorkerCommands> = <
 ) => Promise<void>;
 
 type QueryFunction<TQueries extends WorkerQueries> = <
-    TQueryName extends keyof TQueries
+    TQueryName extends StringKeyOf<TQueries>
 >(
     ...args: TQueries[TQueryName]["param"] extends Nothing
         ? [name: TQueryName]
@@ -53,9 +58,9 @@ type EventListenerFunction<TEvents extends WorkerEventListeners> = <
 export type PostMessageWorkerArgs<
     TCommands extends WorkerCommands,
     TQueries extends WorkerQueries,
-    TInputEvent extends keyof TCommands | keyof TQueries =
-        | keyof TCommands
-        | keyof TQueries
+    TInputEvent extends StringKeyOf<TCommands | TQueries> = StringKeyOf<
+        TCommands | TQueries
+    >
 > = TInputEvent extends keyof TCommands
     ? TCommands[TInputEvent]["param"] extends Nothing
         ? [event: TInputEvent]
@@ -69,9 +74,9 @@ export type PostMessageWorkerArgs<
 export type PostMessageParentArgs<
     TEventListeners extends WorkerEventListeners,
     TQueries extends WorkerQueries,
-    TOutputEvent extends keyof TEventListeners | keyof TQueries =
-        | keyof TEventListeners
-        | keyof TQueries
+    TOutputEvent extends StringKeyOf<TEventListeners | TQueries> = StringKeyOf<
+        TEventListeners | TQueries
+    >
 > = TOutputEvent extends keyof TEventListeners
     ? TEventListeners[TOutputEvent]["returnType"] extends Nothing
         ? [event: TOutputEvent]
@@ -85,62 +90,192 @@ export type PostMessageParentArgs<
         : [event: TOutputEvent, data: TQueries[TOutputEvent]["returnType"]]
     : [event: TOutputEvent];
 
+type OnWorkerMessageArgs<
+    TEventListeners extends WorkerEventListeners,
+    TQueries extends WorkerQueries,
+    TOutputEvent extends StringKeyOf<TEventListeners | TQueries> = StringKeyOf<
+        TEventListeners | TQueries
+    >
+> = TOutputEvent extends keyof TEventListeners
+    ? [
+          event: TOutputEvent,
+          listener: TEventListeners[TOutputEvent]["returnType"] extends Nothing
+              ? () => void
+              : (value: TEventListeners[TOutputEvent]["returnType"]) => void
+      ]
+    : TOutputEvent extends keyof TQueries
+    ? [
+          event: TOutputEvent,
+          listener: TQueries[TOutputEvent]["returnType"] extends Nothing
+              ? () => void
+              : (value: TQueries[TOutputEvent]["returnType"]) => void
+      ]
+    : [event: TOutputEvent, listener: (value?: unknown) => void];
+
+type OnParentMessageArgs<
+    TCommands extends WorkerCommands,
+    TQueries extends WorkerQueries,
+    TInputEvent extends StringKeyOf<TCommands> | StringKeyOf<TQueries> =
+        | StringKeyOf<TCommands>
+        | StringKeyOf<TQueries>
+> = TInputEvent extends keyof TCommands
+    ? [
+          event: TInputEvent,
+          listener: TCommands[TInputEvent]["param"] extends Nothing
+              ? () => void
+              : (value: TCommands[TInputEvent]["param"]) => void
+      ]
+    : TInputEvent extends keyof TQueries
+    ? [
+          event: TInputEvent,
+          listener: TQueries[TInputEvent]["param"] extends Nothing
+              ? () => void
+              : (value: TQueries[TInputEvent]["param"]) => void
+      ]
+    : [event: TInputEvent, listener: (value?: unknown) => void];
+
+interface DefaultWorkerMessageType {
+    data: unknown;
+    event: string;
+}
+
 export abstract class WorkerClient<
     TData extends SimpleObject,
     TCommands extends WorkerCommands,
     TQueries extends WorkerQueries = never,
-    TEvents extends WorkerEventListeners = never
+    TEventListeners extends WorkerEventListeners = never
 > {
-    protected readonly worker!: TSWorker;
+    protected readonly worker!: TSWorker<
+        DefaultWorkerMessageType,
+        DefaultWorkerMessageType
+    >;
+
+    private readonly parentMessageListenerPool = new Map<
+        string,
+        VoidArgsFunction[]
+    >();
+
+    private readonly workerMessageListenerPool = new Map<
+        string,
+        VoidArgsFunction[]
+    >();
 
     public abstract command: CommandFunction<TCommands>;
 
     public abstract query: QueryFunction<TQueries>;
 
-    public abstract addEventListener?: EventListenerFunction<TEvents>;
+    public abstract addEventListener?: EventListenerFunction<TEventListeners>;
 
     public constructor(
         protected workerPath: string,
         protected workerData: TData = {} as TData
     ) {
         if (WorkerClient.isWorker()) {
-            // in worker
-            this.init();
+            parentPort?.on(
+                "message",
+                ({ event, data }: DefaultWorkerMessageType) => {
+                    this.workerMessageListenerPool
+                        .get(event)
+                        ?.forEach((listener) => {
+                            listener(data);
+                        });
+                }
+            );
         } else {
             this.worker = new TSWorker(workerPath, {
                 stderr: true,
                 workerData,
             });
+
+            this.worker.on("message", ({ event, data }) => {
+                this.parentMessageListenerPool
+                    .get(event)
+                    ?.forEach((listener) => {
+                        listener(data);
+                    });
+            });
         }
     }
 
     protected static isWorker(): boolean {
-        return !!parentPort;
+        return !isMainThread;
     }
 
-    public postMessageWorker<
-        TInputEvent extends keyof TCommands | keyof TQueries
-    >(...args: PostMessageWorkerArgs<TCommands, TQueries, TInputEvent>): void {
+    public async terminate(): Promise<void> {
+        if (WorkerClient.isWorker()) {
+            process.exit();
+        }
+        await this.worker.terminate();
+    }
+
+    protected postMessageWorker<
+        TInputEvent extends StringKeyOf<TCommands | TQueries>
+    >(
+        ...[event, data]: PostMessageWorkerArgs<
+            TCommands,
+            TQueries,
+            TInputEvent
+        >
+    ): void {
         if (!WorkerClient.isWorker()) {
             this.worker.postMessage({
-                data: args[1],
-                event: args[0],
+                data,
+                event,
             });
         }
     }
 
-    public postMessageParent<
-        TInputEvent extends keyof TCommands | keyof TQueries
-    >(...args: PostMessageWorkerArgs<TCommands, TQueries, TInputEvent>): void {
+    protected postMessageParent<
+        TOutputEvent extends StringKeyOf<TEventListeners | TQueries>
+    >(
+        ...[event, data]: PostMessageParentArgs<
+            TEventListeners,
+            TQueries,
+            TOutputEvent
+        >
+    ): void {
         if (WorkerClient.isWorker()) {
             parentPort!.postMessage({
-                data: args[1],
-                event: args[0],
+                data,
+                event,
             });
         }
     }
 
-    protected init() {}
+    protected onWorkerMessage<
+        TOutputEvent extends StringKeyOf<TEventListeners | TQueries>
+    >(
+        ...[event, listener]: OnWorkerMessageArgs<
+            TEventListeners,
+            TQueries,
+            TOutputEvent
+        >
+    ): this {
+        if (!WorkerClient.isWorker()) {
+            const listeners = this.parentMessageListenerPool.get(event) ?? [];
+            listeners.push(listener);
+            this.parentMessageListenerPool.set(event, listeners);
+        }
+
+        return this;
+    }
+
+    protected onParentMessage<
+        TInputEvent extends StringKeyOf<TCommands | TQueries>
+    >(
+        ...[event, listener]: OnParentMessageArgs<
+            TCommands,
+            TQueries,
+            TInputEvent
+        >
+    ): this {
+        if (WorkerClient.isWorker()) {
+            const listeners = this.workerMessageListenerPool.get(event) ?? [];
+            listeners.push(listener);
+            this.workerMessageListenerPool.set(event, listeners);
+        }
+        return this;
+    }
 }
 
 type TestWorkerClientCommands = WorkerCommandsBuilder<{
@@ -153,9 +288,13 @@ type TestWorkerClientCommands = WorkerCommandsBuilder<{
 }>;
 
 type TestWorkerClientQueries = WorkerQueriesBuilder<{
-    maQ: {
+    queryNoParam: {
         param: never;
         returnType: string;
+    };
+    queryParamBool: {
+        param: { bool: boolean };
+        returnType: 4;
     };
 }>;
 
@@ -168,14 +307,18 @@ type TestWorkerClientEvents = WorkerEventListenersBuilder<{
 class TestWC extends WorkerClient<
     never,
     TestWorkerClientCommands,
-    TestWorkerClientQueries
+    TestWorkerClientQueries,
+    TestWorkerClientEvents
 > {
-    public addEventListener?: EventListenerFunction<never>;
+    public addEventListener?: EventListenerFunction<TestWorkerClientEvents>;
 
     public command: CommandFunction<TestWorkerClientCommands> = async (
         name,
         ...param
     ) => {
+        if (!WorkerClient.isWorker()) {
+            this.postMessageWorker(name);
+        }
         await Promise.resolve();
         throw new Error("Method not implemented.");
     };
@@ -187,12 +330,9 @@ class TestWC extends WorkerClient<
         await Promise.resolve();
         throw new Error("Method not implemented.");
     };
-
-    protected init() {
-        this.postMessageWorker("maQ");
-    }
 }
 
 // call client
 const client = new TestWC("");
-void client.command("maCmmande");
+void client.command("maCommande");
+client.addEventListener?.("moEvent");
