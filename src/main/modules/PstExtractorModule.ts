@@ -23,19 +23,10 @@ import { Level } from "level";
 
 import type { ConsoleToRendererService } from "../services/ConsoleToRendererService";
 import { TSWorker } from "../worker";
+import { WorkerClient } from "../workers/WorkerClient";
 import { MainModule } from "./MainModule";
-import type {
-    PstEmailWorkerData,
-    PstEmailWorkerMessageType,
-} from "./pst-extractor/pst-email-fetcher.worker";
-import type {
-    PstWorkerData,
-    PstWorkerMessageType,
-} from "./pst-extractor/pst-extractor.worker";
-import {
-    PST_DONE_WORKER_EVENT,
-    PST_PROGRESS_WORKER_EVENT,
-} from "./pst-extractor/pst-extractor.worker";
+import type { FetchWorkerConfig } from "./pst-extractor/pst-email-fetcher.worker";
+import type { ExtractorWorkerConfig } from "./pst-extractor/pst-extractor.worker";
 
 export class PstExtractorError extends AppError {}
 
@@ -53,7 +44,7 @@ export class PstExtractorModule extends MainModule {
 
     private pstWorker?: TSWorker;
 
-    private pstEmailWorker?: TSWorker;
+    private readonly pstEmailWorker?: TSWorker;
 
     private lastProgressState!: PstProgressState;
 
@@ -62,6 +53,15 @@ export class PstExtractorModule extends MainModule {
     private lastPstExtractDatas?: PstExtractDatas;
 
     private lastPath = "";
+
+    private readonly fetchWorker = new WorkerClient<FetchWorkerConfig>(
+        "modules/pst-extractor/pst-email-fetcher.worker.ts"
+    );
+
+    private readonly extractorWorker = new WorkerClient<ExtractorWorkerConfig>(
+        "modules/pst-extractor/pst-extractor.worker.ts",
+        { cachePath: app.getPath("cache") }
+    );
 
     private progressReply?: (
         channel: typeof PST_PROGRESS_EVENT,
@@ -77,6 +77,7 @@ export class PstExtractorModule extends MainModule {
             "pstExtractorMainService",
             this.service
         );
+        const az = this.extractorWorker.workerData.cachePath;
     }
 
     public async init(): Promise<void> {
@@ -134,6 +135,9 @@ export class PstExtractorModule extends MainModule {
         const progressReply = options.noProgress ? void 0 : this.progressReply;
 
         console.info("Start extracting...");
+        await this.fetchWorker.command("open", {
+            pstFilePath: this.lastPath,
+        });
         this.pstWorker = new TSWorker(
             "modules/pst-extractor/pst-extractor.worker.ts",
             {
@@ -244,40 +248,37 @@ export class PstExtractorModule extends MainModule {
             throw new PstExtractorError("Extractor already working.");
         }
         console.info("Start fetching email...");
-        this.pstEmailWorker = new TSWorker(
-            "modules/pst-extractor/pst-email-fetcher.worker.ts",
-            {
-                stderr: true,
-                trackUnmanagedFds: true,
-                workerData: {
-                    emailIndex,
-                    pstFilePath: this.lastPath,
-                } as PstEmailWorkerData,
-            }
-        );
-
-        return new Promise<PstEmail>((resolve, reject) => {
-            this.pstEmailWorker?.on(
-                "message",
-                (message: PstEmailWorkerMessageType) => {
-                    this.working = false;
-                    resolve(message.data.email);
-                    console.log("Fetching done");
-                }
-            );
-
-            this.pstWorker?.on("error", (error) => {
-                this.working = false;
-                reject(error);
-            });
-
-            this.pstWorker?.on("exit", (exitCode) => {
-                this.working = false;
-                if (exitCode === 1) {
-                    reject("Worker stoped for unknown reason.");
-                }
-            });
+        const [email] = await this.fetchWorker.query("fetch", {
+            emailIndexes: [emailIndex],
         });
+        console.log("Fetching done");
+        if (!email) {
+            throw new Error("Email not found from given index.");
+        }
+        return email;
+
+        // return new Promise<PstEmail>((resolve, reject) => {
+        //     this.pstEmailWorker?.on(
+        //         "message",
+        //         (message: PstEmailWorkerMessageType) => {
+        //             this.working = false;
+        //             resolve(message.data.email);
+        //             console.log("Fetching done");
+        //         }
+        //     );
+
+        //     this.pstWorker?.on("error", (error) => {
+        //         this.working = false;
+        //         reject(error);
+        //     });
+
+        //     this.pstWorker?.on("exit", (exitCode) => {
+        //         this.working = false;
+        //         if (exitCode === 1) {
+        //             reject("Worker stoped for unknown reason.");
+        //         }
+        //     });
+        // });
     }
 
     private async stop(): Promise<void> {

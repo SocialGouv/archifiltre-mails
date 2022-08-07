@@ -81,6 +81,8 @@ export type StringKeyOf<T> = {
     [K in keyof T]: K extends string ? K : never;
 }[keyof T];
 
+export type Objectize<T> = { [K in keyof T]: T[K] };
+
 export interface FixedLengthArray<T, TLength extends number> extends Array<T> {
     "0": T;
     length: TLength;

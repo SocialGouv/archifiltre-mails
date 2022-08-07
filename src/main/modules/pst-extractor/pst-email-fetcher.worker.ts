@@ -6,60 +6,54 @@ import { getRecipientFromDisplay } from "@common/modules/views/utils";
 import type { PSTFolder } from "@socialgouv/archimail-pst-extractor";
 import { PSTFile } from "@socialgouv/archimail-pst-extractor";
 import path from "path";
-import { parentPort, workerData } from "worker_threads";
 
-export const PST_EMAIL_DONE_WORKER_EVENT = "pstEmailFetcher.worker.event.done";
+import type {
+    WorkerCommandsBuilder,
+    WorkerConfigBuilder,
+    WorkerQueriesBuilder,
+} from "../../workers/type";
+import { WorkerServer } from "../../workers/WorkerServer";
 
-interface EventDataMapping {
-    [PST_EMAIL_DONE_WORKER_EVENT]: {
-        email: PstEmail;
+type Commands = WorkerCommandsBuilder<{
+    open: {
+        param: {
+            pstFilePath: string;
+        };
     };
-}
+}>;
+type Queries = WorkerQueriesBuilder<{
+    fetch: {
+        param: {
+            emailIndexes: number[][];
+        };
+        returnType: PstEmail[];
+    };
+}>;
 
-export type PstEmailWorkerEvent = keyof EventDataMapping;
+export type FetchWorkerConfig = WorkerConfigBuilder<{
+    commands: Commands;
+    queries: Queries;
+}>;
 
-/**
- * Possible message types comming from the worker.
- */
-export type PstEmailWorkerMessageType<
-    TEvent extends PstEmailWorkerEvent = PstEmailWorkerEvent
-> = TEvent extends PstEmailWorkerEvent
-    ? {
-          data: EventDataMapping[TEvent];
-          event: TEvent;
-      }
-    : never;
+const server = new WorkerServer<FetchWorkerConfig>();
+let pstFile: PSTFile | null = null;
 
-/**
- * Post a message to parent thread.
- */
-function postMessage<TEvent extends PstEmailWorkerEvent>(
-    event: TEvent,
-    data: EventDataMapping[TEvent]
-): void {
-    parentPort?.postMessage({ data, event } as PstEmailWorkerMessageType);
-}
+server.onCommand("open", async ({ pstFilePath }) => {
+    pstFile = new PSTFile(path.resolve(pstFilePath));
 
-/**
- * WorkerData - Initial worker arguments
- */
-export interface PstEmailWorkerData {
-    emailIndex: number[];
-    pstFilePath: string;
-}
+    return Promise.resolve({ ok: true });
+});
 
-if (parentPort) {
-    const { pstFilePath, emailIndex } = workerData as PstEmailWorkerData;
-
-    const pstFile = new PSTFile(path.resolve(pstFilePath));
-    const rootFolder = pstFile.getRootFolder();
-
-    const email = findEmail(rootFolder, emailIndex);
-
-    postMessage(PST_EMAIL_DONE_WORKER_EVENT, {
-        email,
-    });
-}
+server.onQuery("fetch", async ({ emailIndexes }) => {
+    if (!pstFile) {
+        throw new Error("No pst file opened yet.");
+    }
+    return Promise.all(
+        emailIndexes.map((emailIndex) =>
+            findEmail(pstFile!.getRootFolder(), emailIndex)
+        )
+    );
+});
 
 // ---
 
@@ -74,9 +68,7 @@ function findEmail(folder: PSTFolder, emailIndex: number[]): PstEmail {
     const lastFolder = idxCopy.reduce<PSTFolder>((subfolder, index) => {
         return subfolder.getSubFolders()[index]!;
     }, folder);
-    lastFolder.moveChildCursorTo(emailPositionInLastFolder);
-
-    const rawEmail = lastFolder.getNextChild();
+    const rawEmail = lastFolder.getChildAt(emailPositionInLastFolder);
 
     if (!rawEmail) {
         throw new Error(
