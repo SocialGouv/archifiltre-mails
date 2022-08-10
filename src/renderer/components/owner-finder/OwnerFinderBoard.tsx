@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
+import type { AdditionalDataItem } from "@common/modules/pst-extractor/type";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
@@ -9,11 +10,10 @@ import {
     synthesisInputHandler,
     useSynthesisStore,
 } from "../../store/SynthesisStore";
-import type { FolderListItem } from "../../utils/dashboard-recap";
 import style from "./OwnerFinder.module.scss";
 
 export interface OwnerFinderBoardProps {
-    list: FolderListItem[];
+    list: AdditionalDataItem[];
     title: string;
     type: SynthesisType;
 }

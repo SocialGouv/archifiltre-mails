@@ -9,7 +9,6 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 
 import { usePstFileSizeStore } from "../../store/PstFileSizeStore";
-import { usePstStore } from "../../store/PSTStore";
 import { AVERAGE_MAIL_SIZE_IN_KO } from "../../utils/constants";
 import { sanitizeMailDate } from "../../utils/dashboard-viewer";
 import type { MailViewerObject } from "../../utils/dashboard-viewer-dym";
@@ -21,13 +20,11 @@ export const DashboardInformationsMail: FC<{
 }> = ({ mainInfos }) => {
     const { t } = useTranslation();
     const { totalFileSize } = usePstFileSizeStore();
-    const { pstFile } = usePstStore();
 
     const volumeTotal =
         bytesToKilobytes(getFileSizeByMail(mainInfos.data.email.attachments)) +
         AVERAGE_MAIL_SIZE_IN_KO;
 
-    if (!pstFile) return null;
     return (
         <div className={style.dashboard__informations__wrapper__mail}>
             <div>

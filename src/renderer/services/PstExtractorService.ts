@@ -1,6 +1,6 @@
 import {
     PST_EXTRACT_EVENT,
-    PST_GET_EMAIL_EVENT,
+    PST_GET_EMAILS_EVENT,
     PST_PROGRESS_EVENT,
     PST_PROGRESS_SUBSCRIBE_EVENT,
     PST_STOP_EXTRACT_EVENT,
@@ -23,7 +23,7 @@ export interface PstExtractorService extends Service {
      * The work is done in a worker thread in the main process.
      */
     extract: (options: ExtractOptions) => Promise<PstExtractDatas>;
-    getEmail: (emailIndex: number[]) => Promise<PstEmail>;
+    getEmails: (emailIndexes: number[][]) => Promise<PstEmail>;
     /**
      * Trigger a callback on each progress tick. (a tick is based on the progress interval)
      *
@@ -47,10 +47,10 @@ export const pstExtractorService: PstExtractorService = {
         ) as Promise<PstExtractDatas>;
     },
 
-    async getEmail(emailIndex) {
+    async getEmails(emailIndexes) {
         return ipcRenderer.invoke(
-            PST_GET_EMAIL_EVENT,
-            emailIndex
+            PST_GET_EMAILS_EVENT,
+            emailIndexes
         ) as Promise<PstEmail>;
     },
 

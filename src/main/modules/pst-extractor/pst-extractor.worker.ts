@@ -1,4 +1,5 @@
 import type {
+    AdditionalDataItem,
     PstAttachment as PstAttachment,
     PstAttachmentEntries,
     PstMailIdsEntries,
@@ -99,19 +100,23 @@ server.onCommand("extract", async ({ progressInterval: pi }) => {
     let currentDepth = 0;
     let currentFolderIndexes = [-1];
 
+    // folder list collect
+    let folderId = 0;
+    const folderList: AdditionalDataItem[] = [];
+
     /**
      * Process a "raw" folder from the PST and extract sub folders, emails, and attachements.
      *
      * The progress state is updated for every item found and sent to any listener on every emails.
      */
     function processFolder(
-        folder: PSTFolder,
-        progressStateRec: PstProgressState,
-        mailIndexesRec: Map<string, PstMailIndex>,
-        domainIndexesRec: Map<string, string[]>,
-        yearIndexesRec: Map<string, string[]>,
-        recipientIndexesRec: Map<string, string[]>,
-        attachmentsRec: Map<string, PstAttachment[]>
+        folder: PSTFolder
+        // progressState: PstProgressState,
+        // mailIndexes: Map<string, PstMailIndex>,
+        // domainIds: Map<string, string[]>,
+        // yearIds: Map<string, string[]>,
+        // recipientIds: Map<string, string[]>,
+        // attachments: Map<string, PstAttachment[]>
     ): void {
         if (root) {
             root = false;
@@ -127,22 +132,26 @@ server.onCommand("extract", async ({ progressInterval: pi }) => {
 
         if (folder.hasSubfolders) {
             for (const childFolder of folder.getSubFolders()) {
-                progressStateRec.countFolder++;
-                progressStateRec.countTotal++;
+                progressState.countFolder++;
+                progressState.countTotal++;
                 if (
                     childFolder.containerClass !== "" && // root or system folder
                     childFolder.containerClass !== "IPF.Note" // message folder
                 ) {
                     continue;
                 }
+                folderList.push({
+                    id: `${folderId++}`,
+                    name: childFolder.displayName,
+                });
                 processFolder(
-                    childFolder,
-                    progressStateRec,
-                    mailIndexesRec,
-                    domainIndexesRec,
-                    yearIndexesRec,
-                    recipientIndexesRec,
-                    attachmentsRec
+                    childFolder
+                    // progressState,
+                    // mailIndexes,
+                    // domainIds,
+                    // yearIds,
+                    // recipientIds,
+                    // attachments
                 );
             }
         }
@@ -166,18 +175,14 @@ server.onCommand("extract", async ({ progressInterval: pi }) => {
                 const year = email.messageDeliveryTime?.getFullYear();
                 const yearKey = year ? `${year}` : "";
 
-                const domainIdsRec = domainIndexesRec.get(domainKey) ?? [];
-                domainIndexesRec.set(domainKey, [...domainIdsRec, emailId]);
-                const recipientIdsRec =
-                    recipientIndexesRec.get(recipientKey) ?? [];
-                recipientIndexesRec.set(recipientKey, [
-                    ...recipientIdsRec,
-                    emailId,
-                ]);
+                const oneDomainIds = domainIds.get(domainKey) ?? [];
+                domainIds.set(domainKey, [...oneDomainIds, emailId]);
+                const oneRecipientIds = recipientIds.get(recipientKey) ?? [];
+                recipientIds.set(recipientKey, [...oneRecipientIds, emailId]);
 
                 if (yearKey) {
-                    const yearIdsRec = yearIndexesRec.get(yearKey) ?? [];
-                    yearIndexesRec.set(yearKey, [...yearIdsRec, emailId]);
+                    const oneYearIds = yearIds.get(yearKey) ?? [];
+                    yearIds.set(yearKey, [...oneYearIds, emailId]);
                 }
                 // const emailContent: PstEmail = {
                 //     attachementCount: email.numberOfAttachments,
@@ -226,8 +231,8 @@ server.onCommand("extract", async ({ progressInterval: pi }) => {
                 if (email.hasAttachments) {
                     for (let i = 0; i < email.numberOfAttachments; i++) {
                         const attachment = email.getAttachment(i);
-                        progressStateRec.countAttachment++;
-                        progressStateRec.countTotal++;
+                        progressState.countAttachment++;
+                        progressState.countTotal++;
                         const attachmentContent: PstAttachment = {
                             // TODO: change name
                             filename: attachment.displayName,
@@ -235,30 +240,27 @@ server.onCommand("extract", async ({ progressInterval: pi }) => {
                             mimeType: attachment.mimeTag,
                         };
 
-                        if (!attachmentsRec.has(emailId))
-                            attachmentsRec.set(emailId, [attachmentContent]);
-                        else
-                            attachmentsRec
-                                .get(emailId)
-                                ?.push(attachmentContent);
+                        if (!attachments.has(emailId))
+                            attachments.set(emailId, [attachmentContent]);
+                        else attachments.get(emailId)?.push(attachmentContent);
                     }
                 }
 
-                mailIndexesRec.set(emailId, [
+                mailIndexes.set(emailId, [
                     ...currentFolderIndexes,
                     mailIndex++,
                 ]);
 
-                progressStateRec.countEmail++;
-                progressStateRec.countTotal++;
+                progressState.countEmail++;
+                progressState.countTotal++;
 
                 // update progress only when interval ms is reached
                 const now = Date.now();
                 const elapsed = now - nextTimeTick;
                 if (elapsed >= progressInterval) {
-                    progressStateRec.elapsed = now - starTime;
+                    progressState.elapsed = now - starTime;
                     // postMessage(PST_PROGRESS_WORKER_EVENT, progressStateRec);
-                    server.trigger("progress", progressStateRec);
+                    server.trigger("progress", progressState);
                     nextTimeTick = now;
                 }
             }
@@ -267,14 +269,13 @@ server.onCommand("extract", async ({ progressInterval: pi }) => {
     }
 
     processFolder(
-        rootFolder,
-        progressState,
-        // pstExtractTables,
-        mailIndexes,
-        domainIds,
-        yearIds,
-        recipientIds,
-        attachments
+        rootFolder
+        // progressState,
+        // mailIndexes,
+        // domainIds,
+        // yearIds,
+        // recipientIds,
+        // attachments
     );
 
     // const db = new Level<string, PstMailIndex>(
@@ -295,12 +296,19 @@ server.onCommand("extract", async ({ progressInterval: pi }) => {
             valueEncoding: "json",
         }
     );
+    const additionalDatasDb = db.sublevel<string, AdditionalDataItem[]>(
+        "additionalDatas",
+        {
+            valueEncoding: "json",
+        }
+    );
 
     await db.put("index", [...mailIndexes.entries()]);
     await idDb.put("domain", [...domainIds.entries()]);
     await idDb.put("year", [...yearIds.entries()]);
     await idDb.put("recipient", [...recipientIds.entries()]);
     await attachmentDb.put("_", [...attachments.entries()]);
+    await additionalDatasDb.put("folderList", folderList);
     await db.close();
     progressState.elapsed = Date.now() - starTime;
     // postMessage(PST_DONE_WORKER_EVENT, {

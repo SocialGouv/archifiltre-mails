@@ -20,11 +20,11 @@ export const useExporter = (): UseExporter => {
     const fileExporterService = useService("fileExporterService");
     const { t } = useTranslation();
     const { toDeleteIDs } = useImpactStore();
-    const { extractTables, pstFile } = usePstStore();
+    const { extractDatas } = usePstStore();
 
     const openSaveFileDialog = useCallback(
         async (type: ExporterAsFileType) => {
-            if (!fileExporterService || !extractTables?.emails) {
+            if (!fileExporterService || !extractDatas) {
                 return;
             }
 

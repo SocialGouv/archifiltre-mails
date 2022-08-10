@@ -1,6 +1,4 @@
 export interface ExtractOptions {
-    depth?: number;
-    noProgress?: boolean;
     pstFilePath: string;
 }
 
@@ -20,6 +18,11 @@ export interface PstElement {
     other?: unknown[];
     size: number;
     type: PstElementType;
+}
+
+export interface AdditionalDataItem {
+    id: string;
+    name: string;
 }
 
 export interface PstFolder extends PstElement {
@@ -119,6 +122,9 @@ export interface PstExtractTables {
 }
 
 export interface PstExtractDatas {
+    additionalDatas: {
+        folderList: AdditionalDataItem[];
+    };
     attachments: Map<string, PstAttachment[]>;
     domain: Map<string, string[]>;
     indexes: Map<string, PstMailIndex>;

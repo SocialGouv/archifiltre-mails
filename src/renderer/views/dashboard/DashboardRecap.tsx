@@ -35,7 +35,7 @@ export const DashboardRecap: FC = () => {
     const [isFinder, setIsFinder] = useState(false);
 
     const { totalFileSize } = usePstFileSizeStore();
-    const { pstFile, extractTables } = usePstStore();
+    const { extractDatas } = usePstStore();
     const { deletedFolderId, ownerId } = useSynthesisStore();
 
     const switchRecapOn = useCallback(() => {
@@ -46,7 +46,7 @@ export const DashboardRecap: FC = () => {
         setIsFinder(!isFinder);
     }, [isFinder]);
 
-    if (!pstFile || !extractTables) return null;
+    if (!extractDatas) return null;
 
     const sentMails = getMailsByStatus(ownerId, extractTables, "sent");
     const sentMailsCount = sentMails.length;

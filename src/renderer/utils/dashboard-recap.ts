@@ -10,15 +10,14 @@ import { bytesToMegabytes } from "@common/utils";
 export interface FolderListItem {
     id: string;
     name: string;
-    type: string;
 }
 
 export const getPstListOfFolder = (pst: PstFolder[]): FolderListItem[] => {
     const folderList: FolderListItem[] = [];
     pst.forEach((folder) => {
-        const { id, name, type, children } = folder;
+        const { id, name, children } = folder;
         if (isPstFolder(folder)) {
-            folderList.push({ id, name, type });
+            folderList.push({ id, name });
         }
         const childFolders = children?.filter(isPstFolder);
         if (childFolders) folderList.push(...getPstListOfFolder(childFolders));
