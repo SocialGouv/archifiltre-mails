@@ -81,6 +81,11 @@ export type StringKeyOf<T> = {
     [K in keyof T]: K extends string ? K : never;
 }[keyof T];
 
+// eslint-disable-next-line @typescript-eslint/ban-types -- target instance objects
+export type MethodNames<T extends Object> = {
+    [P in keyof T]: T[P] extends EveryFunction ? P : never;
+}[keyof T];
+
 export type Objectize<T> = { [K in keyof T]: T[K] };
 
 export interface FixedLengthArray<T, TLength extends number> extends Array<T> {

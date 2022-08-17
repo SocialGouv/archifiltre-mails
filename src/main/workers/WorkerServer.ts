@@ -9,6 +9,7 @@ import { isMainThread, parentPort, workerData } from "worker_threads";
 import type {
     Ack,
     DefaultWorkerMessageType,
+    WorkerAppConfig,
     WorkerCommands,
     WorkerConfig,
     WorkerEventListeners,
@@ -46,23 +47,8 @@ type TriggerFunction<TEventListeners extends WorkerEventListeners> = <
     data: TEventListeners[TEventName]["returnType"]
 ) => void;
 
-export class WorkerServer<
-    // TData = Any,
-    // TCommands extends WorkerCommands = WorkerCommands,
-    // TQueries extends WorkerQueries = WorkerQueries,
-    // TEventListeners extends WorkerEventListeners = WorkerEventListeners
-    TWorkerConfig extends WorkerConfig
-    // TCommands extends WorkerCommands = TWorkerConfig["commands"] extends WorkerCommands
-    //     ? TWorkerConfig["commands"]
-    //     : WorkerCommands,
-    // TQueries extends WorkerQueries = TWorkerConfig["queries"] extends WorkerQueries
-    //     ? TWorkerConfig["queries"]
-    //     : WorkerQueries,
-    // TEventListeners extends WorkerEventListeners = TWorkerConfig["eventListeners"] extends WorkerEventListeners
-    //     ? TWorkerConfig["eventListeners"]
-    //     : WorkerEventListeners
-> {
-    public workerData = workerData as TWorkerConfig["data"];
+export class WorkerServer<TWorkerConfig extends WorkerConfig> {
+    public workerData = workerData as TWorkerConfig["data"] & WorkerAppConfig;
 
     private readonly callbackPool = new Map<string, EveryFunction>();
 

@@ -38,9 +38,9 @@ const DashboardImpactItem: FC<DashboardImpactItemProps> = ({
 
 export const DashboardImpact: FC = () => {
     const { t } = useTranslation();
-    const { extractTables } = usePstStore();
+    const { extractDatas } = usePstStore();
     const { totalFileSize } = usePstFileSizeStore();
-    const { size } = useImpactStore(extractTables?.attachements);
+    const { size } = useImpactStore(extractDatas?.attachments);
 
     const megabytesToCo2EqInKilo = (totalInMo: number) =>
         (totalInMo * ECOLOGIC_IMPACT_FACTOR) / 1000;

@@ -1,3 +1,4 @@
+import { WORKER_CONFIG_TOKEN, workerConfig } from "@common/config";
 import type {
     Any,
     Nothing,
@@ -10,6 +11,7 @@ import { TSWorker } from "../worker";
 import type {
     Ack,
     DefaultWorkerMessageType,
+    WorkerAppConfig,
     WorkerCommands,
     WorkerConfig,
     WorkerEventListeners,
@@ -47,8 +49,9 @@ type WorkerClientArgs<TWorkerConfig extends WorkerConfig> =
             ? [workerPath: string, workerData: R]
             : [workerPath: string]
         : never;
+
 export class WorkerClient<TWorkerConfig extends WorkerConfig> {
-    public readonly workerData: TWorkerConfig["data"];
+    public readonly workerData: TWorkerConfig["data"] & WorkerAppConfig;
 
     private readonly worker: TSWorker<
         DefaultWorkerMessageType,
@@ -76,7 +79,10 @@ export class WorkerClient<TWorkerConfig extends WorkerConfig> {
             TWorkerConfig["data"]
         ];
         this.workerPath = workerPath;
-        this.workerData = workerData ?? {};
+        this.workerData = {
+            ...(workerData ?? {}),
+            [WORKER_CONFIG_TOKEN]: workerConfig,
+        };
         this.worker = new TSWorker(workerPath, {
             stderr: true,
             workerData: this.workerData,

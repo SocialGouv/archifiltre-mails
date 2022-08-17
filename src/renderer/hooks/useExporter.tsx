@@ -3,7 +3,6 @@ import type {
     ExporterAsFileType,
     ExporterAsFolderType,
 } from "@common/modules/FileExporterModule";
-import { formatEmailTable, getMailsWithTag } from "@common/utils/exporter";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -28,10 +27,10 @@ export const useExporter = (): UseExporter => {
                 return;
             }
 
-            const mailsWithTags = getMailsWithTag(
-                extractTables.emails,
-                toDeleteIDs
-            );
+            // const mailsWithTags = getMailsWithTag(
+            //     extractDatas.indexes,
+            //     toDeleteIDs
+            // );
 
             const dialogPath = await dialog.showSaveDialog({
                 filters: [
@@ -50,15 +49,15 @@ export const useExporter = (): UseExporter => {
                 return;
             }
 
-            const mails = formatEmailTable(mailsWithTags);
-            await fileExporterService.export(type, mails, dialogPath.filePath);
+            // const mails = formatEmailTable(mailsWithTags);
+            // await fileExporterService.export(type, mails, dialogPath.filePath);
         },
-        [t, extractTables?.emails, fileExporterService, toDeleteIDs]
+        [t, extractDatas, fileExporterService, toDeleteIDs]
     );
 
     const openSaveFolderDialog = useCallback(
         async (type: ExporterAsFolderType) => {
-            if (!fileExporterService || !pstFile) return;
+            if (!fileExporterService || !extractDatas) return;
 
             const result = await dialog.showOpenDialog({
                 properties: ["openDirectory"],
@@ -70,9 +69,9 @@ export const useExporter = (): UseExporter => {
                 return;
             }
 
-            await fileExporterService.export(type, pstFile, chosenFile);
+            // await fileExporterService.export(type, pstFile, chosenFile);
         },
-        [fileExporterService, pstFile]
+        [fileExporterService, extractDatas]
     );
 
     return {

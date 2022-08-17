@@ -1,3 +1,4 @@
+import type { WORKER_CONFIG_TOKEN, workerConfig } from "@common/config";
 import type { SimpleObject } from "@common/utils/type";
 
 export interface WorkerCommand<TParam extends SimpleObject = SimpleObject> {
@@ -26,7 +27,8 @@ export type WorkerEventListenersBuilder<T extends WorkerEventListeners> = T;
 
 export interface WorkerConfig {
     commands?: WorkerCommands;
-    data?: unknown;
+    // eslint-disable-next-line @typescript-eslint/ban-types -- need a wider type
+    data?: object;
     eventListeners?: WorkerEventListeners;
     queries?: WorkerQueries;
 }
@@ -40,4 +42,8 @@ export interface Ack {
 export interface DefaultWorkerMessageType {
     data: { _requestId: number; type: "command" | "event" | "query" };
     event: string;
+}
+
+export interface WorkerAppConfig {
+    [WORKER_CONFIG_TOKEN]: typeof workerConfig;
 }

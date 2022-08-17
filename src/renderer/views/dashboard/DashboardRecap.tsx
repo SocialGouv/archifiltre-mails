@@ -1,33 +1,18 @@
-import { getPercentage } from "@common/utils";
 import type { FC } from "react";
 import React, { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Card } from "../../components/common/card/Card";
 import {
-    ContactPicto,
     ExtremeDatePicto,
     FolderPicto,
-    MailPicto,
-    MailSentPicto,
-    TrashPicto,
 } from "../../components/common/pictos/picto";
 import { OwnerFinder } from "../../components/owner-finder/OwnerFinder";
 import { OwnerFinderLanding } from "../../components/owner-finder/OwnerFinderLanding";
 import { usePstFileSizeStore } from "../../store/PstFileSizeStore";
 import { usePstStore } from "../../store/PSTStore";
 import { useSynthesisStore } from "../../store/SynthesisStore";
-import {
-    getDeletedMails,
-    getDeletedMailsCount,
-    getMailsAttachementCount,
-    getMailsAttachementSize,
-    getMailsByStatus,
-    getPstListOfFolder,
-} from "../../utils/dashboard-recap";
-import { getExtremeMailsDates } from "../../utils/pst-extractor";
 import style from "./Dashboard.module.scss";
-import { DashboardRecapItem } from "./DashboardRecapItem";
 
 export const DashboardRecap: FC = () => {
     const { t } = useTranslation();
@@ -48,40 +33,40 @@ export const DashboardRecap: FC = () => {
 
     if (!extractDatas) return null;
 
-    const sentMails = getMailsByStatus(ownerId, extractTables, "sent");
-    const sentMailsCount = sentMails.length;
-    const sentMailsAttachementCount = getMailsAttachementCount(sentMails);
-    const sentMailsAttachementSize = getMailsAttachementSize(sentMails);
-    const sentMailsAttachementPercentage = getPercentage(
-        sentMailsAttachementSize,
-        totalFileSize
-    );
+    // const sentMails = getMailsByStatus(ownerId, extractTables, "sent");
+    // const sentMailsCount = sentMails.length;
+    // const sentMailsAttachementCount = getMailsAttachementCount(sentMails);
+    // const sentMailsAttachementSize = getMailsAttachementSize(sentMails);
+    // const sentMailsAttachementPercentage = getPercentage(
+    //     sentMailsAttachementSize,
+    //     totalFileSize
+    // );
 
-    const receivedMails = getMailsByStatus(ownerId, extractTables, "received");
-    const receivedMailsCount = receivedMails.length;
-    const receivedMailAttachmentCount = getMailsAttachementCount(receivedMails);
-    const receivedMailsAttachementSize = getMailsAttachementSize(receivedMails);
-    const receivedMailsAttachementPercentage = getPercentage(
-        receivedMailsAttachementSize,
-        totalFileSize
-    );
+    // const receivedMails = getMailsByStatus(ownerId, extractTables, "received");
+    // const receivedMailsCount = receivedMails.length;
+    // const receivedMailAttachmentCount = getMailsAttachementCount(receivedMails);
+    // const receivedMailsAttachementSize = getMailsAttachementSize(receivedMails);
+    // const receivedMailsAttachementPercentage = getPercentage(
+    //     receivedMailsAttachementSize,
+    //     totalFileSize
+    // );
 
-    const deletedMails = getDeletedMails(pstFile, deletedFolderId);
-    const {
-        deletedMailsCount,
-        deletedMailsAttachmentCount,
-        deletedMailsAttachementSize,
-    } = getDeletedMailsCount(deletedMails);
-    const deletedMailsAttachementPercentage = getPercentage(
-        deletedMailsAttachementSize,
-        totalFileSize
-    );
+    // const deletedMails = getDeletedMails(pstFile, deletedFolderId);
+    // const {
+    //     deletedMailsCount,
+    //     deletedMailsAttachmentCount,
+    //     deletedMailsAttachementSize,
+    // } = getDeletedMailsCount(deletedMails);
+    // const deletedMailsAttachementPercentage = getPercentage(
+    //     deletedMailsAttachementSize,
+    //     totalFileSize
+    // );
 
-    const contactsCount = [...extractTables.contacts].flat().length;
+    // const contactsCount = [...extractTables.contacts].flat().length;
 
-    const totalFolderSize = getPstListOfFolder(pstFile.children).length;
+    // const totalFolderSize = getPstListOfFolder(pstFile.children).length;
 
-    const { minDate, maxDate } = getExtremeMailsDates(extractTables);
+    // const { minDate, maxDate } = getExtremeMailsDates(extractTables);
 
     // TODO: move to default config (?)
     const extremeDateFormatParam: Intl.DateTimeFormatOptions = {
@@ -91,7 +76,7 @@ export const DashboardRecap: FC = () => {
         <Card title={t("dashboard.recap.cardTitle")} color="blue">
             {isRecapReady ? (
                 <div className={style.dashboard__recap}>
-                    <DashboardRecapItem
+                    {/* <DashboardRecapItem
                         title={t("dashboard.recap.receivedMessages")}
                         mails={receivedMailsCount}
                         attachements={receivedMailAttachmentCount}
@@ -116,7 +101,7 @@ export const DashboardRecap: FC = () => {
                         title={t("dashboard.recap.contactsTitle")}
                         contact={contactsCount}
                         picto={<ContactPicto />}
-                    />
+                    /> */}
                     <div className={style.dashboard__recap__item}>
                         <div className={style.dashboard__recap__picto}>
                             <ExtremeDatePicto />
@@ -130,7 +115,7 @@ export const DashboardRecap: FC = () => {
                             >
                                 {t("dashboard.recap.extremum")}
                             </span>
-                            <span
+                            {/* <span
                                 className={
                                     style.dashboard__recap__informations__item
                                 }
@@ -141,8 +126,8 @@ export const DashboardRecap: FC = () => {
                                     },
                                     minDate,
                                 })}
-                            </span>
-                            <span
+                            </span> */}
+                            {/* <span
                                 className={
                                     style.dashboard__recap__informations__item
                                 }
@@ -153,7 +138,7 @@ export const DashboardRecap: FC = () => {
                                     },
                                     maxDate,
                                 })}
-                            </span>
+                            </span> */}
                         </div>
                     </div>
                     <div className={style.dashboard__recap__item}>
@@ -174,9 +159,9 @@ export const DashboardRecap: FC = () => {
                                     style.dashboard__recap__informations__item
                                 }
                             >
-                                {t("dashboard.recap.folder", {
+                                {/* {t("dashboard.recap.folder", {
                                     count: totalFolderSize,
-                                })}
+                                })} */}
                             </span>
                         </div>
                     </div>

@@ -14,7 +14,7 @@ import style from "./StartScreen.module.scss";
 
 export const StartScreen: React.FC = () => {
     const { pstProgress, setPstFilePath } = usePstExtractor();
-    const { pstFile, extractTables, extractDatas } = usePstStore();
+    const { extractDatas } = usePstStore();
 
     const { changeRoute } = useRouteContext();
 
@@ -30,11 +30,11 @@ export const StartScreen: React.FC = () => {
     );
 
     useEffect(() => {
-        if (pstFile) {
-            console.log({ extractDatas, extractTables, pstFile });
+        if (extractDatas) {
+            console.log({ extractDatas });
             // changeRoute("DASHBOARD");
         }
-    }, [pstFile, changeRoute, extractTables, extractDatas]);
+    }, [changeRoute, extractDatas]);
 
     const progressClassName = pstProgress.elapsed
         ? `${style.startscreen__progress} ${style.active}`

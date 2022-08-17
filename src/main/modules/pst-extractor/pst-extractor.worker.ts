@@ -1,18 +1,15 @@
 import type {
     AdditionalDataItem,
     PstAttachment as PstAttachment,
-    PstAttachmentEntries,
-    PstMailIdsEntries,
     PstMailIndex,
-    PstMailIndexEntries,
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
 import { getDomain, getLdapDomain, isLdap } from "@common/modules/views/utils";
 import type { PSTFolder } from "@socialgouv/archimail-pst-extractor";
 import { PSTFile } from "@socialgouv/archimail-pst-extractor";
-import { Level } from "level";
 import path from "path";
 
+import { pstCacheService } from "../../services/PstCacheService";
 import type {
     WorkerCommandsBuilder,
     WorkerConfigBuilder,
@@ -65,6 +62,7 @@ let pstFile: PSTFile | null = null;
 
 server.onCommand("open", async ({ pstFilePath }) => {
     pstFile = new PSTFile(path.resolve(pstFilePath));
+    pstCacheService.openForPst(pstFilePath);
 
     return Promise.resolve({ ok: true });
 });
@@ -282,34 +280,41 @@ server.onCommand("extract", async ({ progressInterval: pi }) => {
     //     path.resolve(server.workerData.cachePath, "db")
     // );
 
-    const db = new Level<string, PstMailIndexEntries>(
-        "/Users/lsagetlethias/source/SocialGouv/archimail/db",
-        { valueEncoding: "json" }
-    );
-    await db.clear();
-    const idDb = db.sublevel<string, PstMailIdsEntries>("ids", {
-        valueEncoding: "json",
-    });
-    const attachmentDb = db.sublevel<string, PstAttachmentEntries>(
-        "attachment",
-        {
-            valueEncoding: "json",
-        }
-    );
-    const additionalDatasDb = db.sublevel<string, AdditionalDataItem[]>(
-        "additionalDatas",
-        {
-            valueEncoding: "json",
-        }
-    );
+    await pstCacheService.setPstMailIndexes(mailIndexes);
+    await pstCacheService.setAttachments(attachments);
+    await pstCacheService.setGroup("domain", domainIds);
+    await pstCacheService.setGroup("year", yearIds);
+    await pstCacheService.setGroup("recipient", recipientIds);
+    await pstCacheService.setAddtionalDatas("folderList", folderList);
 
-    await db.put("index", [...mailIndexes.entries()]);
-    await idDb.put("domain", [...domainIds.entries()]);
-    await idDb.put("year", [...yearIds.entries()]);
-    await idDb.put("recipient", [...recipientIds.entries()]);
-    await attachmentDb.put("_", [...attachments.entries()]);
-    await additionalDatasDb.put("folderList", folderList);
-    await db.close();
+    // const db = new Level<string, PstMailIndexEntries>(
+    //     "/Users/lsagetlethias/source/SocialGouv/archimail/db",
+    //     { valueEncoding: "json" }
+    // );
+    // await db.clear();
+    // const idDb = db.sublevel<string, PstMailIdsEntries>("ids", {
+    //     valueEncoding: "json",
+    // });
+    // const attachmentDb = db.sublevel<string, PstAttachmentEntries>(
+    //     "attachment",
+    //     {
+    //         valueEncoding: "json",
+    //     }
+    // );
+    // const additionalDatasDb = db.sublevel<string, AdditionalDataItem[]>(
+    //     "additionalDatas",
+    //     {
+    //         valueEncoding: "json",
+    //     }
+    // );
+
+    // await db.put("index", [...mailIndexes.entries()]);
+    // await idDb.put("domain", [...domainIds.entries()]);
+    // await idDb.put("year", [...yearIds.entries()]);
+    // await idDb.put("recipient", [...recipientIds.entries()]);
+    // await attachmentDb.put("_", [...attachments.entries()]);
+    // await additionalDatasDb.put("folderList", folderList);
+    // await db.close();
     progressState.elapsed = Date.now() - starTime;
     // postMessage(PST_DONE_WORKER_EVENT, {
     //     progressState,

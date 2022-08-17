@@ -192,12 +192,8 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
             // then global recap
             if (!pstExtractorService || !extractDatas) return;
             const mails = (
-                await Promise.all(
-                    node.data.ids.map(async (id) =>
-                        pstExtractorService.getEmail(
-                            extractDatas.indexes.get(id)!
-                        )
-                    )
+                await pstExtractorService.getEmails(
+                    node.data.ids.map((id) => extractDatas.indexes.get(id)!)
                 )
             ).sort(
                 (a, b) =>

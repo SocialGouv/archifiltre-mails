@@ -5,13 +5,13 @@ import style from "./StartScreen.module.scss";
 
 export type StartScreenLoaderProps = Pick<
     PstProgressState,
-    "countAttachement" | "countEmail" | "countFolder" | "countTotal"
+    "countAttachment" | "countEmail" | "countFolder" | "countTotal"
 >;
 
 export const StartScreenLoader: React.FC<StartScreenLoaderProps> = ({
     countEmail,
     countFolder,
-    countAttachment: countAttachement,
+    countAttachment,
     countTotal,
 }) => (
     <>
@@ -23,7 +23,7 @@ export const StartScreenLoader: React.FC<StartScreenLoaderProps> = ({
                 <li>nombre de dossiers parcourus : </li>
                 <li>{countFolder}</li>
                 <li>nombre de pj : </li>
-                <li>{countAttachement}</li>
+                <li>{countAttachment}</li>
                 <li>nombre d éléments : </li>
                 <li>{countTotal}</li>
             </ul>

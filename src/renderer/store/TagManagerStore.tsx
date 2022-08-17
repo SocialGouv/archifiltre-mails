@@ -32,10 +32,8 @@ export const useTagManagerStore = (): UseTagManagerStore => {
     const [markedToDelete, setMarkedToDelete] = useAtom(markedToDeleteAtom);
     const [markedToKeep, setMarkedToKeep] = useAtom(markedToKeepAtom);
     const [hoveredNode, setHoveredNode] = useAtom(hoveredNodeAtom);
-    const { extractTables } = usePstStore();
-    const { updateToDeleteImpact } = useImpactStore(
-        extractTables?.attachements
-    );
+    const { extractDatas } = usePstStore();
+    const { updateToDeleteImpact } = useImpactStore(extractDatas?.attachments);
     const tracker = useService("trackerService")?.getProvider();
     const trackTag = useCallback(
         (
@@ -43,7 +41,7 @@ export const useTagManagerStore = (): UseTagManagerStore => {
             markType: TrackAppEventProps["Feat(5.0) Element Marked"]["markType"]
         ) => {
             let sizeRaw = 0;
-            extractTables?.attachements.forEach((attachments, emailUuid) => {
+            extractDatas?.attachments.forEach((attachments, emailUuid) => {
                 if (ids.includes(emailUuid)) {
                     sizeRaw += attachments.reduce(
                         (acc, attachment) => acc + attachment.filesize,
@@ -57,7 +55,7 @@ export const useTagManagerStore = (): UseTagManagerStore => {
                 sizeRaw,
             });
         },
-        [extractTables?.attachements, tracker]
+        [extractDatas?.attachments, tracker]
     );
 
     // DELETE LOGIC

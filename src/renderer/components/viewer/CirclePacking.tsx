@@ -43,8 +43,13 @@ const isMailTagNode = (
 
 export const CirclePacking: React.FC = () => {
     const { t } = useTranslation();
-    const { currentView, computeNextView, restartView, computePreviousView } =
-        useDymViewerNavigation();
+    const {
+        viewList,
+        currentViewIndex,
+        computeNextView,
+        restartView,
+        computePreviousView,
+    } = useDymViewerNavigation();
 
     const { setMainInfos, startFocus, isInfoFocus, mainInfos, cancelFocus } =
         usePstFMInfosStore();
@@ -56,6 +61,8 @@ export const CirclePacking: React.FC = () => {
         markedToDelete,
         markedToKeep,
     } = useTagManagerStore();
+
+    const currentView = viewList[currentViewIndex];
 
     useEffect(() => {
         if (!currentView) return;

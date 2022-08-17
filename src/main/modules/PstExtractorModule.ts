@@ -9,20 +9,16 @@ import { AppError } from "@common/lib/error/AppError";
 import type { Service } from "@common/modules/container/type";
 import { containerModule } from "@common/modules/ContainerModule";
 import type {
-    AdditionalDataItem,
     ExtractOptions,
-    PstAttachmentEntries,
     PstEmail,
     PstExtractDatas,
-    PstMailIdsEntries,
-    PstMailIndexEntries,
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
 import type { UserConfigService } from "@common/modules/UserConfigModule";
 import { app, BrowserWindow, ipcMain } from "electron";
-import { Level } from "level";
 
 import type { ConsoleToRendererService } from "../services/ConsoleToRendererService";
+import type { PstCacheService } from "../services/PstCacheService";
 import type { TSWorker } from "../worker";
 import { WorkerClient } from "../workers/WorkerClient";
 import { MainModule } from "./MainModule";
@@ -71,7 +67,8 @@ export class PstExtractorModule extends MainModule {
 
     constructor(
         private readonly userConfigService: UserConfigService,
-        private readonly consoleToRendererService: ConsoleToRendererService
+        private readonly consoleToRendererService: ConsoleToRendererService,
+        private readonly pstCacheService: PstCacheService
     ) {
         super();
         containerModule.registerService(
@@ -149,6 +146,7 @@ export class PstExtractorModule extends MainModule {
         this.lastPath = options.pstFilePath;
 
         console.info("Start extracting...");
+        console.log(this.fetchWorker);
         await Promise.all([
             this.fetchWorker.command("open", {
                 pstFilePath: this.lastPath,
@@ -178,50 +176,57 @@ export class PstExtractorModule extends MainModule {
             ),
         });
 
-        const db = new Level<string, PstMailIndexEntries>(
-            "/Users/lsagetlethias/source/SocialGouv/archimail/db",
-            { valueEncoding: "json" }
-        );
+        this.pstCacheService.openForPst(this.lastPath);
 
-        const idDb = db.sublevel<string, PstMailIdsEntries>("ids", {
-            valueEncoding: "json",
-        });
-        const attachmentDb = db.sublevel<string, PstAttachmentEntries>(
-            "attachment",
-            {
-                valueEncoding: "json",
-            }
-        );
-        const additionalDatasDb = db.sublevel<string, AdditionalDataItem[]>(
-            "additionalDatas",
-            {
-                valueEncoding: "json",
-            }
-        );
-        const baseRawData = await db.get("index");
-        const domainRawData = await idDb.get("domain");
-        const yearRawData = await idDb.get("year");
-        const recipientRawData = await idDb.get("recipient");
-        const attachmentRawData = await attachmentDb.get("_");
-        const folderList = await additionalDatasDb.get("folderList");
+        // const db = new Level<string, PstMailIndexEntries>(
+        //     "/Users/lsagetlethias/source/SocialGouv/archimail/db",
+        //     { valueEncoding: "json" }
+        // );
+
+        // const idDb = db.sublevel<string, PstMailIdsEntries>("ids", {
+        //     valueEncoding: "json",
+        // });
+        // const attachmentDb = db.sublevel<string, PstAttachmentEntries>(
+        //     "attachment",
+        //     {
+        //         valueEncoding: "json",
+        //     }
+        // );
+        // const additionalDatasDb = db.sublevel<string, AdditionalDataItem[]>(
+        //     "additionalDatas",
+        //     {
+        //         valueEncoding: "json",
+        //     }
+        // );
+        // const baseRawData = await db.get("index");
+        // const domainRawData = await idDb.get("domain");
+        // const yearRawData = await idDb.get("year");
+        // const recipientRawData = await idDb.get("recipient");
+        // const attachmentRawData = await attachmentDb.get("_");
+        // const folderList = await additionalDatasDb.get("folderList");
+        const attachments = await this.pstCacheService.getAttachments();
+        const indexes = await this.pstCacheService.getPstMailIndexes();
+        const { domain, year, recipient } =
+            await this.pstCacheService.getAllGroups();
+        const additionalDatas =
+            await this.pstCacheService.getAllAddtionalData();
         this.consoleToRendererService.log(BrowserWindow.getAllWindows()[0]!, {
-            attachmentRawData,
-            baseRawData,
-            domainRawData,
-            recipientRawData,
-            yearRawData,
+            additionalDatas,
+            attachments,
+            domain,
+            indexes,
+            recipient,
+            year,
         });
         this.lastPstExtractDatas = {
-            additionalDatas: {
-                folderList,
-            },
-            attachments: new Map(attachmentRawData),
-            domain: new Map(domainRawData),
-            indexes: new Map(baseRawData),
-            recipient: new Map(recipientRawData),
-            year: new Map(yearRawData),
+            additionalDatas,
+            attachments,
+            domain,
+            indexes,
+            recipient,
+            year,
         };
-        await db.close();
+        // await db.close();
         this.working = false;
         console.info("Extract done.");
         return this.lastPstExtractDatas;

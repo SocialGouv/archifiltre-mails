@@ -23,7 +23,7 @@ export interface PstExtractorService extends Service {
      * The work is done in a worker thread in the main process.
      */
     extract: (options: ExtractOptions) => Promise<PstExtractDatas>;
-    getEmails: (emailIndexes: number[][]) => Promise<PstEmail>;
+    getEmails: (emailIndexes: number[][]) => Promise<PstEmail[]>;
     /**
      * Trigger a callback on each progress tick. (a tick is based on the progress interval)
      *
@@ -51,7 +51,7 @@ export const pstExtractorService: PstExtractorService = {
         return ipcRenderer.invoke(
             PST_GET_EMAILS_EVENT,
             emailIndexes
-        ) as Promise<PstEmail>;
+        ) as Promise<PstEmail[]>;
     },
 
     name: "PstExtractorService",
