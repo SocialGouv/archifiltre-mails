@@ -1,13 +1,13 @@
-import { IS_DIST_MODE, IS_E2E, IS_PACKAGED } from "@common/config";
+import { IS_DIST_MODE, IS_E2E, IS_PACKAGED, STATIC_PATH } from "@common/config";
 import path from "path";
 import type { ImgHTMLAttributes } from "react";
 import React from "react";
 
 export const getStatic = (relativePath: string): string =>
     IS_PACKAGED()
-        ? path.resolve(__static, relativePath)
+        ? path.resolve(STATIC_PATH, relativePath)
         : IS_E2E || IS_DIST_MODE
-        ? `file://${path.resolve(__dirname, "../../static", relativePath)}`
+        ? `file://${path.resolve(STATIC_PATH, relativePath)}`
         : new URL(relativePath, window.location.origin).toString();
 
 interface StaticImageProps extends ImgHTMLAttributes<HTMLImageElement> {

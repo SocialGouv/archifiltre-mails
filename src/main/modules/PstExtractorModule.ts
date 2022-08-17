@@ -18,12 +18,12 @@ import type { UserConfigService } from "@common/modules/UserConfigModule";
 import { app, BrowserWindow, ipcMain } from "electron";
 
 import type { ConsoleToRendererService } from "../services/ConsoleToRendererService";
-import type { PstCacheService } from "../services/PstCacheService";
 import type { TSWorker } from "../worker";
 import { WorkerClient } from "../workers/WorkerClient";
 import { MainModule } from "./MainModule";
 import type { FetchWorkerConfig } from "./pst-extractor/pst-email-fetcher.worker";
 import type { ExtractorWorkerConfig } from "./pst-extractor/pst-extractor.worker";
+import { PstCache } from "./pst-extractor/PstCache";
 
 export class PstExtractorError extends AppError {}
 
@@ -67,13 +67,12 @@ export class PstExtractorModule extends MainModule {
 
     constructor(
         private readonly userConfigService: UserConfigService,
-        private readonly consoleToRendererService: ConsoleToRendererService,
-        private readonly pstCacheService: PstCacheService
+        private readonly consoleToRendererService: ConsoleToRendererService
     ) {
         super();
-        containerModule.registerService(
-            "pstExtractorMainService",
-            this.service
+        containerModule.registerServices(
+            ["pstExtractorMainService", this.extractorService],
+            ["pstCacheMainService", this.cacheService]
         );
     }
 
@@ -146,7 +145,6 @@ export class PstExtractorModule extends MainModule {
         this.lastPath = options.pstFilePath;
 
         console.info("Start extracting...");
-        console.log(this.fetchWorker);
         await Promise.all([
             this.fetchWorker.command("open", {
                 pstFilePath: this.lastPath,
@@ -155,20 +153,6 @@ export class PstExtractorModule extends MainModule {
                 pstFilePath: this.lastPath,
             }),
         ]);
-        // this.pstWorker = new TSWorker(
-        //     "modules/pst-extractor/pst-extractor.worker.ts",
-        //     {
-        //         stderr: true,
-        //         trackUnmanagedFds: true,
-        //         workerData: {
-        //             ...options,
-        //             cachePath: app.getPath("cache"),
-        //             progressInterval: this.userConfigService.get(
-        //                 "extractProgressDelay"
-        //             ),
-        //         } as PstWorkerData,
-        //     }
-        // );
 
         await this.extractorWorker.command("extract", {
             progressInterval: this.userConfigService.get(
@@ -176,40 +160,14 @@ export class PstExtractorModule extends MainModule {
             ),
         });
 
-        this.pstCacheService.openForPst(this.lastPath);
+        // TODO: hash instead
+        this.cacheService.openForPst(this.lastPath);
 
-        // const db = new Level<string, PstMailIndexEntries>(
-        //     "/Users/lsagetlethias/source/SocialGouv/archimail/db",
-        //     { valueEncoding: "json" }
-        // );
-
-        // const idDb = db.sublevel<string, PstMailIdsEntries>("ids", {
-        //     valueEncoding: "json",
-        // });
-        // const attachmentDb = db.sublevel<string, PstAttachmentEntries>(
-        //     "attachment",
-        //     {
-        //         valueEncoding: "json",
-        //     }
-        // );
-        // const additionalDatasDb = db.sublevel<string, AdditionalDataItem[]>(
-        //     "additionalDatas",
-        //     {
-        //         valueEncoding: "json",
-        //     }
-        // );
-        // const baseRawData = await db.get("index");
-        // const domainRawData = await idDb.get("domain");
-        // const yearRawData = await idDb.get("year");
-        // const recipientRawData = await idDb.get("recipient");
-        // const attachmentRawData = await attachmentDb.get("_");
-        // const folderList = await additionalDatasDb.get("folderList");
-        const attachments = await this.pstCacheService.getAttachments();
-        const indexes = await this.pstCacheService.getPstMailIndexes();
+        const attachments = await this.cacheService.getAttachments();
+        const indexes = await this.cacheService.getPstMailIndexes();
         const { domain, year, recipient } =
-            await this.pstCacheService.getAllGroups();
-        const additionalDatas =
-            await this.pstCacheService.getAllAddtionalData();
+            await this.cacheService.getAllGroups();
+        const additionalDatas = await this.cacheService.getAllAddtionalData();
         this.consoleToRendererService.log(BrowserWindow.getAllWindows()[0]!, {
             additionalDatas,
             attachments,
@@ -226,7 +184,7 @@ export class PstExtractorModule extends MainModule {
             recipient,
             year,
         };
-        // await db.close();
+
         this.working = false;
         console.info("Extract done.");
         return this.lastPstExtractDatas;
@@ -371,16 +329,36 @@ export class PstExtractorModule extends MainModule {
         await this.pstWorker?.terminate();
     }
 
-    public get service(): PstExtractorMainService {
+    public get extractorService(): PstExtractorMainService {
         return {
             extract: this.extract.bind(this),
             getEmails: this.getEmails.bind(this),
             name: "PstExtractorMainService",
         };
     }
+
+    public get cacheService(): PstCacheMainService {
+        return cacheService;
+    }
 }
+
+const cacheService = new (class extends PstCache implements PstCacheMainService {
+    public name = "PstCacheMainService";
+
+    /** @override */
+    public async init(): Promise<void> {
+        await this.db.close();
+    }
+
+    /** @override */
+    public async uninit(): Promise<void> {
+        await this.db.close();
+    }
+})();
 
 export interface PstExtractorMainService extends Service {
     extract: typeof PstExtractorModule.prototype["extract"];
     getEmails: typeof PstExtractorModule.prototype["getEmails"];
 }
+
+export interface PstCacheMainService extends Service, PstCache {}

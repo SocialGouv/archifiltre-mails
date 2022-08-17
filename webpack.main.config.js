@@ -2,6 +2,7 @@ const path = require("path");
 const glob = require("glob");
 const webpack = require("webpack");
 const webpackCommonConfig = require("./webpack.common.config");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 require("dotenv").config();
 
 module.exports =
@@ -26,6 +27,11 @@ module.exports =
                 if (plugin instanceof webpack.BannerPlugin) {
                     plugin.options.exclude = /(preload|\.worker)\.js$/i;
                 }
+            }
+        }
+        for (const plugin of config.plugins) {
+            if (plugin instanceof HtmlWebpackPlugin) {
+                plugin.options?.excludeChunks?.push(...Object.keys(workers));
             }
         }
 

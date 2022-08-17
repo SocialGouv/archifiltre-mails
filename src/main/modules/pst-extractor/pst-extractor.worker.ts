@@ -9,13 +9,13 @@ import type { PSTFolder } from "@socialgouv/archimail-pst-extractor";
 import { PSTFile } from "@socialgouv/archimail-pst-extractor";
 import path from "path";
 
-import { pstCacheService } from "../../services/PstCacheService";
 import type {
     WorkerCommandsBuilder,
     WorkerConfigBuilder,
     WorkerEventListenersBuilder,
 } from "../../workers/type";
 import { WorkerServer } from "../../workers/WorkerServer";
+import { PstCache } from "./PstCache";
 
 // import { randomUUID } from "crypto";
 let ID = 0;
@@ -55,6 +55,8 @@ export type ExtractorWorkerConfig = WorkerConfigBuilder<{
     eventListeners: EventListeners;
 }>;
 
+const pstCache = new PstCache();
+void pstCache.db.close();
 const server = new WorkerServer<ExtractorWorkerConfig>();
 // const server = new WorkerServer<Data, Commands, Any, EventListeners>();
 export type ExtractorWorkerServer = typeof server;
@@ -62,7 +64,7 @@ let pstFile: PSTFile | null = null;
 
 server.onCommand("open", async ({ pstFilePath }) => {
     pstFile = new PSTFile(path.resolve(pstFilePath));
-    pstCacheService.openForPst(pstFilePath);
+    pstCache.openForPst(pstFilePath);
 
     return Promise.resolve({ ok: true });
 });
@@ -88,7 +90,6 @@ server.onCommand("extract", async ({ progressInterval: pi }) => {
     const recipientIds = new Map<string, string[]>();
     const yearIds = new Map<string, string[]>();
 
-    // postMessage(PST_PROGRESS_WORKER_EVENT, progressState);
     server.trigger("progress", progressState);
     const rootFolder = pstFile.getRootFolder();
 
@@ -107,15 +108,7 @@ server.onCommand("extract", async ({ progressInterval: pi }) => {
      *
      * The progress state is updated for every item found and sent to any listener on every emails.
      */
-    function processFolder(
-        folder: PSTFolder
-        // progressState: PstProgressState,
-        // mailIndexes: Map<string, PstMailIndex>,
-        // domainIds: Map<string, string[]>,
-        // yearIds: Map<string, string[]>,
-        // recipientIds: Map<string, string[]>,
-        // attachments: Map<string, PstAttachment[]>
-    ): void {
+    function processFolder(folder: PSTFolder): void {
         if (root) {
             root = false;
         } else {
@@ -142,15 +135,7 @@ server.onCommand("extract", async ({ progressInterval: pi }) => {
                     id: `${folderId++}`,
                     name: childFolder.displayName,
                 });
-                processFolder(
-                    childFolder
-                    // progressState,
-                    // mailIndexes,
-                    // domainIds,
-                    // yearIds,
-                    // recipientIds,
-                    // attachments
-                );
+                processFolder(childFolder);
             }
         }
 
@@ -257,7 +242,6 @@ server.onCommand("extract", async ({ progressInterval: pi }) => {
                 const elapsed = now - nextTimeTick;
                 if (elapsed >= progressInterval) {
                     progressState.elapsed = now - starTime;
-                    // postMessage(PST_PROGRESS_WORKER_EVENT, progressStateRec);
                     server.trigger("progress", progressState);
                     nextTimeTick = now;
                 }
@@ -266,59 +250,21 @@ server.onCommand("extract", async ({ progressInterval: pi }) => {
         currentDepth--;
     }
 
-    processFolder(
-        rootFolder
-        // progressState,
-        // mailIndexes,
-        // domainIds,
-        // yearIds,
-        // recipientIds,
-        // attachments
-    );
+    processFolder(rootFolder);
 
-    // const db = new Level<string, PstMailIndex>(
-    //     path.resolve(server.workerData.cachePath, "db")
-    // );
+    try {
+        await pstCache.setPstMailIndexes(mailIndexes);
+        await pstCache.setAttachments(attachments);
+        await pstCache.setGroup("domain", domainIds);
+        await pstCache.setGroup("year", yearIds);
+        await pstCache.setGroup("recipient", recipientIds);
+        await pstCache.setAddtionalDatas("folderList", folderList);
+    } catch (e: unknown) {
+        console.error(e);
+        process.exit(1);
+    }
 
-    await pstCacheService.setPstMailIndexes(mailIndexes);
-    await pstCacheService.setAttachments(attachments);
-    await pstCacheService.setGroup("domain", domainIds);
-    await pstCacheService.setGroup("year", yearIds);
-    await pstCacheService.setGroup("recipient", recipientIds);
-    await pstCacheService.setAddtionalDatas("folderList", folderList);
-
-    // const db = new Level<string, PstMailIndexEntries>(
-    //     "/Users/lsagetlethias/source/SocialGouv/archimail/db",
-    //     { valueEncoding: "json" }
-    // );
-    // await db.clear();
-    // const idDb = db.sublevel<string, PstMailIdsEntries>("ids", {
-    //     valueEncoding: "json",
-    // });
-    // const attachmentDb = db.sublevel<string, PstAttachmentEntries>(
-    //     "attachment",
-    //     {
-    //         valueEncoding: "json",
-    //     }
-    // );
-    // const additionalDatasDb = db.sublevel<string, AdditionalDataItem[]>(
-    //     "additionalDatas",
-    //     {
-    //         valueEncoding: "json",
-    //     }
-    // );
-
-    // await db.put("index", [...mailIndexes.entries()]);
-    // await idDb.put("domain", [...domainIds.entries()]);
-    // await idDb.put("year", [...yearIds.entries()]);
-    // await idDb.put("recipient", [...recipientIds.entries()]);
-    // await attachmentDb.put("_", [...attachments.entries()]);
-    // await additionalDatasDb.put("folderList", folderList);
-    // await db.close();
     progressState.elapsed = Date.now() - starTime;
-    // postMessage(PST_DONE_WORKER_EVENT, {
-    //     progressState,
-    // });
     server.trigger("done", progressState);
 
     return { ok: true };
@@ -335,52 +281,3 @@ server.onCommand("extract", async ({ progressInterval: pi }) => {
 4/ effectuer des instersections e.g. (domaine(beta.gouv) + année(2018))
 5/ stocker en cache le résultat
 */
-
-// interface EventDataMapping {
-//     [PST_DONE_WORKER_EVENT]: {
-//         progressState: PstProgressState;
-//     };
-//     [PST_PROGRESS_WORKER_EVENT]: PstProgressState;
-// }
-
-// export type PstWorkerEvent = keyof EventDataMapping;
-
-// /**
-//  * Possible message types comming from the worker.
-//  */
-// export type PstWorkerMessageType<
-//     TEvent extends PstWorkerEvent = PstWorkerEvent
-// > = TEvent extends PstWorkerEvent
-//     ? {
-//           data: EventDataMapping[TEvent];
-//           event: TEvent;
-//       }
-//     : never;
-
-// /**
-//  * Post a message to parent thread.
-//  */
-// function postMessage<TEvent extends PstWorkerEvent>(
-//     event: TEvent,
-//     data: EventDataMapping[TEvent]
-// ): void {
-//     parentPort?.postMessage({ data, event } as PstWorkerMessageType);
-// }
-
-// /**
-//  * WorkerData - Initial worker arguments
-//  */
-// export interface PstWorkerData {
-//     cachePath: string;
-//     depth?: number;
-//     progressInterval?: number;
-//     pstFilePath: string;
-// }
-
-// let starTime = Date.now();
-// const progressInterval = 1000;
-// let nextTimeTick = starTime;
-// const definedDepth = Infinity;
-// let root = true;
-// let currentDepth = 0;
-// let currentFolderIndexes = [-1];

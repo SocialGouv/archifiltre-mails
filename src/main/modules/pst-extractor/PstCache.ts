@@ -1,5 +1,4 @@
-import { APP_CACHE } from "@common/config";
-import type { Service } from "@common/modules/container/type";
+import { APP_CACHE, IS_DEV } from "@common/config";
 import type {
     AdditionalDataItem,
     PstAttachment,
@@ -14,11 +13,13 @@ import type {
     UnknownMapping,
 } from "@common/utils/type";
 import { Level } from "level";
+import path from "path";
 
 const ROOT_KEY = "_index_";
 const ATTACHMENTS_KEY = "_attachments_";
 const GROUPS_DB_PREFIX = "_groups_";
 const ADDITIONNAL_DATES_DB_PREFIX = "_additionalDatas_";
+const CACHE_FOLDER_NAME = "archimail-db";
 
 export const knownGroups = ["domain", "year", "recipient"] as const;
 export type KnownGroup = typeof knownGroups[number];
@@ -29,51 +30,51 @@ const defaultDbOptions = {
 };
 
 const SoftLockDb = <
-    TProp extends MethodNames<PstCacheService>,
-    TMeth extends PstCacheService[TProp],
+    TProp extends MethodNames<PstCache>,
+    TMeth extends PstCache[TProp],
     TParams extends Parameters<TMeth>
 >(
-    target: PstCacheService,
+    _proto: PstCache,
     _property: TProp,
     descriptor: TypedPropertyDescriptor<TMeth>
 ) => {
-    const originalMethod = descriptor.value;
-    if (!originalMethod) {
-        return descriptor;
-    }
-    descriptor.value = (async (...args: TParams) => {
-        await target.db.open();
-        const ret = await (originalMethod as AnyFunction)(...args);
-        try {
-            return ret;
-        } finally {
-            await target.db.close();
-        }
-    }) as TMeth;
-
-    return descriptor;
+    const originalMethod = _proto[_property];
+    descriptor.value = async function (this: PstCache, ...args: TParams) {
+        await this.db.open();
+        const ret = await (originalMethod as AnyFunction).apply(this, args);
+        await this.db.close();
+        return ret;
+    } as TMeth;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention -- Private
-class _PstCacheService implements Service {
-    public name = this.constructor.name;
-
+export class PstCache {
     public readonly db: Level<string, unknown>;
 
     private currrentPstID?: string;
 
-    constructor(private readonly cachePath = APP_CACHE()) {
+    constructor(
+        private readonly cachePath = path.resolve(
+            APP_CACHE(),
+            CACHE_FOLDER_NAME
+        )
+    ) {
+        console.log("========================= ", cachePath);
         this.db = new Level(this.cachePath, defaultDbOptions);
+        if (IS_DEV) {
+            void this.db.clear();
+        }
     }
 
     @SoftLockDb
-    public async setPstMailIndexes(indexes: Map<string, PstMailIndex>) {
+    public async setPstMailIndexes(
+        indexes: Map<string, PstMailIndex>
+    ): Promise<void> {
         const currentDb = this.getCurrentPstDb();
         await currentDb.put(ROOT_KEY, [...indexes.entries()]);
     }
 
     @SoftLockDb
-    public async getPstMailIndexes() {
+    public async getPstMailIndexes(): Promise<Map<string, PstMailIndex>> {
         const currentDb = this.getCurrentPstDb();
         const rawIndexes = (await currentDb.get(
             ROOT_KEY
@@ -82,13 +83,15 @@ class _PstCacheService implements Service {
     }
 
     @SoftLockDb
-    public async setAttachments(attachments: Map<string, PstAttachment[]>) {
+    public async setAttachments(
+        attachments: Map<string, PstAttachment[]>
+    ): Promise<void> {
         const currentDb = this.getCurrentPstDb();
         await currentDb.put(ATTACHMENTS_KEY, [...attachments.entries()]);
     }
 
     @SoftLockDb
-    public async getAttachments() {
+    public async getAttachments(): Promise<Map<string, PstAttachment[]>> {
         const currentDb = this.getCurrentPstDb();
         const rawAttachments = (await currentDb.get(
             ATTACHMENTS_KEY
@@ -100,7 +103,7 @@ class _PstCacheService implements Service {
     public async setGroup<T extends KnownGroup | UnknownMapping>(
         name: KnownGroup | T,
         ids: Map<string, string[]>
-    ) {
+    ): Promise<void> {
         const currentGroupsDb = this.getCurrentGroupsDb();
         await currentGroupsDb.put(name, [...ids.entries()]);
     }
@@ -108,14 +111,16 @@ class _PstCacheService implements Service {
     @SoftLockDb
     public async getGroup<T extends KnownGroup | UnknownMapping>(
         name: KnownGroup | T
-    ) {
+    ): Promise<Map<string, string[]>> {
         const currentGroupsDb = this.getCurrentGroupsDb();
         const rawIds = await currentGroupsDb.get(name);
         return new Map(rawIds);
     }
 
     @SoftLockDb
-    public async getAllGroups() {
+    public async getAllGroups(): Promise<
+        Record<KnownGroup | UnknownMapping, Map<string, string[]>>
+    > {
         const currentGroupsDb = this.getCurrentGroupsDb();
         const entries = await currentGroupsDb.iterator().all();
         return entries.reduce(
@@ -128,19 +133,23 @@ class _PstCacheService implements Service {
     public async setAddtionalDatas(
         name: AdditionalDatasType,
         addtionalDatas: AdditionalDataItem[]
-    ) {
+    ): Promise<void> {
         const currentAdditionalDatasDb = this.getCurrentAdditionalDatasDb();
         await currentAdditionalDatasDb.put(name, addtionalDatas);
     }
 
     @SoftLockDb
-    public async getAddtionalDatas(name: AdditionalDatasType) {
+    public async getAddtionalDatas(
+        name: AdditionalDatasType
+    ): Promise<AdditionalDataItem[]> {
         const currentAdditionalDatasDb = this.getCurrentAdditionalDatasDb();
         return currentAdditionalDatasDb.get(name);
     }
 
     @SoftLockDb
-    public async getAllAddtionalData() {
+    public async getAllAddtionalData(): Promise<
+        Record<AdditionalDatasType, AdditionalDataItem[]>
+    > {
         const currentAdditionalDatasDb = this.getCurrentAdditionalDatasDb();
         const entries = await currentAdditionalDatasDb.iterator().all();
         return entries.reduce(
@@ -149,12 +158,7 @@ class _PstCacheService implements Service {
         );
     }
 
-    /** @override */
-    public async init(): Promise<void> {
-        await this.db.close();
-    }
-
-    public openForPst(pstId: string) {
+    public openForPst(pstId: string): void {
         this.currrentPstID = pstId;
     }
 
@@ -180,6 +184,3 @@ class _PstCacheService implements Service {
         );
     }
 }
-
-export const pstCacheService = new _PstCacheService();
-export type PstCacheService = _PstCacheService;

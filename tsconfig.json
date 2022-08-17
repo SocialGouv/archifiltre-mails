@@ -32,5 +32,12 @@
   "exclude": [
     "tests",
     "./node_modules/"
-  ]
+  ],
+  "ts-node": {
+    "require": [
+      "tsconfig-paths/register"
+    ],
+    "transpileOnly": true,
+    "files": true
+  }
 }

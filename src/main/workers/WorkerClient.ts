@@ -152,9 +152,17 @@ export class WorkerClient<TWorkerConfig extends WorkerConfig> {
     public addEventListener: EventListenerFunction<
         NonNullable<TWorkerConfig["eventListeners"]>
     > = (name, listener) => {
+        const _requestId = this._requestId++;
         const listeners = this.eventMessageListenerPool.get(name) ?? [];
         listeners.push(listener);
         this.eventMessageListenerPool.set(name, listeners);
+        this.worker.postMessage({
+            data: {
+                _requestId,
+                type: "event",
+            },
+            event: name,
+        });
     };
 
     public async terminate(): Promise<void> {

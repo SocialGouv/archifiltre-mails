@@ -19,6 +19,8 @@ declare module "*.png" {
 }
 
 declare module "source-map-support";
+// eslint-disable-next-line @typescript-eslint/naming-convention
+declare const __static: string;
 
 declare namespace NodeJS {
     interface ProcessEnv {

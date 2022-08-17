@@ -1,6 +1,8 @@
 import path from "path";
 import { isMainThread, workerData } from "worker_threads";
 
+import { name } from "./utils/package";
+
 export const IS_WORKER = !isMainThread;
 export const WORKER_CONFIG_TOKEN = "__config" as const;
 
@@ -38,7 +40,7 @@ export const IS_E2E = localWorkerConfig.IS_E2E ?? !!process.env.E2E;
 export const IS_MAC = localWorkerConfig.IS_MAC ?? process.platform === "darwin";
 const IS_PACKAGE_EVENT = "config.IS_PACKAGED";
 const APP_CACHE_EVENT = "config.APP_CACHE";
-if (IS_MAIN) {
+if (IS_MAIN && !IS_WORKER) {
     ipcMain.on(IS_PACKAGE_EVENT, (event) => {
         event.returnValue = app.isPackaged;
     });
@@ -57,7 +59,7 @@ export const IS_PACKAGED = (): boolean => {
 export const APP_CACHE = (): string => {
     if (IS_WORKER) return localWorkerConfig.APP_CACHE!;
     if (IS_MAIN) {
-        return app.getPath("cache");
+        return path.resolve(app.getPath("cache"), name);
     } else return ipcRenderer.sendSync(APP_CACHE_EVENT) as string;
 };
 
