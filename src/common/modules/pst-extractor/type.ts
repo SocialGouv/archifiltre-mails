@@ -22,9 +22,14 @@ export interface PstElement {
     type: PstElementType;
 }
 
-export interface AdditionalDataItem {
+export interface FolderListItem {
     id: string;
     name: string;
+}
+
+export interface ExtremeDates {
+    max: number;
+    min: number;
 }
 
 export interface PstFolder extends PstElement {
@@ -123,10 +128,13 @@ export interface PstExtractTables {
     emails: Map<string, PstEmail[]>;
 }
 
+export interface AdditionalDatas {
+    extremeDates: ExtremeDates;
+    folderList: FolderListItem[];
+}
+
 export interface PstExtractDatas {
-    additionalDatas: {
-        folderList: AdditionalDataItem[];
-    };
+    additionalDatas: AdditionalDatas;
     attachments: Map<string, PstAttachment[]>;
     groups: Record<ViewType, Map<string, string[]>>;
     indexes: Map<string, PstMailIndex>;

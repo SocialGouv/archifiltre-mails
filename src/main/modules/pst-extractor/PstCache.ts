@@ -1,6 +1,6 @@
 import { APP_CACHE, IS_DEV } from "@common/config";
 import type {
-    AdditionalDataItem,
+    AdditionalDatas,
     PstAttachment,
     PstAttachmentEntries,
     PstMailIdsEntries,
@@ -17,8 +17,6 @@ const ATTACHMENTS_KEY = "_attachments_";
 const GROUPS_DB_PREFIX = "_groups_";
 const ADDITIONNAL_DATES_DB_PREFIX = "_additionalDatas_";
 const CACHE_FOLDER_NAME = "archimail-db";
-
-export type AdditionalDatasType = "folderList";
 
 const defaultDbOptions = {
     valueEncoding: "json",
@@ -122,31 +120,29 @@ export class PstCache {
     }
 
     @SoftLockDb
-    public async setAddtionalDatas(
-        name: AdditionalDatasType,
-        addtionalDatas: AdditionalDataItem[]
+    public async setAddtionalDatas<T extends keyof AdditionalDatas>(
+        name: T,
+        addtionalDatas: AdditionalDatas[T]
     ): Promise<void> {
         const currentAdditionalDatasDb = this.getCurrentAdditionalDatasDb();
         await currentAdditionalDatasDb.put(name, addtionalDatas);
     }
 
     @SoftLockDb
-    public async getAddtionalDatas(
-        name: AdditionalDatasType
-    ): Promise<AdditionalDataItem[]> {
-        const currentAdditionalDatasDb = this.getCurrentAdditionalDatasDb();
+    public async getAddtionalDatas<T extends keyof AdditionalDatas>(
+        name: T
+    ): Promise<AdditionalDatas[T]> {
+        const currentAdditionalDatasDb = this.getCurrentAdditionalDatasDb<T>();
         return currentAdditionalDatasDb.get(name);
     }
 
     @SoftLockDb
-    public async getAllAddtionalData(): Promise<
-        Record<AdditionalDatasType, AdditionalDataItem[]>
-    > {
+    public async getAllAddtionalData(): Promise<AdditionalDatas> {
         const currentAdditionalDatasDb = this.getCurrentAdditionalDatasDb();
         const entries = await currentAdditionalDatasDb.iterator().all();
         return entries.reduce(
             (acc, [k, v]) => ({ ...acc, [k]: v }),
-            {} as Record<AdditionalDatasType, AdditionalDataItem[]>
+            {} as AdditionalDatas
         );
     }
 
@@ -169,8 +165,8 @@ export class PstCache {
         );
     }
 
-    private getCurrentAdditionalDatasDb() {
-        return this.getCurrentPstDb().sublevel<string, AdditionalDataItem[]>(
+    private getCurrentAdditionalDatasDb<T extends keyof AdditionalDatas>() {
+        return this.getCurrentPstDb().sublevel<T, AdditionalDatas[T]>(
             ADDITIONNAL_DATES_DB_PREFIX,
             defaultDbOptions
         );

@@ -1,5 +1,5 @@
 import type {
-    AdditionalDataItem,
+    FolderListItem,
     PstAttachment as PstAttachment,
     PstMailIndex,
     PstProgressState,
@@ -111,7 +111,10 @@ server.onCommand(
 
         // folder list collect
         let folderId = 0;
-        const folderList: AdditionalDataItem[] = [];
+        const folderList: FolderListItem[] = [];
+        // extrem dates
+        let minDate = Infinity;
+        let maxDate = 0;
 
         /**
          * Process a "raw" folder from the PST and extract sub folders, emails, and attachements.
@@ -156,10 +159,8 @@ server.onCommand(
                         continue;
                     }
 
-                    // const recipients = email.getRecipients();
-
+                    // group mails
                     const emailId = randomUUID();
-
                     for (const viewGroupFn of viewGroupFunctions) {
                         const currentGroupIds = groups.get(viewGroupFn.type)!;
                         const criterion = viewGroupFn.groupByFunction(email);
@@ -169,6 +170,12 @@ server.onCommand(
 
                         groups.set(viewGroupFn.type, currentGroupIds);
                     }
+
+                    // test extrem dates
+                    const sentTime = email.clientSubmitTime!.getTime();
+                    const receivedTime = email.messageDeliveryTime!.getTime();
+                    minDate = Math.min(minDate, sentTime, receivedTime);
+                    maxDate = Math.max(maxDate, sentTime, receivedTime);
 
                     // const emailContent: PstEmail = {
                     //     attachementCount: email.numberOfAttachments,
@@ -265,6 +272,10 @@ server.onCommand(
                 await pstCache.setGroup(groupType, group);
             }
             await pstCache.setAddtionalDatas("folderList", folderList);
+            await pstCache.setAddtionalDatas("extremeDates", {
+                max: maxDate,
+                min: minDate,
+            });
         } catch (e: unknown) {
             console.error(e);
             process.exit(1);

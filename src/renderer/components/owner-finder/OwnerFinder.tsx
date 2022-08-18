@@ -1,5 +1,5 @@
 import { useService } from "@common/modules/ContainerModule";
-import type { AdditionalDataItem } from "@common/modules/pst-extractor/type";
+import type { FolderListItem } from "@common/modules/pst-extractor/type";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
@@ -24,7 +24,7 @@ export const OwnerFinder: React.FC<OwnerFinderProps> = ({ switchFinder }) => {
             ({
                 id: contact,
                 name: contact,
-            } as AdditionalDataItem)
+            } as FolderListItem)
     );
 
     return (

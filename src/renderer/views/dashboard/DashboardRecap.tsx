@@ -66,7 +66,8 @@ export const DashboardRecap: FC = () => {
 
     // const totalFolderSize = getPstListOfFolder(pstFile.children).length;
 
-    // const { minDate, maxDate } = getExtremeMailsDates(extractTables);
+    const { min: minDate, max: maxDate } =
+        extractDatas.additionalDatas.extremeDates;
 
     // TODO: move to default config (?)
     const extremeDateFormatParam: Intl.DateTimeFormatOptions = {
@@ -115,7 +116,7 @@ export const DashboardRecap: FC = () => {
                             >
                                 {t("dashboard.recap.extremum")}
                             </span>
-                            {/* <span
+                            <span
                                 className={
                                     style.dashboard__recap__informations__item
                                 }
@@ -124,10 +125,10 @@ export const DashboardRecap: FC = () => {
                                     formatParams: {
                                         minDate: extremeDateFormatParam,
                                     },
-                                    minDate,
+                                    minDate: new Date(minDate),
                                 })}
-                            </span> */}
-                            {/* <span
+                            </span>
+                            <span
                                 className={
                                     style.dashboard__recap__informations__item
                                 }
@@ -136,9 +137,9 @@ export const DashboardRecap: FC = () => {
                                     formatParams: {
                                         maxDate: extremeDateFormatParam,
                                     },
-                                    maxDate,
+                                    maxDate: new Date(maxDate),
                                 })}
-                            </span> */}
+                            </span>
                         </div>
                     </div>
                     <div className={style.dashboard__recap__item}>

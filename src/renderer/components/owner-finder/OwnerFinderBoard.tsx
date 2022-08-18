@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import type { AdditionalDataItem } from "@common/modules/pst-extractor/type";
+import type { FolderListItem } from "@common/modules/pst-extractor/type";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
@@ -13,7 +13,7 @@ import {
 import style from "./OwnerFinder.module.scss";
 
 export interface OwnerFinderBoardProps {
-    list: AdditionalDataItem[];
+    list: FolderListItem[];
     title: string;
     type: SynthesisType;
 }
