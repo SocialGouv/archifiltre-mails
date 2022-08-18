@@ -275,19 +275,19 @@ export class PstExtractorModule extends MainModule {
         // });
     }
 
-    private async getEmails(emailIndexes: number[][]): Promise<PstEmail> {
+    private async getEmails(emailIndexes: number[][]): Promise<PstEmail[]> {
         if (this.working) {
             throw new PstExtractorError("Extractor already working.");
         }
         console.info("Start fetching emails...");
-        const [email] = await this.fetchWorker.query("fetch", {
-            emailIndexes: emailIndexes,
+        const emails = await this.fetchWorker.query("fetch", {
+            emailIndexes,
         });
         console.log("Fetching done");
-        if (!email) {
-            throw new Error("Email not found from given index.");
+        if (!emails.length) {
+            throw new Error("Emails not found from given indexes.");
         }
-        return email;
+        return emails;
 
         // return new Promise<PstEmail>((resolve, reject) => {
         //     this.pstEmailWorker?.on(

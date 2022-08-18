@@ -40,8 +40,9 @@ export interface Ack {
 }
 
 export interface DefaultWorkerMessageType {
-    data: { _requestId: number; type: "command" | "event" | "query" };
+    data?: unknown;
     event: string;
+    metadata: { _requestId: number; type: "command" | "event" | "query" };
 }
 
 export interface WorkerAppConfig {

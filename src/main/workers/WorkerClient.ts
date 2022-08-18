@@ -92,7 +92,8 @@ export class WorkerClient<TWorkerConfig extends WorkerConfig> {
             "message",
             ({
                 event,
-                data: { _requestId: messageReturnId, type, ...messageData },
+                metadata: { _requestId: messageReturnId, type },
+                data: messageData,
             }) => {
                 if (type === "event") {
                     this.eventMessageListenerPool
@@ -121,12 +122,12 @@ export class WorkerClient<TWorkerConfig extends WorkerConfig> {
                     resolve({ ok: true });
                 });
                 this.worker.postMessage({
-                    data: {
-                        ...param,
+                    data: param,
+                    event: name,
+                    metadata: {
                         _requestId,
                         type: "command",
                     },
-                    event: name,
                 });
             });
         };
@@ -139,12 +140,12 @@ export class WorkerClient<TWorkerConfig extends WorkerConfig> {
         return new Promise((resolve) => {
             this.messageListenerPool.set(_requestId, resolve);
             this.worker.postMessage({
-                data: {
-                    ...param,
+                data: param,
+                event: name,
+                metadata: {
                     _requestId,
                     type: "query",
                 },
-                event: name,
             });
         });
     };
@@ -157,11 +158,11 @@ export class WorkerClient<TWorkerConfig extends WorkerConfig> {
         listeners.push(listener);
         this.eventMessageListenerPool.set(name, listeners);
         this.worker.postMessage({
-            data: {
+            event: name,
+            metadata: {
                 _requestId,
                 type: "event",
             },
-            event: name,
         });
     };
 

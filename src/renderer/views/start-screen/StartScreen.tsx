@@ -31,8 +31,7 @@ export const StartScreen: React.FC = () => {
 
     useEffect(() => {
         if (extractDatas) {
-            console.log({ extractDatas });
-            // changeRoute("DASHBOARD");
+            changeRoute("DASHBOARD");
         }
     }, [changeRoute, extractDatas]);
 

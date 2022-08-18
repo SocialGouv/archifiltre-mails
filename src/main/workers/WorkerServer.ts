@@ -63,18 +63,19 @@ export class WorkerServer<TWorkerConfig extends WorkerConfig> {
             "message",
             async ({
                 event,
-                data: { _requestId, type, ...messageData },
+                metadata: { _requestId, type },
+                data: messageData,
             }: DefaultWorkerMessageType) => {
                 if (type === "event") {
                     const list = this.subscribersPool.get(event) ?? [];
                     list.push((eventData) => {
                         parentPort?.postMessage({
-                            data: {
-                                ...eventData,
+                            data: eventData,
+                            event,
+                            metadata: {
                                 _requestId,
                                 type,
                             },
-                            event,
                         });
                     });
                     this.subscribersPool.set(event, list);
@@ -86,12 +87,12 @@ export class WorkerServer<TWorkerConfig extends WorkerConfig> {
                         );
                     }
                     parentPort?.postMessage({
-                        data: {
-                            ...(await reply(messageData)),
+                        data: await reply(messageData),
+                        event,
+                        metadata: {
                             _requestId,
                             type,
                         },
-                        event,
                     });
                 }
             }

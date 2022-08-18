@@ -13,6 +13,7 @@ import type {
     WorkerQueriesBuilder,
 } from "../../workers/type";
 import { WorkerServer } from "../../workers/WorkerServer";
+import { PstCache } from "./PstCache";
 
 type Commands = WorkerCommandsBuilder<{
     open: {
@@ -35,11 +36,14 @@ export type FetchWorkerConfig = WorkerConfigBuilder<{
     queries: Queries;
 }>;
 
+const pstCache = new PstCache();
+void pstCache.db.close();
 const server = new WorkerServer<FetchWorkerConfig>();
 let pstFile: PSTFile | null = null;
 
 server.onCommand("open", async ({ pstFilePath }) => {
     pstFile = new PSTFile(path.resolve(pstFilePath));
+    pstCache.openForPst(pstFilePath);
 
     return Promise.resolve({ ok: true });
 });
@@ -48,9 +52,20 @@ server.onQuery("fetch", async ({ emailIndexes }) => {
     if (!pstFile) {
         throw new Error("No pst file opened yet.");
     }
+    const allIndexes = await pstCache.getPstMailIndexes();
+    const cacheKeys = [...allIndexes.keys()];
+    const cacheValues = [...allIndexes.values()];
     return Promise.all(
-        emailIndexes.map((emailIndex) =>
-            findEmail(pstFile!.getRootFolder(), emailIndex)
+        emailIndexes.map(
+            async (emailIndex) =>
+                new Promise((ok) => {
+                    const email = findEmail(
+                        pstFile!.getRootFolder(),
+                        emailIndex
+                    );
+                    email.id = cacheKeys[cacheValues.indexOf(emailIndex)]!;
+                    ok(email);
+                })
         )
     );
 });

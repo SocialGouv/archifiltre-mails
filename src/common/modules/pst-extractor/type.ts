@@ -129,8 +129,12 @@ export interface PstExtractTables {
 }
 
 export interface AdditionalDatas {
+    deleted: string[];
     extremeDates: ExtremeDates;
     folderList: FolderListItem[];
+    possibleOwner?: Required<PstEmailRecipient>;
+    received: string[];
+    sent: string[];
 }
 
 export interface PstExtractDatas {

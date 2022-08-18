@@ -190,11 +190,14 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
             // then breadcrump
             // then global recap
             if (!pstExtractorService || !extractDatas) return;
-            const mails = (
-                await pstExtractorService.getEmails(
-                    node.data.ids.map((id) => extractDatas.indexes.get(id)!)
-                )
-            ).sort(
+            const indexes = node.data.ids.map(
+                (id) => extractDatas.indexes.get(id)!
+            );
+            console.log("az", {
+                data: node.data,
+                indexes,
+            });
+            const mails = (await pstExtractorService.getEmails(indexes)).sort(
                 (a, b) =>
                     (a.receivedDate?.valueOf() ?? 0) -
                     (b.receivedDate?.valueOf() ?? 0)

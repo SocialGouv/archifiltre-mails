@@ -14,6 +14,9 @@ import type { Any } from "./type";
 export const randomString = (length = 20): string =>
     randomBytes(length).toString("hex");
 
+export const stringLowerEqual = (a: string, b: string): boolean =>
+    String(a).toLowerCase() === String(b).toLowerCase();
+
 /**
  * Split a string into chunks with defined length.
  *

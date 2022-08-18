@@ -62,8 +62,6 @@ export type ExtractorWorkerConfig = WorkerConfigBuilder<{
 const pstCache = new PstCache();
 void pstCache.db.close();
 const server = new WorkerServer<ExtractorWorkerConfig>();
-// const server = new WorkerServer<Data, Commands, Any, EventListeners>();
-export type ExtractorWorkerServer = typeof server;
 let pstFile: PSTFile | null = null;
 
 server.onCommand("open", async ({ pstFilePath }) => {
@@ -112,6 +110,7 @@ server.onCommand(
         // folder list collect
         let folderId = 0;
         const folderList: FolderListItem[] = [];
+
         // extrem dates
         let minDate = Infinity;
         let maxDate = 0;
@@ -158,9 +157,25 @@ server.onCommand(
                     if (email.messageClass !== "IPM.Note") {
                         continue;
                     }
+                    const emailId = randomUUID();
+                    // const recipients = email.getRecipients();
+                    // const to = getRecipientFromDisplay(
+                    //     email.displayTo,
+                    //     recipients
+                    // );
+                    // const cc = getRecipientFromDisplay(
+                    //     email.displayCC,
+                    //     recipients
+                    // );
+                    // const bcc = getRecipientFromDisplay(
+                    //     email.displayBCC,
+                    //     recipients
+                    // );
+                    // const receiverAddresses = [...to, ...cc, ...bcc].map(
+                    //     (r) => r.email
+                    // );
 
                     // group mails
-                    const emailId = randomUUID();
                     for (const viewGroupFn of viewGroupFunctions) {
                         const currentGroupIds = groups.get(viewGroupFn.type)!;
                         const criterion = viewGroupFn.groupByFunction(email);
@@ -260,26 +275,22 @@ server.onCommand(
                     }
                 }
             }
+
             currentDepth--;
         }
 
         processFolder(rootFolder);
 
-        try {
-            await pstCache.setPstMailIndexes(mailIndexes);
-            await pstCache.setAttachments(attachments);
-            for (const [groupType, group] of groups) {
-                await pstCache.setGroup(groupType, group);
-            }
-            await pstCache.setAddtionalDatas("folderList", folderList);
-            await pstCache.setAddtionalDatas("extremeDates", {
-                max: maxDate,
-                min: minDate,
-            });
-        } catch (e: unknown) {
-            console.error(e);
-            process.exit(1);
+        await pstCache.setPstMailIndexes(mailIndexes);
+        await pstCache.setAttachments(attachments);
+        for (const [groupType, group] of groups) {
+            await pstCache.setGroup(groupType, group);
         }
+        await pstCache.setAddtionalDatas("folderList", folderList);
+        await pstCache.setAddtionalDatas("extremeDates", {
+            max: maxDate,
+            min: minDate,
+        });
 
         progressState.elapsed = Date.now() - starTime;
         server.trigger("done", progressState);
