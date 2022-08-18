@@ -1,3 +1,5 @@
+import type { ViewType } from "../views/setup";
+
 export interface ExtractOptions {
     pstFilePath: string;
 }
@@ -126,8 +128,6 @@ export interface PstExtractDatas {
         folderList: AdditionalDataItem[];
     };
     attachments: Map<string, PstAttachment[]>;
-    domain: Map<string, string[]>;
+    groups: Record<ViewType, Map<string, string[]>>;
     indexes: Map<string, PstMailIndex>;
-    recipient: Map<string, string[]>;
-    year: Map<string, string[]>;
 }

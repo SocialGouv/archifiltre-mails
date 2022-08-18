@@ -7,11 +7,8 @@ import type {
     PstMailIndex,
     PstMailIndexEntries,
 } from "@common/modules/pst-extractor/type";
-import type {
-    AnyFunction,
-    MethodNames,
-    UnknownMapping,
-} from "@common/utils/type";
+import type { ViewType } from "@common/modules/views/setup";
+import type { AnyFunction, MethodNames } from "@common/utils/type";
 import { Level } from "level";
 import path from "path";
 
@@ -21,8 +18,6 @@ const GROUPS_DB_PREFIX = "_groups_";
 const ADDITIONNAL_DATES_DB_PREFIX = "_additionalDatas_";
 const CACHE_FOLDER_NAME = "archimail-db";
 
-export const knownGroups = ["domain", "year", "recipient"] as const;
-export type KnownGroup = typeof knownGroups[number];
 export type AdditionalDatasType = "folderList";
 
 const defaultDbOptions = {
@@ -58,7 +53,6 @@ export class PstCache {
             CACHE_FOLDER_NAME
         )
     ) {
-        console.log("========================= ", cachePath);
         this.db = new Level(this.cachePath, defaultDbOptions);
         if (IS_DEV) {
             void this.db.clear();
@@ -100,8 +94,8 @@ export class PstCache {
     }
 
     @SoftLockDb
-    public async setGroup<T extends KnownGroup | UnknownMapping>(
-        name: KnownGroup | T,
+    public async setGroup(
+        name: ViewType,
         ids: Map<string, string[]>
     ): Promise<void> {
         const currentGroupsDb = this.getCurrentGroupsDb();
@@ -109,9 +103,7 @@ export class PstCache {
     }
 
     @SoftLockDb
-    public async getGroup<T extends KnownGroup | UnknownMapping>(
-        name: KnownGroup | T
-    ): Promise<Map<string, string[]>> {
+    public async getGroup(name: ViewType): Promise<Map<string, string[]>> {
         const currentGroupsDb = this.getCurrentGroupsDb();
         const rawIds = await currentGroupsDb.get(name);
         return new Map(rawIds);
@@ -119,13 +111,13 @@ export class PstCache {
 
     @SoftLockDb
     public async getAllGroups(): Promise<
-        Record<KnownGroup | UnknownMapping, Map<string, string[]>>
+        Record<ViewType, Map<string, string[]>>
     > {
         const currentGroupsDb = this.getCurrentGroupsDb();
         const entries = await currentGroupsDb.iterator().all();
         return entries.reduce(
             (acc, [k, v]) => ({ ...acc, [k]: new Map(v) }),
-            {} as Record<KnownGroup | UnknownMapping, Map<string, string[]>>
+            {} as Record<ViewType, Map<string, string[]>>
         );
     }
 
@@ -171,10 +163,10 @@ export class PstCache {
     }
 
     private getCurrentGroupsDb() {
-        return this.getCurrentPstDb().sublevel<
-            KnownGroup | UnknownMapping,
-            PstMailIdsEntries
-        >(GROUPS_DB_PREFIX, defaultDbOptions);
+        return this.getCurrentPstDb().sublevel<ViewType, PstMailIdsEntries>(
+            GROUPS_DB_PREFIX,
+            defaultDbOptions
+        );
     }
 
     private getCurrentAdditionalDatasDb() {

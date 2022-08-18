@@ -84,7 +84,7 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
         // const aggregatedDomain = getAggregatedDomains(pstFile!);
         const aggregatedDomain = mapToRecord(
             mapOrderByValues(
-                extractDatas!.domain,
+                extractDatas!.groups.domain,
                 (a, b) => b.length - a.length
             )
         );
@@ -163,9 +163,8 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
         if (nextViewGroupBy) {
             const nextDatasFilter = new Map(
                 [
-                    ...(extractDatas?.[
-                        nextViewGroupBy.type as "domain" | "recipient" | "year"
-                    ].entries() ?? []),
+                    ...(extractDatas?.groups[nextViewGroupBy.type]?.entries() ??
+                        []),
                 ].reduce<[string, string[]][]>((acc, [keyToKeep, nextIds]) => {
                     const idsToKeep = nextIds.filter((id) =>
                         node.data.ids.includes(id)

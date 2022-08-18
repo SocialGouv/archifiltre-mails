@@ -62,6 +62,7 @@ const PST_MESSAGE_PROPS: PSTMessageProps[] = [
     "isFromMe",
     "isRead",
     "subject",
+    "senderName",
 ];
 
 export interface ViewConfiguration {
@@ -109,5 +110,5 @@ export const resolveViewConfiguration = (
             groupByFunction: (email) =>
                 String(email[groupByKey as PSTMessageProps]),
         };
-    } else throw new Error("Unknown ViewConfiguration");
+    } else throw new Error(`Unknown "${groupByKey}" ViewConfiguration`);
 };

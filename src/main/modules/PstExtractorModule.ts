@@ -158,6 +158,7 @@ export class PstExtractorModule extends MainModule {
             progressInterval: this.userConfigService.get(
                 "extractProgressDelay"
             ),
+            viewConfigs: this.userConfigService.get("viewConfigs"),
         });
 
         // TODO: hash instead
@@ -165,24 +166,19 @@ export class PstExtractorModule extends MainModule {
 
         const attachments = await this.cacheService.getAttachments();
         const indexes = await this.cacheService.getPstMailIndexes();
-        const { domain, year, recipient } =
-            await this.cacheService.getAllGroups();
+        const groups = await this.cacheService.getAllGroups();
         const additionalDatas = await this.cacheService.getAllAddtionalData();
         this.consoleToRendererService.log(BrowserWindow.getAllWindows()[0]!, {
             additionalDatas,
             attachments,
-            domain,
+            groups,
             indexes,
-            recipient,
-            year,
         });
         this.lastPstExtractDatas = {
             additionalDatas,
             attachments,
-            domain,
+            groups,
             indexes,
-            recipient,
-            year,
         };
 
         this.working = false;
