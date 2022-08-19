@@ -17,7 +17,7 @@ export const builtInViewConfigs: ViewConfiguration[] = [
         type: "year",
     },
     {
-        groupBy: "senderName",
+        groupBy: "senderEmailAddress",
         type: "recipient",
     },
 ];

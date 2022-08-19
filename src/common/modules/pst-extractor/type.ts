@@ -22,7 +22,7 @@ export interface PstElement {
     type: PstElementType;
 }
 
-export interface FolderListItem {
+export interface AddtionalDataItem {
     id: string;
     name: string;
 }
@@ -129,17 +129,20 @@ export interface PstExtractTables {
 }
 
 export interface AdditionalDatas {
+    contactList: AddtionalDataItem[];
     deleted: string[];
     extremeDates: ExtremeDates;
-    folderList: FolderListItem[];
+    folderList: AddtionalDataItem[];
     possibleOwner?: Required<PstEmailRecipient>;
     received: string[];
     sent: string[];
 }
 
+export type GroupType = ViewType | "folder" | "senderMail";
+
 export interface PstExtractDatas {
     additionalDatas: AdditionalDatas;
     attachments: Map<string, PstAttachment[]>;
-    groups: Record<ViewType, Map<string, string[]>>;
+    groups: Record<GroupType, Map<string, string[]>>;
     indexes: Map<string, PstMailIndex>;
 }

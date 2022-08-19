@@ -106,7 +106,9 @@ function findEmail(folder: PSTFolder, emailIndex: number[]): PstEmail {
         elementPath: "",
 
         from: {
-            email: rawEmail.senderEmailAddress,
+            email: (
+                rawEmail.senderSmtpEmailAddress || rawEmail.senderEmailAddress
+            ).toLowerCase(),
             name: rawEmail.senderName,
         },
 

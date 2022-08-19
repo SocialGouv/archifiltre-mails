@@ -2,6 +2,9 @@ import React from "react";
 
 import style from "./Dashboard.module.scss";
 import { DashboardActions } from "./DashboardActions";
+import { DashboardImpact } from "./DashboardImpact";
+import { DashboardInformations } from "./DashboardInformations";
+import { DashboardRecap } from "./DashboardRecap";
 import { DashboardViewer } from "./DashboardViewer";
 
 export interface DashboardComponentProps {
@@ -13,13 +16,13 @@ export const Dashboard: React.FC = () => {
         <div className={style.dashboard}>
             <div className={style.dashboard__header}>
                 <DashboardActions />
-                {/* <DashboardImpact /> */}
+                <DashboardImpact />
             </div>
             <div className={style.dashboard__cards}>
                 <DashboardViewer />
                 <div className={style.dashboardInfos}>
-                    {/* <DashboardRecap /> */}
-                    {/* <DashboardInformations /> */}
+                    <DashboardRecap />
+                    <DashboardInformations />
                 </div>
             </div>
         </div>

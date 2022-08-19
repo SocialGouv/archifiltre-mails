@@ -1,13 +1,16 @@
 import type {
-    FolderListItem,
-    PstAttachment as PstAttachment,
+    AddtionalDataItem,
+    GroupType,
+    PstAttachment,
     PstMailIndex,
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
-import type { ViewType } from "@common/modules/views/setup";
 import { builtInViewConfigs } from "@common/modules/views/setup";
 import type { ViewConfiguration } from "@common/modules/views/utils";
-import { resolveViewConfiguration } from "@common/modules/views/utils";
+import {
+    getRecipientFromDisplay,
+    resolveViewConfiguration,
+} from "@common/modules/views/utils";
 import type { PSTFolder } from "@socialgouv/archimail-pst-extractor";
 import { PSTFile } from "@socialgouv/archimail-pst-extractor";
 import path from "path";
@@ -23,7 +26,7 @@ import { PstCache } from "./PstCache";
 // import { randomUUID } from "crypto";
 let ID = 0;
 function randomUUID() {
-    return `${ID++}`;
+    return `mail-${ID++}`;
 }
 
 interface Data {
@@ -89,12 +92,16 @@ server.onCommand(
             progress: true,
         };
 
-        const groups = new Map<ViewType, Map<string, string[]>>(
+        // view groups
+        const groups = new Map<GroupType, Map<string, string[]>>(
             viewGroupFunctions.map((viewGroupFn) => [
                 viewGroupFn.type,
                 new Map(),
             ])
         );
+        // utility groups
+        groups.set("senderMail", new Map());
+        groups.set("folder", new Map());
         const mailIndexes = new Map<string, PstMailIndex>();
         const attachments = new Map<string, PstAttachment[]>();
 
@@ -109,7 +116,13 @@ server.onCommand(
 
         // folder list collect
         let folderId = 0;
-        const folderList: FolderListItem[] = [];
+        const folderList: AddtionalDataItem[] = [];
+
+        // contact list collect
+        const contactList = new Map<
+            AddtionalDataItem["id"],
+            AddtionalDataItem["name"]
+        >();
 
         // extrem dates
         let minDate = Infinity;
@@ -120,7 +133,7 @@ server.onCommand(
          *
          * The progress state is updated for every item found and sent to any listener on every emails.
          */
-        function processFolder(folder: PSTFolder): void {
+        function processFolder(folder: PSTFolder, currentFolderId = ""): void {
             if (root) {
                 root = false;
             } else {
@@ -143,11 +156,13 @@ server.onCommand(
                     ) {
                         continue;
                     }
+                    const strFolderId = `folder-${folderId}`;
                     folderList.push({
-                        id: `${folderId++}`,
+                        id: strFolderId,
                         name: childFolder.displayName,
                     });
-                    processFolder(childFolder);
+                    folderId++;
+                    processFolder(childFolder, strFolderId);
                 }
             }
 
@@ -158,23 +173,6 @@ server.onCommand(
                         continue;
                     }
                     const emailId = randomUUID();
-                    // const recipients = email.getRecipients();
-                    // const to = getRecipientFromDisplay(
-                    //     email.displayTo,
-                    //     recipients
-                    // );
-                    // const cc = getRecipientFromDisplay(
-                    //     email.displayCC,
-                    //     recipients
-                    // );
-                    // const bcc = getRecipientFromDisplay(
-                    //     email.displayBCC,
-                    //     recipients
-                    // );
-                    // const receiverAddresses = [...to, ...cc, ...bcc].map(
-                    //     (r) => r.email
-                    // );
-
                     // group mails
                     for (const viewGroupFn of viewGroupFunctions) {
                         const currentGroupIds = groups.get(viewGroupFn.type)!;
@@ -186,11 +184,57 @@ server.onCommand(
                         groups.set(viewGroupFn.type, currentGroupIds);
                     }
 
-                    // test extrem dates
+                    // group for sender
+                    const senderMail = email.senderEmailAddress.toLowerCase();
+                    const senderGroupIds = groups.get("senderMail")!;
+                    const senderMailIds = senderGroupIds.get(senderMail) ?? [];
+                    senderGroupIds.set(senderMail, [...senderMailIds, emailId]);
+
+                    // group by folder name (prepare for deleted folder)
+                    const folderGroupIds = groups.get("folder")!;
+                    const folderMailIds =
+                        folderGroupIds.get(currentFolderId) ?? [];
+                    folderGroupIds.set(currentFolderId, [
+                        ...folderMailIds,
+                        emailId,
+                    ]);
+
+                    // test and get extrem dates
                     const sentTime = email.clientSubmitTime!.getTime();
                     const receivedTime = email.messageDeliveryTime!.getTime();
                     minDate = Math.min(minDate, sentTime, receivedTime);
                     maxDate = Math.max(maxDate, sentTime, receivedTime);
+
+                    // get contact
+                    const recipients = email.getRecipients();
+                    const to = getRecipientFromDisplay(
+                        email.displayTo,
+                        recipients
+                    );
+                    const cc = getRecipientFromDisplay(
+                        email.displayCC,
+                        recipients
+                    );
+                    const bcc = getRecipientFromDisplay(
+                        email.displayBCC,
+                        recipients
+                    );
+                    [
+                        ...bcc,
+                        ...cc,
+                        {
+                            email: (
+                                email.senderSmtpEmailAddress ||
+                                email.senderEmailAddress
+                            ).toLowerCase(),
+                            name: email.senderName,
+                        },
+                        ...to,
+                    ].forEach((recipient) => {
+                        const contactKey = recipient.email ?? recipient.name;
+                        if (!contactList.has(contactKey))
+                            contactList.set(contactKey, recipient.name);
+                    });
 
                     // const emailContent: PstEmail = {
                     //     attachementCount: email.numberOfAttachments,
@@ -218,23 +262,6 @@ server.onCommand(
                     //     to: getRecipientFromDisplay(email.displayTo, recipients),
                     //     type: "email",
                     // };
-
-                    // [
-                    //     ...emailContent.bcc,
-                    //     ...emailContent.cc,
-                    //     emailContent.from,
-                    //     ...emailContent.to,
-                    // ].forEach((recipient) => {
-                    //     const contactKey = recipient.email ?? recipient.name;
-                    //     if (!pstExtractTables.contacts.has(contactKey))
-                    //         pstExtractTables.contacts.set(contactKey, [
-                    //             emailContent.id,
-                    //         ]);
-                    //     else
-                    //         pstExtractTables.contacts
-                    //             .get(contactKey)
-                    //             ?.push(emailContent.id);
-                    // });
 
                     if (email.hasAttachments) {
                         for (let i = 0; i < email.numberOfAttachments; i++) {
@@ -287,6 +314,10 @@ server.onCommand(
             await pstCache.setGroup(groupType, group);
         }
         await pstCache.setAddtionalDatas("folderList", folderList);
+        await pstCache.setAddtionalDatas(
+            "contactList",
+            [...contactList.entries()].map(([id, name]) => ({ id, name }))
+        );
         await pstCache.setAddtionalDatas("extremeDates", {
             max: maxDate,
             min: minDate,

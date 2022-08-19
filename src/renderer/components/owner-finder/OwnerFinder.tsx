@@ -1,5 +1,4 @@
 import { useService } from "@common/modules/ContainerModule";
-import type { FolderListItem } from "@common/modules/pst-extractor/type";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
@@ -19,14 +18,6 @@ export const OwnerFinder: React.FC<OwnerFinderProps> = ({ switchFinder }) => {
     const { t } = useTranslation();
     if (!extractDatas) return null;
 
-    const contactList = [...extractDatas.recipient.keys()].map(
-        (contact) =>
-            ({
-                id: contact,
-                name: contact,
-            } as FolderListItem)
-    );
-
     return (
         <section className={style.finder}>
             <OwnerFinderBoard
@@ -36,7 +27,7 @@ export const OwnerFinder: React.FC<OwnerFinderProps> = ({ switchFinder }) => {
             />
             <OwnerFinderBoard
                 title={t("dashboard.ownerfinder.board.owner.title")}
-                list={contactList}
+                list={extractDatas.additionalDatas.contactList}
                 type="owner"
             />
             <button

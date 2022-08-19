@@ -1,6 +1,7 @@
 import { APP_CACHE, IS_DEV } from "@common/config";
 import type {
     AdditionalDatas,
+    GroupType,
     PstAttachment,
     PstAttachmentEntries,
     PstMailIdsEntries,
@@ -93,7 +94,7 @@ export class PstCache {
 
     @SoftLockDb
     public async setGroup(
-        name: ViewType,
+        name: GroupType,
         ids: Map<string, string[]>
     ): Promise<void> {
         const currentGroupsDb = this.getCurrentGroupsDb();
@@ -101,7 +102,7 @@ export class PstCache {
     }
 
     @SoftLockDb
-    public async getGroup(name: ViewType): Promise<Map<string, string[]>> {
+    public async getGroup(name: GroupType): Promise<Map<string, string[]>> {
         const currentGroupsDb = this.getCurrentGroupsDb();
         const rawIds = await currentGroupsDb.get(name);
         return new Map(rawIds);
@@ -109,13 +110,13 @@ export class PstCache {
 
     @SoftLockDb
     public async getAllGroups(): Promise<
-        Record<ViewType, Map<string, string[]>>
+        Record<GroupType, Map<string, string[]>>
     > {
         const currentGroupsDb = this.getCurrentGroupsDb();
         const entries = await currentGroupsDb.iterator().all();
         return entries.reduce(
             (acc, [k, v]) => ({ ...acc, [k]: new Map(v) }),
-            {} as Record<ViewType, Map<string, string[]>>
+            {} as Record<GroupType, Map<string, string[]>>
         );
     }
 

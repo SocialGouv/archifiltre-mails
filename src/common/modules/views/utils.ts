@@ -1,8 +1,7 @@
-import type {
-    PSTMessage,
-    PSTRecipient,
-} from "@socialgouv/archimail-pst-extractor";
+import type { PSTRecipient } from "@socialgouv/archimail-pst-extractor";
+import { PSTMessage } from "@socialgouv/archimail-pst-extractor";
 
+import { Object } from "../../utils/overload";
 import type { UnknownMapping } from "../../utils/type";
 import type { PstEmailRecipient } from "../pst-extractor/type";
 import type { ViewType } from "./setup";
@@ -11,12 +10,16 @@ export const LDAP_ORG = "/O=";
 export const LDAP_ARBITRARY_SPLICE_CHAR = "O=";
 export const COMMON_NAME_PST = "/CN=";
 export const getDomain = (element: string): string =>
-    element.substring(element.indexOf("@"));
+    element.toLowerCase().substring(element.indexOf("@"));
 
 export const getLdapDomain = (ldap: string): string =>
-    ldap.split("/")[1]?.split(LDAP_ARBITRARY_SPLICE_CHAR)[1] ?? "";
+    ldap
+        .toLowerCase()
+        .split("/")[1]
+        ?.split(LDAP_ARBITRARY_SPLICE_CHAR.toLowerCase())[1] ?? "";
 
-export const isLdap = (mail: string): boolean => mail.includes(LDAP_ORG);
+export const isLdap = (mail: string): boolean =>
+    mail.toLowerCase().includes(LDAP_ORG.toLowerCase());
 
 export const getRecipientFromDisplay = (
     display: string,
@@ -31,8 +34,9 @@ export const getRecipientFromDisplay = (
                 (recipient) => recipient.displayName === name
             );
             return {
-                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- Handle empty string
-                email: found?.smtpAddress || found?.emailAddress,
+                email:
+                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- Handle empty string
+                    (found?.smtpAddress || found?.emailAddress)?.toLowerCase(),
                 // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- Handle empty string
                 name: found?.recipientDisplayName || found?.displayName || name,
             };
@@ -49,21 +53,9 @@ type PSTMessageProps = {
         : never;
 }[keyof PSTMessage];
 
-const PST_MESSAGE_PROPS: PSTMessageProps[] = [
-    "body",
-    "conversationTopic",
-    "displayBCC",
-    "displayCC",
-    "displayName",
-    "displayTo",
-    "emailAddress",
-    "hasAttachments",
-    "importance",
-    "isFromMe",
-    "isRead",
-    "subject",
-    "senderName",
-];
+const PST_MESSAGE_PROPS = Object.getOwnPropertyNames(
+    PSTMessage.prototype
+) as PSTMessageProps[];
 
 export interface ViewConfiguration {
     groupBy:

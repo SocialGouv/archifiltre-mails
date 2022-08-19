@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import type { FolderListItem } from "@common/modules/pst-extractor/type";
+import type { AddtionalDataItem } from "@common/modules/pst-extractor/type";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
@@ -13,7 +13,7 @@ import {
 import style from "./OwnerFinder.module.scss";
 
 export interface OwnerFinderBoardProps {
-    list: FolderListItem[];
+    list: AddtionalDataItem[];
     title: string;
     type: SynthesisType;
 }
@@ -26,10 +26,10 @@ export const OwnerFinderBoard: React.FC<OwnerFinderBoardProps> = ({
     const { t } = useTranslation();
     const { ownerName, deletedFolderName, deletedFolderId, ownerId } =
         useSynthesisStore();
-    const compareValue = type === "deleted" ? deletedFolderName : ownerName;
+    const compareValueName = type === "deleted" ? deletedFolderName : ownerName;
     const compareValueId = type === "deleted" ? deletedFolderId : ownerId;
     const filteredList = list.filter((item) =>
-        item.name.toLowerCase().includes(compareValue)
+        item.name.toLowerCase().includes(compareValueName)
     );
 
     return (
@@ -40,9 +40,9 @@ export const OwnerFinderBoard: React.FC<OwnerFinderBoardProps> = ({
                     onChange={(event) => {
                         synthesisInputHandler(event, type);
                     }}
-                    value={compareValue}
+                    value={compareValueName}
+                    placeholder={t("dashboard.ownerfinder.board.search")}
                 />
-                <button>{t("dashboard.ownerfinder.board.search")}</button>
             </div>
             <div className={style.finder__item__board}>
                 {filteredList.length ? (
@@ -60,6 +60,14 @@ export const OwnerFinderBoard: React.FC<OwnerFinderBoardProps> = ({
                             key={index}
                         >
                             {item.name}
+                            <span
+                                className={
+                                    style.finder__item__board__line__id__info
+                                }
+                                title={item.id}
+                            >
+                                ({item.id})
+                            </span>
                         </p>
                     ))
                 ) : (
