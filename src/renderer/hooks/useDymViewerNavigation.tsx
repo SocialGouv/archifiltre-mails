@@ -24,12 +24,6 @@ export interface UseDomainsYearMailsProps {
     viewList: ViewState<DefaultViewerObject>[];
 }
 
-export type ViewType =
-    | typeof CORRESPONDANTS
-    | typeof DOMAIN
-    | typeof MAILS
-    | typeof YEAR;
-
 export interface ViewState<TElement> {
     elements: TElement;
     type: string;
@@ -81,10 +75,11 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
     const trackerService = useService("trackerService");
 
     const createInitialView = useCallback(() => {
+        const initialViewType = groupByFunctions[0]!.type;
         // const aggregatedDomain = getAggregatedDomains(pstFile!);
-        const aggregatedDomain = mapToRecord(
+        const aggregatedFirstGroup = mapToRecord(
             mapOrderByValues(
-                extractDatas!.groups.domain,
+                extractDatas!.groups[initialViewType]!,
                 (a, b) => b.length - a.length
             )
         );
@@ -92,8 +87,8 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
         // TODO: ViewFilter store
         // Liste des view à afficher sinon DEFAULT_VIEW_LIST
         const computedInitialView: ViewState<DefaultViewerObject<"root">> = {
-            elements: createRootView(aggregatedDomain),
-            type: groupByFunctions[0]!.type,
+            elements: createRootView(aggregatedFirstGroup),
+            type: initialViewType,
         };
 
         return computedInitialView;
@@ -193,10 +188,6 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
             const indexes = node.data.ids.map(
                 (id) => extractDatas.indexes.get(id)!
             );
-            console.log("az", {
-                data: node.data,
-                indexes,
-            });
             const mails = (await pstExtractorService.getEmails(indexes)).sort(
                 (a, b) =>
                     (a.receivedDate?.valueOf() ?? 0) -

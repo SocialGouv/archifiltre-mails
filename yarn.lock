@@ -2413,10 +2413,10 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@socialgouv/archimail-pst-extractor@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@socialgouv/archimail-pst-extractor/-/archimail-pst-extractor-0.0.2.tgz#8e27486c9ab7f33d0cdd498c00c698a8bb1dfc4e"
-  integrity sha512-jVXL7FfBFqqNmbfJp3IBPM3y/On6ikeT+IsgTwEGuvqliMtCQ+9tKvfiJSHoCJ85UyeolVnQcWH/EeZPXcl3Cg==
+"@socialgouv/archimail-pst-extractor@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@socialgouv/archimail-pst-extractor/-/archimail-pst-extractor-0.1.0.tgz#53ec2cc44d4cf2c08ea2be4a07f36fb22c6cf132"
+  integrity sha512-QqQH3MyKx00fAbjfa/OxTj/w5daJLf/uoJ79TqDz30jDlWNlbkR2laivbf53/2Lc86Xw3eKqV2gxQF3KFct7tA==
   dependencies:
     long "^5.1.0"
     uuid-parse "^1.1.0"

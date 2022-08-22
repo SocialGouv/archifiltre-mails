@@ -112,6 +112,7 @@ export interface PstProgressState {
 
 /**
  * Computed primary infos extracted from a PST file.
+ * @deprecated
  */
 export interface PstExtractTables {
     /**
@@ -133,6 +134,10 @@ export interface AdditionalDatas {
     deleted: string[];
     extremeDates: ExtremeDates;
     folderList: AddtionalDataItem[];
+    /**
+     * @deprecated
+     * @todo Pre discover pst owner
+     */
     possibleOwner?: Required<PstEmailRecipient>;
     received: string[];
     sent: string[];
