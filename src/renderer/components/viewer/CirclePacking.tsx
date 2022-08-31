@@ -47,7 +47,7 @@ export const CirclePacking: React.FC = () => {
         viewList,
         currentViewIndex,
         computeNextView,
-        restartView,
+        resetView,
         computePreviousView,
     } = useDymViewerNavigation();
 
@@ -162,7 +162,7 @@ export const CirclePacking: React.FC = () => {
 
     const goToInitialView = () => {
         cancelFocus();
-        restartView();
+        resetView();
     };
 
     if (!currentView) return null;
