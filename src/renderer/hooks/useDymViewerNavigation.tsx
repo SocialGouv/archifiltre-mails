@@ -2,6 +2,7 @@ import { useService } from "@common/modules/ContainerModule";
 import type { ComputedDatum } from "@nivo/circle-packing/dist/types/types";
 import { useCallback, useEffect } from "react";
 
+import { useBreadcrumbStore } from "../store/BreadcrumbStore";
 import { usePstFMInfosStore } from "../store/PstFMInfosStore";
 import { usePstStore } from "../store/PSTStore";
 import { viewListStore } from "../store/ViewListStore";
@@ -20,7 +21,7 @@ export interface UseDomainsYearMailsProps {
     computeNextView: (node: ComputedDatum<DefaultViewerObject>) => void;
     computePreviousView: () => void;
     currentViewIndex: number;
-    restartView: () => void;
+    resetView: () => void;
     viewList: ViewState<DefaultViewerObject>[];
 }
 
@@ -42,6 +43,7 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
     const {
         addViewsCallback,
         addViewsGetter,
+        setViewAt,
         setList: setViewList,
         currentIndex: currentViewIndex,
         list: viewList,
@@ -52,6 +54,8 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
     const { getCurrentViewGroupByFunctions } = useViewGroupByFunctions();
     const groupByFunctions = getCurrentViewGroupByFunctions();
     const pstExtractorService = useService("pstExtractorService");
+
+    const { resetBreadcrumb } = useBreadcrumbStore();
 
     // const [viewList, setViewList] = useState<ViewState<DefaultViewerObject>[]>(
     //     []
@@ -97,15 +101,16 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
     useEffect(() => {
         const computedInitialView = createInitialView();
         // setCurrentView(computedInitialView);
-        setCurrentViewIndex(0);
+        // setCurrentViewIndex(0);
         setViewList([computedInitialView]);
     }, [createInitialView, setCurrentViewIndex, setViewList]);
 
-    const restartView = () => {
+    const resetView = () => {
         const computedInitialView = createInitialView();
         // setCurrentView(computedInitialView);
         setCurrentViewIndex(0);
         setViewList([computedInitialView]);
+        resetBreadcrumb();
         cancelFocus();
         // setInitialAttachmentPerLevel();
         // setInitialTotalMailPerLevel();
@@ -123,6 +128,7 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
             const previousIndex = currentViewIndex - 1;
             // const previousView = viewList[previousIndex];
             setCurrentViewIndex(previousIndex);
+            // setPreviousBreadcrumb();
             // setCurrentView(previousView);
             // setPreviousBreadcrumb(previousView!.type);
         }
@@ -154,7 +160,16 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
         }
 
         const nextIndex = currentViewIndex + 1;
+        setCurrentViewIndex(nextIndex);
+
+        const sameView = viewList[nextIndex];
+        if (sameView?.elements.name === node.data.name) {
+            return;
+        }
+
+        // ok, not the same view
         const nextViewGroupBy = groupByFunctions[nextIndex];
+
         if (nextViewGroupBy) {
             const nextDatasFilter = new Map(
                 [
@@ -176,14 +191,9 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
                 (a, b) => b.length - a.length
             );
 
-            const elements = createNodes(orderedNextDatas, node.id);
-            addViewsGetter({ elements, type: nextViewGroupBy.type });
-            // addViewsCallback({ elements, type: nextViewGroupBy.type }); // TODO: test it
-            setCurrentViewIndex(nextIndex);
+            const elements = createNodes(orderedNextDatas, node.id, node.data);
+            setViewAt(nextIndex, { elements, type: nextViewGroupBy.type });
         } else {
-            // TODO: mail view
-            // then breadcrump
-            // then global recap
             if (!pstExtractorService || !extractDatas) return;
             const indexes = node.data.ids.map(
                 (id) => extractDatas.indexes.get(id)!
@@ -196,7 +206,6 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
 
             const elements = createMails(mails, node.id);
             addViewsGetter({ elements, type: "mail" });
-            setCurrentViewIndex(nextIndex);
         }
         // if (currentView.type === DOMAIN) {
         //     // setCurrentDomain(node.data.name);
@@ -297,7 +306,7 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
         computeNextView,
         computePreviousView,
         currentViewIndex,
-        restartView,
+        resetView,
         viewList,
     };
 };
