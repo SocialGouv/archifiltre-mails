@@ -145,7 +145,7 @@ export const createMails = <TId extends string>(
             const { name, size, ...email } = value;
             return {
                 email,
-                id: randomUUID(),
+                id: value.id,
                 ids: [value.id],
                 name,
                 size,

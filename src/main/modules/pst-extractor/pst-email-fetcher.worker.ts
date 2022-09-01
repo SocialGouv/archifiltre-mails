@@ -5,6 +5,7 @@ import type {
 import { getRecipientFromDisplay } from "@common/modules/views/utils";
 import type { PSTFolder } from "@socialgouv/archimail-pst-extractor";
 import { PSTFile } from "@socialgouv/archimail-pst-extractor";
+import { isEqual } from "lodash";
 import path from "path";
 
 import type {
@@ -63,7 +64,12 @@ server.onQuery("fetch", async ({ emailIndexes }) => {
                         pstFile!.getRootFolder(),
                         emailIndex
                     );
-                    email.id = cacheKeys[cacheValues.indexOf(emailIndex)]!;
+                    email.id =
+                        cacheKeys[
+                            cacheValues.findIndex((idxs) =>
+                                isEqual(emailIndex, idxs)
+                            )
+                        ]!;
                     ok(email);
                 })
         )
