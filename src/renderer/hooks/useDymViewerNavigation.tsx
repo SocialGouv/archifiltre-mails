@@ -129,6 +129,7 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
             // const previousView = viewList[previousIndex];
             setCurrentViewIndex(previousIndex);
             // setPreviousBreadcrumb();
+            // setPreviousBreadcrumb();
             // setCurrentView(previousView);
             // setPreviousBreadcrumb(previousView!.type);
         }
