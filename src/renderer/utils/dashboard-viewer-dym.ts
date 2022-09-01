@@ -105,7 +105,8 @@ const nodesCache = new Map<string, DefaultViewerObject>();
 
 export const createNodes = (
     datas: Map<string, string[]>,
-    id: string
+    id: string,
+    currentData: DefaultViewerObject
 ): DefaultViewerObject => {
     let nodeItems = nodesCache.get(id);
     if (nodeItems) return nodeItems;
@@ -119,9 +120,14 @@ export const createNodes = (
             value: ids.length,
         };
     });
+
     nodeItems = {
         children,
-        ...createBase(id),
+        id,
+        ids: children.map((child) => child.id),
+        name: currentData.name,
+        size: datas.size,
+        value: "size",
     };
     try {
         return nodeItems;
@@ -139,7 +145,7 @@ export const createMails = <TId extends string>(
             const { name, size, ...email } = value;
             return {
                 email,
-                id: value.id,
+                id: randomUUID(),
                 ids: [value.id],
                 name,
                 size,

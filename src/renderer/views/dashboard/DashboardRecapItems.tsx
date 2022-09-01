@@ -80,7 +80,7 @@ export const DashboardRecapItems: FC = () => {
         deletedMailsAttachmentSize,
         totalFileSize
     );
-    console.log({ deletedFolderId, deletedMailsAttachmentSize, totalFileSize });
+
     const contactsCount = extractDatas.groups.recipient.size;
 
     const totalFolderSize = extractDatas.additionalDatas.folderList.length;
