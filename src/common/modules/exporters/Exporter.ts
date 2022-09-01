@@ -1,9 +1,6 @@
 import type { Any, SimpleObject } from "../../utils/type";
 import type { PstElement } from "../pst-extractor/type";
 
-/**
- * @param TIsArray should start point be an array of T or plain T
- */
 export type ExportFunction<TSource> = <T extends TSource>(
     obj: T,
     dest: string

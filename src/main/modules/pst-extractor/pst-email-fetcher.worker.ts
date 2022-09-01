@@ -58,7 +58,7 @@ server.onQuery("fetch", async ({ emailIndexes }) => {
     return Promise.all(
         emailIndexes.map(
             async (emailIndex) =>
-                new Promise((ok) => {
+                new Promise<PstEmail>((ok) => {
                     const email = findEmail(
                         pstFile!.getRootFolder(),
                         emailIndex
@@ -81,11 +81,33 @@ function findEmail(folder: PSTFolder, emailIndex: number[]): PstEmail {
     const emailPositionInLastFolder = idxCopy.pop()!;
 
     const lastFolder = idxCopy.reduce<PSTFolder>((subfolder, index) => {
-        return subfolder.getSubFolders()[index]!;
+        let tmpSubFolderIndex = 0;
+        return subfolder.getSubFolders().find((sub) => {
+            if (
+                sub.containerClass !== "" &&
+                sub.containerClass !== "IPF.Note"
+            ) {
+                return false;
+            }
+            if (tmpSubFolderIndex === index) {
+                return true;
+            }
+            tmpSubFolderIndex++;
+        })!;
     }, folder);
     const rawEmail = lastFolder.getChildAt(emailPositionInLastFolder);
 
     if (!rawEmail) {
+        console.log(
+            { lastFolder },
+            lastFolder.displayName,
+            lastFolder.emailCount,
+            lastFolder.folderType,
+            lastFolder.containerClass,
+            lastFolder.unreadCount
+        );
+        lastFolder.moveChildCursorTo(0);
+        console.log({ CHILDREN: [...lastFolder.childrenIterator()] });
         throw new Error(
             `Email not found at given index. (${[
                 ...idxCopy,

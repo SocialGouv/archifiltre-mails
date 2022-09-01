@@ -1,11 +1,6 @@
-import {
-    PST_EXTRACT_EVENT,
-    PST_GET_EMAILS_EVENT,
-    PST_PROGRESS_EVENT,
-    PST_PROGRESS_SUBSCRIBE_EVENT,
-    PST_STOP_EXTRACT_EVENT,
-} from "@common/constant/event";
 import { AppError } from "@common/lib/error/AppError";
+import { ipcMain } from "@common/lib/ipc";
+import type { DualIpcConfigExtractReply } from "@common/lib/ipc/event";
 import type { Service } from "@common/modules/container/type";
 import { containerModule } from "@common/modules/ContainerModule";
 import type {
@@ -15,10 +10,9 @@ import type {
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
 import type { UserConfigService } from "@common/modules/UserConfigModule";
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow } from "electron";
 
 import type { ConsoleToRendererService } from "../services/ConsoleToRendererService";
-import type { TSWorker } from "../worker";
 import { WorkerClient } from "../workers/WorkerClient";
 import { MainModule } from "./MainModule";
 import type { FetchWorkerConfig } from "./pst-extractor/pst-email-fetcher.worker";
@@ -29,6 +23,9 @@ export class PstExtractorError extends AppError {}
 
 const REGEXP_PST = /\.pst$/i;
 
+type ProgressReplyFunction =
+    DualIpcConfigExtractReply<"pstExtractor.event.progressSuscribe">;
+
 /**
  * Module responsible of handling and extracting datas from given PST files.
  *
@@ -38,10 +35,6 @@ export class PstExtractorModule extends MainModule {
     private inited = false;
 
     private working = false;
-
-    private readonly pstWorker?: TSWorker;
-
-    private readonly pstEmailWorker?: TSWorker;
 
     private lastProgressState!: PstProgressState;
 
@@ -60,10 +53,7 @@ export class PstExtractorModule extends MainModule {
         { cachePath: app.getPath("cache") }
     );
 
-    private progressReply?: (
-        channel: typeof PST_PROGRESS_EVENT,
-        progressState: PstProgressState
-    ) => void;
+    private progressReply?: ProgressReplyFunction;
 
     constructor(
         private readonly userConfigService: UserConfigService,
@@ -81,34 +71,34 @@ export class PstExtractorModule extends MainModule {
             return;
         }
 
-        ipcMain.on(PST_PROGRESS_SUBSCRIBE_EVENT, (event) => {
-            this.progressReply = event.reply as typeof this.progressReply;
+        ipcMain.on("pstExtractor.event.progressSuscribe", (event) => {
+            this.progressReply = event.reply;
         });
         ipcMain.handle(
-            PST_EXTRACT_EVENT,
-            async (_event, ...args: [ExtractOptions]) => {
-                return this.extract(args[0]);
+            "pstExtractor.event.extract",
+            async (_event, options) => {
+                return this.extract(options);
             }
         );
         ipcMain.handle(
-            PST_GET_EMAILS_EVENT,
-            async (_event, ...args: [number[][]]) => {
-                return this.getEmails(args[0]);
+            "pstExtractor.event.getEmails",
+            async (_event, indexes) => {
+                return this.getEmails(indexes);
             }
         );
-        ipcMain.handle(PST_STOP_EXTRACT_EVENT, async () => {
+        ipcMain.handle("pstExtractor.event.stopExtract", async () => {
             await this.stop();
         });
 
         this.extractorWorker.addEventListener("progress", (progressState) => {
             this.progressReply?.(
-                PST_PROGRESS_EVENT,
+                "pstExtractor.event.progress",
                 (this.lastProgressState = progressState)
             );
         });
         this.extractorWorker.addEventListener("done", (progressState) => {
             this.progressReply?.(
-                PST_PROGRESS_EVENT,
+                "pstExtractor.event.progress",
                 (this.lastProgressState = {
                     ...progressState,
                     progress: false,
@@ -316,13 +306,16 @@ export class PstExtractorModule extends MainModule {
     private async stop(): Promise<void> {
         this.manuallyStoped = true;
         this.progressReply?.(
-            PST_PROGRESS_EVENT,
+            "pstExtractor.event.progress",
             (this.lastProgressState = {
                 ...this.lastProgressState,
                 progress: false,
             })
         );
-        await this.pstWorker?.terminate();
+
+        // TODO: this.extractorWorker.command("stop");
+        // TODO: this.fetchWorker.command("stop");
+        return Promise.resolve();
     }
 
     public get extractorService(): PstExtractorMainService {

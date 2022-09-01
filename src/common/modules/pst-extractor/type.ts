@@ -83,9 +83,12 @@ export interface PstEmail extends PstElement {
     sentTime: Date | null;
     size: 1;
     subject: string;
-    tag?: string;
     to: PstEmailRecipient[];
     type: "email";
+}
+
+export interface PstEmailWithTag extends PstEmail {
+    tag: string;
 }
 
 export const isPstEmail = (elt: PstElement): elt is PstEmail => {
@@ -129,11 +132,21 @@ export interface PstExtractTables {
     emails: Map<string, PstEmail[]>;
 }
 
+export interface PstShallowFolder {
+    elementPath: string;
+    hasSubfolders: boolean;
+    id: string;
+    mails: string[];
+    name: string;
+    subfolders: PstShallowFolder[];
+}
+
 export interface AdditionalDatas {
     contactList: AddtionalDataItem[];
     deleted: string[];
     extremeDates: ExtremeDates;
     folderList: AddtionalDataItem[];
+    folderStructure: PstShallowFolder[];
     /**
      * @deprecated
      * @todo Pre discover pst owner

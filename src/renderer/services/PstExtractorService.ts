@@ -1,10 +1,4 @@
-import {
-    PST_EXTRACT_EVENT,
-    PST_GET_EMAILS_EVENT,
-    PST_PROGRESS_EVENT,
-    PST_PROGRESS_SUBSCRIBE_EVENT,
-    PST_STOP_EXTRACT_EVENT,
-} from "@common/constant/event";
+import { ipcRenderer } from "@common/lib/ipc";
 import type { Service } from "@common/modules/container/type";
 import type {
     ExtractOptions,
@@ -12,7 +6,6 @@ import type {
     PstExtractDatas,
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
-import { ipcRenderer } from "electron";
 
 type ProgressCallback = (progressState: PstProgressState) => void;
 
@@ -41,33 +34,27 @@ export interface PstExtractorService extends Service {
  */
 export const pstExtractorService: PstExtractorService = {
     async extract(options) {
-        return ipcRenderer.invoke(
-            PST_EXTRACT_EVENT,
-            options
-        ) as Promise<PstExtractDatas>;
+        return ipcRenderer.invoke("pstExtractor.event.extract", options);
     },
 
     async getEmails(emailIndexes) {
-        return ipcRenderer.invoke(
-            PST_GET_EMAILS_EVENT,
-            emailIndexes
-        ) as Promise<PstEmail[]>;
+        return ipcRenderer.invoke("pstExtractor.event.getEmails", emailIndexes);
     },
 
     name: "PstExtractorService",
 
     onProgress(callback: ProgressCallback) {
-        ipcRenderer.removeAllListeners(PST_PROGRESS_EVENT);
+        ipcRenderer.removeAllListeners("pstExtractor.event.progress");
         ipcRenderer.on(
-            PST_PROGRESS_EVENT,
-            (_event, ...[progressState]: [PstProgressState]) => {
+            "pstExtractor.event.progress",
+            (_event, progressState) => {
                 callback(progressState);
             }
         );
-        ipcRenderer.send(PST_PROGRESS_SUBSCRIBE_EVENT);
+        ipcRenderer.send("pstExtractor.event.progressSuscribe");
     },
 
     async stop(): Promise<void> {
-        return ipcRenderer.invoke(PST_STOP_EXTRACT_EVENT) as Promise<void>;
+        return ipcRenderer.invoke("pstExtractor.event.stopExtract");
     },
 };

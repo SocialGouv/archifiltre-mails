@@ -65,11 +65,10 @@ export class TrackerModule extends IsomorphicModule {
                 name as DelegatingName
             );
 
-            return new DelegatingProvider(
-                appId,
-                disabled,
-                names.map((n) => this.findProvider(n))
+            const foundProviders = (names as ProviderType[]).map((n) =>
+                this.findProvider(n)
             );
+            return new DelegatingProvider(appId, disabled, foundProviders);
         }
         return new (providers.find((p) => p.trackerName === name) ??
             NoopProvider)(appId, disabled) as TrackerProvider;

@@ -4,6 +4,7 @@ import type {
     PstAttachment,
     PstMailIndex,
     PstProgressState,
+    PstShallowFolder,
 } from "@common/modules/pst-extractor/type";
 import { builtInViewConfigs } from "@common/modules/views/setup";
 import type { ViewConfiguration } from "@common/modules/views/utils";
@@ -94,10 +95,9 @@ server.onCommand(
 
         // view groups
         const groups = new Map<GroupType, Map<string, string[]>>(
-            viewGroupFunctions.map((viewGroupFn) => [
-                viewGroupFn.type,
-                new Map(),
-            ])
+            viewGroupFunctions.map(
+                (viewGroupFn) => [viewGroupFn.type, new Map()] as const
+            )
         );
         // utility groups
         groups.set("senderMail", new Map());
@@ -133,9 +133,15 @@ server.onCommand(
          *
          * The progress state is updated for every item found and sent to any listener on every emails.
          */
-        function processFolder(folder: PSTFolder, currentFolderId = ""): void {
+        function processFolder(
+            folder: PSTFolder,
+            currentShallowFolder: PstShallowFolder,
+            currentFolderId = ""
+        ): void {
             if (root) {
                 root = false;
+                currentShallowFolder.elementPath = folder.displayName;
+                currentShallowFolder.id = "folder-root";
             } else {
                 currentFolderIndexes[currentDepth] ??= -1;
                 currentFolderIndexes = currentFolderIndexes.slice(
@@ -146,6 +152,9 @@ server.onCommand(
                 currentDepth++;
             }
 
+            currentShallowFolder.hasSubfolders = folder.hasSubfolders;
+            currentShallowFolder.subfolders = [];
+            currentShallowFolder.name = folder.displayName;
             if (folder.hasSubfolders) {
                 for (const childFolder of folder.getSubFolders()) {
                     progressState.countFolder++;
@@ -161,11 +170,18 @@ server.onCommand(
                         id: strFolderId,
                         name: childFolder.displayName,
                     });
+
+                    const childShallowFolder = {} as PstShallowFolder;
+                    childShallowFolder.id = strFolderId;
+                    childShallowFolder.elementPath = `${currentShallowFolder.elementPath}/${childFolder.displayName}`;
+                    currentShallowFolder.subfolders.push(childShallowFolder);
                     folderId++;
-                    processFolder(childFolder, strFolderId);
+
+                    processFolder(childFolder, childShallowFolder, strFolderId);
                 }
             }
 
+            currentShallowFolder.mails = [];
             if (folder.contentCount) {
                 let mailIndex = 0;
                 for (const email of folder.childrenIterator()) {
@@ -173,6 +189,7 @@ server.onCommand(
                         continue;
                     }
                     const emailId = randomUUID();
+                    currentShallowFolder.mails.push(emailId);
                     // group mails
                     for (const viewGroupFn of viewGroupFunctions) {
                         const currentGroupIds = groups.get(viewGroupFn.type)!;
@@ -306,7 +323,8 @@ server.onCommand(
             currentDepth--;
         }
 
-        processFolder(rootFolder);
+        const shallowFolder = {} as PstShallowFolder;
+        processFolder(rootFolder, shallowFolder, "");
 
         await pstCache.setPstMailIndexes(mailIndexes);
         await pstCache.setAttachments(attachments);
@@ -322,6 +340,10 @@ server.onCommand(
             max: maxDate,
             min: minDate,
         });
+        await pstCache.setAddtionalDatas(
+            "folderStructure",
+            shallowFolder.subfolders
+        );
 
         progressState.elapsed = Date.now() - starTime;
         server.trigger("done", progressState);

@@ -2,7 +2,6 @@ import type {
     PstAttachment,
     PstEmail,
     PstExtractDatas,
-    PstExtractTables,
 } from "@common/modules/pst-extractor/type";
 import { v4 as randomUUID } from "uuid";
 
@@ -44,9 +43,6 @@ export const createBase = <TId extends string>(
     size: 0.0001,
     value: "size",
 });
-
-export const getInitialTotalMail = (extractTables: PstExtractTables): number =>
-    [...Object(extractTables.emails).values()].flat().length;
 
 export const getInitialTotalAttachements = (
     attachments: PstExtractDatas["attachments"]

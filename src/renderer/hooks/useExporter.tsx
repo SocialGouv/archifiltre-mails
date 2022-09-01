@@ -1,3 +1,4 @@
+import { ipcRenderer } from "@common/lib/ipc";
 import { useService } from "@common/modules/ContainerModule";
 import type {
     ExporterAsFileType,
@@ -49,7 +50,13 @@ export const useExporter = (): UseExporter => {
                 return;
             }
 
-            // const mails = formatEmailTable(mailsWithTags);
+            await ipcRenderer.invoke(
+                "pstExporter.event.exportMails",
+                type,
+                [...extractDatas.indexes.values()],
+                [...toDeleteIDs],
+                dialogPath.filePath
+            );
             // await fileExporterService.export(type, mails, dialogPath.filePath);
         },
         [t, extractDatas, fileExporterService, toDeleteIDs]
@@ -69,6 +76,14 @@ export const useExporter = (): UseExporter => {
                 return;
             }
 
+            // TODO EML type like
+            await ipcRenderer.invoke(
+                "pstExporter.event.exportMails",
+                type,
+                [...extractDatas.indexes.values()],
+                [],
+                chosenFile
+            );
             // await fileExporterService.export(type, pstFile, chosenFile);
         },
         [fileExporterService, extractDatas]
