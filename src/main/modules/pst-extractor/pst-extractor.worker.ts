@@ -71,6 +71,10 @@ let pstFile: PSTFile | null = null;
 server.onCommand("open", async ({ pstFilePath }) => {
     pstFile = new PSTFile(path.resolve(pstFilePath));
     pstCache.openForPst(pstFilePath);
+    await pstCache.setAddtionalDatas(
+        "pstFilename",
+        path.parse(pstFile.pstFilename).name
+    );
 
     return Promise.resolve({ ok: true });
 });
@@ -140,8 +144,8 @@ server.onCommand(
         ): void {
             if (root) {
                 root = false;
-                currentShallowFolder.elementPath = folder.displayName;
                 currentShallowFolder.id = "folder-root";
+                currentShallowFolder.elementPath = folder.displayName;
             } else {
                 currentFolderIndexes[currentDepth] ??= -1;
                 currentFolderIndexes = currentFolderIndexes.slice(
@@ -340,10 +344,7 @@ server.onCommand(
             max: maxDate,
             min: minDate,
         });
-        await pstCache.setAddtionalDatas(
-            "folderStructure",
-            shallowFolder.subfolders
-        );
+        await pstCache.setAddtionalDatas("folderStructure", shallowFolder);
 
         progressState.elapsed = Date.now() - starTime;
         server.trigger("done", progressState);

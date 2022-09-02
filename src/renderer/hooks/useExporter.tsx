@@ -4,6 +4,7 @@ import type {
     ExporterAsFileType,
     ExporterAsFolderType,
 } from "@common/modules/FileExporterModule";
+import { PST_EXPORTER_EXPORT_MAILS_EVENT } from "@common/modules/pst-exporter/ipc";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -28,11 +29,6 @@ export const useExporter = (): UseExporter => {
                 return;
             }
 
-            // const mailsWithTags = getMailsWithTag(
-            //     extractDatas.indexes,
-            //     toDeleteIDs
-            // );
-
             const dialogPath = await dialog.showSaveDialog({
                 filters: [
                     {
@@ -51,9 +47,8 @@ export const useExporter = (): UseExporter => {
             }
 
             await ipcRenderer.invoke(
-                "pstExporter.event.exportMails",
+                PST_EXPORTER_EXPORT_MAILS_EVENT,
                 type,
-                [...extractDatas.indexes.values()],
                 [...toDeleteIDs],
                 dialogPath.filePath
             );
@@ -67,7 +62,9 @@ export const useExporter = (): UseExporter => {
             if (!fileExporterService || !extractDatas) return;
 
             const result = await dialog.showOpenDialog({
+                message: t("exporter.save.message"),
                 properties: ["openDirectory"],
+                title: t("exporter.save.title", { type }),
             });
 
             const chosenFile = result.filePaths[0];
@@ -76,17 +73,15 @@ export const useExporter = (): UseExporter => {
                 return;
             }
 
-            // TODO EML type like
             await ipcRenderer.invoke(
-                "pstExporter.event.exportMails",
+                PST_EXPORTER_EXPORT_MAILS_EVENT,
                 type,
-                [...extractDatas.indexes.values()],
                 [],
                 chosenFile
             );
             // await fileExporterService.export(type, pstFile, chosenFile);
         },
-        [fileExporterService, extractDatas]
+        [t, extractDatas, fileExporterService]
     );
 
     return {

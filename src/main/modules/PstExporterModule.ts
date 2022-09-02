@@ -6,14 +6,24 @@ import {
     isExporterAsFolderType,
 } from "@common/modules/FileExporterModule";
 import type { I18nService } from "@common/modules/I18nModule";
-import type { PstEmail } from "@common/modules/pst-extractor/type";
+import { PST_EXPORTER_EXPORT_MAILS_EVENT } from "@common/modules/pst-exporter/ipc";
+import type {
+    PstElement,
+    PstEmail,
+    PstFolder,
+    PstShallowFolder,
+} from "@common/modules/pst-extractor/type";
 import type { SimpleObject } from "@common/utils/type";
+import path from "path";
 
 import { MainModule } from "./MainModule";
-import type { PstExtractorMainService } from "./PstExtractorModule";
+import type {
+    PstCacheMainService,
+    PstExtractorMainService,
+} from "./PstExtractorModule";
 
 type ExportMailsFunction = (
-    ...args: GetAsyncIpcConfig<"pstExporter.event.exportMails">["args"]
+    ...args: GetAsyncIpcConfig<typeof PST_EXPORTER_EXPORT_MAILS_EVENT>["args"]
 ) => Promise<void>;
 
 export class PstExporterModule extends MainModule {
@@ -21,8 +31,9 @@ export class PstExporterModule extends MainModule {
 
     constructor(
         private readonly fileExporterService: FileExporterService,
-        private readonly pstExporterService: PstExtractorMainService,
-        private readonly i18nService: I18nService
+        private readonly pstExtractorService: PstExtractorMainService,
+        private readonly i18nService: I18nService,
+        private readonly pstCacheService: PstCacheMainService
     ) {
         super();
     }
@@ -33,13 +44,12 @@ export class PstExporterModule extends MainModule {
         }
 
         await this.i18nService.wait();
-
         await this.fileExporterService.wait();
 
         ipcMain.handle(
-            "pstExporter.event.exportMails",
-            async (_, type, indexes, deletedIds, dest) => {
-                return this.exportMails(type, indexes, deletedIds, dest);
+            PST_EXPORTER_EXPORT_MAILS_EVENT,
+            async (_, type, deletedIds, dest) => {
+                return this.exportMails(type, deletedIds, dest);
             }
         );
 
@@ -49,7 +59,6 @@ export class PstExporterModule extends MainModule {
 
     private readonly exportMails: ExportMailsFunction = async (
         type,
-        indexes,
         deletedIds,
         dest
     ) => {
@@ -59,12 +68,25 @@ export class PstExporterModule extends MainModule {
             );
         }
 
-        if (isExporterAsFolderType(type)) {
-        }
-        const emails = await this.pstExporterService.getEmails(indexes);
+        let destPath = dest;
 
-        const obj = this.formatEmails(emails, deletedIds);
-        await this.fileExporterService.export(type, obj, dest);
+        const indexes = await this.pstCacheService.getPstMailIndexes();
+        const emails = await this.pstExtractorService.getEmails([
+            ...indexes.values(),
+        ]);
+        let obj = null;
+        if (isExporterAsFolderType(type)) {
+            const pstFilename = await this.pstCacheService.getAddtionalDatas(
+                "pstFilename"
+            );
+            destPath = path.join(dest, `/${pstFilename}-${type}-export`);
+            const folderStruct = await this.pstCacheService.getAddtionalDatas(
+                "folderStructure"
+            );
+            obj = this.composePstElement(folderStruct, emails);
+        } else obj = this.formatEmails(emails, deletedIds);
+
+        await this.fileExporterService.export(type, obj, destPath);
     };
 
     /**
@@ -123,5 +145,52 @@ export class PstExporterModule extends MainModule {
             [tKeys.tag]: deletedIds.includes(email.id) ? deleteTag : untagTag,
             [tKeys.elementPath]: email.elementPath,
         }));
+    }
+
+    private composePstElement(
+        folderStructure: PstShallowFolder,
+        emails: PstEmail[]
+    ): PstElement {
+        let root = true;
+        const rec = (shallowFolder: PstShallowFolder) => {
+            const pstFolder: PstFolder = {
+                elementPath: shallowFolder.elementPath,
+                emailCount: shallowFolder.mails.length,
+                id: shallowFolder.id,
+                name: shallowFolder.name,
+                size: shallowFolder.mails.length || 1,
+                type: "folder",
+            };
+            if (root) {
+                root = false;
+                pstFolder.type = "rootFolder";
+            }
+
+            if (shallowFolder.hasSubfolders) {
+                for (const childFolder of shallowFolder.subfolders) {
+                    if (!pstFolder.children) {
+                        pstFolder.children = [];
+                    }
+
+                    pstFolder.children.push(rec(childFolder));
+                }
+            }
+
+            for (const emailId of shallowFolder.mails) {
+                const email = emails.find((message) => message.id === emailId);
+                if (!email) continue;
+                if (!pstFolder.children) {
+                    pstFolder.children = [];
+                }
+
+                email.elementPath = shallowFolder.elementPath;
+
+                pstFolder.children.push(email);
+            }
+
+            return pstFolder;
+        };
+
+        return rec(folderStructure);
     }
 }

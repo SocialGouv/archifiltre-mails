@@ -13,7 +13,6 @@ import type { Exporter } from "./exporters/Exporter";
 import { jsonExporter } from "./exporters/JsonExporter";
 import { xlsxExporter } from "./exporters/XslxExporter";
 import { IsomorphicModule } from "./Module";
-import type { PstMailIndex } from "./pst-extractor/type";
 import type { TrackerService } from "./TrackerModule";
 
 export class FileExporterError extends AppError {}
@@ -89,18 +88,6 @@ export class FileExporterModule extends IsomorphicModule {
                 this.export
             ) as FileExporterService)
         );
-    }
-
-    private async exportMails(
-        type: ExporterType,
-        indexes: PstMailIndex[],
-        dest: string
-    ): Promise<void> {
-        if (!this.inited) {
-            throw new FileExporterError(
-                "Can't export to desired type as the module is not inited."
-            );
-        }
     }
 
     private readonly export: ExportFunction = async (type, obj, dest) => {
