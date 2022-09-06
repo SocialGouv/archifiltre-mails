@@ -138,25 +138,39 @@ export const createNodes = (
 
 export const createMails = <TId extends string>(
     mails: PstEmail[],
-    id: TId
+    id: TId,
+    sender: string
 ): MailViewerObject<TId> => {
-    if (!mailsCache.get(id)) {
-        const children = mails.map((value) => {
-            const { name, size, ...email } = value;
-            return {
-                email,
-                id: value.id,
-                ids: [value.id],
-                name,
-                size,
-                value: name,
-            };
-        });
+    let mailItems = mailsCache.get(id);
+    if (mailItems) return mailItems as MailViewerObject<TId>;
 
+    const children = mails.map((value) => {
+        const { name, size, ...email } = value;
+
+        return {
+            email,
+            id: value.id,
+            ids: [value.id],
+            name,
+            size,
+            value: name,
+        };
+    });
+
+    mailItems = {
+        children,
+        ...createBase(id),
+        name: sender,
+    };
+    try {
+        return mailItems as MailViewerObject<TId>;
+    } finally {
         mailsCache.set(id, {
             children,
             ...createBase(id),
+            name: sender,
         });
     }
-    return mailsCache.get(id) as MailViewerObject<TId>;
+
+    // return mailsCache.get(id) as MailViewerObject<TId>;
 };

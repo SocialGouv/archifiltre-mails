@@ -41,9 +41,8 @@ export interface ViewState<TElement> {
  */
 export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
     const {
-        addViewsCallback,
-        addViewsGetter,
         setViewAt,
+
         setList: setViewList,
         currentIndex: currentViewIndex,
         list: viewList,
@@ -57,30 +56,11 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
 
     const { resetBreadcrumb } = useBreadcrumbStore();
 
-    // const [viewList, setViewList] = useState<ViewState<DefaultViewerObject>[]>(
-    //     []
-    // );
-    // const [currentViewIndex, setCurrentViewIndex] = useState(0);
-    // const [currentDomain, setCurrentDomain] = useState<string>("");
-    // const [currentCorrespondant, setCurrentCorrespondant] =
-    //     useState<string>("");
-
-    // const [currentView, setCurrentView] = // TODO: change with memoized value
-    //     useState<ViewState<DefaultViewerObject>>();
-
-    // const [domainView, setDomainView] =
-    //     useState<ViewState<DomainViewerObject>>();
-
-    // const [correspondantView, setCorrespondantView] =
-    //     useState<ViewState<DefaultViewerObject>>();
-
-    // const [yearView, setYearView] = useState<ViewState<DefaultViewerObject>>();
-
     const trackerService = useService("trackerService");
 
     const createInitialView = useCallback(() => {
         const initialViewType = groupByFunctions[0]!.type;
-        // const aggregatedDomain = getAggregatedDomains(pstFile!);
+
         const aggregatedFirstGroup = mapToRecord(
             mapOrderByValues(
                 extractDatas!.groups[initialViewType]!,
@@ -100,53 +80,27 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
 
     useEffect(() => {
         const computedInitialView = createInitialView();
-        // setCurrentView(computedInitialView);
-        // setCurrentViewIndex(0);
+
         setViewList([computedInitialView]);
     }, [createInitialView, setCurrentViewIndex, setViewList]);
 
     const resetView = () => {
         const computedInitialView = createInitialView();
-        // setCurrentView(computedInitialView);
+
         setCurrentViewIndex(0);
         setViewList([computedInitialView]);
         resetBreadcrumb();
         cancelFocus();
-        // setInitialAttachmentPerLevel();
-        // setInitialTotalMailPerLevel();
-        // setInitialFileSizePerLevel();
-        // setBreadcrumb({ id: computedInitialView.type });
     };
 
     const computePreviousView = () => {
         cancelFocus();
-        // setPreviousAttachmentPerLevel();
-        // setPreviousTotalMailsPerLevel();
-        // setPreviousFileSizePerLevel();
 
         if (currentViewIndex > 0) {
             const previousIndex = currentViewIndex - 1;
-            // const previousView = viewList[previousIndex];
+
             setCurrentViewIndex(previousIndex);
-            // setPreviousBreadcrumb();
-            // setPreviousBreadcrumb();
-            // setCurrentView(previousView);
-            // setPreviousBreadcrumb(previousView!.type);
         }
-
-        // if (currentView?.type === CORRESPONDANTS) {
-        //     setCurrentView(domainView);
-        //     setPreviousBreadcrumb("domain");
-        // }
-        // if (currentView?.type === YEAR) {
-        //     setCurrentView(correspondantView);
-        //     setPreviousBreadcrumb("correspondant");
-        // }
-
-        // if (currentView?.type === MAILS) {
-        //     setCurrentView(yearView);
-        //     setPreviousBreadcrumb("year");
-        // }
 
         return;
     };
@@ -161,9 +115,9 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
         }
 
         const nextIndex = currentViewIndex + 1;
-        setCurrentViewIndex(nextIndex);
 
         const sameView = viewList[nextIndex];
+
         if (sameView?.elements.name === node.data.name) {
             return;
         }
@@ -172,6 +126,8 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
         const nextViewGroupBy = groupByFunctions[nextIndex];
 
         if (nextViewGroupBy) {
+            setCurrentViewIndex(nextIndex); // see comment line 169
+
             const nextDatasFilter = new Map(
                 [
                     ...(extractDatas?.groups[nextViewGroupBy.type]?.entries() ??
@@ -199,97 +155,17 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
             const indexes = node.data.ids.map(
                 (id) => extractDatas.indexes.get(id)!
             );
+
             const mails = (await pstExtractorService.getEmails(indexes)).sort(
                 (a, b) =>
                     (a.receivedDate?.valueOf() ?? 0) -
                     (b.receivedDate?.valueOf() ?? 0)
             );
 
-            const elements = createMails(mails, node.id);
-            addViewsGetter({ elements, type: "mail" });
+            const elements = createMails(mails, node.id, node.data.name);
+            setViewAt(nextIndex, { elements, type: "mail" });
+            setCurrentViewIndex(nextIndex); // to avoid immediate (and multiple) render, we need to set the next index after setting the view.
         }
-        // if (currentView.type === DOMAIN) {
-        //     // setCurrentDomain(node.data.name);
-        //     // setBreadcrumb({
-        //     //     history: [node.data.name],
-        //     //     id: "correspondant",
-        //     // });
-
-        //     // TODO: intersection instead between node.data and currentViewFilter
-        //     const uniqueCorrespondantsByDomain =
-        //         getUniqueCorrespondantsByDomain(pstFile!, node.data.name);
-
-        //     // TODO: createNode instead
-        //     const elements = createCorrespondants(
-        //         uniqueCorrespondantsByDomain,
-        //         node.id
-        //     );
-
-        //     // const totalLevelMails = getTotalLevelMail(elements);
-        //     // setTotalMailPerLevel(totalLevelMails);
-
-        //     // setCurrentView({
-        //     //     elements,
-        //     //     type: CORRESPONDANTS,
-        //     // });
-
-        //     // setCorrespondantView({
-        //     //     elements: createCorrespondants(
-        //     //         uniqueCorrespondantsByDomain,
-        //     //         node.id
-        //     //     ),
-        //     //     type: CORRESPONDANTS,
-        //     // });
-        // }
-
-        // if (currentView.type === CORRESPONDANTS) {
-        //     setBreadcrumb({
-        //         history: [currentDomain, node.data.name],
-        //         id: "year",
-        //     });
-        //     setCurrentCorrespondant(node.data.name);
-
-        //     const yearByCorrespondants = getYearByCorrespondants(
-        //         pstFile!,
-        //         node.data.name
-        //     );
-
-        //     const elements = createYears(yearByCorrespondants, node.id);
-        //     const totalLevelMails = getTotalLevelMail(elements);
-        //     setTotalMailPerLevel(totalLevelMails);
-
-        //     setCurrentView({
-        //         elements,
-        //         type: YEAR,
-        //     });
-
-        //     setYearView({
-        //         elements,
-        //         type: YEAR,
-        //     });
-        // }
-
-        // if (currentView.type === YEAR) {
-        //     setBreadcrumb({
-        //         history: [currentDomain, currentCorrespondant, node.data.name],
-        //         id: "mails",
-        //     });
-
-        //     const mailsByYearAndCorrespondant = getMailsByDym(
-        //         pstFile!,
-        //         currentDomain,
-        //         currentCorrespondant,
-        //         +node.data.name
-        //     );
-        //     const elements = createMails(mailsByYearAndCorrespondant, node.id);
-        //     const totalLevelMails = getTotalLevelMail(elements);
-        //     setTotalMailPerLevel(totalLevelMails);
-
-        //     setCurrentView({
-        //         elements,
-        //         type: MAILS,
-        //     });
-        // }
 
         trackerService?.getProvider().track("Feat(3.0) Element Traversed", {
             viewType:
