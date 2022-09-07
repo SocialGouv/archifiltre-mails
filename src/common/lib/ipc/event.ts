@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import type { IpcMainEvent } from "electron";
 
-import type { UnknownMapping } from "../../utils/type";
+import type {
+    EveryFunction,
+    UnboxPromise,
+    UnknownMapping,
+} from "../../utils/type";
 
 /**
  * Define an IPC config with arguments type and a return values type.
@@ -12,6 +16,14 @@ export interface IpcConfig<TArgs extends unknown[], TReturnValue> {
     args: TArgs;
     returnValue: TReturnValue;
 }
+
+/**
+ * Define an IPC config from arguements and return value of a given function.
+ */
+export type IpcConfigFromFunction<TFunction extends EveryFunction> =
+    TFunction extends (...args: infer TArgs) => infer TReturnValue
+        ? IpcConfig<TArgs, UnboxPromise<TReturnValue>>
+        : never;
 
 /**
  * Define an asynchronous IPC config (e.g. `ipcRenderer.send()`) with arguments

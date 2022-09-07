@@ -77,6 +77,8 @@ export type VoidArgsFunction<TArgs extends Any[] = Any[]> = (
     ...args: TArgs
 ) => void;
 
+export type UnboxPromise<T> = T extends Promise<infer R> ? UnboxPromise<R> : T;
+
 export type StringKeyOf<T> = {
     [K in keyof T]: K extends string ? K : never;
 }[keyof T];

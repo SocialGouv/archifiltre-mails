@@ -1,10 +1,8 @@
-import { ipcRenderer } from "@common/lib/ipc";
 import { useService } from "@common/modules/ContainerModule";
 import type {
     ExporterAsFileType,
     ExporterAsFolderType,
 } from "@common/modules/FileExporterModule";
-import { PST_EXPORTER_EXPORT_MAILS_EVENT } from "@common/modules/pst-exporter/ipc";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -18,14 +16,14 @@ interface UseExporter {
 }
 
 export const useExporter = (): UseExporter => {
-    const fileExporterService = useService("fileExporterService");
+    const pstExporterService = useService("pstExporterService");
     const { t } = useTranslation();
     const { toDeleteIDs } = useImpactStore();
     const { extractDatas } = usePstStore();
 
     const openSaveFileDialog = useCallback(
         async (type: ExporterAsFileType) => {
-            if (!fileExporterService || !extractDatas) {
+            if (!pstExporterService || !extractDatas) {
                 return;
             }
 
@@ -46,20 +44,18 @@ export const useExporter = (): UseExporter => {
                 return;
             }
 
-            await ipcRenderer.invoke(
-                PST_EXPORTER_EXPORT_MAILS_EVENT,
+            await pstExporterService.exportMails({
+                deletedIds: [...toDeleteIDs],
+                dest: dialogPath.filePath,
                 type,
-                [...toDeleteIDs],
-                dialogPath.filePath
-            );
-            // await fileExporterService.export(type, mails, dialogPath.filePath);
+            });
         },
-        [t, extractDatas, fileExporterService, toDeleteIDs]
+        [t, extractDatas, pstExporterService, toDeleteIDs]
     );
 
     const openSaveFolderDialog = useCallback(
         async (type: ExporterAsFolderType) => {
-            if (!fileExporterService || !extractDatas) return;
+            if (!pstExporterService || !extractDatas) return;
 
             const result = await dialog.showOpenDialog({
                 message: t("exporter.save.message"),
@@ -67,21 +63,15 @@ export const useExporter = (): UseExporter => {
                 title: t("exporter.save.title", { type }),
             });
 
-            const chosenFile = result.filePaths[0];
-            if (!chosenFile) {
+            const dest = result.filePaths[0];
+            if (!dest) {
                 // TODO: handle error maybe?
                 return;
             }
 
-            await ipcRenderer.invoke(
-                PST_EXPORTER_EXPORT_MAILS_EVENT,
-                type,
-                [],
-                chosenFile
-            );
-            // await fileExporterService.export(type, pstFile, chosenFile);
+            await pstExporterService.exportMails({ dest, type });
         },
-        [t, extractDatas, fileExporterService]
+        [t, extractDatas, pstExporterService]
     );
 
     return {

@@ -1,11 +1,11 @@
 import { ipcMain } from "@common/lib/ipc";
-import type { GetAsyncIpcConfig } from "@common/lib/ipc/event";
 import type { FileExporterService } from "@common/modules/FileExporterModule";
 import {
     FileExporterError,
     isExporterAsFolderType,
 } from "@common/modules/FileExporterModule";
 import type { I18nService } from "@common/modules/I18nModule";
+import type { ExportMailsFunction } from "@common/modules/pst-exporter/ipc";
 import { PST_EXPORTER_EXPORT_MAILS_EVENT } from "@common/modules/pst-exporter/ipc";
 import type {
     PstElement,
@@ -21,10 +21,6 @@ import type {
     PstCacheMainService,
     PstExtractorMainService,
 } from "./PstExtractorModule";
-
-type ExportMailsFunction = (
-    ...args: GetAsyncIpcConfig<typeof PST_EXPORTER_EXPORT_MAILS_EVENT>["args"]
-) => Promise<void>;
 
 export class PstExporterModule extends MainModule {
     private inited = false;
@@ -46,22 +42,19 @@ export class PstExporterModule extends MainModule {
         await this.i18nService.wait();
         await this.fileExporterService.wait();
 
-        ipcMain.handle(
-            PST_EXPORTER_EXPORT_MAILS_EVENT,
-            async (_, type, deletedIds, dest) => {
-                return this.exportMails(type, deletedIds, dest);
-            }
-        );
+        ipcMain.handle(PST_EXPORTER_EXPORT_MAILS_EVENT, async (_, options) => {
+            return this.exportMails(options);
+        });
 
         this.inited = true;
         return Promise.resolve();
     }
 
-    private readonly exportMails: ExportMailsFunction = async (
+    private readonly exportMails: ExportMailsFunction = async ({
         type,
         deletedIds,
-        dest
-    ) => {
+        dest,
+    }) => {
         if (!this.inited) {
             throw new FileExporterError(
                 "Can't export to desired type as the module is not inited."
@@ -94,7 +87,7 @@ export class PstExporterModule extends MainModule {
      */
     private formatEmails(
         emails: PstEmail[],
-        deletedIds: string[]
+        deletedIds?: string[]
     ): SimpleObject[] {
         const { t } = this.i18nService.i18next;
         const deleteTag = t("exporter.table.tag.delete");
@@ -142,7 +135,7 @@ export class PstExporterModule extends MainModule {
                 .map((attachement) => attachement.filename)
                 .join(","),
             [tKeys.contentText]: email.contentText,
-            [tKeys.tag]: deletedIds.includes(email.id) ? deleteTag : untagTag,
+            [tKeys.tag]: deletedIds?.includes(email.id) ? deleteTag : untagTag,
             [tKeys.elementPath]: email.elementPath,
         }));
     }
