@@ -1,19 +1,6 @@
 import type { Any } from "@common/utils/type";
 import { PubSub } from "@event/PubSub";
 
-jest.mock(
-    "electron",
-    () => {
-        const mockIpcMain = {
-            on: jest.fn().mockReturnThis(),
-        };
-        return { app: { getLocale: () => "fr-FR" }, ipcMain: mockIpcMain };
-    },
-    {
-        virtual: true,
-    }
-);
-
 describe("PubSub", () => {
     it("should trigger events", async () => {
         const eventId = "event.mock" as Any;
