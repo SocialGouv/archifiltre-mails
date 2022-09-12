@@ -9,7 +9,7 @@ import type { xlsxExporter } from "./XslxExporter";
  * Export JSON to .csv file. For Excel, use {@link xlsxExporter} instead.
  */
 export const csvExporter: Exporter = {
-    async export<T>(obj: T, dest: string): Promise<void> {
+    async export<T>(obj: T, dest: string): pvoid {
         console.log("Generate CSV...");
         const parser = new Parser<T>({
             excelStrings: true,

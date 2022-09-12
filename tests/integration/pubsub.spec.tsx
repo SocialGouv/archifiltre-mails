@@ -1,4 +1,3 @@
-import type { Any } from "@common/utils/type";
 import { PubSub } from "@event/PubSub";
 
 describe("PubSub", () => {

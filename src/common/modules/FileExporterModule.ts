@@ -41,7 +41,7 @@ const FILE_EXPORTER_EXPORT_EVENT = "fileExporter.event.export";
 type ExportFunction = (
     type: ExporterType,
     ...args: Parameters<Exporter["export"]>
-) => Promise<void>;
+) => pvoid;
 
 /**
  * Isomorphic module responsible for handling exports capabilities of the app.
@@ -57,7 +57,7 @@ export class FileExporterModule extends IsomorphicModule {
         super();
     }
 
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         if (this.inited) {
             return;
         }
@@ -76,7 +76,7 @@ export class FileExporterModule extends IsomorphicModule {
         return Promise.resolve();
     }
 
-    public async uninit(): Promise<void> {
+    public async uninit(): pvoid {
         this.inited = false;
         return Promise.resolve();
     }

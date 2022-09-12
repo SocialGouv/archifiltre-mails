@@ -1,4 +1,6 @@
 const path = require("path");
+const glob = require("glob");
+const { getDeclaredTypesNames } = require("./scripts/ts-ast");
 
 const tsconfigPath = path.resolve(__dirname, "./tsconfig.json");
 const tsconfigRendererPath = path.resolve(
@@ -12,9 +14,15 @@ const tsconfigCommonPath = path.resolve(
 );
 const tsconfigScriptsPath = path.resolve(__dirname, "./scripts/tsconfig.json");
 
+const typesFiles = glob.sync(path.resolve(__dirname, "./types/**/*.d.ts"));
+const globalTypesNames = typesFiles
+    .flatMap(getDeclaredTypesNames)
+    .reduce((acc, name) => ({ ...acc, [name]: "readonly" }), {});
+
 /** @type {import("eslint").Linter.Config} */
 const typescriptConfig = {
     extends: "@socialgouv/eslint-config-typescript",
+    globals: globalTypesNames,
     parser: "@typescript-eslint/parser",
     parserOptions: {
         project: tsconfigPath,
@@ -23,6 +31,7 @@ const typescriptConfig = {
     plugins: ["typescript-sort-keys"],
     rules: {
         "@typescript-eslint/consistent-type-imports": "error",
+        "@typescript-eslint/no-invalid-void-type": ["off"],
         "@typescript-eslint/no-misused-promises": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-unused-vars": "off",
@@ -118,7 +127,7 @@ const defaultConfig = {
         {
             files: "src/**/*.ts*",
             globals: {
-                __static: true,
+                __static: "readonly",
             },
         },
         {

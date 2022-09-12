@@ -11,8 +11,8 @@ import { usePstStore } from "../store/PSTStore";
 import { dialog } from "../utils/electron";
 
 interface UseExporter {
-    openSaveFileDialog: (type: ExporterAsFileType) => Promise<void>;
-    openSaveFolderDialog: (type: ExporterAsFolderType) => Promise<void>;
+    openSaveFileDialog: (type: ExporterAsFileType) => pvoid;
+    openSaveFolderDialog: (type: ExporterAsFolderType) => pvoid;
 }
 
 export const useExporter = (): UseExporter => {

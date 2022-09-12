@@ -58,7 +58,7 @@ export class MenuModule extends MainModule {
         super();
     }
 
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         await this.i18nService.wait();
         await this.userConfigService.wait();
         this.debugMenu = new DebugMenu(

@@ -6,9 +6,7 @@ export interface ExportMailsOptions {
     dest: string;
     type: ExporterType;
 }
-export type ExportMailsFunction = (
-    options: ExportMailsOptions
-) => Promise<void>;
+export type ExportMailsFunction = (options: ExportMailsOptions) => pvoid;
 
 declare module "../../lib/ipc/event" {
     interface AsyncIpcMapping {

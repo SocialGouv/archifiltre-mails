@@ -31,7 +31,7 @@ export interface Service {
      *
      * If needed, a private `inited` property flag can be used to ensure this method is called once.
      */
-    init?: () => Promise<void>;
+    init?: () => pvoid;
 
     /**
      * Given name. Recommended to be `constructor.name`
@@ -41,7 +41,7 @@ export interface Service {
     /**
      * Uninit a service once when the app close (main) or when a window closes (renderer).
      */
-    uninit?: () => Promise<void>;
+    uninit?: () => pvoid;
 }
 
 /**

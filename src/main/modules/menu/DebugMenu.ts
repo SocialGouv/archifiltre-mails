@@ -153,7 +153,7 @@ export class DebugMenu implements ArchifiltreMailsMenu {
     private async extractAndLogPst(
         browserWindow: BrowserWindow,
         pstFilePath: string
-    ): Promise<void> {
+    ): pvoid {
         const extractDatas = await this.pstExtractorMainService.extract({
             pstFilePath,
         });
@@ -163,7 +163,7 @@ export class DebugMenu implements ArchifiltreMailsMenu {
     private async exportLast(
         browserWindow: BrowserWindow,
         type: ExporterType
-    ): Promise<void> {
+    ): pvoid {
         const dialogReturn = await dialog.showSaveDialog(browserWindow, {
             defaultPath: this.lastPstFilePath.replace(/\.pst$/i, `.${type}`),
             filters: [

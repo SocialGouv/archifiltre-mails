@@ -6,7 +6,6 @@ import { containerModule } from "@common/modules/ContainerModule";
 import type { Module } from "@common/modules/Module";
 import { setupSentry } from "@common/monitoring/sentry";
 import { sleep } from "@common/utils";
-import type { Any } from "@common/utils/type";
 import Sentry from "@sentry/electron";
 import { app, BrowserWindow, Menu } from "electron";
 import path from "path";

@@ -96,7 +96,7 @@ export class PubSub extends IsomorphicService {
     /**
      * @override
      */
-    public async uninit(): Promise<void> {
+    public async uninit(): pvoid {
         this.unsubscribersInRenderer.forEach((unsubscribe, uuid) => {
             console.log("[pubsub] call unsubscribe for ", uuid);
             unsubscribe();

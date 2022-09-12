@@ -65,10 +65,7 @@ export const emlExporter: PstExporter = {
 /**
  * Create a file with a parent wrapper folder and file name as a title.
  */
-const createEmlFile = async (
-    filePath: string,
-    fileContent: EmlFile
-): Promise<void> =>
+const createEmlFile = async (filePath: string, fileContent: EmlFile): pvoid =>
     outputFile(filePath + EML_EXTENSION, generateEml(fileContent));
 
 /**

@@ -1,11 +1,11 @@
 import type { Integration } from "@sentry/types";
 
-import type { ExtendedClass, Nothing } from "../../utils/type";
+import type { ExtendedClass } from "../../utils/type";
 import type { TrackAppId, TrackEvent, TrackEventProps } from "../type";
 
 export type ExtendedTrackerProvider = ExtendedClass<typeof TrackerProvider>;
 export type TrackArgs<TEvent extends TrackEvent> =
-    TrackEventProps[TEvent] extends Nothing
+    TrackEventProps[TEvent] extends nothing
         ? [event: TEvent]
         : [event: TEvent, props: TrackEventProps[TEvent]];
 
@@ -56,7 +56,7 @@ export abstract class TrackerProvider<
      * the app closes. (e.g. to flush pending request,
      * or "log out" the current user)
      */
-    public async uninit(): Promise<void> {
+    public async uninit(): pvoid {
         this.inited = false;
         return Promise.resolve();
     }
@@ -65,7 +65,7 @@ export abstract class TrackerProvider<
      * Init a tracking system (e.g. start the library,
      * identify a user)
      */
-    public abstract init(): Promise<void>;
+    public abstract init(): pvoid;
 
     /**
      * Track an event described by the tracking plan.

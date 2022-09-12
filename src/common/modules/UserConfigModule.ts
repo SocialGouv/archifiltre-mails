@@ -132,7 +132,7 @@ export class UserConfigModule extends IsomorphicModule {
         super();
     }
 
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         if (this.inited) {
             return;
         }
@@ -198,7 +198,7 @@ export class UserConfigModule extends IsomorphicModule {
         this.service.resolve();
     }
 
-    public async uninit(): Promise<void> {
+    public async uninit(): pvoid {
         if (!IS_MAIN) {
             ipcRenderer.sendSync(CONFIG_UNSUB_UPDATE_EVENT, this.configId);
             ipcRenderer.removeAllListeners(CONFIG_UPDATE_EVENT);

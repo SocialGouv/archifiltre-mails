@@ -32,14 +32,14 @@ export class TrackerModule extends IsomorphicModule {
         super();
     }
 
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         await this.userConfigService.wait();
         this.enableTracking = this.userConfigService.get("collectData");
 
         await this.getProvider().init();
     }
 
-    public async uninit(): Promise<void> {
+    public async uninit(): pvoid {
         this.userConfigUnsub();
         await this.getProvider().uninit();
     }

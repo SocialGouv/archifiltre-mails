@@ -66,7 +66,7 @@ export class PstExtractorModule extends MainModule {
         );
     }
 
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         if (this.inited) {
             return;
         }
@@ -110,7 +110,7 @@ export class PstExtractorModule extends MainModule {
         return Promise.resolve();
     }
 
-    public async uninit(): Promise<void> {
+    public async uninit(): pvoid {
         return Promise.resolve();
     }
 
@@ -303,7 +303,7 @@ export class PstExtractorModule extends MainModule {
         // });
     }
 
-    private async stop(): Promise<void> {
+    private async stop(): pvoid {
         this.manuallyStoped = true;
         this.progressReply?.(
             "pstExtractor.event.progress",
@@ -335,12 +335,12 @@ const cacheService = new (class extends PstCache implements PstCacheMainService 
     public name = "PstCacheMainService";
 
     /** @override */
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         await this.db.close();
     }
 
     /** @override */
-    public async uninit(): Promise<void> {
+    public async uninit(): pvoid {
         await this.db.close();
     }
 })();

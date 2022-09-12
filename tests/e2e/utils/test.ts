@@ -39,20 +39,20 @@ export const startApp = async (): Promise<
     return [electronApp, win];
 };
 
-export const closeApp = async (app = electronApp): Promise<void> => {
+export const closeApp = async (app = electronApp): pvoid => {
     await app.close();
 };
 
 /**
  * Wait for the given time. (like sleep)
  */
-export const wait = async (time: number): Promise<void> =>
+export const wait = async (time: number): pvoid =>
     new Promise((resolve) => setTimeout(resolve, time));
 
 /**
  * Types the text as keyboard input. Handles unicode characters for non text keys.
  */
-export const typeText = async (text: string, w = win): Promise<void> => {
+export const typeText = async (text: string, w = win): pvoid => {
     const letters = text.split("");
     for (const letter of letters) {
         await w.keyboard.type(letter);
@@ -62,10 +62,7 @@ export const typeText = async (text: string, w = win): Promise<void> => {
 /**
  * Clicks over the element locator
  */
-export const clickOverElement = async (
-    locator: Locator,
-    w = win
-): Promise<void> => {
+export const clickOverElement = async (locator: Locator, w = win): pvoid => {
     const box = await locator.boundingBox();
     if (!box) {
         return;

@@ -20,7 +20,7 @@ export class MatomoProvider extends TrackerProvider<
 
     public inited = false;
 
-    async init(): Promise<void> {
+    async init(): pvoid {
         if (this.inited) {
             console.warn("[MatomoProvider] Already inited.");
         }

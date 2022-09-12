@@ -1,7 +1,5 @@
 import { WORKER_CONFIG_TOKEN, workerConfig } from "@common/config";
 import type {
-    Any,
-    Nothing,
     SimpleObject,
     StringKeyOf,
     VoidArgsFunction,
@@ -21,7 +19,7 @@ import type {
 type CommandFunction<TCommands extends WorkerCommands> = <
     TCommandName extends StringKeyOf<TCommands>
 >(
-    ...args: TCommands[TCommandName]["param"] extends Nothing
+    ...args: TCommands[TCommandName]["param"] extends nothing
         ? [name: TCommandName]
         : [name: TCommandName, param: TCommands[TCommandName]["param"]]
 ) => Promise<Ack>;
@@ -29,7 +27,7 @@ type CommandFunction<TCommands extends WorkerCommands> = <
 type QueryFunction<TQueries extends WorkerQueries> = <
     TQueryName extends StringKeyOf<TQueries>
 >(
-    ...args: TQueries[TQueryName]["param"] extends Nothing
+    ...args: TQueries[TQueryName]["param"] extends nothing
         ? [name: TQueryName]
         : [name: TQueryName, param: TQueries[TQueryName]["param"]]
 ) => Promise<TQueries[TQueryName]["returnType"]>;
@@ -38,9 +36,7 @@ type EventListenerFunction<TEventListeners extends WorkerEventListeners> = <
     TEventName extends StringKeyOf<TEventListeners>
 >(
     name: TEventName,
-    listener: (
-        value: TEventListeners[TEventName]["returnType"]
-    ) => Promise<void> | void
+    listener: (value: TEventListeners[TEventName]["returnType"]) => pvoid | void
 ) => void;
 
 type WorkerClientArgs<TWorkerConfig extends WorkerConfig> =
@@ -166,7 +162,7 @@ export class WorkerClient<TWorkerConfig extends WorkerConfig> {
         });
     };
 
-    public async terminate(): Promise<void> {
+    public async terminate(): pvoid {
         await this.worker.terminate();
     }
 }

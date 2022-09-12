@@ -34,7 +34,7 @@ export class PstExporterModule extends MainModule {
         super();
     }
 
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         if (this.inited) {
             return;
         }
