@@ -1,4 +1,6 @@
-import type { ViewerObjectChild } from "./dashboard-viewer-dym";
+import type { ComputedDatum } from "@nivo/circle-packing";
+
+import type { ViewerObject, ViewerObjectChild } from "./dashboard-viewer-dym";
 
 export const getPstComputeChildrenId = (
     children: ViewerObjectChild[]
@@ -44,3 +46,18 @@ export const isToDeleteFolder = (id: string, deleteIds: string[]): boolean =>
 
 export const isToKeepFolder = (id: string, keepIds: string[]): boolean =>
     keepIds.includes(id);
+
+/**
+ * @param verifyIds could be current deleteIds / keepIds
+ * @param verifyIds node element
+ */
+export const isNodeContainsIds = (
+    verifyIds: string[],
+    nodeIds: Omit<
+        ComputedDatum<ViewerObject<string>>,
+        "color" | "fill"
+    >["data"]["ids"]
+): boolean =>
+    verifyIds.some((element) => {
+        return nodeIds.includes(element);
+    });

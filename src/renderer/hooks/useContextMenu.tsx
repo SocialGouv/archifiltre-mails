@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { useTagManagerStore } from "../store/TagManagerStore";
 import { CIRCLE_PACKING_ID } from "../utils/constants";
 
 interface UseContextMenuType {
@@ -8,6 +7,7 @@ interface UseContextMenuType {
         x: number;
         y: number;
     };
+    closeMenu: () => void;
     show?: boolean;
 }
 
@@ -17,15 +17,6 @@ export const KEEP_ACTION_BUTTON_ID = "keep-action-btn";
 export const useContextMenu = (): UseContextMenuType => {
     const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
     const [show, setShow] = useState<UseContextMenuType["show"]>(false);
-    const { addMarkedToDelete, addMarkedToKeep } = useTagManagerStore();
-
-    const handleMarkedToDelete = useCallback(() => {
-        addMarkedToDelete();
-    }, [addMarkedToDelete]);
-
-    const handleMarkedToKeep = useCallback(() => {
-        addMarkedToKeep();
-    }, [addMarkedToKeep]);
 
     const handleContextMenu = useCallback(
         (event) => {
@@ -49,6 +40,10 @@ export const useContextMenu = (): UseContextMenuType => {
     );
     const markedToKeepBtn = document.querySelector(`#${KEEP_ACTION_BUTTON_ID}`);
 
+    const closeMenu = () => {
+        setShow(false);
+    };
+
     useEffect(() => {
         circlePackingViewer?.addEventListener("click", handleClick);
         circlePackingViewer?.addEventListener("contextmenu", handleContextMenu);
@@ -66,8 +61,6 @@ export const useContextMenu = (): UseContextMenuType => {
         markedToDeleteBtn,
         handleClick,
         handleContextMenu,
-        handleMarkedToDelete,
-        handleMarkedToKeep,
     ]);
-    return { anchorPoint, show };
+    return { anchorPoint, closeMenu, show };
 };

@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { useDymViewerNavigation } from "../../hooks/useDymViewerNavigation";
 import { usePstFMInfosStore } from "../../store/PstFMInfosStore";
+import { tagManagerStoreV2 } from "../../store/TagManagerStoreV2";
 import { COLORS, ROOT } from "../../utils/constants";
 import type { CirclePackingCommonProps } from "../../utils/dashboard-viewer";
 import {
@@ -18,6 +19,7 @@ import type {
     ViewerObject,
 } from "../../utils/dashboard-viewer-dym";
 import { isMailViewerObject } from "../../utils/dashboard-viewer-dym";
+import { isNodeContainsIds } from "../../utils/tag-manager";
 import { Menu } from "../menu/Menu";
 import style from "./CirclePacking.module.scss";
 import type { OnBlur } from "./CirclePackingCancellableFocusZone";
@@ -46,6 +48,8 @@ export const CirclePacking: React.FC = () => {
     const { setMainInfos, startFocus, isInfoFocus, mainInfos, cancelFocus } =
         usePstFMInfosStore();
 
+    const { setHoveredNode, keepIds, deleteIds } = tagManagerStoreV2();
+
     // const {
     //     setHoveredNode,
     //     addChildrenMarkedToKeep,
@@ -61,24 +65,31 @@ export const CirclePacking: React.FC = () => {
 
     //     const children = currentView.elements.children;
 
-    //     if (isToDeleteFolder(currentView.elements.id, markedToDelete)) {
-    //         addChildrenMarkedToDelete([
-    //             ...getChildrenToDeleteIds(children, markedToKeep),
-    //             ...getUntagChildrenIds(children, markedToDelete, markedToKeep),
-    //         ]);
-    //     }
-    //     if (isToKeepFolder(currentView.elements.id, markedToKeep)) {
-    //         addChildrenMarkedToKeep([
-    //             ...getChildrenToKeepIds(children, markedToDelete),
-    //             ...getUntagChildrenIds(children, markedToKeep, markedToDelete),
-    //         ]);
-    //     }
+    //     // if (isToDeleteFolder(currentView.elements.id, markedToDelete)) {
+    //     //     addChildrenMarkedToDelete([
+    //     //         ...getChildrenToDeleteIds(children, markedToKeep),
+    //     //         ...getUntagChildrenIds(children, markedToDelete, markedToKeep),
+    //     //     ]);
+    //     // }
+    //     // if (isToKeepFolder(currentView.elements.id, markedToKeep)) {
+    //     //     addChildrenMarkedToKeep([
+    //     //         ...getChildrenToKeepIds(children, markedToDelete),
+    //     //         ...getUntagChildrenIds(children, markedToKeep, markedToDelete),
+    //     //     ]);
+    //     // }
     // }, [currentView]); // TODO: Investigate
 
     const getTaggedFilesColor = (
         node: Omit<ComputedDatum<ViewerObject<string>>, "color" | "fill">
     ) => {
         if (node.depth === 0) return BASE_COLOR_LIGHT;
+
+        if (isNodeContainsIds(deleteIds, node.data.ids)) {
+            return DELETE_COLOR;
+        }
+        if (isNodeContainsIds(keepIds, node.data.ids)) {
+            return KEEP_COLOR;
+        }
 
         // if (isToDeleteFolder(node.id, markedToDelete)) {
         //     if (isMailTagNode(node)) {
@@ -111,7 +122,7 @@ export const CirclePacking: React.FC = () => {
         }
 
         setMainInfos(node);
-        // setHoveredNode(node);
+        setHoveredNode(node);
     }, 500);
 
     const handleMouseLeave: CirclePackingCommonProps["onMouseLeave"] = () => {

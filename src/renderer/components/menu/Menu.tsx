@@ -8,14 +8,14 @@ import {
     KEEP_ACTION_BUTTON_ID,
     useContextMenu,
 } from "../../hooks/useContextMenu";
-import { useTagManagerStore } from "../../store/TagManagerStore";
+import { tagManagerStoreV2 } from "../../store/TagManagerStoreV2";
 import style from "./Menu.module.scss";
 
 export const Menu: React.FC = () => {
     const { t } = useTranslation();
-    const { anchorPoint, show } = useContextMenu();
+    const { anchorPoint, show, closeMenu } = useContextMenu();
 
-    const { addMarkedToDelete, addMarkedToKeep } = useTagManagerStore();
+    const { setDeleteIds, setKeepIds, deleteIds } = tagManagerStoreV2();
 
     if (show) {
         return (
@@ -24,7 +24,11 @@ export const Menu: React.FC = () => {
                 style={{ left: anchorPoint.x, top: anchorPoint.y }}
             >
                 <li
-                    onClick={addMarkedToDelete}
+                    onClick={() => {
+                        setDeleteIds();
+                        closeMenu();
+                        // addMarkedToDelete();
+                    }}
                     id={DELETE_ACTION_BUTTON_ID}
                     className={DELETE_ACTION_BUTTON_ID}
                 >
@@ -33,7 +37,11 @@ export const Menu: React.FC = () => {
                 <li
                     id={KEEP_ACTION_BUTTON_ID}
                     className={KEEP_ACTION_BUTTON_ID}
-                    onClick={addMarkedToKeep}
+                    onClick={() => {
+                        setKeepIds();
+                        closeMenu();
+                    }}
+                    // onClick={addMarkedToKeep}
                 >
                     {t("dashboard.viewer.contextMenu.keepAction")}
                 </li>
