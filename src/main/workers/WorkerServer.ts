@@ -85,14 +85,27 @@ export class WorkerServer<TWorkerConfig extends WorkerConfig> {
                             `No ${type} configured for worker message "${event}".`
                         );
                     }
-                    parentPort?.postMessage({
-                        data: await reply(messageData),
-                        event,
-                        metadata: {
-                            _requestId,
-                            type,
-                        },
-                    });
+                    try {
+                        parentPort?.postMessage({
+                            data: await reply(messageData),
+                            event,
+                            metadata: {
+                                _requestId,
+                                type,
+                            },
+                        });
+                    } catch (error: unknown) {
+                        console.log(`[WorkerServer] Error in ${type}`);
+                        console.error(error);
+                        parentPort?.postMessage({
+                            data: error,
+                            event: "error",
+                            metadata: {
+                                _requestId,
+                                type,
+                            },
+                        });
+                    }
                 }
             }
         );

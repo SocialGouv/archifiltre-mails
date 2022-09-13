@@ -46,6 +46,9 @@ type Commands = WorkerCommandsBuilder<{
             pstFilePath: string;
         };
     };
+    stop: {
+        param: never;
+    };
 }>;
 
 type EventListeners = WorkerEventListenersBuilder<{
@@ -77,6 +80,12 @@ server.onCommand("open", async ({ pstFilePath }) => {
     );
 
     return Promise.resolve({ ok: true });
+});
+
+let stop = false;
+server.onCommand("stop", async () => {
+    stop = true;
+    return Promise.resolve({ ok: stop });
 });
 
 server.onCommand(
@@ -257,33 +266,6 @@ server.onCommand(
                             contactList.set(contactKey, recipient.name);
                     });
 
-                    // const emailContent: PstEmail = {
-                    //     attachementCount: email.numberOfAttachments,
-                    //     attachements: [],
-                    //     bcc: getRecipientFromDisplay(email.displayBCC, recipients),
-                    //     cc: getRecipientFromDisplay(email.displayCC, recipients),
-                    //     contentHTML: email.bodyHTML,
-                    //     contentRTF: email.bodyRTF,
-                    //     contentText: email.body,
-                    //     elementPath: parentPath,
-
-                    //     from: {
-                    //         email: email.senderEmailAddress,
-                    //         name: email.senderName,
-                    //     },
-
-                    //     id: emailId,
-                    //     // TODO: change name
-                    //     isFromMe: email.isFromMe,
-                    //     name: `${email.senderName} ${email.originalSubject}`,
-                    //     receivedDate: email.messageDeliveryTime,
-                    //     sentTime: email.clientSubmitTime,
-                    //     size: 1,
-                    //     subject: email.subject,
-                    //     to: getRecipientFromDisplay(email.displayTo, recipients),
-                    //     type: "email",
-                    // };
-
                     if (email.hasAttachments) {
                         for (let i = 0; i < email.numberOfAttachments; i++) {
                             const attachment = email.getAttachment(i);
@@ -352,15 +334,3 @@ server.onCommand(
         return { ok: true };
     }
 );
-
-// Events - Worker => Parent
-// export const PST_PROGRESS_WORKER_EVENT = "pstExtractor.worker.event.progress";
-// export const PST_DONE_WORKER_EVENT = "pstExtractor.worker.event.done";
-
-/*
-1/ tester le switch randomUUID vs incremental id
-2/ 4012 => [ 0, 1, 4, 0, 11, 180 ] == index de stockage global (baseIndex)
-3/ créer des index de recherche par id : Set([id1, id2, id3]) pour tous les domaines, toutes les années, tous les correspondants
-4/ effectuer des instersections e.g. (domaine(beta.gouv) + année(2018))
-5/ stocker en cache le résultat
-*/

@@ -23,7 +23,9 @@ export type WorkerEventListeners = SimpleObject<WorkerEventListener>;
 
 export type WorkerCommandsBuilder<T extends WorkerCommands> = T;
 export type WorkerQueriesBuilder<T extends WorkerQueries> = T;
-export type WorkerEventListenersBuilder<T extends WorkerEventListeners> = T;
+export type WorkerEventListenersBuilder<T extends WorkerEventListeners> = T & {
+    error: WorkerEventListener;
+};
 
 export interface WorkerConfig {
     commands?: WorkerCommands;

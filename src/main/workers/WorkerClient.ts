@@ -105,9 +105,6 @@ export class WorkerClient<TWorkerConfig extends WorkerConfig> {
                 }
             }
         );
-
-        // TODO: handle errors
-        // TODO: handle exit
     }
 
     public command: CommandFunction<NonNullable<TWorkerConfig["commands"]>> =
