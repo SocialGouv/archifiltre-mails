@@ -136,7 +136,9 @@ export const CirclePacking: React.FC = () => {
         setMainInfos(undefined);
     };
 
-    const handleClick: CirclePackingCommonProps["onClick"] = (node) => {
+    const handleClick = debounce<
+        NonNullable<CirclePackingCommonProps["onClick"]>
+    >((node) => {
         if (isMailViewerObject(node.data)) {
             setMainInfos(node);
             startFocus();
@@ -144,7 +146,17 @@ export const CirclePacking: React.FC = () => {
         }
 
         computeNextView(node);
-    };
+    }, 250);
+
+    // const handleClick: CirclePackingCommonProps["onClick"] = (node) => {
+    //     if (isMailViewerObject(node.data)) {
+    //         setMainInfos(node);
+    //         startFocus();
+    //         return;
+    //     }
+
+    //     computeNextView(node);
+    // };
 
     const handleLostFocus = debounce<NonNullable<OnBlur["onBlur"]>>((evt) => {
         const elt = document.elementFromPoint(evt.clientX, evt.clientY);

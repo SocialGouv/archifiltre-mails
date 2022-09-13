@@ -110,6 +110,7 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
     ) => {
         // e.g. ["domain", "recipient"] ; going on recipient
         const currentView = viewList[currentViewIndex];
+
         if (!currentView) {
             return;
         }
@@ -119,6 +120,8 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
         const sameView = viewList[nextIndex];
 
         if (sameView?.elements.name === node.data.name) {
+            setViewAt(nextIndex, sameView);
+            setCurrentViewIndex(nextIndex);
             return;
         }
 
@@ -127,7 +130,6 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
 
         if (nextViewGroupBy) {
             setCurrentViewIndex(nextIndex); // see comment line 169
-
             const nextDatasFilter = new Map(
                 [
                     ...(extractDatas?.groups[nextViewGroupBy.type]?.entries() ??
@@ -149,6 +151,7 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
             );
 
             const elements = createNodes(orderedNextDatas, node.id, node.data);
+
             setViewAt(nextIndex, { elements, type: nextViewGroupBy.type });
         } else {
             if (!pstExtractorService || !extractDatas) return;

@@ -45,6 +45,7 @@ export const viewListStore = create<ViewListStore>((set, get) => ({
     setViewAt: (index: number, view: ViewState<DefaultViewerObject>) => {
         const list = get().list;
         list[index] = view;
+
         set({
             list,
         });
