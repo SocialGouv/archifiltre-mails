@@ -19,7 +19,7 @@ import type {
     ViewerObject,
 } from "../../utils/dashboard-viewer-dym";
 import { isMailViewerObject } from "../../utils/dashboard-viewer-dym";
-import { isNodeContainsIds } from "../../utils/tag-manager";
+import { getNodeContainsIds } from "../../utils/tag-manager";
 import { Menu } from "../menu/Menu";
 import style from "./CirclePacking.module.scss";
 import type { OnBlur } from "./CirclePackingCancellableFocusZone";
@@ -82,13 +82,22 @@ export const CirclePacking: React.FC = () => {
     const getTaggedFilesColor = (
         node: Omit<ComputedDatum<ViewerObject<string>>, "color" | "fill">
     ) => {
+        if (isMailTagNode(node)) {
+            return getTagColor(node, "untag");
+        }
+
         if (node.depth === 0) return BASE_COLOR_LIGHT;
 
-        if (isNodeContainsIds(deleteIds, node.data.ids)) {
-            return DELETE_COLOR;
-        }
-        if (isNodeContainsIds(keepIds, node.data.ids)) {
-            return KEEP_COLOR;
+        const nodeDeletedIds = getNodeContainsIds(deleteIds, node.data.ids);
+        const nodeKeepIds = getNodeContainsIds(keepIds, node.data.ids);
+
+        const color =
+            nodeDeletedIds.length >= nodeKeepIds.length
+                ? DELETE_COLOR
+                : KEEP_COLOR;
+
+        if (nodeDeletedIds.length || nodeKeepIds.length) {
+            return color;
         }
 
         // if (isToDeleteFolder(node.id, markedToDelete)) {
@@ -103,10 +112,6 @@ export const CirclePacking: React.FC = () => {
         //     }
         //     return KEEP_COLOR;
         // }
-
-        if (isMailTagNode(node)) {
-            return getTagColor(node, "untag");
-        }
 
         return BASE_COLOR;
     };

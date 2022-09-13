@@ -15,11 +15,11 @@ export interface TagManagerStore {
 }
 
 export const tagManagerStoreV2 = create<TagManagerStore>((set, get) => ({
-    deleteIds: [""],
+    deleteIds: [],
     hoveredNode: null,
-    keepIds: [""],
+    keepIds: [],
     setDeleteIds: () => {
-        const newDeleteIds = get().hoveredNode?.data.ids ?? [""];
+        const newDeleteIds = get().hoveredNode?.data.ids ?? [];
         const currentKeepIds = get().keepIds;
         const currentDeleteIds = get().deleteIds;
         const keepIds = currentKeepIds.filter(
@@ -33,7 +33,7 @@ export const tagManagerStoreV2 = create<TagManagerStore>((set, get) => ({
         set({ hoveredNode });
     },
     setKeepIds: () => {
-        const newKeepIds = get().hoveredNode?.data.ids ?? [""];
+        const newKeepIds = get().hoveredNode?.data.ids ?? [];
         const currentKeepIds = get().keepIds;
         const currentDeleteIds = get().deleteIds;
         const deleteIds = currentDeleteIds.filter(

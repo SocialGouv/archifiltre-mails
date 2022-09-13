@@ -1,6 +1,6 @@
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import React, { Fragment } from "react";
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+import React from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -15,7 +15,7 @@ export const Menu: React.FC = () => {
     const { t } = useTranslation();
     const { anchorPoint, show, closeMenu } = useContextMenu();
 
-    const { setDeleteIds, setKeepIds, deleteIds } = tagManagerStoreV2();
+    const { setDeleteIds, setKeepIds } = tagManagerStoreV2();
 
     if (show) {
         return (
