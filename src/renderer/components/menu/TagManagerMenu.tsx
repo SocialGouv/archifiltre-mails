@@ -1,33 +1,53 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+import type { CSSProperties, Dispatch, SetStateAction } from "react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
 import {
     DELETE_ACTION_BUTTON_ID,
     KEEP_ACTION_BUTTON_ID,
-    useContextMenu,
 } from "../../hooks/useContextMenu";
-import { tagManagerStoreV2 } from "../../store/TagManagerStoreV2";
+import { tagManagerStore } from "../../store/TagManagerStore";
 import style from "./Menu.module.scss";
 
-export const Menu: React.FC = () => {
+interface ITagManagerMenu {
+    anchorX: number;
+    anchorY: number;
+    setShow: Dispatch<SetStateAction<boolean>>;
+    show: boolean;
+}
+
+const cancellableZoneCSS: CSSProperties = {
+    height: "100vh",
+    left: "0",
+    position: "fixed",
+    top: "0",
+    width: "100vw",
+};
+
+export const TagManagerMenu: React.FC<ITagManagerMenu> = ({
+    anchorX,
+    anchorY,
+    show,
+    setShow,
+}) => {
     const { t } = useTranslation();
-    const { anchorPoint, show, closeMenu } = useContextMenu();
 
-    const { setDeleteIds, setKeepIds } = tagManagerStoreV2();
-
-    if (show) {
-        return (
+    const { setDeleteIds, setKeepIds } = tagManagerStore();
+    if (!show) return null;
+    return (
+        <>
             <ul
+                id="tag-manager-menu"
                 className={style.menu}
-                style={{ left: anchorPoint.x, top: anchorPoint.y }}
+                style={{ left: anchorX, top: anchorY }}
             >
                 <li
                     onClick={() => {
                         setDeleteIds();
-                        closeMenu();
-                        // addMarkedToDelete();
+                        setShow(false);
                     }}
                     id={DELETE_ACTION_BUTTON_ID}
                     className={DELETE_ACTION_BUTTON_ID}
@@ -39,14 +59,18 @@ export const Menu: React.FC = () => {
                     className={KEEP_ACTION_BUTTON_ID}
                     onClick={() => {
                         setKeepIds();
-                        closeMenu();
+                        setShow(false);
                     }}
-                    // onClick={addMarkedToKeep}
                 >
                     {t("dashboard.viewer.contextMenu.keepAction")}
                 </li>
             </ul>
-        );
-    }
-    return <></>;
+            <div
+                style={cancellableZoneCSS}
+                onClick={() => {
+                    setShow(false);
+                }}
+            />
+        </>
+    );
 };

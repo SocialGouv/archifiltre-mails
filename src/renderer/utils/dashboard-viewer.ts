@@ -19,7 +19,7 @@ type ResponsiveCirclePackingProps<TRawDatum> = Partial<
     Pick<CirclePackingSvgProps<TRawDatum>, "data">;
 
 export type CirclePackingCommonProps = Partial<
-    ResponsiveCirclePackingProps<DefaultViewerObject<string>>
+    ResponsiveCirclePackingProps<DefaultViewerObject>
 > & {
     id: keyof PstContent;
     value: keyof PstContent;
@@ -84,7 +84,7 @@ export const sanitizeMailDate = (date: Date): string =>
         .replaceAll('"', "");
 
 export const handleFocusItemBorderColor = (
-    node: ComputedDatum<DefaultViewerObject<string>>,
+    node: ComputedDatum<DefaultViewerObject>,
     mainInfos: MainInfos | undefined,
     isInfoFocus: boolean
 ): string => {
