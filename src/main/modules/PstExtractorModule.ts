@@ -38,8 +38,6 @@ export class PstExtractorModule extends MainModule {
 
     private lastProgressState!: PstProgressState;
 
-    private manuallyStoped = false;
-
     private lastPstExtractDatas?: PstExtractDatas;
 
     private lastPath = "";
@@ -66,7 +64,7 @@ export class PstExtractorModule extends MainModule {
         );
     }
 
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         if (this.inited) {
             return;
         }
@@ -105,12 +103,16 @@ export class PstExtractorModule extends MainModule {
                 })
             );
         });
+        this.extractorWorker.addEventListener("error", (error) => {
+            console.log("[PstExtractorModule] Error");
+            console.error(error); // TODO handle error
+        });
 
         this.inited = true;
         return Promise.resolve();
     }
 
-    public async uninit(): Promise<void> {
+    public async uninit(): pvoid {
         return Promise.resolve();
     }
 
@@ -174,95 +176,6 @@ export class PstExtractorModule extends MainModule {
         this.working = false;
         console.info("Extract done.");
         return this.lastPstExtractDatas;
-        // return new Promise<PstExtractDatas>((resolve, reject) => {
-        //     this.pstWorker?.on("message", (message: PstWorkerMessageType) => {
-        //         switch (message.event) {
-        //             case PST_PROGRESS_WORKER_EVENT:
-        //                 progressReply?.(
-        //                     PST_PROGRESS_EVENT,
-        //                     (this.lastProgressState = message.data)
-        //                 );
-        //                 break;
-        //             case PST_DONE_WORKER_EVENT:
-        //                 progressReply?.(
-        //                     PST_PROGRESS_EVENT,
-        //                     (this.lastProgressState = {
-        //                         ...message.data.progressState,
-        //                         progress: false,
-        //                     })
-        //                 );
-
-        //                 void (async () => {
-        //                     const db = new Level<string, PstMailIndexEntries>(
-        //                         "/Users/lsagetlethias/source/SocialGouv/archimail/db",
-        //                         { valueEncoding: "json" }
-        //                     );
-
-        //                     const idDb = db.sublevel<string, PstMailIdsEntries>(
-        //                         "ids",
-        //                         {
-        //                             valueEncoding: "json",
-        //                         }
-        //                     );
-        //                     const attachmentDb = db.sublevel<
-        //                         string,
-        //                         PstAttachmentEntries
-        //                     >("attachment", {
-        //                         valueEncoding: "json",
-        //                     });
-        //                     const baseRawData = await db.get("index");
-        //                     const domainRawData = await idDb.get("domain");
-        //                     const yearRawData = await idDb.get("year");
-        //                     const recipientRawData = await idDb.get(
-        //                         "recipient"
-        //                     );
-        //                     const attachmentRawData = await attachmentDb.get(
-        //                         "_"
-        //                     );
-        //                     this.consoleToRendererService.log(
-        //                         BrowserWindow.getAllWindows()[0]!,
-        //                         {
-        //                             attachmentRawData,
-        //                             baseRawData,
-        //                             domainRawData,
-        //                             recipientRawData,
-        //                             yearRawData,
-        //                         }
-        //                     );
-        //                     this.lastPstExtractDatas = {
-        //                         attachments: new Map(attachmentRawData),
-        //                         domain: new Map(domainRawData),
-        //                         indexes: new Map(baseRawData),
-        //                         recipient: new Map(recipientRawData),
-        //                         year: new Map(yearRawData),
-        //                     };
-        //                     await db.close();
-        //                     this.working = false;
-        //                     resolve(this.lastPstExtractDatas);
-        //                     console.info("Extract done.");
-        //                 })();
-
-        //                 break;
-        //         }
-        //     });
-
-        //     this.pstWorker?.on("error", (error) => {
-        //         this.working = false;
-        //         reject(error);
-        //     });
-
-        //     this.pstWorker?.on("exit", (exitCode) => {
-        //         this.working = false;
-        //         if (exitCode === 1) {
-        //             if (this.manuallyStoped) {
-        //                 this.manuallyStoped = false;
-        //                 reject(
-        //                     new PstExtractorError("Manually stoped by user.")
-        //                 );
-        //             } else reject("Worker stoped for unknown reason.");
-        //         }
-        //     });
-        // });
     }
 
     private async getEmails(emailIndexes: number[][]): Promise<PstEmail[]> {
@@ -278,33 +191,9 @@ export class PstExtractorModule extends MainModule {
             throw new Error("Emails not found from given indexes.");
         }
         return emails;
-
-        // return new Promise<PstEmail>((resolve, reject) => {
-        //     this.pstEmailWorker?.on(
-        //         "message",
-        //         (message: PstEmailWorkerMessageType) => {
-        //             this.working = false;
-        //             resolve(message.data.email);
-        //             console.log("Fetching done");
-        //         }
-        //     );
-
-        //     this.pstWorker?.on("error", (error) => {
-        //         this.working = false;
-        //         reject(error);
-        //     });
-
-        //     this.pstWorker?.on("exit", (exitCode) => {
-        //         this.working = false;
-        //         if (exitCode === 1) {
-        //             reject("Worker stoped for unknown reason.");
-        //         }
-        //     });
-        // });
     }
 
-    private async stop(): Promise<void> {
-        this.manuallyStoped = true;
+    private async stop(): pvoid {
         this.progressReply?.(
             "pstExtractor.event.progress",
             (this.lastProgressState = {
@@ -335,12 +224,12 @@ const cacheService = new (class extends PstCache implements PstCacheMainService 
     public name = "PstCacheMainService";
 
     /** @override */
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         await this.db.close();
     }
 
     /** @override */
-    public async uninit(): Promise<void> {
+    public async uninit(): pvoid {
         await this.db.close();
     }
 })();

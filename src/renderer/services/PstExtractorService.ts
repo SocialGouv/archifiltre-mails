@@ -26,7 +26,7 @@ export interface PstExtractorService extends Service {
     /**
      * Stop the extract.
      */
-    stop: () => Promise<void>;
+    stop: () => pvoid;
 }
 
 /**
@@ -54,7 +54,7 @@ export const pstExtractorService: PstExtractorService = {
         ipcRenderer.send("pstExtractor.event.progressSuscribe");
     },
 
-    async stop(): Promise<void> {
+    async stop(): pvoid {
         return ipcRenderer.invoke("pstExtractor.event.stopExtract");
     },
 };

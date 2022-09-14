@@ -1,18 +1,15 @@
 import type { ExporterType } from "../FileExporterModule";
-import type { PstMailIndex } from "../pst-extractor/type";
+
+export const PST_EXPORTER_EXPORT_MAILS_EVENT = "pstExporter.event.exportMails";
+export interface ExportMailsOptions {
+    deletedIds?: string[];
+    dest: string;
+    type: ExporterType;
+}
+export type ExportMailsFunction = (options: ExportMailsOptions) => pvoid;
 
 declare module "../../lib/ipc/event" {
     interface AsyncIpcMapping {
-        "pstExporter.event.exportMails": IpcConfig<
-            [
-                type: ExporterType,
-                indexes: PstMailIndex[],
-                deletedIds: string[],
-                dest: string
-            ],
-            void
-        >;
+        [PST_EXPORTER_EXPORT_MAILS_EVENT]: IpcConfigFromFunction<ExportMailsFunction>;
     }
 }
-
-export {};

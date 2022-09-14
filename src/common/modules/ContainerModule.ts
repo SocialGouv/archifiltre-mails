@@ -69,7 +69,7 @@ const serviceMap = new Map<string, unknown>();
 class ContainerModule extends IsomorphicModule {
     private inited = false;
 
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         if (this.inited && IS_PACKAGED()) {
             throw new ModuleError(
                 "ContainerModule has already been inited.",
@@ -94,7 +94,7 @@ class ContainerModule extends IsomorphicModule {
         this.inited = true;
     }
 
-    public async uninit(): Promise<void> {
+    public async uninit(): pvoid {
         if (!this.inited && IS_PACKAGED()) {
             throw new ModuleError("ContainerModule not yet inited.", this);
         }

@@ -81,7 +81,7 @@ export class I18nModule extends IsomorphicModule {
         super();
     }
 
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         // wait for userconfig to be usable
         await this.userConfigService.wait();
 
@@ -156,7 +156,7 @@ export class I18nModule extends IsomorphicModule {
         this.service.resolve();
     }
 
-    public async uninit(): Promise<void> {
+    public async uninit(): pvoid {
         console.info("[I18nModule] uninit ", this.unsubscriberConfigUpdate);
         this.unsubscriberConfigUpdate?.();
         return Promise.resolve();

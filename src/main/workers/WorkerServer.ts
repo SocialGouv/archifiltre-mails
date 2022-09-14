@@ -1,6 +1,5 @@
 import type {
     EveryFunction,
-    Nothing,
     StringKeyOf,
     VoidArgsFunction,
 } from "@common/utils/type";
@@ -21,7 +20,7 @@ type OnCommandFunction<TCommands extends WorkerCommands> = <
 >(
     ...args: [
         name: TCommandName,
-        callback: TCommands[TCommandName]["param"] extends Nothing
+        callback: TCommands[TCommandName]["param"] extends nothing
             ? () => Promise<Ack>
             : (param: TCommands[TCommandName]["param"]) => Promise<Ack>
     ]
@@ -32,7 +31,7 @@ type OnQueryFunction<TQueries extends WorkerQueries> = <
 >(
     ...args: [
         name: TQueryName,
-        callback: TQueries[TQueryName]["param"] extends Nothing
+        callback: TQueries[TQueryName]["param"] extends nothing
             ? () => Promise<TQueries[TQueryName]["returnType"]>
             : (
                   param: TQueries[TQueryName]["param"]
@@ -86,14 +85,27 @@ export class WorkerServer<TWorkerConfig extends WorkerConfig> {
                             `No ${type} configured for worker message "${event}".`
                         );
                     }
-                    parentPort?.postMessage({
-                        data: await reply(messageData),
-                        event,
-                        metadata: {
-                            _requestId,
-                            type,
-                        },
-                    });
+                    try {
+                        parentPort?.postMessage({
+                            data: await reply(messageData),
+                            event,
+                            metadata: {
+                                _requestId,
+                                type,
+                            },
+                        });
+                    } catch (error: unknown) {
+                        console.log(`[WorkerServer] Error in ${type}`);
+                        console.error(error);
+                        parentPort?.postMessage({
+                            data: error,
+                            event: "error",
+                            metadata: {
+                                _requestId,
+                                type,
+                            },
+                        });
+                    }
                 }
             }
         );

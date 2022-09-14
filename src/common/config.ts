@@ -6,6 +6,7 @@ import { name } from "./utils/package";
 export const IS_WORKER = !isMainThread;
 export const WORKER_CONFIG_TOKEN = "__config" as const;
 
+// electron is not available in Worker side so we fake it.
 const { app, ipcMain, ipcRenderer } = IS_WORKER
     ? // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- deal with it
       ({} as typeof import("electron"))

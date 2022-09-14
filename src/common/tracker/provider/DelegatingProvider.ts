@@ -29,14 +29,14 @@ export class DelegatingProvider extends TrackerProvider {
         return query.split(":")[1]!.split(",") as Split<TQuery>;
     }
 
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         await Promise.allSettled(
             this.providers.map(async (provider) => provider.init())
         );
         this.inited = this.providers.every((provider) => provider.inited);
     }
 
-    public async uninit(): Promise<void> {
+    public async uninit(): pvoid {
         await Promise.allSettled(
             this.providers.map(async (provider) => provider.uninit())
         );

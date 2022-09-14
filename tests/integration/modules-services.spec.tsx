@@ -8,19 +8,6 @@ import {
     IsomorphicModuleFactory,
 } from "@common/modules/Module";
 
-jest.mock(
-    "electron",
-    () => {
-        const mockIpcMain = {
-            on: jest.fn().mockReturnThis(),
-        };
-        return { app: { getLocale: () => "fr-FR" }, ipcMain: mockIpcMain };
-    },
-    {
-        virtual: true,
-    }
-);
-
 describe("Module and loader", () => {
     it("should load and unload a mocked module", async () => {
         const flagInit = jest.fn().mockResolvedValue(void 0);

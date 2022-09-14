@@ -1,4 +1,4 @@
-import type { Any, Objectize } from "./type";
+import type { Objectize } from "./type";
 
 type Keys<T> = Objectize<(keyof T)[]>;
 type Values<T> = Objectize<T[keyof T][]>;

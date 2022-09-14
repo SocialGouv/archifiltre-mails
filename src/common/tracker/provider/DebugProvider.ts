@@ -10,7 +10,7 @@ export class DebugProvider extends TrackerProvider {
 
     public inited = true;
 
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         return Promise.resolve();
     }
 

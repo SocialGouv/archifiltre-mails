@@ -59,9 +59,7 @@ export class PstCache {
     }
 
     @SoftLockDb
-    public async setPstMailIndexes(
-        indexes: Map<string, PstMailIndex>
-    ): Promise<void> {
+    public async setPstMailIndexes(indexes: Map<string, PstMailIndex>): pvoid {
         const currentDb = this.getCurrentPstDb();
         await currentDb.put(ROOT_KEY, [...indexes.entries()]);
     }
@@ -78,7 +76,7 @@ export class PstCache {
     @SoftLockDb
     public async setAttachments(
         attachments: Map<string, PstAttachment[]>
-    ): Promise<void> {
+    ): pvoid {
         const currentDb = this.getCurrentPstDb();
         await currentDb.put(ATTACHMENTS_KEY, [...attachments.entries()]);
     }
@@ -93,10 +91,7 @@ export class PstCache {
     }
 
     @SoftLockDb
-    public async setGroup(
-        name: GroupType,
-        ids: Map<string, string[]>
-    ): Promise<void> {
+    public async setGroup(name: GroupType, ids: Map<string, string[]>): pvoid {
         const currentGroupsDb = this.getCurrentGroupsDb();
         await currentGroupsDb.put(name, [...ids.entries()]);
     }
@@ -124,7 +119,7 @@ export class PstCache {
     public async setAddtionalDatas<T extends keyof AdditionalDatas>(
         name: T,
         addtionalDatas: AdditionalDatas[T]
-    ): Promise<void> {
+    ): pvoid {
         const currentAdditionalDatasDb = this.getCurrentAdditionalDatasDb();
         await currentAdditionalDatasDb.put(name, addtionalDatas);
     }

@@ -13,7 +13,7 @@ export class NoopProvider extends TrackerProvider {
 
     private flagConsole = false;
 
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         return Promise.resolve();
     }
 

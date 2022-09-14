@@ -46,6 +46,9 @@ type Commands = WorkerCommandsBuilder<{
             pstFilePath: string;
         };
     };
+    stop: {
+        param: never;
+    };
 }>;
 
 type EventListeners = WorkerEventListenersBuilder<{
@@ -71,8 +74,18 @@ let pstFile: PSTFile | null = null;
 server.onCommand("open", async ({ pstFilePath }) => {
     pstFile = new PSTFile(path.resolve(pstFilePath));
     pstCache.openForPst(pstFilePath);
+    await pstCache.setAddtionalDatas(
+        "pstFilename",
+        path.parse(pstFile.pstFilename).name
+    );
 
     return Promise.resolve({ ok: true });
+});
+
+let stop = false;
+server.onCommand("stop", async () => {
+    stop = true;
+    return Promise.resolve({ ok: stop });
 });
 
 server.onCommand(
@@ -140,8 +153,8 @@ server.onCommand(
         ): void {
             if (root) {
                 root = false;
-                currentShallowFolder.elementPath = folder.displayName;
                 currentShallowFolder.id = "folder-root";
+                currentShallowFolder.elementPath = folder.displayName;
             } else {
                 currentFolderIndexes[currentDepth] ??= -1;
                 currentFolderIndexes = currentFolderIndexes.slice(
@@ -253,33 +266,6 @@ server.onCommand(
                             contactList.set(contactKey, recipient.name);
                     });
 
-                    // const emailContent: PstEmail = {
-                    //     attachementCount: email.numberOfAttachments,
-                    //     attachements: [],
-                    //     bcc: getRecipientFromDisplay(email.displayBCC, recipients),
-                    //     cc: getRecipientFromDisplay(email.displayCC, recipients),
-                    //     contentHTML: email.bodyHTML,
-                    //     contentRTF: email.bodyRTF,
-                    //     contentText: email.body,
-                    //     elementPath: parentPath,
-
-                    //     from: {
-                    //         email: email.senderEmailAddress,
-                    //         name: email.senderName,
-                    //     },
-
-                    //     id: emailId,
-                    //     // TODO: change name
-                    //     isFromMe: email.isFromMe,
-                    //     name: `${email.senderName} ${email.originalSubject}`,
-                    //     receivedDate: email.messageDeliveryTime,
-                    //     sentTime: email.clientSubmitTime,
-                    //     size: 1,
-                    //     subject: email.subject,
-                    //     to: getRecipientFromDisplay(email.displayTo, recipients),
-                    //     type: "email",
-                    // };
-
                     if (email.hasAttachments) {
                         for (let i = 0; i < email.numberOfAttachments; i++) {
                             const attachment = email.getAttachment(i);
@@ -340,10 +326,7 @@ server.onCommand(
             max: maxDate,
             min: minDate,
         });
-        await pstCache.setAddtionalDatas(
-            "folderStructure",
-            shallowFolder.subfolders
-        );
+        await pstCache.setAddtionalDatas("folderStructure", shallowFolder);
 
         progressState.elapsed = Date.now() - starTime;
         server.trigger("done", progressState);
@@ -351,15 +334,3 @@ server.onCommand(
         return { ok: true };
     }
 );
-
-// Events - Worker => Parent
-// export const PST_PROGRESS_WORKER_EVENT = "pstExtractor.worker.event.progress";
-// export const PST_DONE_WORKER_EVENT = "pstExtractor.worker.event.done";
-
-/*
-1/ tester le switch randomUUID vs incremental id
-2/ 4012 => [ 0, 1, 4, 0, 11, 180 ] == index de stockage global (baseIndex)
-3/ créer des index de recherche par id : Set([id1, id2, id3]) pour tous les domaines, toutes les années, tous les correspondants
-4/ effectuer des instersections e.g. (domaine(beta.gouv) + année(2018))
-5/ stocker en cache le résultat
-*/

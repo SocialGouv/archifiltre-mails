@@ -36,6 +36,9 @@ module.exports = {
     projects: [
         {
             displayName: "integration",
+            setupFilesAfterEnv: [
+                "<rootDir>/tests/integration/mock/electron.ts",
+            ],
             testMatch: [
                 "<rootDir>/tests/integration/**/?(*.)(spec|test).(ts|tsx)",
             ],

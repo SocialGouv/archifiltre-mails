@@ -113,25 +113,6 @@ export interface PstProgressState {
     progress: boolean;
 }
 
-/**
- * Computed primary infos extracted from a PST file.
- * @deprecated
- */
-export interface PstExtractTables {
-    /**
-     * Attachement list stored by email uuid
-     */
-    attachements: Map<string, PstAttachment[]>;
-    /**
-     * Contact list associated with list of corresponding email uuid
-     */
-    contacts: Map<string, string[]>;
-    /**
-     * Email list stored by folder uuid
-     */
-    emails: Map<string, PstEmail[]>;
-}
-
 export interface PstShallowFolder {
     elementPath: string;
     hasSubfolders: boolean;
@@ -146,12 +127,13 @@ export interface AdditionalDatas {
     deleted: string[];
     extremeDates: ExtremeDates;
     folderList: AddtionalDataItem[];
-    folderStructure: PstShallowFolder[];
+    folderStructure: PstShallowFolder;
     /**
      * @deprecated
      * @todo Pre discover pst owner
      */
     possibleOwner?: Required<PstEmailRecipient>;
+    pstFilename: string;
     received: string[];
     sent: string[];
 }

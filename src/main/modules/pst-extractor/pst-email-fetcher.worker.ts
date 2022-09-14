@@ -104,16 +104,6 @@ function findEmail(folder: PSTFolder, emailIndex: number[]): PstEmail {
     const rawEmail = lastFolder.getChildAt(emailPositionInLastFolder);
 
     if (!rawEmail) {
-        console.log(
-            { lastFolder },
-            lastFolder.displayName,
-            lastFolder.emailCount,
-            lastFolder.folderType,
-            lastFolder.containerClass,
-            lastFolder.unreadCount
-        );
-        lastFolder.moveChildCursorTo(0);
-        console.log({ CHILDREN: [...lastFolder.childrenIterator()] });
         throw new Error(
             `Email not found at given index. (${[
                 ...idxCopy,

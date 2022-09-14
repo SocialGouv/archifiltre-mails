@@ -1,5 +1,6 @@
 import { mkdir } from "fs/promises";
 import { outputFile } from "fs-extra";
+import path from "path";
 
 import type { PstElement } from "./../pst-extractor/type";
 import { isPstEmail } from "./../pst-extractor/type";
@@ -26,10 +27,15 @@ const EML_CONTENT_TYPE = "Content-Type: text/html";
  */
 export const emlExporter: PstExporter = {
     async export<T extends PstElement>(obj: T, dest: string) {
-        const exportEml = async (pst: PstElement, path?: string) => {
+        const exportEml = async (pst: PstElement) => {
             for (const child of pst.children ?? []) {
                 if (isPstEmail(child)) {
-                    const wrapPath = `${path}${child.elementPath}/${child.subject}/${child.subject}`;
+                    const wrapPath = path.join(
+                        dest,
+                        child.elementPath,
+                        child.subject,
+                        child.subject
+                    );
 
                     const mailContent: EmlFile = {
                         body: child.contentText
@@ -45,28 +51,21 @@ export const emlExporter: PstExporter = {
 
                     await createEmlFile(wrapPath, mailContent);
                 } else {
-                    const destinationPath = `${path}/`;
-                    const folderPath =
-                        child.elementPath === ""
-                            ? destinationPath + child.name
-                            : destinationPath + child.elementPath.substring(1); // remove first '/'
+                    const folderPath = path.join(dest, child.elementPath);
                     await mkdir(folderPath, { recursive: true });
+                    await exportEml(child);
                 }
-                await exportEml(child, path);
             }
         };
 
-        await exportEml(obj, dest);
+        await exportEml(obj);
     },
 };
 
 /**
  * Create a file with a parent wrapper folder and file name as a title.
  */
-const createEmlFile = async (
-    filePath: string,
-    fileContent: EmlFile
-): Promise<void> =>
+const createEmlFile = async (filePath: string, fileContent: EmlFile): pvoid =>
     outputFile(filePath + EML_EXTENSION, generateEml(fileContent));
 
 /**

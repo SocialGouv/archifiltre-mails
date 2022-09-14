@@ -5,7 +5,7 @@ import { AppError } from "./error/AppError";
 /**
  * Load and init the given modules in the current process.
  */
-export const loadModules = async (...mods: Module[]): Promise<void> => {
+export const loadModules = async (...mods: Module[]): pvoid => {
     await Promise.all(
         mods.map(async (mod) => {
             console.log(`<MODULE_LOADER> ${mod.constructor.name} loading !`);
@@ -24,7 +24,7 @@ export const loadModules = async (...mods: Module[]): Promise<void> => {
 /**
  * Unload and uninit the given modules in the current process.
  */
-export const unloadModules = async (...mods: Module[]): Promise<void> => {
+export const unloadModules = async (...mods: Module[]): pvoid => {
     await Promise.all(
         mods.map(async (mod) => {
             console.warn(

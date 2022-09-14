@@ -1,4 +1,3 @@
-import { ipcRenderer } from "@common/lib/ipc";
 import { useService } from "@common/modules/ContainerModule";
 import type {
     ExporterAsFileType,
@@ -12,26 +11,21 @@ import { usePstStore } from "../store/PSTStore";
 import { dialog } from "../utils/electron";
 
 interface UseExporter {
-    openSaveFileDialog: (type: ExporterAsFileType) => Promise<void>;
-    openSaveFolderDialog: (type: ExporterAsFolderType) => Promise<void>;
+    openSaveFileDialog: (type: ExporterAsFileType) => pvoid;
+    openSaveFolderDialog: (type: ExporterAsFolderType) => pvoid;
 }
 
 export const useExporter = (): UseExporter => {
-    const fileExporterService = useService("fileExporterService");
+    const pstExporterService = useService("pstExporterService");
     const { t } = useTranslation();
     const { toDeleteIDs } = useImpactStore();
     const { extractDatas } = usePstStore();
 
     const openSaveFileDialog = useCallback(
         async (type: ExporterAsFileType) => {
-            if (!fileExporterService || !extractDatas) {
+            if (!pstExporterService || !extractDatas) {
                 return;
             }
-
-            // const mailsWithTags = getMailsWithTag(
-            //     extractDatas.indexes,
-            //     toDeleteIDs
-            // );
 
             const dialogPath = await dialog.showSaveDialog({
                 filters: [
@@ -50,43 +44,34 @@ export const useExporter = (): UseExporter => {
                 return;
             }
 
-            await ipcRenderer.invoke(
-                "pstExporter.event.exportMails",
+            await pstExporterService.exportMails({
+                deletedIds: [...toDeleteIDs],
+                dest: dialogPath.filePath,
                 type,
-                [...extractDatas.indexes.values()],
-                [...toDeleteIDs],
-                dialogPath.filePath
-            );
-            // await fileExporterService.export(type, mails, dialogPath.filePath);
+            });
         },
-        [t, extractDatas, fileExporterService, toDeleteIDs]
+        [t, extractDatas, pstExporterService, toDeleteIDs]
     );
 
     const openSaveFolderDialog = useCallback(
         async (type: ExporterAsFolderType) => {
-            if (!fileExporterService || !extractDatas) return;
+            if (!pstExporterService || !extractDatas) return;
 
             const result = await dialog.showOpenDialog({
+                message: t("exporter.save.message"),
                 properties: ["openDirectory"],
+                title: t("exporter.save.title", { type }),
             });
 
-            const chosenFile = result.filePaths[0];
-            if (!chosenFile) {
+            const dest = result.filePaths[0];
+            if (!dest) {
                 // TODO: handle error maybe?
                 return;
             }
 
-            // TODO EML type like
-            await ipcRenderer.invoke(
-                "pstExporter.event.exportMails",
-                type,
-                [...extractDatas.indexes.values()],
-                [],
-                chosenFile
-            );
-            // await fileExporterService.export(type, pstFile, chosenFile);
+            await pstExporterService.exportMails({ dest, type });
         },
-        [fileExporterService, extractDatas]
+        [t, extractDatas, pstExporterService]
     );
 
     return {
