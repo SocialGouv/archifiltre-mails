@@ -1,12 +1,14 @@
 import type { ComputedDatum } from "@nivo/circle-packing";
 import { ResponsiveCirclePacking } from "@nivo/circle-packing";
 import debounce from "lodash/debounce";
-import React, { useEffect } from "react";
+import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import type { CustomContextMenuMouseEvent } from "../../hooks/useContextMenuEventAsClick";
+import { useContextMenuEventAsClick } from "../../hooks/useContextMenuEventAsClick";
 import { useDymViewerNavigation } from "../../hooks/useDymViewerNavigation";
 import { usePstFMInfosStore } from "../../store/PstFMInfosStore";
-import { useTagManagerStore } from "../../store/TagManagerStore";
+import { tagManagerStore } from "../../store/TagManagerStore";
 import { COLORS, ROOT } from "../../utils/constants";
 import type { CirclePackingCommonProps } from "../../utils/dashboard-viewer";
 import {
@@ -19,14 +21,8 @@ import type {
     ViewerObject,
 } from "../../utils/dashboard-viewer-dym";
 import { isMailViewerObject } from "../../utils/dashboard-viewer-dym";
-import {
-    getChildrenToDeleteIds,
-    getChildrenToKeepIds,
-    getUntagChildrenIds,
-    isToDeleteFolder,
-    isToKeepFolder,
-} from "../../utils/tag-manager";
-import { Menu } from "../menu/Menu";
+import { getNodeContainsIds } from "../../utils/tag-manager";
+import { TagManagerMenu } from "../menu/TagManagerMenu";
 import style from "./CirclePacking.module.scss";
 import type { OnBlur } from "./CirclePackingCancellableFocusZone";
 import { CirclePackingCancellableFocusZone } from "./CirclePackingCancellableFocusZone";
@@ -43,59 +39,44 @@ const isMailTagNode = (
 
 export const CirclePacking: React.FC = () => {
     const { t } = useTranslation();
-    const { currentView, computeNextView, restartView, computePreviousView } =
-        useDymViewerNavigation();
-
+    const circlePackingRef = useRef<HTMLDivElement>(null);
+    const {
+        viewList,
+        currentViewIndex,
+        computeNextView,
+        resetView,
+        computePreviousView,
+    } = useDymViewerNavigation();
     const { setMainInfos, startFocus, isInfoFocus, mainInfos, cancelFocus } =
         usePstFMInfosStore();
+    const { setHoveredNode, keepIds, deleteIds } = tagManagerStore();
+    useContextMenuEventAsClick(circlePackingRef.current);
 
-    const {
-        setHoveredNode,
-        addChildrenMarkedToKeep,
-        addChildrenMarkedToDelete,
-        markedToDelete,
-        markedToKeep,
-    } = useTagManagerStore();
+    const [anchorX, setAnchorX] = useState(0);
+    const [anchorY, setAnchorY] = useState(0);
+    const [show, setShow] = useState(false);
 
-    useEffect(() => {
-        if (!currentView) return;
-
-        const children = currentView.elements.children;
-
-        if (isToDeleteFolder(currentView.elements.id, markedToDelete)) {
-            addChildrenMarkedToDelete([
-                ...getChildrenToDeleteIds(children, markedToKeep),
-                ...getUntagChildrenIds(children, markedToDelete, markedToKeep),
-            ]);
-        }
-        if (isToKeepFolder(currentView.elements.id, markedToKeep)) {
-            addChildrenMarkedToKeep([
-                ...getChildrenToKeepIds(children, markedToDelete),
-                ...getUntagChildrenIds(children, markedToKeep, markedToDelete),
-            ]);
-        }
-    }, [currentView]); // TODO: Investigate
+    const currentView = viewList[currentViewIndex];
 
     const getTaggedFilesColor = (
         node: Omit<ComputedDatum<ViewerObject<string>>, "color" | "fill">
     ) => {
-        if (node.depth === 0) return BASE_COLOR_LIGHT;
-
-        if (isToDeleteFolder(node.id, markedToDelete)) {
-            if (isMailTagNode(node)) {
-                return getTagColor(node, "delete");
-            }
-            return DELETE_COLOR;
-        }
-        if (isToKeepFolder(node.id, markedToKeep)) {
-            if (isMailTagNode(node)) {
-                return getTagColor(node, "keep");
-            }
-            return KEEP_COLOR;
-        }
-
         if (isMailTagNode(node)) {
             return getTagColor(node, "untag");
+        }
+
+        if (node.depth === 0) return BASE_COLOR_LIGHT;
+
+        const nodeDeletedIds = getNodeContainsIds(deleteIds, node.data.ids);
+        const nodeKeepIds = getNodeContainsIds(keepIds, node.data.ids);
+
+        const color =
+            nodeDeletedIds.length >= nodeKeepIds.length
+                ? DELETE_COLOR
+                : KEEP_COLOR;
+
+        if (nodeDeletedIds.length || nodeKeepIds.length) {
+            return color;
         }
 
         return BASE_COLOR;
@@ -112,7 +93,6 @@ export const CirclePacking: React.FC = () => {
         }
 
         setMainInfos(node);
-        setHoveredNode(node);
     }, 500);
 
     const handleMouseLeave: CirclePackingCommonProps["onMouseLeave"] = () => {
@@ -121,14 +101,25 @@ export const CirclePacking: React.FC = () => {
         setMainInfos(undefined);
     };
 
-    const handleClick: CirclePackingCommonProps["onClick"] = (node) => {
-        if (isMailViewerObject(node.data)) {
-            setMainInfos(node);
-            startFocus();
-            return;
-        }
+    const handleClick: CirclePackingCommonProps["onClick"] = (node, event) => {
+        const nativeEvent = event.nativeEvent as CustomContextMenuMouseEvent;
 
-        computeNextView(node);
+        const customData = nativeEvent._customData;
+
+        if (customData?.contextMenu) {
+            setAnchorX(event.clientX);
+            setAnchorY(event.clientY);
+            setShow(true);
+            setHoveredNode(node);
+        } else {
+            if (isMailViewerObject(node.data)) {
+                setMainInfos(node);
+                startFocus();
+                return;
+            }
+
+            computeNextView(node);
+        }
     };
 
     const handleLostFocus = debounce<NonNullable<OnBlur["onBlur"]>>((evt) => {
@@ -155,14 +146,18 @@ export const CirclePacking: React.FC = () => {
 
     const goToInitialView = () => {
         cancelFocus();
-        restartView();
+        resetView();
     };
 
     if (!currentView) return null;
 
     return (
         <>
-            <div id="circle-packing" className={style["circle-packing"]}>
+            <div
+                id="circle-packing"
+                className={style["circle-packing"]}
+                ref={circlePackingRef}
+            >
                 <ResponsiveCirclePacking
                     data={currentView.elements}
                     onClick={handleClick}
@@ -183,7 +178,12 @@ export const CirclePacking: React.FC = () => {
                 </div>
             </div>
             <CirclePackingCancellableFocusZone onBlur={handleLostFocus} />
-            <Menu />
+            <TagManagerMenu
+                anchorX={anchorX}
+                anchorY={anchorY}
+                show={show}
+                setShow={setShow}
+            />
         </>
     );
 };

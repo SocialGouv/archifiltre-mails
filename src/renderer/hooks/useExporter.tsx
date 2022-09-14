@@ -3,7 +3,6 @@ import type {
     ExporterAsFileType,
     ExporterAsFolderType,
 } from "@common/modules/FileExporterModule";
-import { formatEmailTable, getMailsWithTag } from "@common/utils/exporter";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -12,26 +11,21 @@ import { usePstStore } from "../store/PSTStore";
 import { dialog } from "../utils/electron";
 
 interface UseExporter {
-    openSaveFileDialog: (type: ExporterAsFileType) => Promise<void>;
-    openSaveFolderDialog: (type: ExporterAsFolderType) => Promise<void>;
+    openSaveFileDialog: (type: ExporterAsFileType) => pvoid;
+    openSaveFolderDialog: (type: ExporterAsFolderType) => pvoid;
 }
 
 export const useExporter = (): UseExporter => {
-    const fileExporterService = useService("fileExporterService");
+    const pstExporterService = useService("pstExporterService");
     const { t } = useTranslation();
     const { toDeleteIDs } = useImpactStore();
-    const { extractTables, pstFile } = usePstStore();
+    const { extractDatas } = usePstStore();
 
     const openSaveFileDialog = useCallback(
         async (type: ExporterAsFileType) => {
-            if (!fileExporterService || !extractTables?.emails) {
+            if (!pstExporterService || !extractDatas) {
                 return;
             }
-
-            const mailsWithTags = getMailsWithTag(
-                extractTables.emails,
-                toDeleteIDs
-            );
 
             const dialogPath = await dialog.showSaveDialog({
                 filters: [
@@ -50,29 +44,34 @@ export const useExporter = (): UseExporter => {
                 return;
             }
 
-            const mails = formatEmailTable(mailsWithTags);
-            await fileExporterService.export(type, mails, dialogPath.filePath);
+            await pstExporterService.exportMails({
+                deletedIds: [...toDeleteIDs],
+                dest: dialogPath.filePath,
+                type,
+            });
         },
-        [t, extractTables?.emails, fileExporterService, toDeleteIDs]
+        [t, extractDatas, pstExporterService, toDeleteIDs]
     );
 
     const openSaveFolderDialog = useCallback(
         async (type: ExporterAsFolderType) => {
-            if (!fileExporterService || !pstFile) return;
+            if (!pstExporterService || !extractDatas) return;
 
             const result = await dialog.showOpenDialog({
+                message: t("exporter.save.message"),
                 properties: ["openDirectory"],
+                title: t("exporter.save.title", { type }),
             });
 
-            const chosenFile = result.filePaths[0];
-            if (!chosenFile) {
+            const dest = result.filePaths[0];
+            if (!dest) {
                 // TODO: handle error maybe?
                 return;
             }
 
-            await fileExporterService.export(type, pstFile, chosenFile);
+            await pstExporterService.exportMails({ dest, type });
         },
-        [fileExporterService, pstFile]
+        [t, extractDatas, pstExporterService]
     );
 
     return {

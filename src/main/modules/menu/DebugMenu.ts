@@ -6,7 +6,6 @@ import type {
 } from "@common/modules/FileExporterModule";
 import type { I18nService } from "@common/modules/I18nModule";
 import type { UserConfigService } from "@common/modules/UserConfigModule";
-import { formatEmailTable } from "@common/utils/exporter";
 import type { BrowserWindow, MenuItemConstructorOptions } from "electron";
 import { dialog, MenuItem } from "electron";
 import { t } from "i18next";
@@ -154,19 +153,17 @@ export class DebugMenu implements ArchifiltreMailsMenu {
     private async extractAndLogPst(
         browserWindow: BrowserWindow,
         pstFilePath: string
-    ): Promise<void> {
-        const [content, tables] = await this.pstExtractorMainService.extract({
-            noProgress: true,
+    ): pvoid {
+        const extractDatas = await this.pstExtractorMainService.extract({
             pstFilePath,
         });
-        this.consoleToRendererService.log(browserWindow, content);
-        this.consoleToRendererService.log(browserWindow, tables);
+        this.consoleToRendererService.log(browserWindow, extractDatas);
     }
 
     private async exportLast(
         browserWindow: BrowserWindow,
         type: ExporterType
-    ): Promise<void> {
+    ): pvoid {
         const dialogReturn = await dialog.showSaveDialog(browserWindow, {
             defaultPath: this.lastPstFilePath.replace(/\.pst$/i, `.${type}`),
             filters: [
@@ -185,15 +182,15 @@ export class DebugMenu implements ArchifiltreMailsMenu {
         }
 
         disableMenus(this.id);
-        const [, tables] = await this.pstExtractorMainService.extract({
-            noProgress: true,
+        const extractDatas = await this.pstExtractorMainService.extract({
             pstFilePath: this.lastPstFilePath,
         });
 
-        const emails = formatEmailTable(tables.emails);
+        // TODO: make it work again
         await this.fileExporterService.export(
             type,
-            emails,
+            {},
+            // emails,
             dialogReturn.filePath
         );
         console.info("MENU EXPORT DONE");

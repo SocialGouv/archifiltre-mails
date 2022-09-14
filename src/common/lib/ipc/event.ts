@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import type { IpcMainEvent } from "electron";
 
-import type { UnknownMapping } from "../../utils/type";
+import type {
+    EveryFunction,
+    UnboxPromise,
+    UnknownMapping,
+} from "../../utils/type";
 
 /**
  * Define an IPC config with arguments type and a return values type.
@@ -12,6 +16,14 @@ export interface IpcConfig<TArgs extends unknown[], TReturnValue> {
     args: TArgs;
     returnValue: TReturnValue;
 }
+
+/**
+ * Define an IPC config from arguements and return value of a given function.
+ */
+export type IpcConfigFromFunction<TFunction extends EveryFunction> =
+    TFunction extends (...args: infer TArgs) => infer TReturnValue
+        ? IpcConfig<TArgs, UnboxPromise<TReturnValue>>
+        : never;
 
 /**
  * Define an asynchronous IPC config (e.g. `ipcRenderer.send()`) with arguments
@@ -26,6 +38,11 @@ export interface DualIpcConfig<
 > extends IpcConfig<TArgs, TReturnValues> {
     replyKey: TReplyChannel;
 }
+
+export type DualIpcConfigExtractReply<T extends DualAsyncIpcKeys> = (
+    replyChannel: GetDualAsyncIpcConfig<T>["replyKey"],
+    ...args: GetDualAsyncIpcConfig<T>["returnValue"]
+) => void;
 
 /**
  * A default IPC config if you only need to declare an IPC channel for autocomplete.
@@ -69,15 +86,12 @@ export type ReplyDualAsyncIpcKeys = {
     [K in DualAsyncIpcKeys]: DualAsyncIpcMapping[K]["replyKey"];
 }[DualAsyncIpcKeys];
 
-export type GetSyncIpcConfig<T> = T extends SyncIpcKeys
-    ? SyncIpcMapping[T]
-    : DefaultIpcConfig;
-export type GetAsyncIpcConfig<T> = T extends AsyncIpcKeys
-    ? AsyncIpcMapping[T]
-    : DefaultIpcConfig;
-export type GetDualAsyncIpcConfig<T> = T extends DualAsyncIpcKeys
-    ? DualAsyncIpcMapping[T]
-    : DefaultDualIpcConfig;
+export type GetSyncIpcConfig<T extends SyncIpcKeys | UnknownMapping> =
+    T extends SyncIpcKeys ? SyncIpcMapping[T] : DefaultIpcConfig;
+export type GetAsyncIpcConfig<T extends AsyncIpcKeys | UnknownMapping> =
+    T extends AsyncIpcKeys ? AsyncIpcMapping[T] : DefaultIpcConfig;
+export type GetDualAsyncIpcConfig<T extends DualAsyncIpcKeys | UnknownMapping> =
+    T extends DualAsyncIpcKeys ? DualAsyncIpcMapping[T] : DefaultDualIpcConfig;
 export type GetRepliedDualAsyncIpcConfig<T> = T extends ReplyDualAsyncIpcKeys
     ? {
           [K in DualAsyncIpcKeys]: T extends DualAsyncIpcMapping[K]["replyKey"]
@@ -100,7 +114,8 @@ export type ReplyDualAsyncIpcChannel<
 > = ReplyDualAsyncIpcKeys | T;
 
 // -- augments
-interface CustomSyncIpcMainEvent<T> extends IpcMainEvent {
+interface CustomSyncIpcMainEvent<T extends SyncIpcKeys | UnknownMapping>
+    extends IpcMainEvent {
     /**
      * Sync event comming from `ipcRenderer.sendSync`. Use `ipcRenderer.send` to return a sync value.
      * @deprecated
@@ -109,7 +124,8 @@ interface CustomSyncIpcMainEvent<T> extends IpcMainEvent {
     returnValue: GetSyncIpcConfig<T>["returnValue"];
 }
 
-interface CustomAsyncIpcMainEvent<T> extends IpcMainEvent {
+interface CustomAsyncIpcMainEvent<T extends DualAsyncIpcKeys | UnknownMapping>
+    extends IpcMainEvent {
     reply: (
         replyChannel: GetDualAsyncIpcConfig<T>["replyKey"],
         ...args: GetDualAsyncIpcConfig<T>["returnValue"]

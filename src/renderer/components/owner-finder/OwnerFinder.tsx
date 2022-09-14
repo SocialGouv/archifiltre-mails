@@ -4,8 +4,6 @@ import { useTranslation } from "react-i18next";
 
 import { usePstStore } from "../../store/PSTStore";
 import { useSynthesisStore } from "../../store/SynthesisStore";
-import type { FolderListItem } from "../../utils/dashboard-recap";
-import { getPstListOfFolder } from "../../utils/dashboard-recap";
 import style from "./OwnerFinder.module.scss";
 import { OwnerFinderBoard } from "./OwnerFinderBoard";
 
@@ -14,32 +12,22 @@ export interface OwnerFinderProps {
 }
 
 export const OwnerFinder: React.FC<OwnerFinderProps> = ({ switchFinder }) => {
-    const { pstFile, extractTables } = usePstStore();
+    const { extractDatas } = usePstStore();
     const { ownerId, deletedFolderId } = useSynthesisStore();
     const trackerService = useService("trackerService");
     const { t } = useTranslation();
-    if (!pstFile || !extractTables) return null;
-
-    const folderList = getPstListOfFolder(pstFile.children);
-    const contactList = [...extractTables.contacts.keys()].map(
-        (contact) =>
-            ({
-                id: contact,
-                name: contact,
-                type: "",
-            } as FolderListItem)
-    );
+    if (!extractDatas) return null;
 
     return (
         <section className={style.finder}>
             <OwnerFinderBoard
                 title={t("dashboard.ownerfinder.board.deleted.title")}
-                list={folderList}
+                list={extractDatas.additionalDatas.folderList}
                 type="deleted"
             />
             <OwnerFinderBoard
                 title={t("dashboard.ownerfinder.board.owner.title")}
-                list={contactList}
+                list={extractDatas.additionalDatas.contactList}
                 type="owner"
             />
             <button

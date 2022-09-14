@@ -1,56 +1,33 @@
 import { useService } from "@common/modules/ContainerModule";
 import type { ComputedDatum } from "@nivo/circle-packing/dist/types/types";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 
 import { useBreadcrumbStore } from "../store/BreadcrumbStore";
-import {
-    setInitialAttachmentPerLevel,
-    setPreviousAttachmentPerLevel,
-} from "../store/PstAttachmentCountStore";
-import {
-    setInitialFileSizePerLevel,
-    setPreviousFileSizePerLevel,
-} from "../store/PstFileSizeStore";
 import { usePstFMInfosStore } from "../store/PstFMInfosStore";
-import {
-    setInitialTotalMailPerLevel,
-    setPreviousTotalMailsPerLevel,
-    setTotalMailPerLevel,
-} from "../store/PstMailCountStore";
 import { usePstStore } from "../store/PSTStore";
+import { viewListStore } from "../store/ViewListStore";
 import { CORRESPONDANTS, DOMAIN, MAILS, YEAR } from "../utils/constants";
-import type {
-    DefaultViewerObject,
-    DomainViewerObject,
-} from "../utils/dashboard-viewer-dym";
+import type { DefaultViewerObject } from "../utils/dashboard-viewer-dym";
 import {
-    createCorrespondants,
-    createDomain,
     createMails,
-    createYears,
-    getAggregatedDomains,
-    getMailsByDym,
-    getTotalLevelMail,
-    getUniqueCorrespondantsByDomain,
-    getYearByCorrespondants,
+    createNodes,
+    createRootView,
+    mapOrderByValues,
+    mapToRecord,
 } from "../utils/dashboard-viewer-dym";
+import { useViewGroupByFunctions } from "./useViewGroupByFunctions";
 
 export interface UseDomainsYearMailsProps {
-    computeNextView: (node: ComputedDatum<DefaultViewerObject<string>>) => void;
+    computeNextView: (node: ComputedDatum<DefaultViewerObject>) => void;
     computePreviousView: () => void;
-    currentView?: ViewState<DefaultViewerObject<string>>;
-    restartView: () => void;
+    currentViewIndex: number;
+    resetView: () => void;
+    viewList: ViewState<DefaultViewerObject>[];
 }
-
-export type ViewType =
-    | typeof CORRESPONDANTS
-    | typeof DOMAIN
-    | typeof MAILS
-    | typeof YEAR;
 
 export interface ViewState<TElement> {
     elements: TElement;
-    type: ViewType;
+    type: string;
 }
 
 /**
@@ -63,164 +40,141 @@ export interface ViewState<TElement> {
  * - Allow user to go back in the previous view
  */
 export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
-    const { pstFile } = usePstStore();
-    const { setBreadcrumb, setPreviousBreadcrumb } = useBreadcrumbStore();
+    const {
+        setViewAt,
+
+        setList: setViewList,
+        currentIndex: currentViewIndex,
+        list: viewList,
+        setCurrentIndex: setCurrentViewIndex,
+    } = viewListStore.getState();
+    const { extractDatas } = usePstStore();
     const { cancelFocus } = usePstFMInfosStore();
-    const [currentDomain, setCurrentDomain] = useState<string>("");
-    const [currentCorrespondant, setCurrentCorrespondant] =
-        useState<string>("");
+    const { getCurrentViewGroupByFunctions } = useViewGroupByFunctions();
+    const groupByFunctions = getCurrentViewGroupByFunctions();
+    const pstExtractorService = useService("pstExtractorService");
 
-    const [currentView, setCurrentView] =
-        useState<ViewState<DefaultViewerObject<string>>>();
-
-    const [domainView, setDomainView] =
-        useState<ViewState<DomainViewerObject>>();
-
-    const [correspondantView, setCorrespondantView] =
-        useState<ViewState<DefaultViewerObject<string>>>();
-
-    const [yearView, setYearView] =
-        useState<ViewState<DefaultViewerObject<string>>>();
+    const { resetBreadcrumb } = useBreadcrumbStore();
 
     const trackerService = useService("trackerService");
 
     const createInitialView = useCallback(() => {
-        const aggregatedDomain = getAggregatedDomains(pstFile!);
+        const initialViewType = groupByFunctions[0]!.type;
 
-        const computedInitialView = {
-            elements: createDomain(aggregatedDomain),
-            type: DOMAIN as ViewType,
+        const aggregatedFirstGroup = mapToRecord(
+            mapOrderByValues(
+                extractDatas!.groups[initialViewType]!,
+                (a, b) => b.length - a.length
+            )
+        );
+
+        // TODO: ViewFilter store
+        // Liste des view à afficher sinon DEFAULT_VIEW_LIST
+        const computedInitialView: ViewState<DefaultViewerObject<"root">> = {
+            elements: createRootView(aggregatedFirstGroup),
+            type: initialViewType,
         };
 
-        setCurrentView(computedInitialView);
-        setDomainView(computedInitialView);
-    }, [pstFile]);
+        return computedInitialView;
+    }, [extractDatas, groupByFunctions]);
 
     useEffect(() => {
-        createInitialView();
-    }, [createInitialView]);
+        const computedInitialView = createInitialView();
 
-    const restartView = () => {
-        setCurrentView(domainView);
+        setViewList([computedInitialView]);
+    }, [createInitialView, setCurrentViewIndex, setViewList]);
+
+    const resetView = () => {
+        const computedInitialView = createInitialView();
+
+        setCurrentViewIndex(0);
+        setViewList([computedInitialView]);
+        resetBreadcrumb();
         cancelFocus();
-        setInitialAttachmentPerLevel();
-        setInitialTotalMailPerLevel();
-        setInitialFileSizePerLevel();
-        setBreadcrumb({ id: "domain" });
     };
 
     const computePreviousView = () => {
         cancelFocus();
-        setPreviousAttachmentPerLevel();
-        setPreviousTotalMailsPerLevel();
-        setPreviousFileSizePerLevel();
 
-        if (currentView?.type === CORRESPONDANTS) {
-            setCurrentView(domainView);
-            setPreviousBreadcrumb("domain");
-        }
-        if (currentView?.type === YEAR) {
-            setCurrentView(correspondantView);
-            setPreviousBreadcrumb("correspondant");
-        }
+        if (currentViewIndex > 0) {
+            const previousIndex = currentViewIndex - 1;
 
-        if (currentView?.type === MAILS) {
-            setCurrentView(yearView);
-            setPreviousBreadcrumb("year");
+            setCurrentViewIndex(previousIndex);
         }
 
         return;
     };
 
-    const computeNextView = (
-        node: ComputedDatum<DefaultViewerObject<string>>
+    const computeNextView = async (
+        node: ComputedDatum<DefaultViewerObject>
     ) => {
-        if (currentView?.type === DOMAIN) {
-            setCurrentDomain(node.data.name);
-            setBreadcrumb({
-                history: [node.data.name],
-                id: "correspondant",
-            });
+        // e.g. ["domain", "recipient"] ; going on recipient
+        const currentView = viewList[currentViewIndex];
 
-            const uniqueCorrespondantsByDomain =
-                getUniqueCorrespondantsByDomain(pstFile!, node.data.name);
-
-            const elements = createCorrespondants(
-                uniqueCorrespondantsByDomain,
-                node.id
-            );
-
-            const totalLevelMails = getTotalLevelMail(elements);
-            setTotalMailPerLevel(totalLevelMails);
-
-            setCurrentView({
-                elements,
-                type: CORRESPONDANTS,
-            });
-
-            setCorrespondantView({
-                elements: createCorrespondants(
-                    uniqueCorrespondantsByDomain,
-                    node.id
-                ),
-                type: CORRESPONDANTS,
-            });
+        if (!currentView) {
+            return;
         }
 
-        if (currentView?.type === CORRESPONDANTS) {
-            setBreadcrumb({
-                history: [currentDomain, node.data.name],
-                id: "year",
-            });
-            setCurrentCorrespondant(node.data.name);
+        const nextIndex = currentViewIndex + 1;
 
-            const yearByCorrespondants = getYearByCorrespondants(
-                pstFile!,
-                node.data.name
-            );
+        const sameView = viewList[nextIndex];
 
-            const elements = createYears(yearByCorrespondants, node.id);
-            const totalLevelMails = getTotalLevelMail(elements);
-            setTotalMailPerLevel(totalLevelMails);
-
-            setCurrentView({
-                elements,
-                type: YEAR,
-            });
-
-            setYearView({
-                elements,
-                type: YEAR,
-            });
+        if (sameView?.elements.name === node.data.name) {
+            setViewAt(nextIndex, sameView);
+            setCurrentViewIndex(nextIndex);
+            return;
         }
 
-        if (currentView?.type === YEAR) {
-            setBreadcrumb({
-                history: [currentDomain, currentCorrespondant, node.data.name],
-                id: "mails",
-            });
+        // ok, not the same view
+        const nextViewGroupBy = groupByFunctions[nextIndex];
 
-            const mailsByYearAndCorrespondant = getMailsByDym(
-                pstFile!,
-                currentDomain,
-                currentCorrespondant,
-                +node.data.name
+        if (nextViewGroupBy) {
+            setCurrentViewIndex(nextIndex); // see comment line 169
+            const nextDatasFilter = new Map(
+                [
+                    ...(extractDatas?.groups[nextViewGroupBy.type]?.entries() ??
+                        []),
+                ].reduce<[string, string[]][]>((acc, [keyToKeep, nextIds]) => {
+                    const idsToKeep = nextIds.filter((id) =>
+                        node.data.ids.includes(id)
+                    );
+                    if (idsToKeep.length) {
+                        return [...acc, [keyToKeep, idsToKeep]];
+                    }
+                    return acc;
+                }, [])
             );
-            const elements = createMails(mailsByYearAndCorrespondant, node.id);
-            const totalLevelMails = getTotalLevelMail(elements);
-            setTotalMailPerLevel(totalLevelMails);
 
-            setCurrentView({
-                elements,
-                type: MAILS,
-            });
+            const orderedNextDatas = mapOrderByValues(
+                nextDatasFilter,
+                (a, b) => b.length - a.length
+            );
+
+            const elements = createNodes(orderedNextDatas, node.id, node.data);
+
+            setViewAt(nextIndex, { elements, type: nextViewGroupBy.type });
+        } else {
+            if (!pstExtractorService || !extractDatas) return;
+            const indexes = node.data.ids.map(
+                (id) => extractDatas.indexes.get(id)!
+            );
+
+            const mails = (await pstExtractorService.getEmails(indexes)).sort(
+                (a, b) =>
+                    (a.receivedDate?.valueOf() ?? 0) -
+                    (b.receivedDate?.valueOf() ?? 0)
+            );
+
+            const elements = createMails(mails, node.id, node.data.name);
+            setViewAt(nextIndex, { elements, type: "mail" });
+            setCurrentViewIndex(nextIndex); // to avoid immediate (and multiple) render, we need to set the next index after setting the view.
         }
 
         trackerService?.getProvider().track("Feat(3.0) Element Traversed", {
             viewType:
-                currentView?.type === DOMAIN
+                currentView.type === DOMAIN
                     ? CORRESPONDANTS
-                    : currentView?.type === CORRESPONDANTS
+                    : currentView.type === CORRESPONDANTS
                     ? YEAR
                     : MAILS,
         });
@@ -231,7 +185,8 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
     return {
         computeNextView,
         computePreviousView,
-        currentView,
-        restartView,
+        currentViewIndex,
+        resetView,
+        viewList,
     };
 };

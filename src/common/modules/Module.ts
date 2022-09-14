@@ -13,12 +13,12 @@ export interface Module {
      *
      * If needed, a private `inited` property flag can be used to ensure this method is called once.
      */
-    init: () => Promise<void>;
+    init: () => pvoid;
 
     /**
      * Uninit a module once when the app close (main) or when a window closes (renderer).
      */
-    uninit: () => Promise<void>;
+    uninit: () => pvoid;
 }
 
 /**
@@ -39,8 +39,8 @@ export abstract class IsomorphicModule implements Module {
 
     // eslint-disable-next-line @typescript-eslint/no-useless-constructor, @typescript-eslint/no-empty-function -- abstract constructor signature
     constructor(..._args: unknown[]) {}
-    public abstract init(): Promise<void>;
-    public abstract uninit(): Promise<void>;
+    public abstract init(): pvoid;
+    public abstract uninit(): pvoid;
 }
 
 const factory = new Map<string, IsomorphicModule>();

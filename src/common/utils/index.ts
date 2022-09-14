@@ -1,7 +1,6 @@
 import { randomBytes } from "crypto";
 
 import { AppError } from "../lib/error/AppError";
-import type { Any } from "./type";
 
 /**
  * Generate a random string of 20 hex char by default.
@@ -13,6 +12,9 @@ import type { Any } from "./type";
  */
 export const randomString = (length = 20): string =>
     randomBytes(length).toString("hex");
+
+export const stringLowerEqual = (a: string, b: string): boolean =>
+    String(a).toLowerCase() === String(b).toLowerCase();
 
 /**
  * Split a string into chunks with defined length.
@@ -43,7 +45,7 @@ export const chunkString = (input: string, length: number): string[] => {
     return result;
 };
 
-export const sleep = async (ms: number): Promise<void> =>
+export const sleep = async (ms: number): pvoid =>
     new Promise((resolve) => {
         setTimeout(resolve, ms);
     });

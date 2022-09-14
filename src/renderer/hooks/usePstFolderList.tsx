@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
 import { usePstStore } from "../store/PSTStore";
-import { getPstFolderList } from "../utils/pst-extractor";
 
 interface UsePstFolderList {
     folderList: string[];
@@ -10,14 +9,17 @@ interface UsePstFolderList {
 export const usePstFolderList = (): UsePstFolderList => {
     const [folderList, setFolderList] = useState<string[]>([""]);
 
-    const { pstFile } = usePstStore();
+    const { extractDatas } = usePstStore();
 
     useEffect(() => {
-        if (pstFile) {
-            const extractedFolderList = getPstFolderList(pstFile);
-            setFolderList(extractedFolderList);
+        if (extractDatas) {
+            setFolderList(
+                extractDatas.additionalDatas.folderList.map(
+                    (folder) => folder.name
+                )
+            );
         }
-    }, [pstFile]);
+    }, [extractDatas]);
 
     return { folderList };
 };

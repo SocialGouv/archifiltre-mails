@@ -1,6 +1,6 @@
+import type { ViewType } from "../views/setup";
+
 export interface ExtractOptions {
-    depth?: number;
-    noProgress?: boolean;
     pstFilePath: string;
 }
 
@@ -22,15 +22,34 @@ export interface PstElement {
     type: PstElementType;
 }
 
+export interface AddtionalDataItem {
+    id: string;
+    name: string;
+}
+
+export interface ExtremeDates {
+    max: number;
+    min: number;
+}
+
 export interface PstFolder extends PstElement {
     emailCount: number;
-    folderType: string;
     type: "folder" | "rootFolder";
 }
 
 export const isPstFolder = (elt: PstElement): elt is PstFolder => {
     return elt.type === "folder" || elt.type === "rootFolder";
 };
+
+export type PstMailIndex = number[];
+export type PstMailIndexEntries = [string, PstMailIndex][];
+export type PstMailIdsEntries = [string, string[]][];
+export type PstAttachmentEntries = [string, PstAttachment[]][];
+
+export interface PstAttachementIndex {
+    index: number;
+    mailIndex: PstMailIndex;
+}
 
 export interface PstContent extends PstFolder {
     children: PstFolder[];
@@ -51,8 +70,8 @@ export interface PstEmailRecipient {
 }
 
 export interface PstEmail extends PstElement {
-    attachementCount: number;
-    attachements: PstAttachement[];
+    attachmentCount: number;
+    attachments: PstAttachment[];
     bcc: PstEmailRecipient[];
     cc: PstEmailRecipient[];
     contentHTML: string;
@@ -64,16 +83,19 @@ export interface PstEmail extends PstElement {
     sentTime: Date | null;
     size: 1;
     subject: string;
-    tag?: string;
     to: PstEmailRecipient[];
     type: "email";
+}
+
+export interface PstEmailWithTag extends PstEmail {
+    tag: string;
 }
 
 export const isPstEmail = (elt: PstElement): elt is PstEmail => {
     return elt.type === "email";
 };
 
-export interface PstAttachement {
+export interface PstAttachment {
     filename: string;
     filesize: number;
     mimeType: string;
@@ -83,7 +105,7 @@ export interface PstAttachement {
  * State object on each progress tick (one tick per extracted email).
  */
 export interface PstProgressState {
-    countAttachement: number;
+    countAttachment: number;
     countEmail: number;
     countFolder: number;
     countTotal: number;
@@ -91,20 +113,36 @@ export interface PstProgressState {
     progress: boolean;
 }
 
-/**
- * Computed primary infos extracted from a PST file.
- */
-export interface PstExtractTables {
+export interface PstShallowFolder {
+    elementPath: string;
+    hasSubfolders: boolean;
+    id: string;
+    mails: string[];
+    name: string;
+    subfolders: PstShallowFolder[];
+}
+
+export interface AdditionalDatas {
+    contactList: AddtionalDataItem[];
+    deleted: string[];
+    extremeDates: ExtremeDates;
+    folderList: AddtionalDataItem[];
+    folderStructure: PstShallowFolder;
     /**
-     * Attachement list stored by email uuid
+     * @deprecated
+     * @todo Pre discover pst owner
      */
-    attachements: Map<string, PstAttachement[]>;
-    /**
-     * Contact list associated with list of corresponding email uuid
-     */
-    contacts: Map<string, string[]>;
-    /**
-     * Email list stored by folder uuid
-     */
-    emails: Map<string, PstEmail[]>;
+    possibleOwner?: Required<PstEmailRecipient>;
+    pstFilename: string;
+    received: string[];
+    sent: string[];
+}
+
+export type GroupType = ViewType | "folder" | "senderMail";
+
+export interface PstExtractDatas {
+    additionalDatas: AdditionalDatas;
+    attachments: Map<string, PstAttachment[]>;
+    groups: Record<GroupType, Map<string, string[]>>;
+    indexes: Map<string, PstMailIndex>;
 }

@@ -8,28 +8,6 @@ export type MutableArray<T> = T extends readonly (infer U)[] ? U[] : never;
  */
 export type UnknownMapping = string & { _?: never };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export interface long {
-    high: number;
-    low: number;
-    unsigned: boolean;
-}
-
-export type Nothing = never | 0 | null | undefined;
-/**
- * Stub to trick eslint.
- * @deprecated
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Any = any;
-
-/**
- * Force expand a type for debug purpose. Don't work on every type.
- * @deprecated
- */
-// eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/ban-types
-export type __DEBUG_TYPE__<T> = { [P in keyof T]: T[P] } & {};
-
 /**
  * Get direct subkeys of a given non array object and/or unpack a subarray type to use its keys as subkeys.
  *
@@ -69,11 +47,26 @@ export type DirectOrUnpackedChainedSubKeyOf<T> = {
 
 export type KeyAndSubKeyOf<T> = DirectOrUnpackedChainedSubKeyOf<T> | keyof T;
 
-export type SimpleObject = Record<string, unknown>;
+export type SimpleObject<T = unknown> = Record<string, T>;
+export type AnyFunction = (...args: unknown[]) => unknown;
+export type EveryFunction = (...args: Any[]) => Any;
 export type VoidFunction = () => void;
 export type VoidArgsFunction<TArgs extends Any[] = Any[]> = (
     ...args: TArgs
 ) => void;
+
+export type UnboxPromise<T> = T extends Promise<infer R> ? UnboxPromise<R> : T;
+
+export type StringKeyOf<T> = {
+    [K in keyof T]: K extends string ? K : never;
+}[keyof T];
+
+// eslint-disable-next-line @typescript-eslint/ban-types -- target instance objects
+export type MethodNames<T extends Object> = {
+    [P in keyof T]: T[P] extends EveryFunction ? P : never;
+}[keyof T];
+
+export type Objectize<T> = { [K in keyof T]: T[K] };
 
 export interface FixedLengthArray<T, TLength extends number> extends Array<T> {
     "0": T;

@@ -1,4 +1,4 @@
-import type { Any, VoidFunction } from "../../utils/type";
+import type { VoidFunction } from "../../utils/type";
 
 export interface Event<TState = unknown> {
     namespace: string;

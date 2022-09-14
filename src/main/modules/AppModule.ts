@@ -25,7 +25,7 @@ export class AppModule extends MainModule {
         super();
     }
 
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         // can't await because mainWindow is created after this init
         void this.mainWindowRetriever().then(async (mainWindow) => {
             await this.userConfigService.wait();

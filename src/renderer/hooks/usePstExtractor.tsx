@@ -10,7 +10,6 @@ import { setTotalMail } from "../store/PstMailCountStore";
 import { usePstStore } from "../store/PSTStore";
 import {
     getInitialTotalAttachements,
-    getInitialTotalMail,
     getInititalTotalFileSize,
 } from "../utils/dashboard-viewer-dym";
 
@@ -20,7 +19,7 @@ interface UsePstExtractor {
 }
 
 const pstProgressInitialState: PstProgressState = {
-    countAttachement: 0,
+    countAttachment: 0,
     countEmail: 0,
     countFolder: 0,
     countTotal: 0,
@@ -41,29 +40,30 @@ export const usePstExtractor = (): UsePstExtractor => {
     const pstExtractorService = useService("pstExtractorService");
     const trackerService = useService("trackerService");
 
-    const { setPstFile, setExtractTables } = usePstStore();
+    const { setExtractDatas } = usePstStore();
 
     useEffect(() => {
         if (pstFilePath && pstExtractorService && trackerService) {
             void (async () => {
                 const beforeExtractTimestamp = Date.now();
-                const [pstExtractedFile, extractTables] =
-                    await pstExtractorService.extract({
-                        pstFilePath,
-                    });
+                const extractDatas = await pstExtractorService.extract({
+                    pstFilePath,
+                });
                 const loadTime = Date.now() - beforeExtractTimestamp;
 
-                setPstFile(pstExtractedFile);
-                setExtractTables(extractTables);
+                setExtractDatas(extractDatas);
 
-                const totalMail = getInitialTotalMail(extractTables);
+                const totalMail = extractDatas.indexes.size;
                 setTotalMail(totalMail);
 
-                const totalAttachments =
-                    getInitialTotalAttachements(extractTables);
+                const totalAttachments = getInitialTotalAttachements(
+                    extractDatas.attachments
+                );
                 setTotalAttachment(totalAttachments);
 
-                const totalFileSize = getInititalTotalFileSize(extractTables);
+                const totalFileSize = getInititalTotalFileSize(
+                    extractDatas.attachments
+                );
                 setTotalFileSize(totalFileSize);
 
                 trackerService.getProvider().track("PST Dropped", {
@@ -75,13 +75,7 @@ export const usePstExtractor = (): UsePstExtractor => {
                 });
             })();
         }
-    }, [
-        pstExtractorService,
-        pstFilePath,
-        setExtractTables,
-        setPstFile,
-        trackerService,
-    ]);
+    }, [pstExtractorService, pstFilePath, setExtractDatas, trackerService]);
 
     useEffect(() => {
         pstExtractorService?.onProgress(setPstProgress);

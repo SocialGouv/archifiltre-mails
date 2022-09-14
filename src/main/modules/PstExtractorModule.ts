@@ -1,35 +1,30 @@
-import {
-    PST_EXTRACT_EVENT,
-    PST_PROGRESS_EVENT,
-    PST_PROGRESS_SUBSCRIBE_EVENT,
-    PST_STOP_EXTRACT_EVENT,
-} from "@common/constant/event";
 import { AppError } from "@common/lib/error/AppError";
+import { ipcMain } from "@common/lib/ipc";
+import type { DualIpcConfigExtractReply } from "@common/lib/ipc/event";
 import type { Service } from "@common/modules/container/type";
 import { containerModule } from "@common/modules/ContainerModule";
 import type {
     ExtractOptions,
-    PstContent,
-    PstExtractTables,
+    PstEmail,
+    PstExtractDatas,
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
 import type { UserConfigService } from "@common/modules/UserConfigModule";
-import { ipcMain } from "electron";
+import { BrowserWindow } from "electron";
 
-import { TSWorker } from "../worker";
+import type { ConsoleToRendererService } from "../services/ConsoleToRendererService";
+import { WorkerClient } from "../workers/WorkerClient";
 import { MainModule } from "./MainModule";
-import type {
-    PstWorkerData,
-    PstWorkerMessageType,
-} from "./pst-extractor/pst-extractor.worker";
-import {
-    PST_DONE_WORKER_EVENT,
-    PST_PROGRESS_WORKER_EVENT,
-} from "./pst-extractor/pst-extractor.worker";
+import type { FetchWorkerConfig } from "./pst-extractor/pst-email-fetcher.worker";
+import type { ExtractorWorkerConfig } from "./pst-extractor/pst-extractor.worker";
+import { PstCache } from "./pst-extractor/PstCache";
 
 export class PstExtractorError extends AppError {}
 
 const REGEXP_PST = /\.pst$/i;
+
+type ProgressReplyFunction =
+    DualIpcConfigExtractReply<"pstExtractor.event.progressSuscribe">;
 
 /**
  * Module responsible of handling and extracting datas from given PST files.
@@ -41,178 +36,206 @@ export class PstExtractorModule extends MainModule {
 
     private working = false;
 
-    private pstWorker?: TSWorker;
-
     private lastProgressState!: PstProgressState;
 
-    private manuallyStoped = false;
-
-    private lastPstExtractTables?: PstExtractTables;
-
-    private lastContent?: PstContent;
+    private lastPstExtractDatas?: PstExtractDatas;
 
     private lastPath = "";
 
-    private progressReply?: (
-        channel: typeof PST_PROGRESS_EVENT,
-        progressState: PstProgressState
-    ) => void;
+    private readonly fetchWorker = new WorkerClient<FetchWorkerConfig>(
+        "modules/pst-extractor/pst-email-fetcher.worker.ts"
+    );
 
-    constructor(private readonly userConfigService: UserConfigService) {
+    private readonly extractorWorker = new WorkerClient<ExtractorWorkerConfig>(
+        "modules/pst-extractor/pst-extractor.worker.ts"
+    );
+
+    private progressReply?: ProgressReplyFunction;
+
+    constructor(
+        private readonly userConfigService: UserConfigService,
+        private readonly consoleToRendererService: ConsoleToRendererService
+    ) {
         super();
-        containerModule.registerService(
-            "pstExtractorMainService",
-            this.service
+        containerModule.registerServices(
+            ["pstExtractorMainService", this.extractorService],
+            ["pstCacheMainService", this.cacheService]
         );
     }
 
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         if (this.inited) {
             return;
         }
 
-        ipcMain.on(PST_PROGRESS_SUBSCRIBE_EVENT, (event) => {
-            this.progressReply = event.reply as typeof this.progressReply;
+        ipcMain.on("pstExtractor.event.progressSuscribe", (event) => {
+            this.progressReply = event.reply;
         });
         ipcMain.handle(
-            PST_EXTRACT_EVENT,
-            async (_event, ...args: [ExtractOptions]) => {
-                return this.extract(args[0]);
+            "pstExtractor.event.extract",
+            async (_event, options) => {
+                return this.extract(options);
             }
         );
-        ipcMain.handle(PST_STOP_EXTRACT_EVENT, async () => {
+        ipcMain.handle(
+            "pstExtractor.event.getEmails",
+            async (_event, indexes) => {
+                return this.getEmails(indexes);
+            }
+        );
+        ipcMain.handle("pstExtractor.event.stopExtract", async () => {
             await this.stop();
+        });
+
+        this.extractorWorker.addEventListener("progress", (progressState) => {
+            this.progressReply?.(
+                "pstExtractor.event.progress",
+                (this.lastProgressState = progressState)
+            );
+        });
+        this.extractorWorker.addEventListener("done", (progressState) => {
+            this.progressReply?.(
+                "pstExtractor.event.progress",
+                (this.lastProgressState = {
+                    ...progressState,
+                    progress: false,
+                })
+            );
+        });
+        this.extractorWorker.addEventListener("error", (error) => {
+            console.log("[PstExtractorModule] Error");
+            console.error(error); // TODO handle error
         });
 
         this.inited = true;
         return Promise.resolve();
     }
 
-    public async uninit(): Promise<void> {
+    public async uninit(): pvoid {
         return Promise.resolve();
     }
 
-    private async extract(
-        options: ExtractOptions
-    ): Promise<[PstContent, PstExtractTables]> {
+    private async extract(options: ExtractOptions): Promise<PstExtractDatas> {
         if (this.working) {
             throw new PstExtractorError("Extractor already working.");
         }
+
         if (!REGEXP_PST.test(options.pstFilePath)) {
             throw new PstExtractorError(
                 `Cannot extract PST from an unknown path or file. Got "${options.pstFilePath}"`
             );
         }
 
-        if (
-            // TODO: change with hash (xxhash or md5, in stream mode)
-            options.pstFilePath === this.lastPath &&
-            this.lastContent &&
-            this.lastPstExtractTables
-        ) {
-            return [this.lastContent, this.lastPstExtractTables];
+        if (options.pstFilePath === this.lastPath && this.lastPstExtractDatas) {
+            return this.lastPstExtractDatas;
         }
 
         this.working = true;
 
-        delete this.lastPstExtractTables;
+        delete this.lastPstExtractDatas;
         this.lastPath = options.pstFilePath;
 
-        const progressReply = options.noProgress ? void 0 : this.progressReply;
-
         console.info("Start extracting...");
-        this.pstWorker = new TSWorker(
-            "modules/pst-extractor/pst-extractor.worker.ts",
-            {
-                stderr: true,
-                trackUnmanagedFds: true,
-                workerData: {
-                    ...options,
-                    progressInterval: this.userConfigService.get(
-                        "extractProgressDelay"
-                    ),
-                } as PstWorkerData,
-            }
-        );
-        return new Promise<[PstContent, PstExtractTables]>(
-            (resolve, reject) => {
-                this.pstWorker?.on(
-                    "message",
-                    (message: PstWorkerMessageType) => {
-                        switch (message.event) {
-                            case PST_PROGRESS_WORKER_EVENT:
-                                progressReply?.(
-                                    PST_PROGRESS_EVENT,
-                                    (this.lastProgressState = message.data)
-                                );
-                                break;
-                            case PST_DONE_WORKER_EVENT:
-                                progressReply?.(
-                                    PST_PROGRESS_EVENT,
-                                    (this.lastProgressState = {
-                                        ...message.data.progressState,
-                                        progress: false,
-                                    })
-                                );
+        await Promise.all([
+            this.fetchWorker.command("open", {
+                pstFilePath: this.lastPath,
+            }),
+            this.extractorWorker.command("open", {
+                pstFilePath: this.lastPath,
+            }),
+        ]);
 
-                                this.working = false;
-                                [this.lastContent, this.lastPstExtractTables] =
-                                    [
-                                        message.data.content,
-                                        message.data.pstExtractTables,
-                                    ];
-                                resolve([
-                                    this.lastContent,
-                                    this.lastPstExtractTables,
-                                ]);
-                                console.info("Extract done.");
-                                break;
-                        }
-                    }
-                );
+        await this.extractorWorker.command("extract", {
+            progressInterval: this.userConfigService.get(
+                "extractProgressDelay"
+            ),
+            viewConfigs: this.userConfigService.get("viewConfigs"),
+        });
 
-                this.pstWorker?.on("error", (error) => {
-                    this.working = false;
-                    reject(error);
-                });
+        // TODO: hash instead
+        this.cacheService.openForPst(this.lastPath);
 
-                this.pstWorker?.on("exit", (exitCode) => {
-                    this.working = false;
-                    if (exitCode === 1) {
-                        if (this.manuallyStoped) {
-                            this.manuallyStoped = false;
-                            reject(
-                                new PstExtractorError(
-                                    "Manually stoped by user."
-                                )
-                            );
-                        } else reject("Worker stoped for unknown reason.");
-                    }
-                });
-            }
-        );
+        const attachments = await this.cacheService.getAttachments();
+        const indexes = await this.cacheService.getPstMailIndexes();
+        const groups = await this.cacheService.getAllGroups();
+        const additionalDatas = await this.cacheService.getAllAddtionalData();
+        this.consoleToRendererService.log(BrowserWindow.getAllWindows()[0]!, {
+            additionalDatas,
+            attachments,
+            groups,
+            indexes,
+        });
+        this.lastPstExtractDatas = {
+            additionalDatas,
+            attachments,
+            groups,
+            indexes,
+        };
+
+        this.working = false;
+        console.info("Extract done.");
+        return this.lastPstExtractDatas;
     }
 
-    private async stop(): Promise<void> {
-        this.manuallyStoped = true;
+    private async getEmails(emailIndexes: number[][]): Promise<PstEmail[]> {
+        if (this.working) {
+            throw new PstExtractorError("Extractor already working.");
+        }
+        console.info("Start fetching emails...");
+        const emails = await this.fetchWorker.query("fetch", {
+            emailIndexes,
+        });
+        console.log("Fetching done");
+        if (!emails.length) {
+            throw new Error("Emails not found from given indexes.");
+        }
+        return emails;
+    }
+
+    private async stop(): pvoid {
         this.progressReply?.(
-            PST_PROGRESS_EVENT,
+            "pstExtractor.event.progress",
             (this.lastProgressState = {
                 ...this.lastProgressState,
                 progress: false,
             })
         );
-        await this.pstWorker?.terminate();
+
+        // TODO: this.extractorWorker.command("stop");
+        // TODO: this.fetchWorker.command("stop");
+        return Promise.resolve();
     }
 
-    public get service(): PstExtractorMainService {
+    public get extractorService(): PstExtractorMainService {
         return {
             extract: this.extract.bind(this),
+            getEmails: this.getEmails.bind(this),
             name: "PstExtractorMainService",
         };
     }
+
+    public get cacheService(): PstCacheMainService {
+        return cacheService;
+    }
 }
+
+const cacheService = new (class extends PstCache implements PstCacheMainService {
+    public name = "PstCacheMainService";
+
+    /** @override */
+    public async init(): pvoid {
+        await this.db.close();
+    }
+
+    /** @override */
+    public async uninit(): pvoid {
+        await this.db.close();
+    }
+})();
 
 export interface PstExtractorMainService extends Service {
     extract: typeof PstExtractorModule.prototype["extract"];
+    getEmails: typeof PstExtractorModule.prototype["getEmails"];
 }
+
+export interface PstCacheMainService extends Service, PstCache {}

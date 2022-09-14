@@ -4,7 +4,7 @@ import { Parser } from "json2csv";
 import type { SimpleObject } from "../../utils/type";
 import type { JsonExporter } from "./Exporter";
 // eslint-disable-next-line unused-imports/no-unused-imports
-import type { xlsxExporter } from "./XslxExporter";
+import { xlsxExporter } from "./XslxExporter";
 
 /**
  * Export JSON to .csv file. For Excel, use {@link xlsxExporter} instead.

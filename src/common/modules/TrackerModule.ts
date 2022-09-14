@@ -32,14 +32,14 @@ export class TrackerModule extends IsomorphicModule {
         super();
     }
 
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         await this.userConfigService.wait();
         this.enableTracking = this.userConfigService.get("collectData");
 
         await this.getProvider().init();
     }
 
-    public async uninit(): Promise<void> {
+    public async uninit(): pvoid {
         this.userConfigUnsub();
         await this.getProvider().uninit();
     }
@@ -65,11 +65,10 @@ export class TrackerModule extends IsomorphicModule {
                 name as DelegatingName
             );
 
-            return new DelegatingProvider(
-                appId,
-                disabled,
-                names.map((n) => this.findProvider(n))
+            const foundProviders = (names as ProviderType[]).map((n) =>
+                this.findProvider(n)
             );
+            return new DelegatingProvider(appId, disabled, foundProviders);
         }
         return new (providers.find((p) => p.trackerName === name) ??
             NoopProvider)(appId, disabled) as TrackerProvider;

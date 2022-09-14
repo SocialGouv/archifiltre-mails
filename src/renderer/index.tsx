@@ -7,6 +7,7 @@ import { render } from "react-dom";
 
 import { App } from "./app";
 import { ConsoleFromMainModule } from "./modules/ConsoleFromMainModule";
+import { pstExporterService } from "./services/PstExporterService";
 import { pstExtractorService } from "./services/PstExtractorService";
 
 module.hot?.accept();
@@ -14,10 +15,10 @@ module.hot?.accept();
 const setupSentryIntegrations = setupSentry();
 
 void (async () => {
-    const isomorphicModules = getIsomorphicModules([
-        "pstExtractorService",
-        pstExtractorService,
-    ]);
+    const isomorphicModules = getIsomorphicModules(
+        ["pstExtractorService", pstExtractorService],
+        ["pstExporterService", pstExporterService]
+    );
     const modules: Module[] = [
         ...isomorphicModules,
         new ConsoleFromMainModule(),

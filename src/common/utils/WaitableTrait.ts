@@ -8,7 +8,7 @@ export interface Waitable {
     /**
      * Wait for an object to be resolved. Usefull when service dependencies are called during boot time, at the same moment of their init.
      */
-    wait: () => Promise<void>;
+    wait: () => pvoid;
 }
 
 /**
@@ -28,7 +28,7 @@ export class WaitableTrait extends Trait implements Waitable {
         });
     }
 
-    public async wait(): Promise<void> {
+    public async wait(): pvoid {
         if (!this.resolved) {
             return new Promise<void>((resolve) => {
                 if (!this.resolveCallbacks) {

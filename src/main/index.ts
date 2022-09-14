@@ -6,7 +6,6 @@ import { containerModule } from "@common/modules/ContainerModule";
 import type { Module } from "@common/modules/Module";
 import { setupSentry } from "@common/monitoring/sentry";
 import { sleep } from "@common/utils";
-import type { Any } from "@common/utils/type";
 import Sentry from "@sentry/electron";
 import { app, BrowserWindow, Menu } from "electron";
 import path from "path";
@@ -14,6 +13,7 @@ import path from "path";
 import { AppModule } from "./modules/AppModule";
 import { DevToolsModule } from "./modules/DevToolsModule";
 import { MenuModule } from "./modules/MenuModule";
+import { PstExporterModule } from "./modules/PstExporterModule";
 import { PstExtractorModule } from "./modules/PstExtractorModule";
 import { consoleToRendererService } from "./services/ConsoleToRendererService";
 
@@ -106,13 +106,22 @@ app.on("ready", async () => {
                 trackerService
             ),
             new DevToolsModule(),
-            new PstExtractorModule(containerModule.get("userConfigService")),
+            new PstExtractorModule(
+                containerModule.get("userConfigService"),
+                consoleToRendererService
+            ),
             new MenuModule(
                 consoleToRendererService,
                 containerModule.get("pstExtractorMainService"),
                 containerModule.get("i18nService"),
                 containerModule.get("fileExporterService"),
                 containerModule.get("userConfigService")
+            ),
+            new PstExporterModule(
+                containerModule.get("fileExporterService"),
+                containerModule.get("pstExtractorMainService"),
+                containerModule.get("i18nService"),
+                containerModule.get("pstCacheMainService")
             ),
         ];
 

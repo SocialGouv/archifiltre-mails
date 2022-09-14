@@ -30,7 +30,7 @@ export class PosthogProvider extends TrackerProvider<
 
     public inited = false;
 
-    public async init(): Promise<void> {
+    public async init(): pvoid {
         if (this.inited) {
             console.warn("[PosthogProvider] Already inited.", this.disabled);
         }
@@ -79,7 +79,7 @@ export class PosthogProvider extends TrackerProvider<
         }
     }
 
-    public async uninit(): Promise<void> {
+    public async uninit(): pvoid {
         console.info("[Tracker][PosthogProvider] Shutdown posthog");
         if (this.isMain(this.tracker)) {
             this.tracker.shutdown();

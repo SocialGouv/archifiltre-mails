@@ -22,7 +22,7 @@ export const setAttachmentPerLevel = (newAttachmentPerLevel: number): void => {
 };
 
 export const setPreviousAttachmentPerLevel = (): void => {
-    setState(({ attachmentPerLevel: attachmentPerLevel }) => {
+    setState(({ attachmentPerLevel }) => {
         if (attachmentPerLevel.length === 1)
             return {
                 attachmentPerLevel: [attachmentPerLevel[0] ?? 0],

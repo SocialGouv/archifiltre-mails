@@ -62,6 +62,17 @@ interface IpcRenderer extends BaseIpcRenderer {
         ) => void
     ) => this;
 
+    removeAllListeners: <
+        T extends
+            | AsyncIpcKeys
+            | DualAsyncIpcKeys
+            | ReplyDualAsyncIpcKeys
+            | SyncIpcKeys
+            | UnknownMapping
+    >(
+        channel: T
+    ) => this;
+
     send: <T extends DualAsyncIpcKeys | UnknownMapping>(
         channel: DualAsyncIpcChannel<T>,
         ...args: GetDualAsyncIpcConfig<T>["args"]

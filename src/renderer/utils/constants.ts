@@ -38,20 +38,17 @@ export const COLORS = {
     TRANSPARENT: "transparent",
 } as const;
 
-// html id and classname
-export const CIRCLE_PACKING_ID = "#circle-packing";
-
 export const MAX_TRESHOLD = 20;
 export const TRESHOLD_KEY = "_other";
 export const RATIO_FROM_MAX = 10;
 
-export const LDAP_ORG = "/O=";
-export const LDAP_ARBITRARY_SPLICE_CHAR = "O=";
-export const COMMON_NAME_PST = "/CN=";
-
+/** @deprecated */
 export const DOMAIN = "domain";
+/** @deprecated */
 export const CORRESPONDANTS = "correspondants";
+/** @deprecated */
 export const YEAR = "year";
+/** @deprecated */
 export const MAILS = "mails";
 
 export const MONTHS_NB = {
