@@ -4,8 +4,8 @@ import debounce from "lodash/debounce";
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import type { CustomContextMenuMouseEvent } from "../../hooks/useContextMenu";
-import { useContextMenu } from "../../hooks/useContextMenu";
+import type { CustomContextMenuMouseEvent } from "../../hooks/useContextMenuEventAsClick";
+import { useContextMenuEventAsClick } from "../../hooks/useContextMenuEventAsClick";
 import { useDymViewerNavigation } from "../../hooks/useDymViewerNavigation";
 import { usePstFMInfosStore } from "../../store/PstFMInfosStore";
 import { tagManagerStore } from "../../store/TagManagerStore";
@@ -50,7 +50,7 @@ export const CirclePacking: React.FC = () => {
     const { setMainInfos, startFocus, isInfoFocus, mainInfos, cancelFocus } =
         usePstFMInfosStore();
     const { setHoveredNode, keepIds, deleteIds } = tagManagerStore();
-    useContextMenu(circlePackingRef.current);
+    useContextMenuEventAsClick(circlePackingRef.current);
 
     const [anchorX, setAnchorX] = useState(0);
     const [anchorY, setAnchorY] = useState(0);

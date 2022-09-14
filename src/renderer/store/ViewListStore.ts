@@ -4,10 +4,6 @@ import type { ViewState } from "../hooks/useDymViewerNavigation";
 import type { DefaultViewerObject } from "../utils/dashboard-viewer-dym";
 
 export interface ViewListStore {
-    // Both unused. Replace by setViewAt, prefered behaviour. Maybe should be deleted.
-
-    // addViewsCallback: (...views: ViewListStore["list"]) => void;
-    // addViewsGetter: (...views: ViewListStore["list"]) => void;
     currentIndex: number;
     list: ViewState<DefaultViewerObject>[];
     prevIndex: number;
@@ -20,16 +16,6 @@ export interface ViewListStore {
     ) => void;
 }
 export const viewListStore = create<ViewListStore>((set, get) => ({
-    // addViewsCallback: (...views: ViewState<DefaultViewerObject>[]) => {
-    //     set((currentState) => {
-    //         currentState.list.push(...views);
-    //     });
-    // },
-    // addViewsGetter: (...views: ViewState<DefaultViewerObject>[]) => {
-    //     set({
-    //         list: [...get().list, ...views],
-    //     });
-    // },
     currentIndex: 0,
     list: [],
     prevIndex: -1,

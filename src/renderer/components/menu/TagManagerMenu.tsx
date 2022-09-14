@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 import {
     DELETE_ACTION_BUTTON_ID,
     KEEP_ACTION_BUTTON_ID,
-} from "../../hooks/useContextMenu";
+} from "../../hooks/useContextMenuEventAsClick";
 import { tagManagerStore } from "../../store/TagManagerStore";
 import style from "./Menu.module.scss";
 

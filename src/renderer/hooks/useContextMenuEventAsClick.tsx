@@ -7,7 +7,9 @@ export type CustomContextMenuMouseEvent = MouseEvent & {
 export const DELETE_ACTION_BUTTON_ID = "delete-action-btn";
 export const KEEP_ACTION_BUTTON_ID = "keep-action-btn";
 
-export const useContextMenu = (element: HTMLDivElement | null): void => {
+export const useContextMenuEventAsClick = (
+    element: HTMLDivElement | null
+): void => {
     const handleContextMenu = useCallback((event: MouseEvent) => {
         event.preventDefault();
 

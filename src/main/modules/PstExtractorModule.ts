@@ -10,7 +10,7 @@ import type {
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
 import type { UserConfigService } from "@common/modules/UserConfigModule";
-import { app, BrowserWindow } from "electron";
+import { BrowserWindow } from "electron";
 
 import type { ConsoleToRendererService } from "../services/ConsoleToRendererService";
 import { WorkerClient } from "../workers/WorkerClient";
@@ -47,8 +47,7 @@ export class PstExtractorModule extends MainModule {
     );
 
     private readonly extractorWorker = new WorkerClient<ExtractorWorkerConfig>(
-        "modules/pst-extractor/pst-extractor.worker.ts",
-        { cachePath: app.getPath("cache") }
+        "modules/pst-extractor/pst-extractor.worker.ts"
     );
 
     private progressReply?: ProgressReplyFunction;

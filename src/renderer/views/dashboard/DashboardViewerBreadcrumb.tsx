@@ -9,7 +9,7 @@ import style from "./Dashboard.module.scss";
 
 export const DashboardViewerBreadcrumb: React.FC = () => {
     const { t } = useTranslation();
-    const { breadcrumb } = useBreadcrumbStore(true);
+    const { breadcrumb } = useBreadcrumbStore({allowUpdate: true});
 
     return (
         <div className={style.dashboard__viewer__breadcrumb}>

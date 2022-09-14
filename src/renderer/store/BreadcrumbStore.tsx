@@ -40,9 +40,11 @@ export const makeBreadcrumb = (breadcrumb: BreadcrumbObject): string =>
         ? breadcrumb.id
         : `${joinBreadcrumbHistory(breadcrumb.history)} > ${breadcrumb.id}`;
 
-export const useBreadcrumbStore = (
-    allowUpdate?: boolean
-): UseBreadcrumbStore => {
+interface UseBreadcrumbStoreOptions {allowUpdate: boolean}
+const defaultOptions: UseBreadcrumbStoreOptions = { allowUpdate: false} 
+export const useBreadcrumbStore = ({
+    allowUpdate
+} = defaultOptions): UseBreadcrumbStore => {
     const [breadcrumb, setBreadcrumb] = useAtom(breadcrumbAtom);
     const { list, currentIndex, prevIndex } = viewListStore();
 

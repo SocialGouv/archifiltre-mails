@@ -30,10 +30,6 @@ function randomUUID() {
     return `mail-${ID++}`;
 }
 
-interface Data {
-    cachePath: string;
-}
-
 type Commands = WorkerCommandsBuilder<{
     extract: {
         param: {
@@ -62,7 +58,6 @@ type EventListeners = WorkerEventListenersBuilder<{
 
 export type ExtractorWorkerConfig = WorkerConfigBuilder<{
     commands: Commands;
-    data: Data;
     eventListeners: EventListeners;
 }>;
 
