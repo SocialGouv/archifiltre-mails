@@ -28,10 +28,10 @@ describe("Module and loader", () => {
         expect(mockModule).toStrictEqual(
             IsomorphicModuleFactory.getInstance(MockModule)
         );
-        expect(flagInit).toBeCalledTimes(1);
+        expect(flagInit).toHaveBeenCalledTimes(1);
 
         await expect(unloadModules(mockModule)).resolves.not.toThrow();
-        expect(flagUninit).toBeCalledTimes(1);
+        expect(flagUninit).toHaveBeenCalledTimes(1);
     });
 });
 
@@ -52,8 +52,8 @@ describe("Service", () => {
         expect(containerModule.get("mockService")).toBeDefined();
         expect(containerModule.get("mockService")).toBeInstanceOf(MockService);
         await expect(loadModules(containerModule)).resolves.not.toThrow();
-        expect(flagLoad).toBeCalledTimes(1);
+        expect(flagLoad).toHaveBeenCalledTimes(1);
         await expect(containerModule.uninit()).resolves.not.toThrow();
-        expect(flagUnload).toBeCalledTimes(1);
+        expect(flagUnload).toHaveBeenCalledTimes(1);
     });
 });
