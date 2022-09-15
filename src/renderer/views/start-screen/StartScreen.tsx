@@ -2,8 +2,8 @@ import { toDecimalsFloat } from "@common/utils";
 import React, { useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
+import { Logo } from "../../components/common/logo/Logo";
 import { CogPicto } from "../../components/common/pictos/picto";
-import { StaticImage } from "../../components/common/staticImage/StaticImage";
 import { Dropzone } from "../../components/dropzone/Dropzone";
 import { useRouteContext } from "../../context/RouterContext";
 import { usePstExtractor } from "../../hooks/usePstExtractor";
@@ -47,7 +47,7 @@ export const StartScreen: React.FC = () => {
             >
                 <CogPicto />
             </button>
-            <StaticImage className={style.logo} alt="logo" src="img/logo.png" />
+            <Logo className={style.logo} />
             <Dropzone onDrop={onDrop} accept={ACCEPTED_EXTENSION} />
             <div className={progressClassName}>
                 <ul>

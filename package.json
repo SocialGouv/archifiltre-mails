@@ -8,6 +8,9 @@
   "main": "dist/main/main.js",
   "homepage": "https://archifiltre.fr/mails",
   "repository": "git@github.com:SocialGouv/archifiltre-mails.git",
+  "bugs": {
+    "url": "https://github.com/SocialGouv/archifiltre-mails/issues"
+  },
   "scripts": {
     "dev": "electron-webpack dev",
     "debug": "cross-env 'ELECTRON_ARGS=[\"--inspect-brk=9229\"]' yarn dev",
@@ -25,6 +28,7 @@
     "lint:fix-test": "eslint --fix -c tests/.eslintrc.json 'tests/**/*.ts*'",
     "lint:fix-all": "yarn lint:fix && yarn lint:fix-test",
     "devtools": "ts-node scripts/getReactDevtools.ts",
+    "replaceForChannel": "node scripts/replaceForChannel.js",
     "test": "jest",
     "test:components": "jest components",
     "test:integration": "jest integration",

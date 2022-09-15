@@ -1,7 +1,9 @@
+import { PRODUCT_CHANNEL } from "@common/config";
 import { getIsomorphicModules } from "@common/lib/core/isomorphic";
 import { loadModules, unloadModules } from "@common/lib/ModuleManager";
 import type { Module } from "@common/modules/Module";
 import { setupSentry } from "@common/monitoring/sentry";
+import { version } from "@common/utils/package";
 import React from "react";
 import { render } from "react-dom";
 
@@ -12,6 +14,8 @@ import { pstExtractorService } from "./services/PstExtractorService";
 module.hot?.accept();
 // get integrations setup callback
 const setupSentryIntegrations = setupSentry();
+
+document.title = `Mails v${version} (${PRODUCT_CHANNEL})`;
 
 void (async () => {
     const isomorphicModules = getIsomorphicModules([

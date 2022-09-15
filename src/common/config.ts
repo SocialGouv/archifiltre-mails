@@ -1,6 +1,13 @@
 import { app, ipcMain, ipcRenderer } from "electron";
 import path from "path";
 
+import { version } from "./utils/package";
+
+export const PRODUCT_CHANNEL = version.includes("beta")
+    ? "beta"
+    : version.includes("next")
+    ? "next"
+    : "stable";
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 export const IS_MAIN = (ipcMain && !ipcRenderer) as boolean;
 export const IS_TEST = !!process.env.NODE_ENV?.startsWith("test");

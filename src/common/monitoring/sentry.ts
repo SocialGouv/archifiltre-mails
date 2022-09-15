@@ -2,7 +2,7 @@ import * as SentryBrowser from "@sentry/browser";
 import * as Sentry from "@sentry/electron";
 import * as SentryNode from "@sentry/node";
 
-import { IS_MAIN, IS_PACKAGED } from "../config";
+import { IS_MAIN, IS_PACKAGED, PRODUCT_CHANNEL } from "../config";
 import { containerModule } from "../modules/ContainerModule";
 import { name, version } from "../utils/package";
 import type { VoidFunction } from "../utils/type";
@@ -19,7 +19,10 @@ export const setupSentry = (): VoidFunction => {
     if (!IS_PACKAGED()) return () => void 0;
     const commonOptions: Partial<Sentry.ElectronOptions> = {
         dsn: process.env.SENTRY_DSN,
-        getSessions: () => [], // because we do a manual preload
+        environment:
+            PRODUCT_CHANNEL === "stable" ? "production" : PRODUCT_CHANNEL,
+        // because we do a manual preload
+        getSessions: () => [],
         release: `${name}@${version}`,
     };
     Sentry.init(commonOptions);
