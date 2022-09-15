@@ -6,6 +6,7 @@
   "author": "Fabrique des ministères sociaux",
   "license": "Apache-2.0",
   "main": "dist/main/main.js",
+  "homepage": "https://archifiltre.fr/mails",
   "repository": "git@github.com:SocialGouv/archifiltre-mails.git",
   "scripts": {
     "dev": "electron-webpack dev",
@@ -70,7 +71,7 @@
     "productName": "Mails par Archifiltre",
     "afterSign": "scripts/notarize.js",
     "files": [
-      "electron/build/icon.*"
+      "electron/build/icon*.*"
     ],
     "extraResources": [
       {
@@ -106,6 +107,9 @@
       "entitlements": "./electron/build/entitlements.mac.plist",
       "entitlementsInherit": "./electron/build/entitlements.mac.plist"
     },
+    "dmg": {
+      "title": "${name} ${version}"
+    },
     "win": {
       "icon": "./electron/build/icon.png"
     },
@@ -118,7 +122,11 @@
     "nsis": {
       "artifactName": "${name}-${os}-setup.${ext}",
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "language": 1036,
+      "menuCategory": "Archifiltre",
+      "installerIcon": "./electron/build/installerIcon.png",
+      "uninstallerIcon": "./electron/build/uninstallerIcon.png"
     },
     "linux": {
       "category": "Office",
@@ -172,6 +180,7 @@
     "postcss": "^8.4.14",
     "postcss-scss": "^4.0.3",
     "prettier": "^2.7.1",
+    "replace": "^1.2.1",
     "rimraf": "^3.0.2",
     "sass": "^1.49.0",
     "sass-loader": "10",
