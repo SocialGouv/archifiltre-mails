@@ -3,13 +3,16 @@ import "./styles/global.scss";
 
 import React from "react";
 
+import { AutoUpdateProvider } from "./context/AutoUpdateContext";
 import { RouteContextProvider } from "./context/RouterContext";
 import { Views } from "./views";
 
 export const App: React.FC = () => (
     <main>
-        <RouteContextProvider>
-            <Views />
-        </RouteContextProvider>
+        <AutoUpdateProvider>
+            <RouteContextProvider>
+                <Views />
+            </RouteContextProvider>
+        </AutoUpdateProvider>
     </main>
 );

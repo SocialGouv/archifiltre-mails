@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Logo } from "../../components/common/logo/Logo";
 import { CogPicto } from "../../components/common/pictos/picto";
 import { Dropzone } from "../../components/dropzone/Dropzone";
+import { useAutoUpdateContext } from "../../context/AutoUpdateContext";
 import { useRouteContext } from "../../context/RouterContext";
 import { usePstExtractor } from "../../hooks/usePstExtractor";
 import { usePstStore } from "../../store/PSTStore";
@@ -17,6 +18,7 @@ export const StartScreen: React.FC = () => {
     const { pstFile } = usePstStore();
 
     const { changeRoute } = useRouteContext();
+    const { updateInfo } = useAutoUpdateContext();
 
     const { t } = useTranslation();
 
@@ -42,7 +44,11 @@ export const StartScreen: React.FC = () => {
     return (
         <div className={style.startscreen}>
             <button
-                className={style.startscreen__open__config}
+                className={
+                    updateInfo
+                        ? style.startscreen__open__config__update__available
+                        : style.startscreen__open__config
+                }
                 onClick={toggleUserConfigPanel}
             >
                 <CogPicto />

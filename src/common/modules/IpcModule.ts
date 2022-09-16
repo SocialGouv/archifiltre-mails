@@ -7,6 +7,10 @@ import { IsomorphicModule } from "./Module";
 
 declare module "../lib/ipc/event" {
     interface AsyncIpcMapping {
+        "dialog.showMessageBox": IpcConfig<
+            Parameters<Dialog["showMessageBox"]>,
+            ReturnType<Dialog["showMessageBox"]>
+        >;
         "dialog.showOpenDialog": IpcConfig<
             Parameters<Dialog["showOpenDialog"]>,
             ReturnType<Dialog["showOpenDialog"]>
@@ -37,6 +41,9 @@ export class IpcModule extends IsomorphicModule {
             return Promise.resolve();
         }
 
+        ipcMain.handle("dialog.showMessageBox", async (_event, options) =>
+            dialog.showMessageBox(options)
+        );
         ipcMain.handle("dialog.showOpenDialog", async (_event, options) =>
             dialog.showOpenDialog(options)
         );

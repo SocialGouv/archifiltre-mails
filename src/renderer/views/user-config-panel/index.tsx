@@ -3,10 +3,12 @@ import { useService } from "@common/modules/ContainerModule";
 import { schema } from "@common/modules/user-config/schema";
 import type { UserConfigTypedKeys } from "@common/modules/user-config/type";
 import { Object } from "@common/utils/overload";
+import { version } from "@common/utils/package";
 import type { ReactNode } from "react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
+import { useAutoUpdateContext } from "../../context/AutoUpdateContext";
 import {
     isUserConfigPanelOpen,
     toggleUserConfigPanel,
@@ -21,6 +23,7 @@ export interface UserConfigPanelProps {
 export const UserConfigPanel: React.FC = () => {
     const { t } = useTranslation();
     const userConfigService = useService("userConfigService");
+    const { updateInfo, doUpdate } = useAutoUpdateContext();
     if (!isUserConfigPanelOpen()) {
         return null;
     }
@@ -31,6 +34,25 @@ export const UserConfigPanel: React.FC = () => {
     return (
         <div className={style.userconfig}>
             <h1>{t("user-config.panel.title")}</h1>
+            <div className={style.versionBlock}>
+                <span>{t("user-config.version.current", { version })}</span>
+                <span
+                    className={updateInfo ? style.versionAvailable : ""}
+                    aria-hidden
+                    onClick={() => {
+                        doUpdate();
+                    }}
+                >
+                    {updateInfo
+                        ? t("user-config.version.updateAvailable", updateInfo)
+                              .split("")
+                              .map((letter, idx) => (
+                                  <span key={idx}>{letter}</span>
+                              ))
+                        : t("user-config.version.noUpdateAvailable")}
+                </span>
+            </div>
+            <hr />
 
             {Object.keys(schema).map((valueName) => {
                 const valueSchema = schema[valueName];
