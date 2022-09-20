@@ -11,7 +11,7 @@ import {
     MailSentPicto,
     TrashPicto,
 } from "../../components/common/pictos/picto";
-import { usePstFileSizeStore } from "../../store/PstFileSizeStore";
+import { pstContentCounterPerLevelStore } from "../../store/PstContentCounterPerLevelStore";
 import { usePstStore } from "../../store/PSTStore";
 import { useSynthesisStore } from "../../store/SynthesisStore";
 import {
@@ -25,7 +25,7 @@ import { DashboardRecapItem } from "./DashboardRecapItem";
 
 export const DashboardRecapItems: FC = () => {
     const { t } = useTranslation();
-    const { totalFileSize } = usePstFileSizeStore();
+    const { totalFilesize } = pstContentCounterPerLevelStore();
     const { extractDatas } = usePstStore();
     const { deletedFolderId, ownerId } = useSynthesisStore();
 
@@ -44,7 +44,7 @@ export const DashboardRecapItems: FC = () => {
     );
     const sentMailsAttachementPercentage = getPercentage(
         sentMailsAttachementSize,
-        totalFileSize
+        totalFilesize
     );
 
     const receivedMailIds = getMailIdsByStatus(
@@ -63,7 +63,7 @@ export const DashboardRecapItems: FC = () => {
     );
     const receivedMailsAttachementPercentage = getPercentage(
         receivedMailsAttachementSize,
-        totalFileSize
+        totalFilesize
     );
 
     const deletedMailIds = getDeletedMailIds(deletedFolderId, extractDatas);
@@ -78,7 +78,7 @@ export const DashboardRecapItems: FC = () => {
     );
     const deletedMailsAttachmentPercentage = getPercentage(
         deletedMailsAttachmentSize,
-        totalFileSize
+        totalFilesize
     );
 
     const contactsCount = extractDatas.groups.recipient.size;

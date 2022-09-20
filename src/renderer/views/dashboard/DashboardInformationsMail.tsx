@@ -8,7 +8,7 @@ import type { FC } from "react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import { usePstFileSizeStore } from "../../store/PstFileSizeStore";
+import { pstContentCounterPerLevelStore } from "../../store/PstContentCounterPerLevelStore";
 import { AVERAGE_MAIL_SIZE_IN_KO } from "../../utils/constants";
 import { sanitizeMailDate } from "../../utils/dashboard-viewer";
 import type { MailViewerObject } from "../../utils/dashboard-viewer-dym";
@@ -19,7 +19,7 @@ export const DashboardInformationsMail: FC<{
     mainInfos: ComputedDatum<MailViewerObject<string>>;
 }> = ({ mainInfos }) => {
     const { t } = useTranslation();
-    const { totalFileSize } = usePstFileSizeStore();
+    const { totalFilesize } = pstContentCounterPerLevelStore();
 
     const volumeTotal =
         bytesToKilobytes(getFileSizeByMail(mainInfos.data.email.attachments)) +
@@ -91,7 +91,7 @@ export const DashboardInformationsMail: FC<{
             <div>
                 <strong>{t("dashboard.informations.percentage")} </strong>
                 {toDecimalsFloat(volumeTotal, 2)}Ko (
-                {getPercentage(volumeTotal / 1000, totalFileSize)}%)
+                {getPercentage(volumeTotal / 1000, totalFilesize)}%)
             </div>
             <div>
                 <strong>{t("dashboard.informations.mailFocus")}</strong>

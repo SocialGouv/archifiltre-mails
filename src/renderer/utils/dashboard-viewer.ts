@@ -10,6 +10,7 @@ import { COLORS, MONTHS_NB } from "./constants";
 import type {
     DefaultViewerObject,
     MailViewerObject,
+    ViewerObjectChild,
 } from "./dashboard-viewer-dym";
 import { isMailViewerObject } from "./dashboard-viewer-dym";
 
@@ -92,3 +93,10 @@ export const handleFocusItemBorderColor = (
         return COLORS.BLACK;
     return COLORS.TRANSPARENT;
 };
+
+/**
+ * Utility function to get total count per level for the given object per level
+ * (Total count of mails, attachment...).
+ */
+export const getTotalCount = (viewObject: ViewerObjectChild[]): number =>
+    viewObject.reduce((acc, curr) => acc + curr.size, 0);

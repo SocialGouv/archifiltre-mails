@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import type { CustomContextMenuMouseEvent } from "../../hooks/useContextMenuEventAsClick";
 import { useContextMenuEventAsClick } from "../../hooks/useContextMenuEventAsClick";
 import { useDymViewerNavigation } from "../../hooks/useDymViewerNavigation";
+import { usePstContentCounterPerLevel } from "../../store/PstContentCounterPerLevelStore";
 import { usePstFMInfosStore } from "../../store/PstFMInfosStore";
 import { tagManagerStore } from "../../store/TagManagerStore";
 import { COLORS, ROOT } from "../../utils/constants";
@@ -47,9 +48,11 @@ export const CirclePacking: React.FC = () => {
         resetView,
         computePreviousView,
     } = useDymViewerNavigation();
+
     const { setMainInfos, startFocus, isInfoFocus, mainInfos, cancelFocus } =
         usePstFMInfosStore();
     const { setHoveredNode, keepIds, deleteIds } = tagManagerStore();
+
     useContextMenuEventAsClick(circlePackingRef.current);
 
     const [anchorX, setAnchorX] = useState(0);
@@ -57,6 +60,8 @@ export const CirclePacking: React.FC = () => {
     const [show, setShow] = useState(false);
 
     const currentView = viewList[currentViewIndex];
+
+    usePstContentCounterPerLevel();
 
     const getTaggedFilesColor = (
         node: Omit<ComputedDatum<ViewerObject<string>>, "color" | "fill">
