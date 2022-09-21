@@ -91,7 +91,11 @@ export const DashboardInformationsMail: FC<{
             <div>
                 <strong>{t("dashboard.informations.percentage")} </strong>
                 {toDecimalsFloat(volumeTotal, 2)}Ko (
-                {getPercentage(volumeTotal / 1000, totalFilesize)}%)
+                {getPercentage(
+                    volumeTotal / 1000,
+                    totalFilesize[totalFilesize.length - 1] ?? 1
+                )}
+                %)
             </div>
             <div>
                 <strong>{t("dashboard.informations.mailFocus")}</strong>

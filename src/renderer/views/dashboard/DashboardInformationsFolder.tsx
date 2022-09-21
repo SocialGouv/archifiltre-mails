@@ -45,16 +45,19 @@ export const DashboardInformationsFolder: FC<{
                 </div>
                 <div>
                     <span>{t("dashboard.informations.mailCountTotal")} </span>
-                    <span>{totalMail}</span>
+                    <span>{totalMail[totalMail.length - 1]}</span>
                 </div>
                 <div>
                     <span>{t("dashboard.informations.attachementCount")} </span>
-                    <span>{totalAttachment}</span>
+                    <span>{totalAttachment[totalAttachment.length - 1]}</span>
                 </div>
                 <div>
                     <span>{t("dashboard.informations.percentage")} </span>
-                    {totalFilesize} Mo (
-                    {getPercentage(totalFilesize, totalArchiveSize)}
+                    {totalFilesize[totalFilesize.length - 1]} Mo (
+                    {getPercentage(
+                        totalFilesize[totalFilesize.length - 1] ?? 1,
+                        totalArchiveSize
+                    )}
                     %)
                     {/* {fileSizePerLevel[fileSizePerLevel.length - 1]} Mo (
                     {getPercentage(

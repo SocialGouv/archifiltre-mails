@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { StaticImage } from "../../components/common/staticImage/StaticImage";
 import { useImpactStore } from "../../store/ImpactStore";
-import { usePstFileSizeStore } from "../../store/PstFileSizeStore";
+import { pstContentCounterPerLevelStore } from "../../store/PstContentCounterPerLevelStore";
 import {
     ECOLOGIC_IMPACT_FACTOR,
     ECOLOGIC_TRAIN_FACTOR,
@@ -37,7 +37,7 @@ const DashboardImpactItem: FC<DashboardImpactItemProps> = ({
 
 export const DashboardImpact: FC = () => {
     const { t } = useTranslation();
-    const { totalFileSize } = usePstFileSizeStore();
+    const { totalArchiveSize } = pstContentCounterPerLevelStore();
     const { deleteSize } = useImpactStore();
 
     const megabytesToCo2EqInKilo = (totalInMo: number) =>
@@ -49,6 +49,7 @@ export const DashboardImpact: FC = () => {
     const cO2EqKgToDelete = Math.round(
         megabytesToCo2EqInKilo(computedImpactInMega)
     );
+
     const cO2EqKgByTrainInKm = Math.round(cO2EqKgToTrain(cO2EqKgToDelete));
 
     return (
@@ -56,7 +57,7 @@ export const DashboardImpact: FC = () => {
             <div className={style.dashboard__impact__inner}>
                 <DashboardImpactItem
                     img={"img/pictos/globe.png"}
-                    impactNumber={`${totalFileSize} Mo`}
+                    impactNumber={`${totalArchiveSize} Mo`}
                     impactInfo={t("dashboard.impact.totalSize")}
                 />
                 <DashboardImpactItem

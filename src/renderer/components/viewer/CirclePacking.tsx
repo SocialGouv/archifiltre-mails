@@ -40,6 +40,7 @@ const isMailTagNode = (
 
 export const CirclePacking: React.FC = () => {
     const { t } = useTranslation();
+    usePstContentCounterPerLevel();
     const circlePackingRef = useRef<HTMLDivElement>(null);
     const {
         viewList,
@@ -60,8 +61,6 @@ export const CirclePacking: React.FC = () => {
     const [show, setShow] = useState(false);
 
     const currentView = viewList[currentViewIndex];
-
-    usePstContentCounterPerLevel();
 
     const getTaggedFilesColor = (
         node: Omit<ComputedDatum<ViewerObject<string>>, "color" | "fill">
