@@ -33,6 +33,7 @@ export const DashboardRecapItems: FC = () => {
 
     // TODO: mutualize / DRY
     const sentMailIds = getMailIdsByStatus(ownerId, extractDatas, "sent");
+
     const sentMailsCount = sentMailIds.length;
     const sentMailsAttachementCount = getMailsAttachmentCount(
         sentMailIds,
