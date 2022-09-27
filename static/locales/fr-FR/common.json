@@ -1,17 +1,18 @@
 {
+  "button.cancel": "Annuler",
   "button.no": "Non",
   "button.save": "Sauvegarder",
   "button.yes": "Oui",
   "loader.loading": "Chargement ...",
+  "menu.debug.changeLanguage_DE-DE": "Deutsch 🇩🇪",
+  "menu.debug.changeLanguage_EN-GB": "English 🇬🇧",
+  "menu.debug.changeLanguage_FR-FR": "Français 🇫🇷",
+  "menu.debug.changeLanguage": "Changer la langue ...",
+  "menu.debug.exportLastFile": "Exporter le dernier fichier ...",
   "menu.debug.label": "Debogue",
-  "menu.debug.sublabel": "Debogue personnalisé",
   "menu.debug.openConsolePst": "Ouvrir et loguer un fichier PST ...",
   "menu.debug.openConsolePstLast": "Ouvrir et loguer le dernier fichier PST",
-  "menu.debug.exportLastFile": "Exporter le dernier fichier ...",
-  "menu.debug.changeLanguage": "Changer la langue ...",
-  "menu.debug.changeLanguage_FR-FR": "Français 🇫🇷",
-  "menu.debug.changeLanguage_EN-GB": "English 🇬🇧",
-  "menu.debug.changeLanguage_DE-DE": "Deutsch 🇩🇪",
-  "menu.help.enableDebug": "Activer Debogue",
-  "menu.debug.resetConfig": "Réinitialiser la config utilisateur"
+  "menu.debug.resetConfig": "Réinitialiser la config utilisateur",
+  "menu.debug.sublabel": "Debogue personnalisé",
+  "menu.help.enableDebug": "Activer Debogue"
 }

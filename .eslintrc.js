@@ -66,8 +66,8 @@ const defaultConfig = {
             files: ["**/*.tsx"],
             ...typescriptConfig,
             extends: [
-                `${typescriptConfig.extends}`,
                 "@socialgouv/eslint-config-react",
+                `${typescriptConfig.extends}`,
             ],
         },
         {
