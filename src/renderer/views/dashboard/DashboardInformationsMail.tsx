@@ -57,11 +57,9 @@ export const DashboardInformationsMail: FC<{
                 <strong>
                     {t("dashboard.informations.attachementTitles")}{" "}
                 </strong>{" "}
-                {mainInfos.data.email.attachments.map(
-                    ({ filename }, index: number) => (
-                        <span key={index}>{filename}</span>
-                    )
-                )}
+                {mainInfos.data.email.attachments.map(({ filename }, index) => (
+                    <span key={index}>{filename}</span>
+                ))}
             </div>
             <div>
                 <strong>{t("dashboard.informations.to")}</strong>{" "}
@@ -91,10 +89,7 @@ export const DashboardInformationsMail: FC<{
             <div>
                 <strong>{t("dashboard.informations.percentage")} </strong>
                 {toDecimalsFloat(volumeTotal, 2)}Ko (
-                {getPercentage(
-                    volumeTotal / 1000,
-                    totalFilesize[totalFilesize.length - 1] ?? 1
-                )}
+                {getPercentage(volumeTotal, totalFilesize.last() ?? 1, 3)}
                 %)
             </div>
             <div>

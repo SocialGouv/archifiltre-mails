@@ -1,3 +1,5 @@
+import "@common/utils/overload";
+
 import { getIsomorphicModules } from "@common/lib/core/isomorphic";
 import { loadModules, unloadModules } from "@common/lib/ModuleManager";
 import type { Module } from "@common/modules/Module";

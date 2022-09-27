@@ -1,3 +1,5 @@
+import "@common/utils/overload";
+
 import type {
     EveryFunction,
     StringKeyOf,

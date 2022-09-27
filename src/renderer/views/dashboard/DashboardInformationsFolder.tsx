@@ -30,7 +30,7 @@ export const DashboardInformationsFolder: FC<{
 
     const infosId = breadcrumbId as InformationsId;
     const currentElementTitle =
-        history?.[history.length - 1] ?? t("dashboard.informations.allDomains");
+        history?.last() ?? t("dashboard.informations.allDomains");
 
     return (
         <div className={style.dashboard__informations__wrapper__folder}>
@@ -45,26 +45,17 @@ export const DashboardInformationsFolder: FC<{
                 </div>
                 <div>
                     <span>{t("dashboard.informations.mailCountTotal")} </span>
-                    <span>{totalMail[totalMail.length - 1]}</span>
+                    <span>{totalMail.last()}</span>
                 </div>
                 <div>
                     <span>{t("dashboard.informations.attachementCount")} </span>
-                    <span>{totalAttachment[totalAttachment.length - 1]}</span>
+                    <span>{totalAttachment.last()}</span>
                 </div>
                 <div>
                     <span>{t("dashboard.informations.percentage")} </span>
-                    {totalFilesize[totalFilesize.length - 1]} Mo (
-                    {getPercentage(
-                        totalFilesize[totalFilesize.length - 1] ?? 1,
-                        totalArchiveSize
-                    )}
+                    {totalFilesize.last()} Mo (
+                    {getPercentage(totalFilesize.last() ?? 1, totalArchiveSize)}
                     %)
-                    {/* {fileSizePerLevel[fileSizePerLevel.length - 1]} Mo (
-                    {getPercentage(
-                        fileSizePerLevel[fileSizePerLevel.length - 1] ?? 0,
-                        totalFileSize
-                    )}
-                    %) */}
                 </div>
             </div>
             <div

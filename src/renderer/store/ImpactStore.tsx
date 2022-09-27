@@ -27,25 +27,15 @@ export const useImpactStore = (): { deleteSize: number } => {
             const attachments = [...extractDatas.attachments];
             // need to reset current delete size before update it.
             deleteSize.current = 0;
-            attachments.forEach((attachment) => {
+            for (const attachment of attachments) {
                 if (deleteIds.includes(attachment[0])) {
-                    attachment[1].forEach(
-                        (attach) => (deleteSize.current += attach.filesize)
-                    );
+                    for (const attach of attachment[1]) {
+                        deleteSize.current += attach.filesize;
+                    }
                 }
-            });
+            }
 
             setDeleteSize(deleteSize.current);
-
-            // investigate (to use instead of forEach loop?): why this TS error => Function declared in a loop contains unsafe references to variable(s)
-            //
-            // for (const attachment of attachments) {
-            //     if (deleteIds.includes(attachment[0])) {
-            //         attachment[1].forEach(
-            //             (attach) => (filesize += attach.filesize)
-            //         );
-            //     }
-            // }
         }
     }, [deleteIds, extractDatas, setDeleteSize]);
 

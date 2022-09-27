@@ -89,34 +89,31 @@ export const usePstContentCounterPerLevel = (): void => {
                     .map((child) => child.ids)
                     .flat();
 
-                let filesize = 0;
-
-                const { total: totalAttachmentPerLevel, filesize: fs } =
+                const { totalAttachmentPerLevel, filesize } =
                     attachments.reduce(
-                        (accumulatedAttachment, currentAttachment) => {
-                            if (mailsIds.includes(currentAttachment[0])) {
-                                currentAttachment[1].forEach(
-                                    (c) => (filesize += c.filesize)
-                                );
-                                // investigate: why update to 0 ?
-                                // const currentFilesize = currentAttachment[1].reduce(
-                                //     (a, c) => a + c.filesize,
-                                //     0
-                                // );
+                        (
+                            accumulatedAttachment,
+                            [mailId, currentAttachments]
+                        ) => {
+                            if (mailsIds.includes(mailId)) {
+                                const currentFilesize =
+                                    currentAttachments.reduce(
+                                        (acc, attachment) =>
+                                            acc + attachment.filesize,
+                                        0
+                                    );
 
-                                return {
-                                    filesize: 0, // should be `currentFilesize`, see line 88.
-                                    total:
-                                        accumulatedAttachment.total +
-                                        currentAttachment[1].length,
-                                };
+                                accumulatedAttachment.filesize +=
+                                    currentFilesize;
+                                accumulatedAttachment.totalAttachmentPerLevel +=
+                                    currentAttachments.length;
                             }
 
                             return accumulatedAttachment;
                         },
                         {
                             filesize: 0,
-                            total: 0,
+                            totalAttachmentPerLevel: 0,
                         }
                     );
 

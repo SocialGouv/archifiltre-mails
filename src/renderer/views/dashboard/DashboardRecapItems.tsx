@@ -45,7 +45,7 @@ export const DashboardRecapItems: FC = () => {
     );
     const sentMailsAttachementPercentage = getPercentage(
         sentMailsAttachementSize,
-        totalFilesize[totalFilesize.length - 1] ?? 1
+        totalFilesize.last() ?? 1
     );
 
     const receivedMailIds = getMailIdsByStatus(
@@ -64,7 +64,7 @@ export const DashboardRecapItems: FC = () => {
     );
     const receivedMailsAttachementPercentage = getPercentage(
         receivedMailsAttachementSize,
-        totalFilesize[totalFilesize.length - 1] ?? 1
+        totalFilesize.last() ?? 1
     );
 
     const deletedMailIds = getDeletedMailIds(deletedFolderId, extractDatas);
@@ -79,7 +79,7 @@ export const DashboardRecapItems: FC = () => {
     );
     const deletedMailsAttachmentPercentage = getPercentage(
         deletedMailsAttachmentSize,
-        totalFilesize[totalFilesize.length - 1] ?? 1
+        totalFilesize.last() ?? 1
     );
 
     const contactsCount = extractDatas.groups.recipient.size;
