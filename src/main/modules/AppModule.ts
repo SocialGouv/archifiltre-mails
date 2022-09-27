@@ -4,11 +4,10 @@ import type { TrackerService } from "@common/modules/TrackerModule";
 import type { UserConfigService } from "@common/modules/UserConfigModule";
 import { version } from "@common/utils/package";
 import { dialog } from "electron";
-import type { ProgressInfo, UpdateInfo } from "electron-updater";
-import { autoUpdater } from "electron-updater";
 
 import type { MainWindowRetriever } from "..";
 import type { ConsoleToRendererService } from "../services/ConsoleToRendererService";
+import { isQuitingForUpdate, setupAutoUpdate } from "./app/autoUpdate";
 import { MainModule } from "./MainModule";
 
 /**
@@ -66,11 +65,12 @@ export class AppModule extends MainModule {
                 version,
             });
 
+            await this.i18nService.wait();
             if (!IS_E2E) {
-                await this.i18nService.wait();
                 const { t } = this.i18nService.i18next;
                 // ask before leaving
                 mainWindow.on("close", async (event) => {
+                    if (isQuitingForUpdate()) return;
                     event.preventDefault();
                     const answer = await dialog.showMessageBox(mainWindow, {
                         buttons: [
@@ -91,76 +91,21 @@ export class AppModule extends MainModule {
                 });
             }
 
-            // TODO: more interactive auto-update
-            autoUpdater.on("checking-for-update", () => {
-                this.consoleToRendererService.log(
-                    mainWindow,
-                    "[UPDATE] Check for update"
-                );
-            });
-
-            autoUpdater.on("update-available", (info: UpdateInfo) => {
-                this.consoleToRendererService.log(
-                    mainWindow,
-                    "[UPDATE] Update available",
-                    info
-                );
-            });
-
-            autoUpdater.on("update-not-available", (info: UpdateInfo) => {
-                this.consoleToRendererService.log(
-                    mainWindow,
-                    "[UPDATE] Update NOT available",
-                    info
-                );
-            });
-
-            autoUpdater.on("error", (err) => {
-                this.consoleToRendererService.log(
-                    mainWindow,
-                    "[UPDATE] Error",
-                    err
-                );
-            });
-
-            autoUpdater.on("download-progress", (progress: ProgressInfo) => {
-                this.consoleToRendererService.log(
-                    mainWindow,
-                    "[UPDATE] Progress...",
-                    progress
-                );
-            });
-
-            autoUpdater.on("update-downloaded", (info: UpdateInfo) => {
-                this.consoleToRendererService.log(
-                    mainWindow,
-                    "[UPDATE] Update downloaded",
-                    info
-                );
-                this.trackerService.getProvider().track("App Updated", {
-                    currentVersion: info.version,
-                    oldVersion: version,
-                });
-            });
-
             const log = this.consoleToRendererService.log.bind(
                 this.consoleToRendererService,
                 mainWindow
             );
-            autoUpdater.logger = {
-                debug: log,
-                error: log,
-                info: log,
-                warn: log,
-            };
-            this.consoleToRendererService.log(
-                mainWindow,
-                "Current version:",
-                autoUpdater.currentVersion.raw,
-                autoUpdater.currentVersion
+            setupAutoUpdate(
+                this.trackerService,
+                {
+                    debug: log,
+                    error: log,
+                    info: log,
+                    log,
+                    warn: log,
+                },
+                this.i18nService.i18next.t
             );
-            autoUpdater.allowDowngrade = false;
-            await autoUpdater.checkForUpdatesAndNotify();
         });
 
         return Promise.resolve();
