@@ -62,7 +62,7 @@ export const DashboardImpact: FC = () => {
                     impactInfo={t("dashboard.impact.totalSize")}
                 />
                 <DashboardImpactItem
-                    img={"img/pictos/airplane.png"}
+                    img={"img/pictos/train.png"}
                     impactNumber={`${t(
                         "dashboard.impact.ecologicImpactByTrain",
                         {
