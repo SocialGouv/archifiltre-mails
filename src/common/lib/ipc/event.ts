@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
-import type { IpcMainEvent } from "electron";
+import type { IpcMainEvent, IpcRendererEvent } from "electron";
 
 import type {
     EveryFunction,
@@ -53,6 +53,7 @@ export type DefaultIpcConfig = IpcConfig<unknown[], unknown>;
  */
 export type DefaultDualIpcConfig = DualIpcConfig<"", unknown[], unknown[]>;
 
+//TODO: rename mapping interface with more contextual and understandable names
 /**
  * A map of IPC channels associated to their associated config.
  *
@@ -79,12 +80,25 @@ export interface AsyncIpcMapping {}
  */
 export interface DualAsyncIpcMapping {}
 
+/**
+ * @internal
+ */
+export type ReplyDualAsyncIpcMapping = {
+    [K in DualAsyncIpcMapping[DualAsyncIpcKeys]["replyKey"]]: IpcConfig<
+        Extract<
+            {
+                [P in DualAsyncIpcKeys as DualAsyncIpcMapping[P]["replyKey"]]: DualAsyncIpcMapping[P];
+            }[K],
+            { replyKey: K; returnValue: unknown[] }
+        >["returnValue"],
+        void
+    >;
+};
+
 export type SyncIpcKeys = keyof SyncIpcMapping;
 export type AsyncIpcKeys = keyof AsyncIpcMapping;
 export type DualAsyncIpcKeys = keyof DualAsyncIpcMapping;
-export type ReplyDualAsyncIpcKeys = {
-    [K in DualAsyncIpcKeys]: DualAsyncIpcMapping[K]["replyKey"];
-}[DualAsyncIpcKeys];
+export type ReplyDualAsyncIpcKeys = keyof ReplyDualAsyncIpcMapping;
 
 export type GetSyncIpcConfig<T extends SyncIpcKeys | UnknownMapping> =
     T extends SyncIpcKeys ? SyncIpcMapping[T] : DefaultIpcConfig;
@@ -93,11 +107,7 @@ export type GetAsyncIpcConfig<T extends AsyncIpcKeys | UnknownMapping> =
 export type GetDualAsyncIpcConfig<T extends DualAsyncIpcKeys | UnknownMapping> =
     T extends DualAsyncIpcKeys ? DualAsyncIpcMapping[T] : DefaultDualIpcConfig;
 export type GetRepliedDualAsyncIpcConfig<T> = T extends ReplyDualAsyncIpcKeys
-    ? {
-          [K in DualAsyncIpcKeys]: T extends DualAsyncIpcMapping[K]["replyKey"]
-              ? IpcConfig<DualAsyncIpcMapping[K]["returnValue"], void>
-              : never;
-      }[DualAsyncIpcKeys]
+    ? ReplyDualAsyncIpcMapping[T]
     : DefaultIpcConfig;
 
 export type SyncIpcChannel<T extends SyncIpcKeys | UnknownMapping> =
@@ -122,6 +132,7 @@ interface CustomSyncIpcMainEvent<T extends SyncIpcKeys | UnknownMapping>
      */
     reply: never;
     returnValue: GetSyncIpcConfig<T>["returnValue"];
+    type: T;
 }
 
 interface CustomAsyncIpcMainEvent<T extends DualAsyncIpcKeys | UnknownMapping>
@@ -135,6 +146,7 @@ interface CustomAsyncIpcMainEvent<T extends DualAsyncIpcKeys | UnknownMapping>
      * @deprecated
      */
     returnValue: never;
+    type: T;
 }
 
 export type CustomIpcMainEvent<T> = T extends SyncIpcKeys
@@ -142,3 +154,12 @@ export type CustomIpcMainEvent<T> = T extends SyncIpcKeys
     : T extends DualAsyncIpcKeys
     ? CustomAsyncIpcMainEvent<T>
     : IpcMainEvent;
+
+interface CustomAsyncIpcRendererEvent<T extends string>
+    extends IpcRendererEvent {
+    type: T;
+}
+
+export type CustomIpcRendererEvent<T> = T extends ReplyDualAsyncIpcKeys
+    ? CustomAsyncIpcRendererEvent<T>
+    : IpcRendererEvent;

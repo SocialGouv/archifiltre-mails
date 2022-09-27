@@ -1,17 +1,18 @@
 {
+  "button.cancel": "Cancel",
   "button.no": "No",
   "button.save": "Save",
   "button.yes": "Yes",
   "loader.loading": "Loading...",
+  "menu.debug.changeLanguage_DE-DE": "Deutsch 🇩🇪",
+  "menu.debug.changeLanguage_EN-GB": "English 🇬🇧",
+  "menu.debug.changeLanguage_FR-FR": "Français 🇫🇷",
+  "menu.debug.changeLanguage": "Change language...",
+  "menu.debug.exportLastFile": "Export last file...",
   "menu.debug.label": "Debug",
-  "menu.debug.sublabel": "Custom debugging",
   "menu.debug.openConsolePst": "Open and console log PST file...",
   "menu.debug.openConsolePstLast": "Open and console log last PST file",
-  "menu.debug.exportLastFile": "Export last file...",
-  "menu.debug.changeLanguage": "Change language...",
-  "menu.debug.changeLanguage_FR-FR": "Français 🇫🇷",
-  "menu.debug.changeLanguage_EN-GB": "English 🇬🇧",
-  "menu.debug.changeLanguage_DE-DE": "Deutsch 🇩🇪",
-  "menu.help.enableDebug": "Enable Debug",
-  "menu.debug.resetConfig": "Reset user config"
+  "menu.debug.resetConfig": "Reset user config",
+  "menu.debug.sublabel": "Custom debugging",
+  "menu.help.enableDebug": "Enable Debug"
 }

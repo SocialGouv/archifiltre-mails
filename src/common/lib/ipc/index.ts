@@ -2,7 +2,6 @@ import type {
     IpcMain as BaseIpcMain,
     IpcMainInvokeEvent,
     IpcRenderer as BaseIpcRenderer,
-    IpcRendererEvent,
 } from "electron";
 import {
     ipcMain as baseIpcMain,
@@ -14,6 +13,7 @@ import type {
     AsyncIpcChannel,
     AsyncIpcKeys,
     CustomIpcMainEvent,
+    CustomIpcRendererEvent,
     DualAsyncIpcChannel,
     DualAsyncIpcKeys,
     GetAsyncIpcConfig,
@@ -54,10 +54,18 @@ interface IpcRenderer extends BaseIpcRenderer {
         ...args: GetAsyncIpcConfig<T>["args"]
     ) => Promise<GetAsyncIpcConfig<T>["returnValue"]>;
 
+    off: <T extends ReplyDualAsyncIpcKeys | UnknownMapping>(
+        channel: ReplyDualAsyncIpcChannel<T>,
+        listener: (
+            event: CustomIpcRendererEvent<T>,
+            ...args: GetRepliedDualAsyncIpcConfig<T>["args"]
+        ) => void
+    ) => this;
+
     on: <T extends ReplyDualAsyncIpcKeys | UnknownMapping>(
         channel: ReplyDualAsyncIpcChannel<T>,
         listener: (
-            event: IpcRendererEvent,
+            event: CustomIpcRendererEvent<T>,
             ...args: GetRepliedDualAsyncIpcConfig<T>["args"]
         ) => void
     ) => this;
