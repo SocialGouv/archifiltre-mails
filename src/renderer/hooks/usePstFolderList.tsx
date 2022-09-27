@@ -7,7 +7,7 @@ interface UsePstFolderList {
 }
 
 export const usePstFolderList = (): UsePstFolderList => {
-    const [folderList, setFolderList] = useState<string[]>([""]);
+    const [folderList, setFolderList] = useState<string[]>([]);
 
     const { extractDatas } = usePstStore();
 

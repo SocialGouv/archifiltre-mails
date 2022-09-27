@@ -6,8 +6,8 @@ import type {
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useImpactStore } from "../store/ImpactStore";
 import { usePstStore } from "../store/PSTStore";
+import { tagManagerStore } from "../store/TagManagerStore";
 import { dialog } from "../utils/electron";
 
 interface UseExporter {
@@ -18,7 +18,7 @@ interface UseExporter {
 export const useExporter = (): UseExporter => {
     const pstExporterService = useService("pstExporterService");
     const { t } = useTranslation();
-    const { toDeleteIDs } = useImpactStore();
+    const { deleteIds: deletedIds } = tagManagerStore();
     const { extractDatas } = usePstStore();
 
     const openSaveFileDialog = useCallback(
@@ -45,12 +45,12 @@ export const useExporter = (): UseExporter => {
             }
 
             await pstExporterService.exportMails({
-                deletedIds: [...toDeleteIDs],
+                deletedIds,
                 dest: dialogPath.filePath,
                 type,
             });
         },
-        [t, extractDatas, pstExporterService, toDeleteIDs]
+        [t, extractDatas, pstExporterService, deletedIds]
     );
 
     const openSaveFolderDialog = useCallback(

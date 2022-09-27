@@ -7,7 +7,7 @@ export const getMailIdsByStatus = (
     type: "received" | "sent"
 ): string[] => {
     if (type === "sent") {
-        return extractDatas.groups.senderMail.get(ownerId)!;
+        return extractDatas.groups.senderMail.get(ownerId) ?? [];
     }
     return [...extractDatas.groups.senderMail.entries()]
         .filter(([email]) => email !== ownerId)

@@ -5,8 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { StaticImage } from "../../components/common/staticImage/StaticImage";
 import { useImpactStore } from "../../store/ImpactStore";
-import { usePstFileSizeStore } from "../../store/PstFileSizeStore";
-import { usePstStore } from "../../store/PSTStore";
+import { pstContentCounterPerLevelStore } from "../../store/PstContentCounterPerLevelStore";
 import {
     ECOLOGIC_IMPACT_FACTOR,
     ECOLOGIC_TRAIN_FACTOR,
@@ -38,19 +37,19 @@ const DashboardImpactItem: FC<DashboardImpactItemProps> = ({
 
 export const DashboardImpact: FC = () => {
     const { t } = useTranslation();
-    const { extractDatas } = usePstStore();
-    const { totalFileSize } = usePstFileSizeStore();
-    const { size } = useImpactStore(extractDatas?.attachments);
+    const { totalArchiveSize } = pstContentCounterPerLevelStore();
+    const { deleteSize } = useImpactStore();
 
     const megabytesToCo2EqInKilo = (totalInMo: number) =>
         (totalInMo * ECOLOGIC_IMPACT_FACTOR) / 1000;
 
     const cO2EqKgToTrain = (cO2eqKg: number) => cO2eqKg * ECOLOGIC_TRAIN_FACTOR;
 
-    const computedImpactInMega = bytesToMegabytes(size);
+    const computedImpactInMega = bytesToMegabytes(deleteSize);
     const cO2EqKgToDelete = Math.round(
         megabytesToCo2EqInKilo(computedImpactInMega)
     );
+
     const cO2EqKgByTrainInKm = Math.round(cO2EqKgToTrain(cO2EqKgToDelete));
 
     return (
@@ -58,7 +57,7 @@ export const DashboardImpact: FC = () => {
             <div className={style.dashboard__impact__inner}>
                 <DashboardImpactItem
                     img={"img/pictos/globe.png"}
-                    impactNumber={`${totalFileSize} Mo`}
+                    impactNumber={`${totalArchiveSize} Mo`}
                     impactInfo={t("dashboard.impact.totalSize")}
                 />
                 <DashboardImpactItem
@@ -75,7 +74,7 @@ export const DashboardImpact: FC = () => {
                 />
                 <DashboardImpactItem
                     img={"img/pictos/desktop.png"}
-                    impactNumber={`${bytesToMegabytes(size)} Mo`}
+                    impactNumber={`${bytesToMegabytes(deleteSize)} Mo`}
                     impactInfo={t("dashboard.impact.identify")}
                 />
             </div>

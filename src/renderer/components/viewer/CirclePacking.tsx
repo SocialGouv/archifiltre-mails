@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import type { CustomContextMenuMouseEvent } from "../../hooks/useContextMenuEventAsClick";
 import { useContextMenuEventAsClick } from "../../hooks/useContextMenuEventAsClick";
 import { useDymViewerNavigation } from "../../hooks/useDymViewerNavigation";
+import { usePstContentCounterPerLevel } from "../../store/PstContentCounterPerLevelStore";
 import { usePstFMInfosStore } from "../../store/PstFMInfosStore";
 import { tagManagerStore } from "../../store/TagManagerStore";
 import { COLORS, ROOT } from "../../utils/constants";
@@ -39,6 +40,7 @@ const isMailTagNode = (
 
 export const CirclePacking: React.FC = () => {
     const { t } = useTranslation();
+    usePstContentCounterPerLevel();
     const circlePackingRef = useRef<HTMLDivElement>(null);
     const {
         viewList,
@@ -47,9 +49,11 @@ export const CirclePacking: React.FC = () => {
         resetView,
         computePreviousView,
     } = useDymViewerNavigation();
+
     const { setMainInfos, startFocus, isInfoFocus, mainInfos, cancelFocus } =
         usePstFMInfosStore();
     const { setHoveredNode, keepIds, deleteIds } = tagManagerStore();
+
     useContextMenuEventAsClick(circlePackingRef.current);
 
     const [anchorX, setAnchorX] = useState(0);

@@ -1,3 +1,5 @@
+import "@common/utils/overload";
+
 import { IS_DIST_MODE, IS_E2E, IS_PACKAGED } from "@common/config";
 import { getIsomorphicModules } from "@common/lib/core/isomorphic";
 import { AppError } from "@common/lib/error/AppError";

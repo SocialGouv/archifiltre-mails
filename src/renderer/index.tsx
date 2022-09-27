@@ -1,3 +1,5 @@
+import "@common/utils/overload";
+
 import { PRODUCT_CHANNEL } from "@common/config";
 import { getIsomorphicModules } from "@common/lib/core/isomorphic";
 import { loadModules, unloadModules } from "@common/lib/ModuleManager";

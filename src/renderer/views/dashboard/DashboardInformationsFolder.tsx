@@ -5,10 +5,8 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 
 import { useBreadcrumbStore } from "../../store/BreadcrumbStore";
-import { useAttachmentCountStore } from "../../store/PstAttachmentCountStore";
-import { usePstFileSizeStore } from "../../store/PstFileSizeStore";
+import { pstContentCounterPerLevelStore } from "../../store/PstContentCounterPerLevelStore";
 import type { UsePstMainInfosStore } from "../../store/PstFMInfosStore";
-import { useMailCountStore } from "../../store/PstMailCountStore";
 import style from "./Dashboard.module.scss";
 import { DashboardInformationsLoader } from "./DashboardInformationsLoader";
 
@@ -22,10 +20,9 @@ export const DashboardInformationsFolder: FC<{
     mainInfos: UsePstMainInfosStore["mainInfos"];
 }> = ({ mainInfos }) => {
     const { t } = useTranslation();
-
-    const { attachmentPerLevel } = useAttachmentCountStore();
-    const { totalMailPerLevel } = useMailCountStore();
-    const { fileSizePerLevel, totalFileSize } = usePstFileSizeStore();
+    const { totalMail, totalAttachment, totalArchiveSize, totalFilesize } =
+        pstContentCounterPerLevelStore();
+    // const { fileSizePerLevel, totalFileSize } = usePstFileSizeStore();
 
     const {
         breadcrumb: { id: breadcrumbId, history },
@@ -33,7 +30,7 @@ export const DashboardInformationsFolder: FC<{
 
     const infosId = breadcrumbId as InformationsId;
     const currentElementTitle =
-        history?.[history.length - 1] ?? t("dashboard.informations.allDomains");
+        history?.last() ?? t("dashboard.informations.allDomains");
 
     return (
         <div className={style.dashboard__informations__wrapper__folder}>
@@ -48,23 +45,16 @@ export const DashboardInformationsFolder: FC<{
                 </div>
                 <div>
                     <span>{t("dashboard.informations.mailCountTotal")} </span>
-                    <span>
-                        {totalMailPerLevel[totalMailPerLevel.length - 1]}
-                    </span>
+                    <span>{totalMail.last()}</span>
                 </div>
                 <div>
                     <span>{t("dashboard.informations.attachementCount")} </span>
-                    <span>
-                        {attachmentPerLevel[attachmentPerLevel.length - 1]}
-                    </span>
+                    <span>{totalAttachment.last()}</span>
                 </div>
                 <div>
                     <span>{t("dashboard.informations.percentage")} </span>
-                    {fileSizePerLevel[fileSizePerLevel.length - 1]} Mo (
-                    {getPercentage(
-                        fileSizePerLevel[fileSizePerLevel.length - 1] ?? 0,
-                        totalFileSize
-                    )}
+                    {totalFilesize.last()} Mo (
+                    {getPercentage(totalFilesize.last() ?? 1, totalArchiveSize)}
                     %)
                 </div>
             </div>

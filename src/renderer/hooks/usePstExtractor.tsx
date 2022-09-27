@@ -4,9 +4,7 @@ import { bytesToGigabytes } from "@common/utils";
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 
-import { setTotalAttachment } from "../store/PstAttachmentCountStore";
-import { setTotalFileSize } from "../store/PstFileSizeStore";
-import { setTotalMail } from "../store/PstMailCountStore";
+import { pstContentCounterPerLevelStore } from "../store/PstContentCounterPerLevelStore";
 import { usePstStore } from "../store/PSTStore";
 import {
     getInitialTotalAttachements,
@@ -41,6 +39,7 @@ export const usePstExtractor = (): UsePstExtractor => {
     const trackerService = useService("trackerService");
 
     const { setExtractDatas } = usePstStore();
+    const { setTotalArchiveSize } = pstContentCounterPerLevelStore();
 
     useEffect(() => {
         if (pstFilePath && pstExtractorService && trackerService) {
@@ -54,28 +53,33 @@ export const usePstExtractor = (): UsePstExtractor => {
                 setExtractDatas(extractDatas);
 
                 const totalMail = extractDatas.indexes.size;
-                setTotalMail(totalMail);
 
-                const totalAttachments = getInitialTotalAttachements(
+                const totalAttachment = getInitialTotalAttachements(
                     extractDatas.attachments
                 );
-                setTotalAttachment(totalAttachments);
 
-                const totalFileSize = getInititalTotalFileSize(
+                const filesize = getInititalTotalFileSize(
                     extractDatas.attachments
                 );
-                setTotalFileSize(totalFileSize);
+
+                setTotalArchiveSize(filesize);
 
                 trackerService.getProvider().track("PST Dropped", {
-                    attachmentCount: totalAttachments,
+                    attachmentCount: totalAttachment,
                     loadTime,
                     mailCount: totalMail,
-                    size: bytesToGigabytes(totalFileSize, 2),
-                    sizeRaw: totalFileSize,
+                    size: bytesToGigabytes(filesize, 2),
+                    sizeRaw: filesize,
                 });
             })();
         }
-    }, [pstExtractorService, pstFilePath, setExtractDatas, trackerService]);
+    }, [
+        pstExtractorService,
+        pstFilePath,
+        setExtractDatas,
+        setTotalArchiveSize,
+        trackerService,
+    ]);
 
     useEffect(() => {
         pstExtractorService?.onProgress(setPstProgress);

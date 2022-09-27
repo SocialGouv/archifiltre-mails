@@ -1,3 +1,5 @@
+import { last } from "lodash";
+
 import type { Objectize } from "./type";
 
 type Keys<T> = Objectize<(keyof T)[]>;
@@ -17,6 +19,10 @@ type ChangeTuple<TInput extends Any[], TOutputType> = {
     [K in keyof TInput]: TOutputType;
 };
 
+Array.prototype.last = function <T>() {
+    return last<T>(this);
+};
+
 /* eslint-disable @typescript-eslint/method-signature-style */
 declare global {
     interface String {
@@ -24,6 +30,8 @@ declare global {
     }
 
     interface Array<T> {
+        last<TThis extends T[]>(this: TThis): T | undefined;
+
         map<TU, TThis extends T[]>(
             this: TThis,
             callbackfn: (value: T, index: number, array: T[]) => TU,
