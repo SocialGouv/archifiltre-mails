@@ -159,7 +159,10 @@ $dashboard-card-width: calc(50vw - 0.5rem);
   .dashboard__actions__bar__btn__userconfig {
     svg {
       // white
-      filter: invert(100%) sepia(0%) saturate(100%) hue-rotate(0deg) brightness(100%) contrast(100%);
+      // filter: invert(100%) sepia(0%) saturate(100%) hue-rotate(0deg) brightness(100%) contrast(100%);
+      path {
+        fill: #fff;
+      }
     }
 
     &__update__available {
