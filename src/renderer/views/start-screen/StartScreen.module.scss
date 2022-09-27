@@ -11,6 +11,19 @@
   right: 2rem;
   top: 2rem;
   width: 2rem;
+
+  &__update__available {
+    @extend .startscreen__open__config;
+
+    &::after {
+      background-color: #f00;
+      border-radius: 50px;
+      content: '';
+      height: 0.5em;
+      position: absolute;
+      width: 0.5em;
+    }
+  }
 }
 
 .logo {

@@ -1,7 +1,7 @@
 import path from "path";
 import { isMainThread, workerData } from "worker_threads";
 
-import { name } from "./utils/package";
+import { name, version } from "./utils/package";
 
 export const IS_WORKER = !isMainThread;
 export const WORKER_CONFIG_TOKEN = "__config" as const;
@@ -22,12 +22,20 @@ export interface WorkerConfig {
     IS_MAIN: boolean;
     IS_PACKAGED: boolean;
     IS_TEST: boolean;
+    PRODUCT_CHANNEL: "beta" | "next" | "stable";
     STATIC_PATH: string;
 }
 
 const localWorkerConfig: Partial<WorkerConfig> = IS_WORKER
     ? workerData[WORKER_CONFIG_TOKEN]
     : {};
+
+export const PRODUCT_CHANNEL =
+    localWorkerConfig.PRODUCT_CHANNEL ?? version.includes("beta")
+        ? "beta"
+        : version.includes("next")
+        ? "next"
+        : "stable";
 
 export const IS_MAIN =
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -84,5 +92,6 @@ export const workerConfig: WorkerConfig = {
     IS_MAIN,
     IS_PACKAGED: IS_PACKAGED(),
     IS_TEST,
+    PRODUCT_CHANNEL,
     STATIC_PATH,
 };

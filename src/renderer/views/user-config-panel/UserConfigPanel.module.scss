@@ -96,3 +96,55 @@
     }
   }
 }
+
+.version-block {
+  > span {
+    display: block;
+  }
+}
+
+.version-available {
+  /*
+   * Animation variables
+   */
+  $animation-steps: 20;
+  $animation-duration: 5;
+  $animation-element: span;
+  $animation-elements-count: 100;
+  $delay-between-letters: 0.2;
+
+  /*
+   * Element animation delay loop
+   */
+  $total-delay-time: $animation-elements-count * $delay-between-letters;
+
+  cursor: pointer;
+
+  /*
+   * Elements settings
+   */
+  #{$animation-element} {
+    animation-direction: alternate;
+    animation-duration: #{$animation-duration}s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    animation-name: anim-text-flow-keys;
+  }
+
+  /*
+   * Keyframe loop
+   */
+  @keyframes anim-text-flow-keys {
+    @for $i from 0 through $animation-steps {
+      #{percentage(calc($i * (1 / $animation-steps)))} {
+        color: hsl(random(365) 60% 60% / 100%);
+      }
+    }
+  }
+
+  @for $i from 1 through $animation-elements-count {
+    #{$animation-element}:nth-of-type(#{$i}) {
+      animation-delay: #{($i * $delay-between-letters) - $total-delay-time}s;
+    }
+  }
+}

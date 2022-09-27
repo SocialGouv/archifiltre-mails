@@ -19,7 +19,7 @@
 - [x] pub/sub
 - [x] config view
 - [ ] send bug
-- [ ] check for update
+- [x] check for update
 - [ ] Isomorphic electron mock ?
 - [ ] Use preload + sandbox
 - [ ] move common electron + Archifiltre code to 3rd party package
