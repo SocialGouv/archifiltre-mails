@@ -39,9 +39,7 @@ export const UserConfigPanel: React.FC = () => {
                 <span
                     className={updateInfo ? style.versionAvailable : ""}
                     aria-hidden
-                    onClick={() => {
-                        doUpdate();
-                    }}
+                    onClick={doUpdate}
                 >
                     {updateInfo
                         ? t("user-config.version.updateAvailable", updateInfo)
