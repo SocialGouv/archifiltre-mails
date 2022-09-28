@@ -3,16 +3,25 @@ import type {
     PstEmail,
 } from "@common/modules/pst-extractor/type";
 import { getRecipientFromDisplay } from "@common/modules/views/utils";
-import type { PSTFolder } from "@socialgouv/archimail-pst-extractor";
+import { notImplemented } from "@common/utils";
+import type {
+    PSTFolder,
+    PSTMessage,
+} from "@socialgouv/archimail-pst-extractor";
 import { PSTFile } from "@socialgouv/archimail-pst-extractor";
+import { randomUUID } from "crypto";
+import { promises as fs } from "fs";
 import { isEqual } from "lodash";
 import path from "path";
+import { Pool, TimeoutError } from "tarn";
 
 import type {
     WorkerCommandsBuilder,
     WorkerConfigBuilder,
+    WorkerEventListenersBuilder,
     WorkerQueriesBuilder,
 } from "../../workers/type";
+import { Ack } from "../../workers/type";
 import { WorkerServer } from "../../workers/WorkerServer";
 import { PstCache } from "./PstCache";
 
@@ -22,63 +31,130 @@ type Commands = WorkerCommandsBuilder<{
             pstFilePath: string;
         };
     };
+    writeEml: {
+        param: {
+            emailIndexes: number[][];
+        };
+    };
 }>;
 type Queries = WorkerQueriesBuilder<{
     fetch: {
         param: {
             emailIndexes: number[][];
         };
-        returnType: PstEmail[];
+        // returnType: PstEmail[];
+        returnType: string;
+    };
+}>;
+type EventListeners = WorkerEventListenersBuilder<{
+    log: {
+        returnType: string;
     };
 }>;
 
 export type FetchWorkerConfig = WorkerConfigBuilder<{
     commands: Commands;
+    eventListeners: EventListeners;
     queries: Queries;
 }>;
 
 const pstCache = new PstCache();
 void pstCache.db.close();
 const server = new WorkerServer<FetchWorkerConfig>();
-let pstFile: PSTFile | null = null;
 
+let pool: Pool<FileAndId> | null = null;
+let buf: Buffer | null = null;
+
+let fileId = 0;
+interface FileAndId {
+    id: number;
+    pstFile: PSTFile;
+}
 server.onCommand("open", async ({ pstFilePath }) => {
-    pstFile = new PSTFile(path.resolve(pstFilePath));
+    const filePath = path.resolve(pstFilePath);
+    buf = await fs.readFile(filePath);
+    pool = new Pool<FileAndId>({
+        create() {
+            if (!buf) {
+                throw new Error("File not read");
+            }
+            const id = fileId++;
+            return { id, pstFile: new PSTFile(buf) };
+        },
+        destroy({ pstFile }) {
+            pstFile.close();
+        },
+        max: 50,
+        min: 1,
+    });
     pstCache.openForPst(pstFilePath);
 
-    return Promise.resolve({ ok: true });
+    return Ack.Resolve();
 });
 
 server.onQuery("fetch", async ({ emailIndexes }) => {
-    if (!pstFile) {
-        throw new Error("No pst file opened yet.");
-    }
     const allIndexes = await pstCache.getPstMailIndexes();
     const cacheKeys = [...allIndexes.keys()];
     const cacheValues = [...allIndexes.values()];
-    return Promise.all(
-        emailIndexes.map(
-            async (emailIndex) =>
-                new Promise<PstEmail>((ok) => {
-                    const email = findEmail(
-                        pstFile!.getRootFolder(),
-                        emailIndex
-                    );
-                    email.id =
-                        cacheKeys[
-                            cacheValues.findIndex((idxs) =>
-                                isEqual(emailIndex, idxs)
-                            )
-                        ]!;
-                    ok(email);
-                })
-        )
+
+    const emails = await parallelIndexesProcess(
+        emailIndexes,
+        (rawEmail, emailIndex) => {
+            const email = toInternalPstEmail(rawEmail);
+            email.id =
+                cacheKeys[
+                    cacheValues.findIndex((idxs) => isEqual(emailIndex, idxs))
+                ]!;
+            return email;
+        }
     );
+
+    const cacheKey = randomUUID();
+    await pstCache.setTempEmails(cacheKey, emails);
+    return cacheKey;
 });
+
+// TODO writeEml could be renamed "export" and export functions can be ported here
+// we want to directly manipulate rawEmail file (and attachments) right after retreiving
+// like fetch, the operation could be parallelized (pool of writter or simply Promise.all)
+// for eml files, rawEmail.toEML() can now be used
+server.onCommand("writeEml", notImplemented);
 
 // ---
 
-function findEmail(folder: PSTFolder, emailIndex: number[]): PstEmail {
+type ProcessFunction<T> = (rawEmail: PSTMessage, emailIndex: number[]) => T;
+const parallelIndexesProcess = async <T>(
+    emailIndexes: number[][],
+    processFunction: ProcessFunction<T>
+): Promise<T[]> => {
+    if (!pool) {
+        throw new Error("No pst file opened yet.");
+    }
+    console.time("==FETCH MAILS");
+    const emails = await Promise.all(
+        emailIndexes.map(async (emailIndex) => {
+            try {
+                const fileAndId = await pool!.acquire().promise;
+                const email = processFunction(
+                    findEmail(fileAndId.pstFile.getRootFolder(), emailIndex),
+                    emailIndex
+                );
+                pool!.release(fileAndId);
+                return email;
+            } catch (error: unknown) {
+                if (error instanceof TimeoutError) {
+                    console.error("Pool timeout error mega fail...");
+                }
+                throw error;
+            }
+        })
+    );
+    console.timeEnd("==FETCH MAILS");
+
+    return emails;
+};
+
+function findEmail(folder: PSTFolder, emailIndex: number[]): PSTMessage {
     if (!emailIndex.length) {
         throw new Error("No index provided.");
     }
@@ -112,6 +188,10 @@ function findEmail(folder: PSTFolder, emailIndex: number[]): PstEmail {
         );
     }
 
+    return rawEmail;
+}
+
+const toInternalPstEmail = (rawEmail: PSTMessage): PstEmail => {
     const recipients = rawEmail.getRecipients();
     const email: PstEmail = {
         attachmentCount: rawEmail.numberOfAttachments,
@@ -122,7 +202,6 @@ function findEmail(folder: PSTFolder, emailIndex: number[]): PstEmail {
         contentRTF: rawEmail.bodyRTF,
         contentText: rawEmail.body,
         elementPath: "",
-
         from: {
             email: (
                 rawEmail.senderSmtpEmailAddress || rawEmail.senderEmailAddress
@@ -131,14 +210,18 @@ function findEmail(folder: PSTFolder, emailIndex: number[]): PstEmail {
         },
 
         id: "",
+
         // TODO: change name
         isFromMe: rawEmail.isFromMe,
+
+        messageId: rawEmail.internetMessageId,
         name: `${rawEmail.senderName} ${rawEmail.originalSubject}`,
-        receivedDate: rawEmail.messageDeliveryTime,
-        sentTime: rawEmail.clientSubmitTime,
+        receivedTime: rawEmail.messageDeliveryTime!.getTime(),
+        sentTime: rawEmail.clientSubmitTime!.getTime(),
         size: 1,
         subject: rawEmail.subject,
         to: getRecipientFromDisplay(rawEmail.displayTo, recipients),
+        transportMessageHeaders: rawEmail.transportMessageHeaders,
         type: "email",
     };
 
@@ -157,4 +240,4 @@ function findEmail(folder: PSTFolder, emailIndex: number[]): PstEmail {
     }
 
     return email;
-}
+};

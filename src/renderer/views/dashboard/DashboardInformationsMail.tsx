@@ -38,11 +38,11 @@ export const DashboardInformationsMail: FC<{
             <div>
                 <strong>{t("dashboard.informations.sentDate")} </strong>{" "}
                 {/* TODO: change sanitize with i18n */}
-                {sanitizeMailDate(mainInfos.data.email.sentTime!)}
+                {sanitizeMailDate(new Date(mainInfos.data.email.sentTime))}
             </div>
             <div>
                 <strong>{t("dashboard.informations.receivedDate")} </strong>{" "}
-                {sanitizeMailDate(mainInfos.data.email.receivedDate!)}
+                {sanitizeMailDate(new Date(mainInfos.data.email.receivedTime))}
             </div>
             <div>
                 <strong>{t("dashboard.informations.parentFolder")}</strong>

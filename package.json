@@ -65,6 +65,7 @@
       "react-dropzone",
       "react-i18next",
       "source-map-support",
+      "tarn",
       "zustand"
     ]
   },
@@ -213,6 +214,7 @@
     "electron-util": "^0.17.2",
     "fs-extra": "^10.1.0",
     "i18next": "^21.8.10",
+    "iconv-lite": "^0.6.3",
     "jotai": "^1.7.2",
     "json2csv": "^5.0.6",
     "level": "^8.0.0",
@@ -224,7 +226,9 @@
     "react-dom": "^17.0.2",
     "react-dropzone": "^12.0.4",
     "react-i18next": "^11.17.2",
+    "sanitize-filename": "^1.6.3",
     "source-map-support": "^0.5.21",
+    "tarn": "^3.0.2",
     "uuid": "^8.3.2",
     "xlsx": "^0.18.0",
     "zustand": "^3.7.0"

@@ -74,16 +74,18 @@ export interface PstEmail extends PstElement {
     attachments: PstAttachment[];
     bcc: PstEmailRecipient[];
     cc: PstEmailRecipient[];
-    contentHTML: string;
-    contentRTF: string;
+    contentHTML?: string;
+    contentRTF?: string;
     contentText: string;
     from: PstEmailRecipient;
     isFromMe: boolean;
-    receivedDate: Date | null;
-    sentTime: Date | null;
+    messageId: string;
+    receivedTime: number;
+    sentTime: number;
     size: 1;
     subject: string;
     to: PstEmailRecipient[];
+    transportMessageHeaders: string;
     type: "email";
 }
 

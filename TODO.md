@@ -38,3 +38,13 @@
 
 ## Infra / Archi
 - [ ] change build system to vite-electron-builder (https://github.com/cawa-93/vite-electron-builder)
+
+
+## eml and co
+- [x] eml export folder
+- [x] eml body content not visible in outlook or osx info
+- [ ] pst extractor indexes => descriptorId
+- [ ] eml export parallel ops
+- [x] test csv export
+- [ ] windows installer appId shortcut regedit
+- [ ] windows open pst error (db?) 

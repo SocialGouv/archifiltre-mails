@@ -13,6 +13,10 @@ import type {
     PstFolder,
     PstShallowFolder,
 } from "@common/modules/pst-extractor/type";
+import {
+    ensureIncrementalFileName,
+    ensureIncrementalFolderName,
+} from "@common/utils/fs";
 import type { SimpleObject } from "@common/utils/type";
 import path from "path";
 
@@ -72,12 +76,19 @@ export class PstExporterModule extends MainModule {
             const pstFilename = await this.pstCacheService.getAddtionalDatas(
                 "pstFilename"
             );
-            destPath = path.join(dest, `/${pstFilename}-${type}-export`);
+            destPath = path.join(
+                dest,
+                `${path.sep}${pstFilename}-${type}-export`
+            );
+            destPath = await ensureIncrementalFolderName(destPath);
             const folderStruct = await this.pstCacheService.getAddtionalDatas(
                 "folderStructure"
             );
             obj = this.composePstElement(folderStruct, emails);
-        } else obj = this.formatEmails(emails, deletedIds);
+        } else {
+            destPath = await ensureIncrementalFileName(destPath);
+            obj = this.formatEmails(emails, deletedIds);
+        }
 
         await this.fileExporterService.export(type, obj, destPath);
     };
@@ -116,8 +127,8 @@ export class PstExporterModule extends MainModule {
 
         return emails.map((email) => ({
             [tKeys.id]: email.id,
-            [tKeys.receivedDate]: email.receivedDate,
-            [tKeys.sentTime]: email.sentTime,
+            [tKeys.receivedDate]: new Date(email.receivedTime).toUTCString(),
+            [tKeys.sentTime]: new Date(email.sentTime).toUTCString(),
             [tKeys.fromName]: email.from.name,
             [tKeys.fromEmail]: email.from.email ?? "",
             [tKeys.toName]: email.to.map((to) => to.name).join(","),

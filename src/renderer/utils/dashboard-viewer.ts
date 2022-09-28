@@ -37,7 +37,7 @@ const DEFAULT_OPACITY = 1;
 export const getColorFromTrimester = (
     node: Omit<ComputedDatum<MailViewerObject<string>>, "color" | "fill">
 ): number => {
-    const month = node.data.email.receivedDate?.getMonth() ?? 1; // January
+    const month = new Date(node.data.email.receivedTime).getMonth();
 
     const opacityMonthKey = Object.keys(opacities).find(
         (monthOpa) => month <= monthOpa
@@ -66,10 +66,13 @@ export const commonProperties: CirclePackingCommonProps = {
     enableLabels: true,
     id: "id",
     isInteractive: true,
-    label: (node) =>
-        isMailViewerObject(node.data)
-            ? `${node.data.email.receivedDate?.getDay()}-${node.data.email.receivedDate?.getMonth()}-${node.data.email.receivedDate?.getFullYear()}`
-            : node.data.name,
+    label: (node) => {
+        if (isMailViewerObject(node.data)) {
+            const receivedDate = new Date(node.data.email.receivedTime);
+            return `${receivedDate.getDay()}-${receivedDate.getMonth()}-${receivedDate.getFullYear()}`;
+        }
+        return node.data.name;
+    },
     labelsFilter: (label) => label.node.height === 0,
     labelsSkipRadius: 16,
     motionConfig: "slow",

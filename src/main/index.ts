@@ -1,3 +1,4 @@
+// import "@common/utils/electron";
 import "@common/utils/overload";
 
 import { IS_DIST_MODE, IS_E2E, IS_PACKAGED } from "@common/config";
@@ -45,7 +46,10 @@ const PRELOAD_PATH = IS_PACKAGED()
     ? path.resolve(process.resourcesPath, "preload.js") // prod
     : IS_DIST_MODE
     ? path.resolve(__dirname, "preload.js") // dist / e2e
-    : path.resolve(__dirname, "preload.js").replace("/src/", "/dist/"); // dev
+    : path
+          .resolve(__dirname, "preload.js")
+          .replace(`${path.sep}src${path.sep}`, `${path.sep}dist${path.sep}`); // dev
+
 /**
  * Global reference.
  *
