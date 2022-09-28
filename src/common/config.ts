@@ -68,7 +68,12 @@ export const IS_PACKAGED = (): boolean => {
 export const APP_CACHE = (): string => {
     if (IS_WORKER) return localWorkerConfig.APP_CACHE!;
     if (IS_MAIN) {
-        return path.resolve(app.getPath("cache"), name);
+        return path.resolve(
+            IS_DEV
+                ? path.resolve(__dirname, "../../node_modules/.cache")
+                : app.getPath("cache"),
+            name
+        );
     } else return ipcRenderer.sendSync(APP_CACHE_EVENT) as string;
 };
 
