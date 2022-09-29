@@ -54,7 +54,7 @@ if (IS_MAIN && !IS_WORKER) {
         event.returnValue = app.isPackaged;
     });
     ipcMain.on(APP_CACHE_EVENT, (event) => {
-        event.returnValue = app.getPath("cache");
+        event.returnValue = APP_CACHE();
     });
 }
 

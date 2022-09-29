@@ -1,7 +1,8 @@
 import "@common/utils/overload";
 
-import { PRODUCT_CHANNEL } from "@common/config";
+import { IS_DEV, PRODUCT_CHANNEL } from "@common/config";
 import { getIsomorphicModules } from "@common/lib/core/isomorphic";
+import { ipcRenderer } from "@common/lib/ipc";
 import { loadModules, unloadModules } from "@common/lib/ModuleManager";
 import type { Module } from "@common/modules/Module";
 import { setupSentry } from "@common/monitoring/sentry";
@@ -36,4 +37,18 @@ void (async () => {
     setupSentryIntegrations();
 
     render(<App />, document.querySelector("#app"));
+
+    if (IS_DEV) {
+        window["_archifiltre-debug"] = {
+            ipcRenderer,
+            pstExporterService,
+            pstExtractorService,
+        };
+    }
 })();
+
+declare global {
+    export interface Window {
+        ["_archifiltre-debug"]: Any;
+    }
+}
