@@ -34,6 +34,7 @@ export const COLORS = {
     CARD_LABEL_PURPLE: "purple",
     DELETE_COLOR: "rgb(247, 94, 66)",
     KEEP_COLOR: "#62bc6f",
+    MAIL_FROM_ME: "#fadda1",
     RED: "red",
     TRANSPARENT: "transparent",
 } as const;
