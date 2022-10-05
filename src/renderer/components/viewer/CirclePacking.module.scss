@@ -45,6 +45,106 @@
   }
 }
 
+.circle-packing-legend {
+  align-items: center;
+  align-self: center;
+  border: solid 3px #4991f7;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  font-weight: 600;
+  height: 30px;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  width: 30px;
+}
+
+.circle-packing-legend-open {
+  align-items: center;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  z-index: 10;
+
+  &::after {
+    background: #ccc;
+    content: '';
+    height: 100%;
+    opacity: 0.5;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: -1;
+  }
+
+  div {
+    align-items: center;
+    background: #fff;
+    border-radius: 13px;
+    display: flex;
+    font-size: 1rem;
+    justify-content: center;
+    max-width: 800px;
+    padding: 5rem;
+    width: 50%;
+
+    ul {
+      height: 80%;
+      margin: 0 !important;
+      width: 90%;
+    }
+
+    li {
+      align-items: center;
+      display: flex;
+      margin: 0 0 1.5rem !important;
+    }
+
+    small {
+      border-radius: 50%;
+      display: inline-block;
+      height: 2rem;
+      margin: 0 1rem 0 0 !important;
+      width: 2rem;
+    }
+
+    [data-name='global'] {
+      background: rgb(234 240 253);
+    }
+
+    [data-name='inside'] {
+      background: rgb(31 120 180);
+    }
+
+    [data-name='keep'] {
+      background: rgb(98 188 111);
+    }
+
+    [data-name='delete'] {
+      background: rgb(247 94 66);
+    }
+
+    [data-name='focus'] {
+      border: solid 3px;
+    }
+
+    [data-name='sent'] {
+      border: solid 3px rgb(250 221 161);
+    }
+
+    [data-name='months'] {
+      background: linear-gradient(90deg, rgb(31 120 180 / 45%) 43%, rgb(31 120 180 / 100%) 100%);
+      border-radius: 50%;
+      width: 2.3rem;
+    }
+  }
+}
+
 .circle-packing {
   height: 45vh;
   width: 100%;
@@ -58,7 +158,9 @@
 
   .circle-packing-actions-button {
     display: flex;
+    justify-content: center;
     margin: 0 !important;
+    position: relative;
 
     button {
       align-items: center;
