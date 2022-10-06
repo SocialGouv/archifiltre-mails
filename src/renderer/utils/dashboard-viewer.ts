@@ -96,7 +96,7 @@ export const handleFocusItemBorderColor = (
         isMailViewerObject(node.data) &&
         ownerId === node.data.email.from.email
     )
-        return COLORS.MAIL_FROM_ME;
+        return COLORS.MAIL_FROM_ME as string;
     return COLORS.TRANSPARENT;
 };
 
