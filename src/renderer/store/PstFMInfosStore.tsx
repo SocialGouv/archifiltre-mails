@@ -1,7 +1,5 @@
-import { useService } from "@common/modules/ContainerModule";
 import type { ComputedDatum } from "@nivo/circle-packing";
-import { atom, useAtom } from "jotai/index";
-import type { SetStateAction } from "react";
+import create from "zustand";
 
 import type {
     MailViewerObject,
@@ -20,36 +18,21 @@ export interface UsePstMainInfosStore {
     cancelFocus: () => void;
     isInfoFocus: boolean;
     mainInfos: MainInfos | undefined;
-    setMainInfos: (update?: SetStateAction<MainInfos | undefined>) => void;
+    setMainInfos: (update?: MainInfos | undefined) => void;
     startFocus: () => void;
 }
 
-const pstMainInfosAtom = atom<MainInfos | undefined>(undefined);
-const isInfoFocusAtom = atom<boolean>(false);
-
-/**
- * A hook that exposes Folder and Mails informations. (FM: accronym for Folder & Mails)
- */
-export const usePstFMInfosStore = (): UsePstMainInfosStore => {
-    const [mainInfos, setMainInfos] = useAtom(pstMainInfosAtom);
-
-    const [isInfoFocus, setIsInfoFocus] = useAtom(isInfoFocusAtom);
-    const trackerService = useService("trackerService");
-
-    const startFocus = () => {
-        trackerService?.getProvider().track("Feat(4.0) Detail Expanded");
-        setIsInfoFocus(true);
-    };
-
-    const cancelFocus = () => {
-        setIsInfoFocus(false);
-    };
-
-    return {
-        cancelFocus,
-        isInfoFocus,
-        mainInfos,
-        setMainInfos,
-        startFocus,
-    };
-};
+export const usePstFMInfosStore = create<UsePstMainInfosStore>((set) => ({
+    cancelFocus: () => {
+        set({ isInfoFocus: false });
+    },
+    isInfoFocus: false,
+    mainInfos: undefined,
+    setMainInfos: (mainInfos: MainInfos | undefined) => {
+        set({ mainInfos });
+    },
+    startFocus: () => {
+        // trackerService?.getProvider().track("Feat(4.0) Detail Expanded");
+        set({ isInfoFocus: true });
+    },
+}));
