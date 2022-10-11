@@ -38,7 +38,6 @@ export const synthesisIdHandler = (
 ): void => {
     const target = event.target as HTMLElement;
     const handler = type === "deleted" ? setDeletedFolderId : setMailBoxOwnerId;
-
     handler(target.id);
 };
 
