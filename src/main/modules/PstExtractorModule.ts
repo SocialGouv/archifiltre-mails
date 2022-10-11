@@ -103,8 +103,20 @@ export class PstExtractorModule extends MainModule {
             );
         });
         this.extractorWorker.addEventListener("error", (error) => {
-            console.log("[PstExtractorModule] Error");
+            console.log("[PstExtractorModule] extractorWorker Error");
             console.error(error); // TODO handle error
+        });
+
+        this.fetchWorker.addEventListener("error", (error) => {
+            console.log("[PstExtractorModule] fetchWorker Error");
+            console.error(error); // TODO handle error
+        });
+
+        this.fetchWorker.addEventListener("log", (message) => {
+            this.consoleToRendererService.log(
+                BrowserWindow.getAllWindows()[0]!,
+                `[FROM FETCHWORKER] ${message}`
+            );
         });
 
         this.inited = true;
@@ -182,9 +194,11 @@ export class PstExtractorModule extends MainModule {
             throw new PstExtractorError("Extractor already working.");
         }
         console.info("Start fetching emails...");
-        const emails = await this.fetchWorker.query("fetch", {
+        const cacheKey = await this.fetchWorker.query("fetch", {
             emailIndexes,
         });
+
+        const emails = await this.cacheService.getTempEmails(cacheKey);
         console.log("Fetching done");
         if (!emails.length) {
             throw new Error("Emails not found from given indexes.");

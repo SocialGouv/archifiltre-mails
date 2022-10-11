@@ -21,6 +21,7 @@ import type {
     WorkerConfigBuilder,
     WorkerEventListenersBuilder,
 } from "../../workers/type";
+import { Ack } from "../../workers/type";
 import { WorkerServer } from "../../workers/WorkerServer";
 import { PstCache } from "./PstCache";
 
@@ -74,13 +75,13 @@ server.onCommand("open", async ({ pstFilePath }) => {
         path.parse(pstFile.pstFilename).name
     );
 
-    return Promise.resolve({ ok: true });
+    return Ack.Resolve();
 });
 
 let stop = false;
 server.onCommand("stop", async () => {
     stop = true;
-    return Promise.resolve({ ok: stop });
+    return Ack.Resolve();
 });
 
 server.onCommand(
@@ -149,9 +150,14 @@ server.onCommand(
             if (root) {
                 root = false;
                 currentShallowFolder.id = "folder-root";
-                currentShallowFolder.elementPath = folder.displayName;
+                currentShallowFolder.elementPath = folder.displayName.replace(
+                    "/",
+                    "\\/"
+                );
             } else {
+                // current folder index or -1 at this depth (-1 because we "++" after to go to 0)
                 currentFolderIndexes[currentDepth] ??= -1;
+                // when we go back to parent folder, we need to go back from (e.g.) [0, 4, 5] to [0, 4]
                 currentFolderIndexes = currentFolderIndexes.slice(
                     0,
                     currentDepth + 1
@@ -164,6 +170,7 @@ server.onCommand(
             currentShallowFolder.subfolders = [];
             currentShallowFolder.name = folder.displayName;
             if (folder.hasSubfolders) {
+                const indexesBeforeSubfolderProcess = [...currentFolderIndexes];
                 for (const childFolder of folder.getSubFolders()) {
                     progressState.countFolder++;
                     progressState.countTotal++;
@@ -181,12 +188,17 @@ server.onCommand(
 
                     const childShallowFolder = {} as PstShallowFolder;
                     childShallowFolder.id = strFolderId;
-                    childShallowFolder.elementPath = `${currentShallowFolder.elementPath}/${childFolder.displayName}`;
+                    childShallowFolder.elementPath = `${
+                        currentShallowFolder.elementPath
+                    }/${childFolder.displayName.replace("/", "\\/")}`;
                     currentShallowFolder.subfolders.push(childShallowFolder);
                     folderId++;
 
                     processFolder(childFolder, childShallowFolder, strFolderId);
                 }
+
+                // merci subconscient - ne pas toucher ... :'(
+                currentFolderIndexes = [...indexesBeforeSubfolderProcess];
             }
 
             currentShallowFolder.mails = [];
@@ -326,6 +338,6 @@ server.onCommand(
         progressState.elapsed = Date.now() - starTime;
         server.trigger("done", progressState);
 
-        return { ok: true };
+        return Ack.Value;
     }
 );

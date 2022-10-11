@@ -1,9 +1,10 @@
-import { APP_CACHE, IS_DEV } from "@common/config";
+import { APP_CACHE } from "@common/config";
 import type {
     AdditionalDatas,
     GroupType,
     PstAttachment,
     PstAttachmentEntries,
+    PstEmail,
     PstMailIdsEntries,
     PstMailIndex,
     PstMailIndexEntries,
@@ -17,6 +18,7 @@ const ROOT_KEY = "_index_";
 const ATTACHMENTS_KEY = "_attachments_";
 const GROUPS_DB_PREFIX = "_groups_";
 const ADDITIONNAL_DATES_DB_PREFIX = "_additionalDatas_";
+const PST_FETCH_CACHE_PREFIX = "_pstFetchCache_";
 const CACHE_FOLDER_NAME = "archimail-db";
 
 const defaultDbOptions = {
@@ -53,9 +55,6 @@ export class PstCache {
         )
     ) {
         this.db = new Level(this.cachePath, defaultDbOptions);
-        if (IS_DEV) {
-            void this.db.clear();
-        }
     }
 
     @SoftLockDb
@@ -142,6 +141,20 @@ export class PstCache {
         );
     }
 
+    @SoftLockDb
+    public async setTempEmails(cacheKey: string, emails: PstEmail[]): pvoid {
+        const currentPstFetchCacheDb = this.getCurrentPstFetchCacheDb();
+        await currentPstFetchCacheDb.put(cacheKey, emails);
+    }
+
+    @SoftLockDb
+    public async getTempEmails(cacheKey: string): Promise<PstEmail[]> {
+        const currentPstFetchCacheDb = this.getCurrentPstFetchCacheDb();
+        const ret = await currentPstFetchCacheDb.get(cacheKey);
+        await currentPstFetchCacheDb.del(cacheKey);
+        return ret;
+    }
+
     public openForPst(pstId: string): void {
         this.currrentPstID = pstId;
     }
@@ -164,6 +177,13 @@ export class PstCache {
     private getCurrentAdditionalDatasDb<T extends keyof AdditionalDatas>() {
         return this.getCurrentPstDb().sublevel<T, AdditionalDatas[T]>(
             ADDITIONNAL_DATES_DB_PREFIX,
+            defaultDbOptions
+        );
+    }
+
+    private getCurrentPstFetchCacheDb() {
+        return this.getCurrentPstDb().sublevel<string, PstEmail[]>(
+            PST_FETCH_CACHE_PREFIX,
             defaultDbOptions
         );
     }

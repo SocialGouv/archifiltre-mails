@@ -23,9 +23,7 @@ export type WorkerEventListeners = SimpleObject<WorkerEventListener>;
 
 export type WorkerCommandsBuilder<T extends WorkerCommands> = T;
 export type WorkerQueriesBuilder<T extends WorkerQueries> = T;
-export type WorkerEventListenersBuilder<T extends WorkerEventListeners> = T & {
-    error: WorkerEventListener;
-};
+export type WorkerEventListenersBuilder<T extends WorkerEventListeners> = T;
 
 export interface WorkerConfig {
     commands?: WorkerCommands;
@@ -35,10 +33,22 @@ export interface WorkerConfig {
     queries?: WorkerQueries;
 }
 
-export type WorkerConfigBuilder<T extends WorkerConfig> = T;
+export type WorkerConfigBuilder<T extends WorkerConfig> = T & {
+    eventListeners: {
+        error: WorkerEventListener;
+        log: WorkerEventListener<string>;
+    };
+};
 
 export interface Ack {
     ok: true;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace Ack {
+    export const Value: Ack = { ok: true };
+    export const Resolve = async (): Promise<Ack> =>
+        Promise.resolve<Ack>(Value);
 }
 
 export interface DefaultWorkerMessageType {

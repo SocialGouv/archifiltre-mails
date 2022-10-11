@@ -160,9 +160,7 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
             );
 
             const mails = (await pstExtractorService.getEmails(indexes)).sort(
-                (a, b) =>
-                    (a.receivedDate?.valueOf() ?? 0) -
-                    (b.receivedDate?.valueOf() ?? 0)
+                (a, b) => a.receivedTime - b.receivedTime
             );
 
             const elements = createMails(mails, node.id, node.data.name);

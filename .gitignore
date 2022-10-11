@@ -7,6 +7,10 @@ chromedriverlog.txt
 bin/
 *.p12
 .secrets
+!electron/.appData
+electron/.appData/*
+!electron/.appCache
+electron/.appCache/*
 
 ##
 ## Should be global, but it's an open source project

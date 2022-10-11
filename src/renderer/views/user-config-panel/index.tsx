@@ -53,6 +53,8 @@ export const UserConfigPanel: React.FC = () => {
             <hr />
 
             {Object.keys(schema).map((valueName) => {
+                if (valueName === "_firstOpened" || valueName === "viewConfigs")
+                    return null;
                 const valueSchema = schema[valueName];
                 if (valueSchema.enum) {
                     valueSchema.type = "array";
@@ -60,7 +62,6 @@ export const UserConfigPanel: React.FC = () => {
 
                 switch (valueSchema.type) {
                     case "boolean":
-                        if (valueName === "_firstOpened") return null;
                         valueName = valueName as UserConfigTypedKeys<boolean>;
                         return (
                             <Checkbox

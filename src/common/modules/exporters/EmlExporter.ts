@@ -1,60 +1,38 @@
+import { emlStringify } from "@socialgouv/archimail-pst-extractor";
 import { mkdir } from "fs/promises";
-import { outputFile } from "fs-extra";
+import { EOL } from "os";
 import path from "path";
+import sanitizeFilename from "sanitize-filename";
 
-import type { PstElement } from "./../pst-extractor/type";
+import { outputFile } from "../../utils/fs";
+import type { PstElement, PstEmail } from "./../pst-extractor/type";
 import { isPstEmail } from "./../pst-extractor/type";
 import type { PstExporter } from "./Exporter";
 
-interface EmlFile {
-    body: string;
-    from: string;
-    isSent: number;
-    subject: string;
-    to: string;
-}
-
-const BACK_LINE = " \n";
 const EML_EXTENSION = ".eml";
-const EML_FROM = "From: ";
-const EML_TO = "To: ";
-const EML_SUBJECT = "Subject: ";
-const EML_HEADERS = "X-Unset: ";
-const EML_CONTENT_TYPE = "Content-Type: text/html";
+const EML_PATH_ESCAPED_SEP = "_";
 
 /**
  * Export PST to EML archive.
  */
 export const emlExporter: PstExporter = {
     async export<T extends PstElement>(obj: T, dest: string) {
+        await mkdir(dest);
         const exportEml = async (pst: PstElement) => {
             for (const child of pst.children ?? []) {
                 if (isPstEmail(child)) {
+                    const escapedSubject = sanitizeFilename(child.subject, {
+                        replacement: EML_PATH_ESCAPED_SEP,
+                    });
+
                     const wrapPath = path.join(
-                        dest,
                         child.elementPath,
-                        child.subject,
-                        child.subject
+                        escapedSubject,
+                        escapedSubject
                     );
 
-                    const mailContent: EmlFile = {
-                        body: child.contentText
-                            .replaceAll("\n", "")
-                            .replaceAll("\r", ""),
-                        from: child.from.email ?? "[unknown]",
-                        isSent: child.isFromMe ? 0 : 1,
-                        subject: child.subject,
-                        to: child.to
-                            .map((recipient) => recipient.email)
-                            .join(" "),
-                    };
-
-                    await createEmlFile(wrapPath, mailContent);
-                } else {
-                    const folderPath = path.join(dest, child.elementPath);
-                    await mkdir(folderPath, { recursive: true });
-                    await exportEml(child);
-                }
+                    await createEmlFile(wrapPath, child, dest);
+                } else await exportEml(child);
             }
         };
 
@@ -65,28 +43,33 @@ export const emlExporter: PstExporter = {
 /**
  * Create a file with a parent wrapper folder and file name as a title.
  */
-const createEmlFile = async (filePath: string, fileContent: EmlFile): pvoid =>
-    outputFile(filePath + EML_EXTENSION, generateEml(fileContent));
+const createEmlFile = async (filePath: string, email: PstEmail, dest: string) =>
+    outputFile(filePath + EML_EXTENSION, generate(email), dest, {
+        encoding: "utf-8",
+    });
 
 /**
  * Generate an EML from the given object.
  */
-const generateEml = (mailContent: EmlFile): string => {
-    const mailFrom = EML_FROM + mailContent.from + BACK_LINE;
-    const mailTo = EML_TO + mailContent.to + BACK_LINE;
-    const mailType = EML_CONTENT_TYPE + BACK_LINE;
-    const mailHeadersSentState = `${EML_HEADERS}${mailContent.isSent}${BACK_LINE}`;
-    const mailSubject = EML_SUBJECT + mailContent.subject + BACK_LINE;
-    const mailBody =
-        `${BACK_LINE}<!DOCTYPE html><html><head></head><body style='background-color: black; color: red'><p>` +
-        `${mailContent.body}<p></body></html>`;
-
-    return (
-        mailFrom +
-        mailTo +
-        mailType +
-        mailHeadersSentState +
-        mailSubject +
-        mailBody
+const generate = (email: PstEmail): string => {
+    // TODO use "emlParse(rawEmail.transportMessageHeaders.replace(/Content-Type:.*/i, ""), {headersOnly: true})"
+    // TODO move to worker and do like xlsxExporter where write file logic is handled separatly
+    return emlStringify(
+        {
+            cc: email.cc,
+            from: email.from,
+            headers: {
+                /* eslint-disable @typescript-eslint/naming-convention */
+                Date: new Date(email.receivedTime).toUTCString(),
+                "MIME-Version": "1.0",
+                "Message-ID": email.messageId,
+                /* eslint-enable @typescript-eslint/naming-convention */
+            },
+            html: email.contentHTML,
+            subject: email.subject,
+            text: email.contentText,
+            to: email.to,
+        },
+        { lf: EOL }
     );
 };

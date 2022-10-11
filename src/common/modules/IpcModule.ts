@@ -1,5 +1,5 @@
-import type { Dialog, Shell } from "electron";
-import { dialog, shell } from "electron";
+import type { App, Dialog, Shell } from "electron";
+import { app, dialog, shell } from "electron";
 
 import { IS_MAIN } from "../config";
 import { ipcMain } from "../lib/ipc";
@@ -28,6 +28,21 @@ declare module "../lib/ipc/event" {
             ReturnType<Shell["showItemInFolder"]>
         >;
     }
+
+    interface SyncIpcMapping {
+        "app.getAppPath": IpcConfig<
+            Parameters<App["getAppPath"]>,
+            ReturnType<App["getAppPath"]>
+        >;
+        "app.getName": IpcConfig<
+            Parameters<App["getName"]>,
+            ReturnType<App["getName"]>
+        >;
+        "app.getPath": IpcConfig<
+            Parameters<App["getPath"]>,
+            ReturnType<App["getPath"]>
+        >;
+    }
 }
 
 /**
@@ -41,6 +56,15 @@ export class IpcModule extends IsomorphicModule {
             return Promise.resolve();
         }
 
+        ipcMain.on("app.getPath", (event, options) => {
+            event.returnValue = app.getPath(options);
+        });
+        ipcMain.on("app.getName", (event) => {
+            event.returnValue = app.getName();
+        });
+        ipcMain.on("app.getAppPath", (event) => {
+            event.returnValue = app.getAppPath();
+        });
         ipcMain.handle("dialog.showMessageBox", async (_event, options) =>
             dialog.showMessageBox(options)
         );

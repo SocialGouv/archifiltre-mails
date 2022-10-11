@@ -2523,11 +2523,12 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@socialgouv/archimail-pst-extractor@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@socialgouv/archimail-pst-extractor/-/archimail-pst-extractor-0.1.0.tgz#53ec2cc44d4cf2c08ea2be4a07f36fb22c6cf132"
-  integrity sha512-QqQH3MyKx00fAbjfa/OxTj/w5daJLf/uoJ79TqDz30jDlWNlbkR2laivbf53/2Lc86Xw3eKqV2gxQF3KFct7tA==
+"@socialgouv/archimail-pst-extractor@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@socialgouv/archimail-pst-extractor/-/archimail-pst-extractor-0.2.0.tgz#b14048cffc5803cff828d9ecc9ffe91d05e51114"
+  integrity sha512-77f/UcVK3UAAdvR9B/BihVlYx0vy0AIo4rCyX5uFl1Rcbsm6I8eMyAwCftia2Vd8GgDbn9aqpd5Bd7vtEktOjQ==
   dependencies:
+    iconv-lite "^0.6.3"
     long "^5.1.0"
     uuid-parse "^1.1.0"
 
@@ -8638,7 +8639,7 @@ iconv-lite@0.4.24:
   dependencies:
     safer-buffer ">= 2.1.2 < 3"
 
-iconv-lite@0.6, iconv-lite@^0.6.2:
+iconv-lite@0.6, iconv-lite@^0.6.2, iconv-lite@^0.6.3:
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.6.3.tgz#a52f80bf38da1952eb5c681790719871a1a72501"
   integrity sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==
@@ -14303,6 +14304,11 @@ tar@^6.1.0, tar@^6.1.11, tar@^6.1.2:
     minizlib "^2.1.1"
     mkdirp "^1.0.3"
     yallist "^4.0.0"
+
+tarn@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/tarn/-/tarn-3.0.2.tgz#73b6140fbb881b71559c4f8bfde3d9a4b3d27693"
+  integrity sha512-51LAVKUSZSVfI05vjPESNc5vwqqZpbXCsU+/+wxlOrUjk2SnFTt97v9ZgQrD4YmxYW1Px6w2KjaDitCfkvgxMQ==
 
 temp-dir@^2.0.0:
   version "2.0.0"

@@ -97,7 +97,14 @@ export class WorkerServer<TWorkerConfig extends WorkerConfig> {
                             },
                         });
                     } catch (error: unknown) {
-                        console.log(`[WorkerServer] Error in ${type}`);
+                        console.log(`[WorkerServer] Error in ${type}`, {
+                            data: error,
+                            event: "error",
+                            metadata: {
+                                _requestId,
+                                type,
+                            },
+                        });
                         console.error(error);
                         parentPort?.postMessage({
                             data: error,
