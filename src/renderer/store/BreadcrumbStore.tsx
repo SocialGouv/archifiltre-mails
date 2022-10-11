@@ -1,8 +1,7 @@
 import type { UnknownMapping } from "@common/utils/type";
 import { t } from "i18next";
-import { atom, useAtom } from "jotai/index";
-import type { SetStateAction } from "react";
 import { useEffect, useMemo } from "react";
+import create from "zustand";
 
 import type { LocaleFileResources } from "../../common/i18n/raw";
 import { viewListStore } from "./ViewListStore";
@@ -18,19 +17,13 @@ export type BreadcrumbId = {
 
 export interface BreadcrumbObject {
     history?: string[];
-    historyIds?: string[];
     id: BreadcrumbId | UnknownMapping;
 }
 
 export interface UseBreadcrumbStore {
     breadcrumb: BreadcrumbObject;
     resetBreadcrumb: () => void;
-    setBreadcrumb: (update: SetStateAction<BreadcrumbObject>) => void;
 }
-
-const breadcrumbAtom = atom<BreadcrumbObject>({
-    id: "",
-});
 
 const joinBreadcrumbHistory = (labels: string[] | undefined) =>
     labels?.join(CHEVRON);
@@ -44,10 +37,16 @@ interface UseBreadcrumbStoreOptions {
     allowUpdate: boolean;
 }
 const defaultOptions: UseBreadcrumbStoreOptions = { allowUpdate: false };
+
+const breadcrumbStore = create<BreadcrumbObject>(() => ({
+    history: [],
+    id: "",
+}));
+
 export const useBreadcrumbStore = ({
     allowUpdate,
 } = defaultOptions): UseBreadcrumbStore => {
-    const [breadcrumb, setBreadcrumb] = useAtom(breadcrumbAtom);
+    const breadcrumb = breadcrumbStore();
     const { list, currentIndex, prevIndex } = viewListStore();
 
     const initialType = list[0]
@@ -70,10 +69,10 @@ export const useBreadcrumbStore = ({
     useEffect(() => {
         if (allowUpdate) {
             if (currentIndex === 0) {
-                setBreadcrumb(initialBreadcrumb);
+                breadcrumbStore.setState(initialBreadcrumb);
             } else if (currentView && currentViewName) {
                 if (prevIndex < currentIndex) {
-                    setBreadcrumb((prevBreadcrumb) => {
+                    breadcrumbStore.setState((prevBreadcrumb) => {
                         const { history } = prevBreadcrumb;
 
                         const newHistory = !history?.length
@@ -86,7 +85,7 @@ export const useBreadcrumbStore = ({
                         };
                     });
                 } else {
-                    setBreadcrumb((prevBreadcrumb) => {
+                    breadcrumbStore.setState((prevBreadcrumb) => {
                         const history = prevBreadcrumb.history ?? [];
                         history.pop();
                         return {
@@ -104,18 +103,16 @@ export const useBreadcrumbStore = ({
         currentViewType,
         list,
         prevIndex,
-        setBreadcrumb,
         allowUpdate,
         initialBreadcrumb,
     ]);
 
     const resetBreadcrumb = () => {
-        setBreadcrumb(initialBreadcrumb);
+        breadcrumbStore.setState(initialBreadcrumb);
     };
 
     return {
         breadcrumb,
         resetBreadcrumb,
-        setBreadcrumb,
     };
 };

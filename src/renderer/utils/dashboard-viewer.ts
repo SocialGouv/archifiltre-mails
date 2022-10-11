@@ -90,10 +90,16 @@ export const sanitizeMailDate = (date: Date): string =>
 export const handleFocusItemBorderColor = (
     node: ComputedDatum<DefaultViewerObject>,
     mainInfos: MainInfos | undefined,
-    isInfoFocus: boolean
+    isInfoFocus: boolean,
+    ownerId: string
 ): string => {
     if (mainInfos && isInfoFocus && node.data.id === mainInfos.id)
         return COLORS.BLACK;
+    else if (
+        isMailViewerObject(node.data) &&
+        ownerId === node.data.email.from.email
+    )
+        return COLORS.MAIL_FROM_ME;
     return COLORS.TRANSPARENT;
 };
 

@@ -9,6 +9,7 @@ import { useContextMenuEventAsClick } from "../../hooks/useContextMenuEventAsCli
 import { useDymViewerNavigation } from "../../hooks/useDymViewerNavigation";
 import { usePstContentCounterPerLevel } from "../../store/PstContentCounterPerLevelStore";
 import { usePstFMInfosStore } from "../../store/PstFMInfosStore";
+import { useSynthesisStore } from "../../store/SynthesisStore";
 import { tagManagerStore } from "../../store/TagManagerStore";
 import { COLORS, ROOT } from "../../utils/constants";
 import type { CirclePackingCommonProps } from "../../utils/dashboard-viewer";
@@ -27,6 +28,7 @@ import { TagManagerMenu } from "../menu/TagManagerMenu";
 import style from "./CirclePacking.module.scss";
 import type { OnBlur } from "./CirclePackingCancellableFocusZone";
 import { CirclePackingCancellableFocusZone } from "./CirclePackingCancellableFocusZone";
+import { CirclePackingLegend } from "./CirclePackingLegend";
 import { CirclePackingTooltip } from "./CirclePackingTooltip";
 
 const { BASE_COLOR, BASE_COLOR_LIGHT, DELETE_COLOR, KEEP_COLOR } = COLORS;
@@ -49,11 +51,10 @@ export const CirclePacking: React.FC = () => {
         resetView,
         computePreviousView,
     } = useDymViewerNavigation();
-
     const { setMainInfos, startFocus, isInfoFocus, mainInfos, cancelFocus } =
         usePstFMInfosStore();
     const { setHoveredNode, keepIds, deleteIds } = tagManagerStore();
-
+    const { ownerId } = useSynthesisStore();
     useContextMenuEventAsClick(circlePackingRef.current);
 
     const [anchorX, setAnchorX] = useState(0);
@@ -92,7 +93,6 @@ export const CirclePacking: React.FC = () => {
         if (isInfoFocus) return;
 
         if (node.data.name === ROOT) {
-            setMainInfos((infos) => infos);
             return;
         }
 
@@ -142,7 +142,7 @@ export const CirclePacking: React.FC = () => {
     }, 200);
 
     const handleBorderColor: CirclePackingCommonProps["borderColor"] = (node) =>
-        handleFocusItemBorderColor(node, mainInfos, isInfoFocus);
+        handleFocusItemBorderColor(node, mainInfos, isInfoFocus, ownerId);
 
     const goToPreviousView = () => {
         computePreviousView();
@@ -179,6 +179,7 @@ export const CirclePacking: React.FC = () => {
                     <button onClick={goToInitialView}>
                         {t("dashboard.viewer.restart")}
                     </button>
+                    <CirclePackingLegend />
                 </div>
             </div>
             <CirclePackingCancellableFocusZone onBlur={handleLostFocus} />
