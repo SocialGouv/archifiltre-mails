@@ -1,3 +1,4 @@
+import { useService } from "@common/modules/ContainerModule";
 import type { ComputedDatum } from "@nivo/circle-packing";
 import create from "zustand";
 
@@ -22,7 +23,7 @@ export interface UsePstMainInfosStore {
     startFocus: () => void;
 }
 
-export const usePstFMInfosStore = create<UsePstMainInfosStore>((set) => ({
+const _usePstFMInfosStore = create<UsePstMainInfosStore>((set) => ({
     cancelFocus: () => {
         set({ isInfoFocus: false });
     },
@@ -32,7 +33,19 @@ export const usePstFMInfosStore = create<UsePstMainInfosStore>((set) => ({
         set({ mainInfos });
     },
     startFocus: () => {
-        // trackerService?.getProvider().track("Feat(4.0) Detail Expanded");
         set({ isInfoFocus: true });
     },
 }));
+
+export const usePstFMInfosStore = (): UsePstMainInfosStore => {
+    const trackerService = useService("trackerService");
+    const { startFocus, ...rest } = _usePstFMInfosStore();
+
+    return {
+        startFocus: () => {
+            trackerService?.getProvider().track("Feat(4.0) Detail Expanded");
+            startFocus();
+        },
+        ...rest,
+    };
+};

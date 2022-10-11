@@ -17,7 +17,6 @@ export type BreadcrumbId = {
 
 export interface BreadcrumbObject {
     history?: string[];
-    // historyIds?: string[];
     id: BreadcrumbId | UnknownMapping;
 }
 
