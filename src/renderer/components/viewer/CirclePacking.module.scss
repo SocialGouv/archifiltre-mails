@@ -68,6 +68,7 @@
   height: auto;
   justify-content: center;
   left: 10px;
+  pointer-events: none;
   position: fixed;
   width: calc(50% - 0.5rem);
   z-index: 10;
@@ -193,11 +194,21 @@
 }
 
 .circle-packing-legend-switcher {
-  left: 0;
-  position: absolute;
+  align-items: center;
+  bottom: 2rem;
+  display: flex;
+  left: calc(50vw - 4.5rem);
+  position: fixed;
+
+  span {
+    margin: 0 !important;
+    position: absolute;
+    right: 100%;
+    width: 180px;
+  }
 
   #switch-label {
-    background: grey;
+    background: rgb(128 128 128);
     border-radius: 100px;
     cursor: pointer;
     display: block;
