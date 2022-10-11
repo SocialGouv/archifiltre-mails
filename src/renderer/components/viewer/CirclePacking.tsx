@@ -9,6 +9,7 @@ import { useContextMenuEventAsClick } from "../../hooks/useContextMenuEventAsCli
 import { useDymViewerNavigation } from "../../hooks/useDymViewerNavigation";
 import { usePstContentCounterPerLevel } from "../../store/PstContentCounterPerLevelStore";
 import { usePstFMInfosStore } from "../../store/PstFMInfosStore";
+import { useSynthesisStore } from "../../store/SynthesisStore";
 import { tagManagerStore } from "../../store/TagManagerStore";
 import { COLORS, ROOT } from "../../utils/constants";
 import type { CirclePackingCommonProps } from "../../utils/dashboard-viewer";
@@ -49,11 +50,10 @@ export const CirclePacking: React.FC = () => {
         resetView,
         computePreviousView,
     } = useDymViewerNavigation();
-
     const { setMainInfos, startFocus, isInfoFocus, mainInfos, cancelFocus } =
         usePstFMInfosStore();
     const { setHoveredNode, keepIds, deleteIds } = tagManagerStore();
-
+    const { ownerId } = useSynthesisStore();
     useContextMenuEventAsClick(circlePackingRef.current);
 
     const [anchorX, setAnchorX] = useState(0);
@@ -142,7 +142,7 @@ export const CirclePacking: React.FC = () => {
     }, 200);
 
     const handleBorderColor: CirclePackingCommonProps["borderColor"] = (node) =>
-        handleFocusItemBorderColor(node, mainInfos, isInfoFocus);
+        handleFocusItemBorderColor(node, mainInfos, isInfoFocus, ownerId);
 
     const goToPreviousView = () => {
         computePreviousView();
