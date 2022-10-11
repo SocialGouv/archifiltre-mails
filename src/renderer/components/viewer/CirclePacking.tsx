@@ -93,7 +93,6 @@ export const CirclePacking: React.FC = () => {
         if (isInfoFocus) return;
 
         if (node.data.name === ROOT) {
-            setMainInfos((infos) => infos);
             return;
         }
 
