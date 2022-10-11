@@ -28,6 +28,7 @@ import { TagManagerMenu } from "../menu/TagManagerMenu";
 import style from "./CirclePacking.module.scss";
 import type { OnBlur } from "./CirclePackingCancellableFocusZone";
 import { CirclePackingCancellableFocusZone } from "./CirclePackingCancellableFocusZone";
+import { CirclePackingLegend } from "./CirclePackingLegend";
 import { CirclePackingTooltip } from "./CirclePackingTooltip";
 
 const { BASE_COLOR, BASE_COLOR_LIGHT, DELETE_COLOR, KEEP_COLOR } = COLORS;
@@ -179,6 +180,7 @@ export const CirclePacking: React.FC = () => {
                     <button onClick={goToInitialView}>
                         {t("dashboard.viewer.restart")}
                     </button>
+                    <CirclePackingLegend />
                 </div>
             </div>
             <CirclePackingCancellableFocusZone onBlur={handleLostFocus} />
