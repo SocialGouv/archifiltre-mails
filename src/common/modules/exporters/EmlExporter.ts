@@ -9,21 +9,7 @@ import type { PstElement, PstEmail } from "./../pst-extractor/type";
 import { isPstEmail } from "./../pst-extractor/type";
 import type { PstExporter } from "./Exporter";
 
-interface EmlFile {
-    body: string;
-    from: string;
-    isSent: number;
-    subject: string;
-    to: string;
-}
-
-const BACK_LINE = " \n";
 const EML_EXTENSION = ".eml";
-const EML_FROM = "From: ";
-const EML_TO = "To: ";
-const EML_SUBJECT = "Subject: ";
-const EML_HEADERS = "X-Unset: ";
-const EML_CONTENT_TYPE = "Content-Type: text/html";
 const EML_PATH_ESCAPED_SEP = "_";
 
 /**
@@ -45,20 +31,6 @@ export const emlExporter: PstExporter = {
                         escapedSubject
                     );
 
-                    const mailContent: EmlFile = {
-                        body: child.contentText
-                            .replaceAll("\n", "")
-                            .replaceAll("\r", ""),
-                        // body: child.contentHTML,
-                        from: child.from.email ?? "[unknown]",
-                        isSent: child.isFromMe ? 0 : 1,
-                        subject: child.subject,
-                        to: child.to
-                            .map((recipient) => recipient.email)
-                            .join(" "),
-                    };
-
-                    // await createEmlFile(wrapPath, mailContent, dest);
                     await createEmlFile(wrapPath, child, dest);
                 } else await exportEml(child);
             }
@@ -71,13 +43,8 @@ export const emlExporter: PstExporter = {
 /**
  * Create a file with a parent wrapper folder and file name as a title.
  */
-const createEmlFile = async (
-    filePath: string,
-    // fileContent: EmlFile,
-    fileContent: PstEmail,
-    dest: string
-) =>
-    outputFile(filePath + EML_EXTENSION, generate(fileContent), dest, {
+const createEmlFile = async (filePath: string, email: PstEmail, dest: string) =>
+    outputFile(filePath + EML_EXTENSION, generate(email), dest, {
         encoding: "utf-8",
     });
 
@@ -92,9 +59,11 @@ const generate = (email: PstEmail): string => {
             cc: email.cc,
             from: email.from,
             headers: {
-                Date: new Date(email.receivedTime).toUTCString(), // eslint-disable-line @typescript-eslint/naming-convention
-                "MIME-Version": "1.0", // eslint-disable-line @typescript-eslint/naming-convention
-                "Message-ID": email.messageId, // eslint-disable-line @typescript-eslint/naming-convention
+                /* eslint-disable @typescript-eslint/naming-convention */
+                Date: new Date(email.receivedTime).toUTCString(),
+                "MIME-Version": "1.0",
+                "Message-ID": email.messageId,
+                /* eslint-enable @typescript-eslint/naming-convention */
             },
             html: email.contentHTML,
             subject: email.subject,

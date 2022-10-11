@@ -18,7 +18,6 @@ import { Pool, TimeoutError } from "tarn";
 import type {
     WorkerCommandsBuilder,
     WorkerConfigBuilder,
-    WorkerEventListenersBuilder,
     WorkerQueriesBuilder,
 } from "../../workers/type";
 import { Ack } from "../../workers/type";
@@ -42,19 +41,12 @@ type Queries = WorkerQueriesBuilder<{
         param: {
             emailIndexes: number[][];
         };
-        // returnType: PstEmail[];
-        returnType: string;
-    };
-}>;
-type EventListeners = WorkerEventListenersBuilder<{
-    log: {
         returnType: string;
     };
 }>;
 
 export type FetchWorkerConfig = WorkerConfigBuilder<{
     commands: Commands;
-    eventListeners: EventListeners;
     queries: Queries;
 }>;
 

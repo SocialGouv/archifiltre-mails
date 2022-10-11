@@ -112,12 +112,12 @@ export class PstExtractorModule extends MainModule {
             console.error(error); // TODO handle error
         });
 
-        // this.fetchWorker.addEventListener("log", (message) => {
-        //     this.consoleToRendererService.log(
-        //         BrowserWindow.getAllWindows()[0]!,
-        //         `[FROM FETCHWORKER] ${message}`
-        //     );
-        // });
+        this.fetchWorker.addEventListener("log", (message) => {
+            this.consoleToRendererService.log(
+                BrowserWindow.getAllWindows()[0]!,
+                `[FROM FETCHWORKER] ${message}`
+            );
+        });
 
         this.inited = true;
         return Promise.resolve();

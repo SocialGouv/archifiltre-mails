@@ -36,6 +36,7 @@ export interface WorkerConfig {
 export type WorkerConfigBuilder<T extends WorkerConfig> = T & {
     eventListeners: {
         error: WorkerEventListener;
+        log: WorkerEventListener<string>;
     };
 };
 

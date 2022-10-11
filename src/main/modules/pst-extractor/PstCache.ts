@@ -55,9 +55,6 @@ export class PstCache {
         )
     ) {
         this.db = new Level(this.cachePath, defaultDbOptions);
-        // if (IS_DEV) {
-        //     void this.db.clear();
-        // }
     }
 
     @SoftLockDb
