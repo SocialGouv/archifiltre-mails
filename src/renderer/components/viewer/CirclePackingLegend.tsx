@@ -12,7 +12,6 @@ export const CirclePackingLegend: React.FC = () => {
         setIsopen(!isOpen);
     };
 
-    // TODO: 2 niveau de lecture ==> interaction / display (catégorie) + déplacer en bas
     return (
         <>
             {isOpen && (
