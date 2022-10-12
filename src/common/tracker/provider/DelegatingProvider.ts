@@ -1,5 +1,6 @@
 import type { Integration } from "@sentry/types";
 
+import { logger } from "../../logger";
 import type { Split, UnionConcat } from "../../utils/type";
 import type { TrackAppId, TrackEvent } from "../type";
 import type { TrackArgs } from "./TrackerProvider";
@@ -19,7 +20,7 @@ export class DelegatingProvider extends TrackerProvider {
         disabled: boolean,
         private readonly providers: TrackerProvider[]
     ) {
-        console.log("[Tracker][DelegatingProvider]", { providers });
+        logger.log("[Tracker][DelegatingProvider]", { providers });
         super(appId, disabled);
     }
 

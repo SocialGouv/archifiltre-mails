@@ -1,4 +1,5 @@
 import axios from "axios";
+import { logger } from '../../logger';
 
 /**
  * @see https://developer.matomo.org/api-reference/tracking-api
@@ -110,7 +111,7 @@ export class MatomoClient {
                 },
             })
             .then((res) => {
-                console.log(
+                logger.log(
                     "MATOMO RESPONSE",
                     res.status,
                     res.statusText,

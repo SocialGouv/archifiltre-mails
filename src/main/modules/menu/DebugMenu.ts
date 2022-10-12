@@ -1,5 +1,6 @@
 import { IS_PACKAGED } from "@common/config";
 import { SupportedLocales } from "@common/i18n/raw";
+import { logger } from "@common/logger";
 import type {
     ExporterType,
     FileExporterService,
@@ -10,7 +11,6 @@ import type { BrowserWindow, MenuItemConstructorOptions } from "electron";
 import { dialog, MenuItem } from "electron";
 import { t } from "i18next";
 
-import type { ConsoleToRendererService } from "../../services/ConsoleToRendererService";
 // eslint-disable-next-line unused-imports/no-unused-imports -- MenuModule used in doc
 import type { ArchifiltreMailsMenu, MenuModule } from "../MenuModule";
 import type { PstExtractorMainService } from "../PstExtractorModule";
@@ -33,7 +33,6 @@ export class DebugMenu implements ArchifiltreMailsMenu {
     private lastPstFilePath = "";
 
     constructor(
-        private readonly consoleToRendererService: ConsoleToRendererService,
         private readonly pstExtractorMainService: PstExtractorMainService,
         private readonly i18nService: I18nService,
         private readonly fileExporterService: FileExporterService,
@@ -103,11 +102,7 @@ export class DebugMenu implements ArchifiltreMailsMenu {
     }
 
     private readonly onClickOpenLogPST: MenuItemConstructorOptions["click"] =
-        async (_menuItem, browserWindow, _event) => {
-            if (!browserWindow) {
-                return;
-            }
-
+        async () => {
             const dialogReturn = await dialog.showOpenDialog({
                 filters: [
                     {
@@ -127,7 +122,7 @@ export class DebugMenu implements ArchifiltreMailsMenu {
 
             if (pstFilePath) {
                 disableMenus(this.id);
-                await this.extractAndLogPst(browserWindow, pstFilePath);
+                await this.extractAndLogPst(pstFilePath);
                 enableMenus(
                     this.id,
                     EXPORT_LAST_PST_MENU_ID,
@@ -137,27 +132,18 @@ export class DebugMenu implements ArchifiltreMailsMenu {
         };
 
     private readonly onClickOpenLogLastPST: MenuItemConstructorOptions["click"] =
-        async (_menuItem, browserWindow, _event) => {
-            if (this.lastPstFilePath && browserWindow) {
-                this.consoleToRendererService.log(
-                    browserWindow,
-                    `Open last PST file: ${this.lastPstFilePath}`
-                );
-                await this.extractAndLogPst(
-                    browserWindow,
-                    this.lastPstFilePath
-                );
+        async () => {
+            if (this.lastPstFilePath) {
+                logger.log(`Open last PST file: ${this.lastPstFilePath}`);
+                await this.extractAndLogPst(this.lastPstFilePath);
             }
         };
 
-    private async extractAndLogPst(
-        browserWindow: BrowserWindow,
-        pstFilePath: string
-    ): pvoid {
+    private async extractAndLogPst(pstFilePath: string): pvoid {
         const extractDatas = await this.pstExtractorMainService.extract({
             pstFilePath,
         });
-        this.consoleToRendererService.log(browserWindow, extractDatas);
+        logger.log(extractDatas);
     }
 
     private async exportLast(
@@ -193,6 +179,6 @@ export class DebugMenu implements ArchifiltreMailsMenu {
             // emails,
             dialogReturn.filePath
         );
-        console.info("MENU EXPORT DONE");
+        logger.info("MENU EXPORT DONE");
     }
 }

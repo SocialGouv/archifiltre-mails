@@ -49,13 +49,15 @@ type TriggerFunction<TEventListeners extends WorkerEventListeners> = <
 ) => void;
 
 export class WorkerServer<TWorkerConfig extends WorkerConfig> {
+    private static INSTANCE: WorkerServer<WorkerConfig> | null = null;
+
     public workerData = workerData as TWorkerConfig["data"] & WorkerAppConfig;
 
     private readonly callbackPool = new Map<string, EveryFunction>();
 
     private readonly subscribersPool = new Map<string, VoidArgsFunction[]>();
 
-    constructor() {
+    private constructor() {
         if (isMainThread) {
             throw new Error("Worker server should not be in main thread.");
         }
@@ -97,6 +99,7 @@ export class WorkerServer<TWorkerConfig extends WorkerConfig> {
                             },
                         });
                     } catch (error: unknown) {
+                        // eslint-disable-next-line no-console
                         console.log(`[WorkerServer] Error in ${type}`, {
                             data: error,
                             event: "error",
@@ -105,6 +108,7 @@ export class WorkerServer<TWorkerConfig extends WorkerConfig> {
                                 type,
                             },
                         });
+                        // eslint-disable-next-line no-console
                         console.error(error);
                         parentPort?.postMessage({
                             data: error,
@@ -118,6 +122,19 @@ export class WorkerServer<TWorkerConfig extends WorkerConfig> {
                 }
             }
         );
+    }
+
+    /**
+     * Get a single server instance per worker.
+     */
+    public static getInstance<
+        TWorkerConfig extends WorkerConfig
+    >(): WorkerServer<TWorkerConfig> {
+        if (!this.INSTANCE) {
+            this.INSTANCE = new WorkerServer();
+        }
+
+        return this.INSTANCE as unknown as WorkerServer<TWorkerConfig>;
     }
 
     public onCommand: OnCommandFunction<

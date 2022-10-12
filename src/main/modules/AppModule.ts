@@ -6,7 +6,6 @@ import { version } from "@common/utils/package";
 import { dialog } from "electron";
 
 import type { MainWindowRetriever } from "..";
-import type { ConsoleToRendererService } from "../services/ConsoleToRendererService";
 import { isQuitingForUpdate, setupAutoUpdate } from "./app/autoUpdate";
 import { MainModule } from "./MainModule";
 
@@ -16,7 +15,6 @@ import { MainModule } from "./MainModule";
 export class AppModule extends MainModule {
     constructor(
         private readonly mainWindowRetriever: MainWindowRetriever,
-        private readonly consoleToRendererService: ConsoleToRendererService,
         private readonly i18nService: I18nService,
         private readonly userConfigService: UserConfigService,
         private readonly trackerService: TrackerService
@@ -91,21 +89,7 @@ export class AppModule extends MainModule {
                 });
             }
 
-            const log = this.consoleToRendererService.log.bind(
-                this.consoleToRendererService,
-                mainWindow
-            );
-            setupAutoUpdate(
-                this.trackerService,
-                {
-                    debug: log,
-                    error: log,
-                    info: log,
-                    log,
-                    warn: log,
-                },
-                this.i18nService.i18next.t
-            );
+            setupAutoUpdate(this.trackerService, this.i18nService.i18next.t);
         });
 
         return Promise.resolve();

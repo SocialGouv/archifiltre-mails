@@ -7,7 +7,6 @@ import type { MenuItem } from "electron";
 import { Menu } from "electron";
 import { t } from "i18next";
 
-import type { ConsoleToRendererService } from "../services/ConsoleToRendererService";
 import { MainModule } from "./MainModule";
 import { DebugMenu } from "./menu/DebugMenu";
 import type { PstExtractorMainService } from "./PstExtractorModule";
@@ -49,7 +48,6 @@ export class MenuModule extends MainModule {
     private debugMenu?: DebugMenu;
 
     constructor(
-        private readonly consoleToRendererService: ConsoleToRendererService,
         private readonly pstExtractorMainService: PstExtractorMainService,
         private readonly i18nService: I18nService,
         private readonly fileExporterService: FileExporterService,
@@ -62,7 +60,6 @@ export class MenuModule extends MainModule {
         await this.i18nService.wait();
         await this.userConfigService.wait();
         this.debugMenu = new DebugMenu(
-            this.consoleToRendererService,
             this.pstExtractorMainService,
             this.i18nService,
             this.fileExporterService,
