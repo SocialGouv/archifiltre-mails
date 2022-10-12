@@ -56,6 +56,8 @@ jobs:
       - name: Setup Node
         uses: ./.github/actions/setup-node
       - name: Yarn install
+        env:
+          npm_config_build_from_source: true
         run: yarn --frozen-lockfile --perfer-offline
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v5

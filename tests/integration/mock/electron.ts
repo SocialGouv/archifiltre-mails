@@ -1,5 +1,7 @@
 import path from "path";
 
+process.env.NODE_ENV = "test-jest";
+
 jest.mock(
     "electron",
     () => {
@@ -9,6 +11,7 @@ jest.mock(
         return {
             app: {
                 getLocale: () => "fr-FR",
+                getName: () => `archifiltre-mails-test`,
                 getPath: (p: string) =>
                     path.resolve(__dirname, `../__app_getPath__/${p}`),
             },
