@@ -19,8 +19,18 @@ export const DashboardActions: FC = () => {
         setExporter((open) => !open);
     }, [setExporter]);
 
+    const saveWork = useCallback(() => {
+        console.log("SAVE WORK");
+    }, []);
+
     return (
         <div className={style.dashboard__actions__bar}>
+            <div className={style.dashboard__actions__bar__btn}>
+                <button onClick={saveWork}>
+                    <ExportPicto />
+                    SAVE
+                </button>
+            </div>
             <div className={style.dashboard__actions__bar__btn}>
                 <button onClick={switchExporter}>
                     <ExportPicto />
