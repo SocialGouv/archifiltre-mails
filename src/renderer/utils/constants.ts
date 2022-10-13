@@ -17,7 +17,7 @@ export type VIZUALISATION =
     | "vizualisation.sunburst";
 
 // extractor
-export const ACCEPTED_EXTENSION = ".pst";
+export const ACCEPTED_EXTENSION = [".pst", ".json"];
 export const ARBITRARY_FLAT_LEVEL = 12;
 
 export const ROOT = "root";

@@ -36,18 +36,28 @@ export const usePstExtractor = (): UsePstExtractor => {
         pstProgressInitialState
     );
     const pstExtractorService = useService("pstExtractorService");
+    const workManagerService = useService("workManagerService");
     const trackerService = useService("trackerService");
 
     const { setExtractDatas } = usePstStore();
     const { setTotalArchiveSize } = pstContentCounterPerLevelStore();
 
     useEffect(() => {
-        if (pstFilePath && pstExtractorService && trackerService) {
+        if (
+            pstFilePath &&
+            workManagerService &&
+            pstExtractorService &&
+            trackerService
+        ) {
             void (async () => {
                 const beforeExtractTimestamp = Date.now();
-                const extractDatas = await pstExtractorService.extract({
-                    pstFilePath,
-                });
+                console.log("DROP", pstFilePath);
+                const extractDatas = pstFilePath.endsWith(".json")
+                    ? await workManagerService.load({ from: pstFilePath })
+                    : await pstExtractorService.extract({
+                          pstFilePath,
+                      });
+                console.log("extractDatas", extractDatas);
                 const loadTime = Date.now() - beforeExtractTimestamp;
 
                 setExtractDatas(extractDatas);
@@ -79,6 +89,7 @@ export const usePstExtractor = (): UsePstExtractor => {
         setExtractDatas,
         setTotalArchiveSize,
         trackerService,
+        workManagerService,
     ]);
 
     useEffect(() => {

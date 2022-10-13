@@ -18,6 +18,7 @@ import { DevToolsModule } from "./modules/DevToolsModule";
 import { MenuModule } from "./modules/MenuModule";
 import { PstExporterModule } from "./modules/PstExporterModule";
 import { PstExtractorModule } from "./modules/PstExtractorModule";
+import { WorkManagerModule } from "./modules/WorkManagerModule";
 import { consoleToRendererService } from "./services/ConsoleToRendererService";
 
 export type MainWindowRetriever = () => Promise<BrowserWindow>;
@@ -115,6 +116,11 @@ app.on("ready", async () => {
             new PstExtractorModule(
                 containerModule.get("userConfigService"),
                 consoleToRendererService
+            ),
+            new WorkManagerModule(
+                containerModule.get("fileExporterService"),
+                containerModule.get("i18nService"),
+                containerModule.get("pstCacheMainService")
             ),
             new MenuModule(
                 consoleToRendererService,

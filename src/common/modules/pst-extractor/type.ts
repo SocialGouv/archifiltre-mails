@@ -134,7 +134,7 @@ export interface AdditionalDatas {
      * @deprecated
      * @todo Pre discover pst owner
      */
-    possibleOwner?: Required<PstEmailRecipient>;
+    possibleOwner: Required<PstEmailRecipient>;
     pstFilename: string;
     received: string[];
     sent: string[];

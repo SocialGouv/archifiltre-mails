@@ -14,6 +14,7 @@ import { App } from "./app";
 import { ConsoleFromMainModule } from "./modules/ConsoleFromMainModule";
 import { pstExporterService } from "./services/PstExporterService";
 import { pstExtractorService } from "./services/PstExtractorService";
+import { workManagerService } from "./services/WorkManagerService";
 
 module.hot?.accept();
 // get integrations setup callback
@@ -24,7 +25,8 @@ document.title = `Mails v${version} (${PRODUCT_CHANNEL})`;
 void (async () => {
     const isomorphicModules = getIsomorphicModules(
         ["pstExtractorService", pstExtractorService],
-        ["pstExporterService", pstExporterService]
+        ["pstExporterService", pstExporterService],
+        ["workManagerService", workManagerService]
     );
     const modules: Module[] = [
         ...isomorphicModules,

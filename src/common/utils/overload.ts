@@ -4,8 +4,14 @@ import type { Objectize } from "./type";
 
 type Keys<T> = Objectize<(keyof T)[]>;
 type Values<T> = Objectize<T[keyof T][]>;
+type Entries<T> = Objectize<
+    {
+        [K in keyof T]: [K, T[K]];
+    }[keyof T][]
+>;
 
 interface ObjectOverload {
+    entries: <T>(o: T) => Entries<T>;
     getOwnPropertyNames: <T>(o: T) => Keys<T>;
     keys: <T>(o: T) => Keys<T>;
     values: <T>(o: T) => Values<T>;
