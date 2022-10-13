@@ -18,7 +18,10 @@ import { readFile } from "fs/promises";
 import path from "path";
 
 import { MainModule } from "./MainModule";
-import type { PstCacheMainService } from "./PstExtractorModule";
+import type {
+    PstCacheMainService,
+    PstExtractorMainService,
+} from "./PstExtractorModule";
 
 export class WorkManagerModule extends MainModule {
     private inited = false;
@@ -26,7 +29,8 @@ export class WorkManagerModule extends MainModule {
     constructor(
         private readonly fileExporterService: FileExporterService,
         private readonly i18nService: I18nService,
-        private readonly pstCacheService: PstCacheMainService
+        private readonly pstCacheService: PstCacheMainService,
+        private readonly pstExtractorMainService: PstExtractorMainService
     ) {
         super();
     }
@@ -96,12 +100,18 @@ export class WorkManagerModule extends MainModule {
             const attachments = new Map(workFile.attachments);
             const groups = {} as Record<GroupType, Map<string, string[]>>;
 
-            const pstPath = path.format({
+            // TODO check that pst file exists and turn into downgraded mode if not
+            const pstFilePath = path.format({
                 dir: path.dirname(from),
                 ext: ".pst",
                 name: workFile.additionalDatas.pstFilename,
             });
-            this.pstCacheService.openForPst(pstPath);
+            this.pstCacheService.openForPst(pstFilePath);
+            // not in downgraded mode
+            await this.pstExtractorMainService.openPstInWorkers({
+                fetcherOnly: true,
+                pstFilePath,
+            });
 
             await this.pstCacheService.setPstMailIndexes(indexes);
             await this.pstCacheService.setAttachments(attachments);

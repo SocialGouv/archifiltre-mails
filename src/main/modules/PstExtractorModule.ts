@@ -21,6 +21,11 @@ import { PstCache } from "./pst-extractor/PstCache";
 
 export class PstExtractorError extends AppError {}
 
+interface OpenPstOptions {
+    fetcherOnly?: true;
+    pstFilePath: string;
+}
+
 const REGEXP_PST = /\.pst$/i;
 
 type ProgressReplyFunction =
@@ -127,7 +132,7 @@ export class PstExtractorModule extends MainModule {
         return Promise.resolve();
     }
 
-    private async extract(options: ExtractOptions): Promise<PstExtractDatas> {
+    private async openPstInWorkers(options: OpenPstOptions): pvoid {
         if (this.working) {
             throw new PstExtractorError("Extractor already working.");
         }
@@ -138,25 +143,31 @@ export class PstExtractorModule extends MainModule {
             );
         }
 
-        if (options.pstFilePath === this.lastPath && this.lastPstExtractDatas) {
-            return this.lastPstExtractDatas;
-        }
-
-        this.working = true;
-
-        delete this.lastPstExtractDatas;
         this.lastPath = options.pstFilePath;
 
-        console.info("Start extracting...");
         await Promise.all([
             this.fetchWorker.command("open", {
                 pstFilePath: this.lastPath,
             }),
-            this.extractorWorker.command("open", {
-                pstFilePath: this.lastPath,
-            }),
+            options.fetcherOnly
+                ? Promise.resolve()
+                : this.extractorWorker.command("open", {
+                      pstFilePath: this.lastPath,
+                  }),
         ]);
+    }
 
+    private async extract(options: ExtractOptions): Promise<PstExtractDatas> {
+        if (options.pstFilePath === this.lastPath && this.lastPstExtractDatas) {
+            return this.lastPstExtractDatas;
+        }
+
+        await this.openPstInWorkers({ pstFilePath: options.pstFilePath });
+
+        this.working = true;
+        delete this.lastPstExtractDatas;
+
+        console.time(`PST Extract ${options.pstFilePath}`);
         await this.extractorWorker.command("extract", {
             progressInterval: this.userConfigService.get(
                 "extractProgressDelay"
@@ -185,7 +196,7 @@ export class PstExtractorModule extends MainModule {
         };
 
         this.working = false;
-        console.info("Extract done.");
+        console.timeEnd(`PST Extract ${options.pstFilePath}`);
         return this.lastPstExtractDatas;
     }
 
@@ -225,6 +236,7 @@ export class PstExtractorModule extends MainModule {
             extract: this.extract.bind(this),
             getEmails: this.getEmails.bind(this),
             name: "PstExtractorMainService",
+            openPstInWorkers: this.openPstInWorkers.bind(this),
         };
     }
 
@@ -250,6 +262,7 @@ const cacheService = new (class extends PstCache implements PstCacheMainService 
 export interface PstExtractorMainService extends Service {
     extract: typeof PstExtractorModule.prototype["extract"];
     getEmails: typeof PstExtractorModule.prototype["getEmails"];
+    openPstInWorkers: typeof PstExtractorModule.prototype["openPstInWorkers"];
 }
 
 export interface PstCacheMainService extends Service, PstCache {}

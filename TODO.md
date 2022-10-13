@@ -46,5 +46,15 @@
 - [ ] pst extractor indexes => descriptorId
 - [ ] eml export parallel ops
 - [x] test csv export
-- [ ] windows installer appId shortcut regedit
+- [x] windows installer appId shortcut regedit
 - [ ] windows open pst error (db?) 
+
+## work manager
+- [x] basic save/load
+- [ ] add additionnal metadata (owner, deleted/keep, deleted folder)
+- [ ] either encode file and/or add security control (id field, check that pst file is in the same dir, checksum)
+- [ ] change dropzone and savemodal texts
+- [ ] "open" pst in fetcher-worker OR act as "downgraded" mode without email content nor attachments
+- [ ] add tracking on save/load
+- [ ] BONUS: add toast when any export/import is complete
+- [ ] BONUS: add progressbar (electron + front) for export and electron-only for import (https://www.electronjs.org/fr/docs/latest/api/browser-window#winsetprogressbarprogress-options)
