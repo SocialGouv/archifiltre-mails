@@ -4,6 +4,10 @@ import create from "zustand";
 import type { ViewerObject } from "../utils/dashboard-viewer-dym";
 
 type HoveredNode = ComputedDatum<ViewerObject<string>>;
+interface TaggedNodesFromWorkLoading {
+    deleteIds: string[];
+    keepIds: string[];
+}
 
 export interface TagManagerStore {
     deleteIds: string[];
@@ -12,6 +16,9 @@ export interface TagManagerStore {
     setDeleteIds: () => void;
     setHoveredNode: (hoveredNode: HoveredNode | null) => void;
     setKeepIds: () => void;
+    setTaggedNodesFromWorkLoading: (
+        taggedNodesIds: TaggedNodesFromWorkLoading
+    ) => void;
 }
 
 export const tagManagerStore = create<TagManagerStore>((set, get) => ({
@@ -42,5 +49,13 @@ export const tagManagerStore = create<TagManagerStore>((set, get) => ({
         const keepIds = [...new Set([...currentKeepIds, ...newKeepIds])];
 
         set({ deleteIds, keepIds });
+    },
+    setTaggedNodesFromWorkLoading: (
+        taggedNodesIds: TaggedNodesFromWorkLoading
+    ) => {
+        set({
+            deleteIds: taggedNodesIds.deleteIds,
+            keepIds: taggedNodesIds.keepIds,
+        });
     },
 }));

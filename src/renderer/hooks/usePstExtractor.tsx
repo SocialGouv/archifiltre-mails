@@ -1,11 +1,16 @@
 import { useService } from "@common/modules/ContainerModule";
-import type { PstProgressState } from "@common/modules/pst-extractor/type";
+import type {
+    PstExtractDatas,
+    PstProgressState,
+} from "@common/modules/pst-extractor/type";
 import { bytesToGigabytes } from "@common/utils";
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 
 import { pstContentCounterPerLevelStore } from "../store/PstContentCounterPerLevelStore";
 import { usePstStore } from "../store/PSTStore";
+import { setDeletedFolderId, setMailBoxOwnerId } from "../store/SynthesisStore";
+import { tagManagerStore } from "../store/TagManagerStore";
 import {
     getInitialTotalAttachements,
     getInititalTotalFileSize,
@@ -41,6 +46,7 @@ export const usePstExtractor = (): UsePstExtractor => {
 
     const { setExtractDatas } = usePstStore();
     const { setTotalArchiveSize } = pstContentCounterPerLevelStore();
+    const { setTaggedNodesFromWorkLoading } = tagManagerStore();
 
     useEffect(() => {
         if (
@@ -51,13 +57,29 @@ export const usePstExtractor = (): UsePstExtractor => {
         ) {
             void (async () => {
                 const beforeExtractTimestamp = Date.now();
+                let extractDatas = {} as PstExtractDatas;
                 console.log("DROP", pstFilePath);
-                const extractDatas = pstFilePath.endsWith(".json")
-                    ? await workManagerService.load({ from: pstFilePath })
-                    : await pstExtractorService.extract({
-                          pstFilePath,
-                      });
+                if (pstFilePath.endsWith(".json")) {
+                    const { uncachedAdditionalDatas, ...rest } =
+                        await workManagerService.load({
+                            from: pstFilePath,
+                        });
+
+                    setMailBoxOwnerId(uncachedAdditionalDatas.ownerId);
+                    setDeletedFolderId(uncachedAdditionalDatas.deletedFolderId);
+                    setTaggedNodesFromWorkLoading({
+                        deleteIds: uncachedAdditionalDatas.deleteIds,
+                        keepIds: uncachedAdditionalDatas.keepIds,
+                    });
+
+                    extractDatas = rest;
+                } else {
+                    extractDatas = await pstExtractorService.extract({
+                        pstFilePath,
+                    });
+                }
                 console.log("extractDatas", extractDatas);
+
                 const loadTime = Date.now() - beforeExtractTimestamp;
 
                 setExtractDatas(extractDatas);

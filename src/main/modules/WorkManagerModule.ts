@@ -55,7 +55,10 @@ export class WorkManagerModule extends MainModule {
         return Promise.resolve();
     }
 
-    private readonly save: SaveWorkFunction = async ({ dest }) => {
+    private readonly save: SaveWorkFunction = async ({
+        dest,
+        uncachedAdditionalDatas,
+    }) => {
         if (!this.inited) {
             // TODO change error type
             throw new FileExporterError(
@@ -78,6 +81,7 @@ export class WorkManagerModule extends MainModule {
                 {}
             ) as Record<GroupType, [string, string[]][]>,
             indexes: [...indexes],
+            uncachedAdditionalDatas,
         };
 
         await this.fileExporterService.export("json", obj, destPath);
@@ -133,6 +137,7 @@ export class WorkManagerModule extends MainModule {
                 attachments,
                 groups,
                 indexes,
+                uncachedAdditionalDatas: workFile.uncachedAdditionalDatas,
             };
         } catch (error: unknown) {
             console.error("What the actual F?");

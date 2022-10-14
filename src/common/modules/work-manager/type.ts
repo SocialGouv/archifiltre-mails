@@ -10,4 +10,12 @@ export interface WorkFile {
     attachments: [string, PstAttachment[]][];
     groups: Record<GroupType, [string, string[]][]>;
     indexes: PstMailIndexEntries;
+    uncachedAdditionalDatas: UncachedAdditionalDatas;
+}
+
+export interface UncachedAdditionalDatas {
+    deleteIds: string[];
+    deletedFolderId: string;
+    keepIds: string[];
+    ownerId: string;
 }
