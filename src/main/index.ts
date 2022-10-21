@@ -120,7 +120,8 @@ app.on("ready", async () => {
             new WorkManagerModule(
                 containerModule.get("fileExporterService"),
                 containerModule.get("i18nService"),
-                containerModule.get("pstCacheMainService")
+                containerModule.get("pstCacheMainService"),
+                containerModule.get("pstExtractorMainService")
             ),
             new MenuModule(
                 consoleToRendererService,
