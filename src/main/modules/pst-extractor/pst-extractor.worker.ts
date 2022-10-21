@@ -78,9 +78,9 @@ server.onCommand("open", async ({ pstFilePath }) => {
     return Ack.Resolve();
 });
 
-let stop = false;
+let _stop = false;
 server.onCommand("stop", async () => {
-    stop = true;
+    _stop = true;
     return Ack.Resolve();
 });
 

@@ -168,7 +168,7 @@ export class DebugMenu implements ArchifiltreMailsMenu {
         }
 
         disableMenus(this.id);
-        const extractDatas = await this.pstExtractorMainService.extract({
+        const _extractDatas = await this.pstExtractorMainService.extract({
             pstFilePath: this.lastPstFilePath,
         });
 
