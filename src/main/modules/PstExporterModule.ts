@@ -20,11 +20,9 @@ import {
 import type { SimpleObject } from "@common/utils/type";
 import path from "path";
 
+import type { PstCacheMainService } from "./CacheModule";
 import { MainModule } from "./MainModule";
-import type {
-    PstCacheMainService,
-    PstExtractorMainService,
-} from "./PstExtractorModule";
+import type { PstExtractorMainService } from "./PstExtractorModule";
 
 export class PstExporterModule extends MainModule {
     private inited = false;

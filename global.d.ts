@@ -24,6 +24,7 @@ declare const __static: string;
 
 declare namespace NodeJS {
     interface ProcessEnv {
+        CACHE_PROVIDER: string;
         SENTRY_DSN: string;
         SENTRY_ORG: string;
         SENTRY_URL: string;

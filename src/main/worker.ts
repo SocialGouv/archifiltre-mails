@@ -1,4 +1,5 @@
 import { IS_DIST_MODE, IS_PACKAGED } from "@common/config";
+import { logger } from "@common/logger";
 import path from "path";
 import type { WorkerOptions } from "worker_threads";
 import { SHARE_ENV, Worker as BaseWorker } from "worker_threads";

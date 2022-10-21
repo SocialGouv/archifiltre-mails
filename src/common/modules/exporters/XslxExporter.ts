@@ -2,6 +2,7 @@
 import type { WorkBook } from "xlsx";
 import { utils, writeFile } from "xlsx";
 
+import { logger } from "../../logger";
 import { chunkString } from "../../utils";
 import type { SimpleObject } from "../../utils/type";
 import type { JsonExporter } from "./Exporter";
@@ -13,7 +14,7 @@ const MAX_CELL_LENGTH = 32767;
  */
 export const xlsxExporter: JsonExporter = {
     async export<T extends SimpleObject>(obj: T[], dest: string) {
-        console.log("Generate XLSX");
+        logger.info("[XlsxExporter] Generate XLSX");
         const sheet = utils.json_to_sheet(sanitize(obj), {
             WTF: true,
             cellDates: true,
@@ -27,7 +28,7 @@ export const xlsxExporter: JsonExporter = {
             Sheets,
         };
 
-        console.log("And write");
+        logger.info("[XlsxExporter] And write");
         await writeFile(book, dest);
     },
 };

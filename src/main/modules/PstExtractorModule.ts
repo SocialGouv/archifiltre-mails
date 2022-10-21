@@ -1,6 +1,7 @@
 import { AppError } from "@common/lib/error/AppError";
 import { ipcMain } from "@common/lib/ipc";
 import type { DualIpcConfigExtractReply } from "@common/lib/ipc/event";
+import { logger } from "@common/logger";
 import type { Service } from "@common/modules/container/type";
 import { containerModule } from "@common/modules/ContainerModule";
 import type {
@@ -10,14 +11,12 @@ import type {
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
 import type { UserConfigService } from "@common/modules/UserConfigModule";
-import { BrowserWindow } from "electron";
 
-import type { ConsoleToRendererService } from "../services/ConsoleToRendererService";
 import { WorkerClient } from "../workers/WorkerClient";
+import type { PstCacheMainService } from "./CacheModule";
 import { MainModule } from "./MainModule";
 import type { FetchWorkerConfig } from "./pst-extractor/pst-email-fetcher.worker";
 import type { ExtractorWorkerConfig } from "./pst-extractor/pst-extractor.worker";
-import { PstCache } from "./pst-extractor/PstCache";
 
 export class PstExtractorError extends AppError {}
 
@@ -54,13 +53,13 @@ export class PstExtractorModule extends MainModule {
 
     constructor(
         private readonly userConfigService: UserConfigService,
-        private readonly consoleToRendererService: ConsoleToRendererService
+        private readonly cacheService: PstCacheMainService
     ) {
         super();
-        containerModule.registerServices(
-            ["pstExtractorMainService", this.extractorService],
-            ["pstCacheMainService", this.cacheService]
-        );
+        containerModule.registerServices([
+            "pstExtractorMainService",
+            this.extractorService,
+        ]);
     }
 
     public async init(): pvoid {
@@ -103,20 +102,21 @@ export class PstExtractorModule extends MainModule {
             );
         });
         this.extractorWorker.addEventListener("error", (error) => {
-            console.log("[PstExtractorModule] extractorWorker Error");
-            console.error(error); // TODO handle error
+            logger.log("[PstExtractorModule] extractorWorker Error");
+            logger.error(error); // TODO handle error
         });
 
         this.fetchWorker.addEventListener("error", (error) => {
-            console.log("[PstExtractorModule] fetchWorker Error");
-            console.error(error); // TODO handle error
+            logger.log("[PstExtractorModule] fetchWorker Error");
+            logger.error(error); // TODO handle error
+        });
+
+        this.extractorWorker.addEventListener("log", (message) => {
+            logger.log(`[FROM EXTRACTWORKER] ${message}`);
         });
 
         this.fetchWorker.addEventListener("log", (message) => {
-            this.consoleToRendererService.log(
-                BrowserWindow.getAllWindows()[0]!,
-                `[FROM FETCHWORKER] ${message}`
-            );
+            logger.log(`[FROM FETCHWORKER] ${message}`);
         });
 
         this.inited = true;
@@ -147,7 +147,7 @@ export class PstExtractorModule extends MainModule {
         delete this.lastPstExtractDatas;
         this.lastPath = options.pstFilePath;
 
-        console.info("Start extracting...");
+        logger.info("[PstExtractorModule] Start extracting...");
         await Promise.all([
             this.fetchWorker.command("open", {
                 pstFilePath: this.lastPath,
@@ -156,6 +156,7 @@ export class PstExtractorModule extends MainModule {
                 pstFilePath: this.lastPath,
             }),
         ]);
+        logger.info("[PstExtractorModule] Pst opened");
 
         await this.extractorWorker.command("extract", {
             progressInterval: this.userConfigService.get(
@@ -163,15 +164,17 @@ export class PstExtractorModule extends MainModule {
             ),
             viewConfigs: this.userConfigService.get("viewConfigs"),
         });
+        logger.info("[PstExtractorModule] Worker extract done");
 
         // TODO: hash instead
         this.cacheService.openForPst(this.lastPath);
+        logger.info("[PstExtractorModule] Cache opened");
 
         const attachments = await this.cacheService.getAttachments();
         const indexes = await this.cacheService.getPstMailIndexes();
         const groups = await this.cacheService.getAllGroups();
         const additionalDatas = await this.cacheService.getAllAddtionalData();
-        this.consoleToRendererService.log(BrowserWindow.getAllWindows()[0]!, {
+        logger.debug({
             additionalDatas,
             attachments,
             groups,
@@ -185,7 +188,7 @@ export class PstExtractorModule extends MainModule {
         };
 
         this.working = false;
-        console.info("Extract done.");
+        logger.info("[PstExtractorModule] Extract done.");
         return this.lastPstExtractDatas;
     }
 
@@ -193,13 +196,13 @@ export class PstExtractorModule extends MainModule {
         if (this.working) {
             throw new PstExtractorError("Extractor already working.");
         }
-        console.info("Start fetching emails...");
+        logger.info("[PstExtractorModule] Start fetching emails...");
         const cacheKey = await this.fetchWorker.query("fetch", {
             emailIndexes,
         });
 
         const emails = await this.cacheService.getTempEmails(cacheKey);
-        console.log("Fetching done");
+        logger.log("[PstExtractorModule] Fetching done");
         if (!emails.length) {
             throw new Error("Emails not found from given indexes.");
         }
@@ -227,29 +230,9 @@ export class PstExtractorModule extends MainModule {
             name: "PstExtractorMainService",
         };
     }
-
-    public get cacheService(): PstCacheMainService {
-        return cacheService;
-    }
 }
-
-const cacheService = new (class extends PstCache implements PstCacheMainService {
-    public name = "PstCacheMainService";
-
-    /** @override */
-    public async init(): pvoid {
-        await this.db.close();
-    }
-
-    /** @override */
-    public async uninit(): pvoid {
-        await this.db.close();
-    }
-})();
 
 export interface PstExtractorMainService extends Service {
     extract: typeof PstExtractorModule.prototype["extract"];
     getEmails: typeof PstExtractorModule.prototype["getEmails"];
 }
-
-export interface PstCacheMainService extends Service, PstCache {}
