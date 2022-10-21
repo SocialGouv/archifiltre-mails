@@ -109,6 +109,7 @@ export const usePstExtractor = (): UsePstExtractor => {
         pstExtractorService,
         pstFilePath,
         setExtractDatas,
+        setTaggedNodesFromWorkLoading,
         setTotalArchiveSize,
         trackerService,
         workManagerService,
