@@ -12,7 +12,7 @@
   - [x] coverage
   - [x] generate build
 ## Services
-- [ ] Logger (winston + sentry + console + "renderer transport to main")
+- [x] Logger (winston + sentry + console + "renderer transport to main")
 - [x] Tracker (posthog)
 - [x] global and user config (shared over ipc)
 - [x] i18n (i18next + react-i18next (start [here](./src/common/i18n/)))
@@ -46,5 +46,5 @@
 - [ ] pst extractor indexes => descriptorId
 - [ ] eml export parallel ops
 - [x] test csv export
-- [ ] windows installer appId shortcut regedit
-- [ ] windows open pst error (db?) 
+- [x] windows installer appId shortcut regedit
+- [x] windows open pst error (db?) 

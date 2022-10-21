@@ -17,6 +17,7 @@ import {
 } from "../i18n/raw";
 import type { PubSub } from "../lib/event/PubSub";
 import type { Event, Unsubscriber } from "../lib/event/type";
+import { logger } from "../logger";
 import { WaitableTrait } from "../utils/WaitableTrait";
 import { IsomorphicService } from "./ContainerModule";
 import { IsomorphicModule } from "./Module";
@@ -139,7 +140,7 @@ export class I18nModule extends IsomorphicModule {
         this.unsubscriberConfigUpdate = this.pubSub.subscribe(
             "event.userconfig.updated",
             (event) => {
-                console.log(
+                logger.log(
                     "[i18nModule] pubsub trigger",
                     this.userConfigChangedFromHere,
                     event
@@ -157,7 +158,7 @@ export class I18nModule extends IsomorphicModule {
     }
 
     public async uninit(): pvoid {
-        console.info("[I18nModule] uninit ", this.unsubscriberConfigUpdate);
+        logger.info("[I18nModule] uninit ", this.unsubscriberConfigUpdate);
         this.unsubscriberConfigUpdate?.();
         return Promise.resolve();
     }
@@ -209,7 +210,7 @@ export class I18nModule extends IsomorphicModule {
             ipcMain.handle(
                 I18N_CHANGE_LANGUAGE_EVENT,
                 async (_evt, lng: Locale) => {
-                    console.log("[I18nModule] change asked from renderer", lng);
+                    logger.log("[I18nModule] change asked from renderer", lng);
                     const oldLng = i18next.language;
                     await i18next.changeLanguage(lng);
                     this.userConfigChangedFromHere = true;
@@ -231,7 +232,7 @@ export class I18nModule extends IsomorphicModule {
             ipcRenderer.on(
                 I18N_CHANGE_LANGUAGE_CALLBACK_EVENT,
                 async (_evt, lng: Locale) => {
-                    console.log("[I18nModule] change triggered by main", lng);
+                    logger.log("[I18nModule] change triggered by main", lng);
                     const oldLng = i18next.language;
                     await i18next.changeLanguage(lng);
                     this.triggerLanguageChangedListeners(lng, oldLng as Locale);

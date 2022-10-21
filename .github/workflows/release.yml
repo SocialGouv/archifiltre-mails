@@ -105,6 +105,7 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_URL: ${{ secrets.SENTRY_URL }}
+          CACHE_PROVIDER: localdb
       - name: Archive dist
         uses: actions/upload-artifact@v2
         with:

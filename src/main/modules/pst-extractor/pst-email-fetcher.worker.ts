@@ -1,3 +1,4 @@
+import { logger } from "@common/logger";
 import type {
     PstAttachment as PstAttachment,
     PstEmail,
@@ -22,7 +23,7 @@ import type {
 } from "../../workers/type";
 import { Ack } from "../../workers/type";
 import { WorkerServer } from "../../workers/WorkerServer";
-import { PstCache } from "./PstCache";
+import { CacheModule } from "../CacheModule";
 
 type Commands = WorkerCommandsBuilder<{
     open: {
@@ -50,9 +51,9 @@ export type FetchWorkerConfig = WorkerConfigBuilder<{
     queries: Queries;
 }>;
 
-const pstCache = new PstCache();
-void pstCache.db.close();
-const server = new WorkerServer<FetchWorkerConfig>();
+const pstCache = CacheModule.getCacheService();
+void pstCache.close();
+const server = WorkerServer.getInstance<FetchWorkerConfig>();
 
 let pool: Pool<FileAndId> | null = null;
 let buf: Buffer | null = null;
@@ -122,6 +123,7 @@ const parallelIndexesProcess = async <T>(
     if (!pool) {
         throw new Error("No pst file opened yet.");
     }
+    // eslint-disable-next-line no-console
     console.time("==FETCH MAILS");
     const emails = await Promise.all(
         emailIndexes.map(async (emailIndex) => {
@@ -135,12 +137,13 @@ const parallelIndexesProcess = async <T>(
                 return email;
             } catch (error: unknown) {
                 if (error instanceof TimeoutError) {
-                    console.error("Pool timeout error mega fail...");
+                    logger.error("Pool timeout error mega fail...");
                 }
                 throw error;
             }
         })
     );
+    // eslint-disable-next-line no-console
     console.timeEnd("==FETCH MAILS");
 
     return emails;

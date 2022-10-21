@@ -1,4 +1,6 @@
+import { IS_DEV } from "../config";
 import type { PubSub } from "../lib/event/PubSub";
+import { DebugProvider } from "../tracker/provider/DebugProvider";
 import { DelegatingProvider } from "../tracker/provider/DelegatingProvider";
 import { NoopProvider } from "../tracker/provider/NoopProvider";
 import type { TrackerProvider } from "../tracker/provider/TrackerProvider";
@@ -70,8 +72,9 @@ export class TrackerModule extends IsomorphicModule {
             );
             return new DelegatingProvider(appId, disabled, foundProviders);
         }
-        return new (providers.find((p) => p.trackerName === name) ??
-            NoopProvider)(appId, disabled) as TrackerProvider;
+        return new (providers.find((p) => p.trackerName === name) ?? IS_DEV
+            ? DebugProvider
+            : NoopProvider)(appId, disabled) as TrackerProvider;
     }
 
     get service(): TrackerService {

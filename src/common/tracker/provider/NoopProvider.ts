@@ -1,3 +1,4 @@
+import { logger } from "../../logger";
 import type { TrackEvent } from "../type";
 import type { TrackArgs } from "./TrackerProvider";
 import { TrackerProvider } from "./TrackerProvider";
@@ -31,8 +32,7 @@ export class NoopProvider extends TrackerProvider {
 
     private warn() {
         if (!this.flagConsole) {
-            // eslint-disable-next-line no-console
-            console.warn(
+            logger.warn(
                 `[Tracker] No tracker set or found (${process.env.TRACKER_PROVIDER})`
             );
             this.flagConsole = true;

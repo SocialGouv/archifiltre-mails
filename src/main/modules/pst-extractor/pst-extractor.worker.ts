@@ -23,7 +23,7 @@ import type {
 } from "../../workers/type";
 import { Ack } from "../../workers/type";
 import { WorkerServer } from "../../workers/WorkerServer";
-import { PstCache } from "./PstCache";
+import { CacheModule } from "../CacheModule";
 
 // import { randomUUID } from "crypto";
 let ID = 0;
@@ -62,9 +62,9 @@ export type ExtractorWorkerConfig = WorkerConfigBuilder<{
     eventListeners: EventListeners;
 }>;
 
-const pstCache = new PstCache();
-void pstCache.db.close();
-const server = new WorkerServer<ExtractorWorkerConfig>();
+const pstCache = CacheModule.getCacheService();
+void pstCache.close();
+const server = WorkerServer.getInstance<ExtractorWorkerConfig>();
 let pstFile: PSTFile | null = null;
 
 server.onCommand("open", async ({ pstFilePath }) => {
@@ -78,9 +78,9 @@ server.onCommand("open", async ({ pstFilePath }) => {
     return Ack.Resolve();
 });
 
-let stop = false;
+let _stop = false;
 server.onCommand("stop", async () => {
-    stop = true;
+    _stop = true;
     return Ack.Resolve();
 });
 

@@ -1,17 +1,16 @@
 import "@common/utils/overload";
+import "@common/logger";
 
 import { IS_DEV, PRODUCT_CHANNEL } from "@common/config";
 import { getIsomorphicModules } from "@common/lib/core/isomorphic";
 import { ipcRenderer } from "@common/lib/ipc";
 import { loadModules, unloadModules } from "@common/lib/ModuleManager";
-import type { Module } from "@common/modules/Module";
 import { setupSentry } from "@common/monitoring/sentry";
 import { version } from "@common/utils/package";
 import React from "react";
 import { render } from "react-dom";
 
 import { App } from "./app";
-import { ConsoleFromMainModule } from "./modules/ConsoleFromMainModule";
 import { pstExporterService } from "./services/PstExporterService";
 import { pstExtractorService } from "./services/PstExtractorService";
 
@@ -26,14 +25,10 @@ void (async () => {
         ["pstExtractorService", pstExtractorService],
         ["pstExporterService", pstExporterService]
     );
-    const modules: Module[] = [
-        ...isomorphicModules,
-        new ConsoleFromMainModule(),
-    ];
     window.addEventListener("beforeunload", async () =>
-        unloadModules(...modules)
+        unloadModules(...isomorphicModules)
     );
-    await loadModules(...modules);
+    await loadModules(...isomorphicModules);
     setupSentryIntegrations();
 
     render(<App />, document.querySelector("#app"));
@@ -41,8 +36,7 @@ void (async () => {
     if (IS_DEV) {
         window["_archifiltre-debug"] = {
             ipcRenderer,
-            pstExporterService,
-            pstExtractorService,
+            modules: isomorphicModules,
         };
     }
 })();

@@ -1,6 +1,7 @@
 import type MatomoTracker from "@datapunt/matomo-tracker-js";
 
 import { IS_MAIN } from "../../config";
+import { logger } from "../../logger";
 import { MatomoClient } from "../matomo/MatomoClient";
 import type { TrackEvent } from "../type";
 import { eventCategoryMap } from "../type";
@@ -22,7 +23,7 @@ export class MatomoProvider extends TrackerProvider<
 
     async init(): pvoid {
         if (this.inited) {
-            console.warn("[MatomoProvider] Already inited.");
+            logger.warn("[MatomoProvider] Already inited.");
         }
         if (IS_MAIN) {
             this.tracker = new MatomoClient(

@@ -1,10 +1,11 @@
 import { PRODUCT_CHANNEL } from "@common/config";
 import { ipcMain } from "@common/lib/ipc";
+import { logger } from "@common/logger";
 import type { AutoUpdateCheckIpcConfig } from "@common/modules/app/ipc";
 import type { TrackerService } from "@common/modules/TrackerModule";
 import { version } from "@common/utils/package";
 import { dialog } from "electron";
-import type { Logger, ProgressInfo, UpdateInfo } from "electron-updater";
+import type { ProgressInfo, UpdateInfo } from "electron-updater";
 import { autoUpdater } from "electron-updater";
 import type { TFunction } from "i18next";
 
@@ -19,7 +20,6 @@ export const isQuitingForUpdate = (): boolean => quitForUpdate;
 let setup = false;
 export const setupAutoUpdate = (
     trackerService: TrackerService,
-    logger: Logger & { error: Console["error"]; log: Console["log"] },
     t: TFunction
 ): void => {
     if (setup) return;

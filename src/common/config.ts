@@ -15,6 +15,7 @@ const { app, ipcMain, ipcRenderer } = IS_WORKER
 
 export interface WorkerConfig {
     APP_CACHE: string;
+    APP_DATA: string;
     IS_DEV: boolean;
     IS_DIST_MODE: boolean;
     IS_E2E: boolean;
@@ -51,12 +52,16 @@ export const IS_MAC = localWorkerConfig.IS_MAC ?? process.platform === "darwin";
 export const IS_WIN = localWorkerConfig.IS_WIN ?? process.platform === "win32";
 const IS_PACKAGE_EVENT = "config.IS_PACKAGED";
 const APP_CACHE_EVENT = "config.APP_CACHE";
+const APP_DATA_EVENT = "config.APP_DATA";
 if (IS_MAIN && !IS_WORKER) {
     ipcMain.on(IS_PACKAGE_EVENT, (event) => {
         event.returnValue = app.isPackaged;
     });
     ipcMain.on(APP_CACHE_EVENT, (event) => {
         event.returnValue = APP_CACHE();
+    });
+    ipcMain.on(APP_DATA_EVENT, (event) => {
+        event.returnValue = APP_DATA();
     });
 }
 
@@ -87,6 +92,13 @@ export const APP_CACHE = (): string => {
     } else return ipcRenderer.sendSync(APP_CACHE_EVENT) as string;
 };
 
+export const APP_DATA = (): string => {
+    if (IS_WORKER) return localWorkerConfig.APP_DATA!;
+    if (IS_MAIN) {
+        return app.getPath("userData");
+    } else return ipcRenderer.sendSync(APP_DATA_EVENT) as string;
+};
+
 export const IS_DIST_MODE =
     localWorkerConfig.IS_DIST_MODE ??
     (!IS_PACKAGED() && !process.env.ELECTRON_WEBPACK_WDS_PORT);
@@ -100,6 +112,7 @@ export const STATIC_PATH =
 
 export const workerConfig: WorkerConfig = {
     APP_CACHE: APP_CACHE(),
+    APP_DATA: APP_DATA(),
     IS_DEV,
     IS_DIST_MODE,
     IS_E2E,
