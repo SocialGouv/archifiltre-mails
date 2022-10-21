@@ -35,6 +35,7 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_URL: ${{ secrets.SENTRY_URL }}
+          CACHE_PROVIDER: file
 
       - name: Archive dist
         uses: actions/upload-artifact@v2
