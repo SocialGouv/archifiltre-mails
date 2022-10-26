@@ -24,6 +24,7 @@ export interface WorkerConfig {
     IS_PACKAGED: boolean;
     IS_TEST: boolean;
     IS_WIN: boolean;
+    NATIVES_PATH: string;
     PRODUCT_CHANNEL: "beta" | "next" | "stable";
     STATIC_PATH: string;
 }
@@ -110,6 +111,11 @@ export const STATIC_PATH =
         ? path.resolve(__dirname, "../../static") // dist / e2e
         : __static; // dev
 
+export const NATIVES_PATH =
+    localWorkerConfig.NATIVES_PATH ?? IS_PACKAGED()
+        ? path.resolve(STATIC_PATH, "../natives") // prod
+        : path.resolve(__dirname, "../../node_modules"); // dist / e2e | should not be used in dev
+
 export const workerConfig: WorkerConfig = {
     APP_CACHE: APP_CACHE(),
     APP_DATA: APP_DATA(),
@@ -121,6 +127,7 @@ export const workerConfig: WorkerConfig = {
     IS_PACKAGED: IS_PACKAGED(),
     IS_TEST,
     IS_WIN,
+    NATIVES_PATH,
     PRODUCT_CHANNEL,
     STATIC_PATH,
 };

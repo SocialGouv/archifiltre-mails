@@ -94,6 +94,7 @@ jobs:
           yarn semantic-release
           echo "next-version=$(node -e "console.log(require('./package.json').version)")" >> $GITHUB_OUTPUT
           yarn compile --no-progress
+          yarn compile-workers --no-progress
         env:
           ARCHIFILTRE_RELEASE_MODE: version
           TRACKER_MATOMO_ID_SITE: ${{ steps.nosecrets.outputs.tracker_matomo_id_site }}

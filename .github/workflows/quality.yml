@@ -23,7 +23,9 @@ jobs:
           yarn --frozen-lockfile --perfer-offline
 
       - name: Test if code compile
-        run: yarn compile --no-progress --display-error-details
+        run: |
+          yarn compile --no-progress --display-error-details
+          yarn compile-workers --no-progress --display-error-details
         env:
           SKIP_SENTRY_UPLOAD: 1
           TRACKER_MATOMO_ID_SITE: ${{ secrets.TRACKER_MATOMO_ID_SITE }}

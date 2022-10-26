@@ -1,4 +1,5 @@
 import "@common/utils/overload";
+import "./electron-env";
 
 import { IS_DIST_MODE, IS_E2E, IS_PACKAGED } from "@common/config";
 import { getIsomorphicModules } from "@common/lib/core/isomorphic";

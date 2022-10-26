@@ -23,7 +23,9 @@ jobs:
         run: yarn --frozen-lockfile --perfer-offline
 
       - name: Compiling
-        run: yarn compile
+        run: |
+          yarn compile --no-progress
+          yarn compile-workers --no-progress
         env:
           SKIP_SENTRY_UPLOAD: 1
           TRACKER_MATOMO_ID_SITE: ${{ secrets.TRACKER_MATOMO_ID_SITE }}

@@ -12,7 +12,6 @@ const workers = glob
         return [name, path.dirname(filePath).split("src/main/")[1], filePath];
     })
     .reduce((acc, [name, directoryPath, filePath]) => {
-        console.log({ directoryPath, filePath, name });
         acc[path.join(directoryPath, name)] = filePath;
         return acc;
     }, {});
@@ -20,6 +19,7 @@ const workers = glob
 module.exports = async (
     /** @type {import("electron-webpack/out/core").ConfigurationEnv} */ env = {}
 ) => {
+    console.info("Compile workers", workers);
     env.production = true;
     env.autoClean = false;
     const config = await webpackMain(env);
@@ -41,12 +41,7 @@ module.exports = async (
     config.module.rules.push({
         loader: "string-replace-loader",
         options: {
-            replace: `(() => {
-const path = require("path");
-const IS_PACKAGED = __dirname.indexOf(path.join("resources/workers/")) > -1;
-
-return path.resolve(process.cwd(), IS_PACKAGED ? "resources/natives/" : "node_modules/", "classic-level/");
-            })()`,
+            replace: `require("path").resolve(process.env.ELECTRON_NATIVES_PATH, "classic-level/")`,
             search: "__dirname",
         },
         test: /node_modules\/classic-level\/binding\.js$/,
