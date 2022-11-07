@@ -3,9 +3,10 @@ import type {
     PstExtractDatas,
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
-import { bytesToGigabytes } from "@common/utils";
+import { bytesToGigabytes, createToast, isJsonFile } from "@common/utils";
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { pstContentCounterPerLevelStore } from "../store/PstContentCounterPerLevelStore";
 import { usePstStore } from "../store/PSTStore";
@@ -43,6 +44,7 @@ export const usePstExtractor = (): UsePstExtractor => {
     const pstExtractorService = useService("pstExtractorService");
     const workManagerService = useService("workManagerService");
     const trackerService = useService("trackerService");
+    const { t } = useTranslation();
 
     const { setExtractDatas } = usePstStore();
     const { setTotalArchiveSize } = pstContentCounterPerLevelStore();
@@ -59,7 +61,7 @@ export const usePstExtractor = (): UsePstExtractor => {
                 const beforeExtractTimestamp = Date.now();
                 let extractDatas = {} as PstExtractDatas;
                 console.log("DROP", pstFilePath);
-                if (pstFilePath.endsWith(".json")) {
+                if (isJsonFile(pstFilePath)) {
                     const { uncachedAdditionalDatas, ...rest } =
                         await workManagerService.load({
                             from: pstFilePath,
@@ -87,6 +89,12 @@ export const usePstExtractor = (): UsePstExtractor => {
                 const loadTime = Date.now() - beforeExtractTimestamp;
 
                 setExtractDatas(extractDatas);
+
+                const toastMessage = isJsonFile(pstFilePath)
+                    ? t("notification.import.wip")
+                    : t("notification.import.pst");
+
+                createToast(toastMessage);
 
                 const totalMail = extractDatas.indexes.size;
 

@@ -63,6 +63,7 @@
       "posthog-js",
       "react-dropzone",
       "react-i18next",
+      "react-toastify",
       "source-map-support",
       "tarn",
       "zustand"
@@ -223,6 +224,7 @@
     "react-dom": "^17.0.2",
     "react-dropzone": "^12.0.4",
     "react-i18next": "^11.17.2",
+    "react-toastify": "9.0.3",
     "sanitize-filename": "^1.6.3",
     "source-map-support": "^0.5.21",
     "tarn": "^3.0.2",

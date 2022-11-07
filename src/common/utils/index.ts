@@ -1,4 +1,5 @@
 import { randomBytes } from "crypto";
+import { toast } from "react-toastify";
 
 import { AppError } from "../lib/error/AppError";
 
@@ -76,3 +77,15 @@ export const bytesToMegabytes = (bytes: number, decimals = 1): number =>
 
 export const bytesToKilobytes = (bytes: number, decimals = 1): number =>
     toDecimalsFloat(bytes / 1000, decimals);
+
+export const isJsonFile = (file: string): boolean => file.endsWith(".json");
+
+export const createToast = (message: string): void => {
+    toast(message, {
+        autoClose: 3500,
+        closeOnClick: true,
+        pauseOnHover: true,
+        position: "top-right",
+        theme: "light",
+    });
+};

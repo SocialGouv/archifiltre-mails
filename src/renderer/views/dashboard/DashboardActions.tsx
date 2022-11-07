@@ -1,5 +1,6 @@
 import { useService } from "@common/modules/ContainerModule";
 import type { UncachedAdditionalDatas } from "@common/modules/work-manager/type";
+import { createToast } from "@common/utils";
 import { randomUUID } from "crypto";
 import type { FC } from "react";
 import React, { useCallback, useState } from "react";
@@ -63,6 +64,8 @@ export const DashboardActions: FC = () => {
             dest: dialogPath.filePath,
             uncachedAdditionalDatas,
         });
+
+        createToast(t("notification.export.wip"));
         trackerService?.getProvider().track("Work Saved", { workHash });
     }, [
         deleteIds,
