@@ -18,4 +18,5 @@ export interface UncachedAdditionalDatas {
     deletedFolderId: string;
     keepIds: string[];
     ownerId: string;
+    workHash: string;
 }

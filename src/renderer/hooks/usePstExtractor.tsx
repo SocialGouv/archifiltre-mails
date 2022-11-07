@@ -72,6 +72,10 @@ export const usePstExtractor = (): UsePstExtractor => {
                         keepIds: uncachedAdditionalDatas.keepIds,
                     });
 
+                    trackerService.getProvider().track("Work Reloaded", {
+                        workHash: uncachedAdditionalDatas.workHash,
+                    });
+
                     extractDatas = rest;
                 } else {
                     extractDatas = await pstExtractorService.extract({

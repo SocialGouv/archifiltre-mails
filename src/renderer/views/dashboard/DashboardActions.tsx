@@ -1,5 +1,6 @@
 import { useService } from "@common/modules/ContainerModule";
 import type { UncachedAdditionalDatas } from "@common/modules/work-manager/type";
+import { randomUUID } from "crypto";
 import type { FC } from "react";
 import React, { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -15,14 +16,12 @@ import { DashboardActionsExporter } from "./DashboardActionsExporter";
 
 export const DashboardActions: FC = () => {
     const { t } = useTranslation();
-
     const [exporter, setExporter] = useState(false);
-
     const { updateInfo } = useAutoUpdateContext();
-
     const workManagerService = useService("workManagerService");
     const { ownerId, deletedFolderId } = useSynthesisStore();
     const { keepIds, deleteIds } = tagManagerStore();
+    const trackerService = useService("trackerService");
 
     const switchExporter = useCallback(() => {
         setExporter((open) => !open);
@@ -40,7 +39,7 @@ export const DashboardActions: FC = () => {
                     name: t("exporter.save.filterName", { type: ".json" }),
                 },
             ],
-            message: t("exporter.save.message"),
+            message: t("exporter.save.message-work-in-progress"),
             nameFieldLabel: t("exporter.save.nameFieldLabel"),
             showsTagField: false,
             title: t("exporter.save.title", { type: ".json" }),
@@ -50,18 +49,30 @@ export const DashboardActions: FC = () => {
             return;
         }
 
+        const workHash = randomUUID();
+
         const uncachedAdditionalDatas: UncachedAdditionalDatas = {
             deleteIds,
             deletedFolderId,
             keepIds,
             ownerId,
+            workHash,
         };
 
         await workManagerService.save({
             dest: dialogPath.filePath,
             uncachedAdditionalDatas,
         });
-    }, [deleteIds, deletedFolderId, keepIds, ownerId, t, workManagerService]);
+        trackerService?.getProvider().track("Work Saved", { workHash });
+    }, [
+        deleteIds,
+        deletedFolderId,
+        keepIds,
+        ownerId,
+        t,
+        workManagerService,
+        trackerService,
+    ]);
 
     return (
         <div className={style.dashboard__actions__bar}>
