@@ -40,7 +40,7 @@
 - [ ] change build system to vite-electron-builder (https://github.com/cawa-93/vite-electron-builder)
 
 
-## eml and co
+## Eml and co
 - [x] eml export folder
 - [x] eml body content not visible in outlook or osx info
 - [ ] pst extractor indexes => descriptorId
@@ -49,12 +49,17 @@
 - [x] windows installer appId shortcut regedit
 - [ ] windows open pst error (db?) 
 
-## work manager
+## Work manager
 - [x] basic save/load
 - [x] add additionnal metadata (owner, deleted/keep, deleted folder)
 - [ ] either encode file and/or add security control (id field, check that pst file is in the same dir, checksum)
 - [x] change dropzone and savemodal texts
 - [ ] "open" pst in fetcher-worker OR act as "downgraded" mode without email content nor attachments
 - [x] add tracking on save/load
-- [ ] BONUS: add toast when any export/import is complete
+- [x] BONUS: add toast when any export/import is complete
 - [x] BONUS: add progressbar (electron + front) for export and electron-only for import (https://www.electronjs.org/fr/docs/latest/api/browser-window#winsetprogressbarprogress-options)
+
+# Notifications
+- [x] React toastify
+- [ ] Check for fix issue: stuck on version 9.0.3. Above versions use Webpack 5 and there is a lack of support for es modules. Check release info : https://github.com/fkhadra/react-toastify/releases/tag/v9.0.4 and issue : https://github.com/fkhadra/react-toastify/issues/775
+- [ ] Global notifications
