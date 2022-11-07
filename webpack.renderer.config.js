@@ -21,6 +21,8 @@ module.exports =
                     esModule: true,
                     localsConvention: "camelCase",
                     modules: {
+                        auto: (resourcePath) =>
+                            !resourcePath.includes("ReactToastify.css"),
                         localIdentName: "[local]___[hash:base64:5]",
                         mode: "local",
                     },
