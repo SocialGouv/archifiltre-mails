@@ -176,7 +176,7 @@
     "@types/rimraf": "^3.0.2",
     "@types/uuid": "^8.3.4",
     "@types/webpack": "4",
-    "axios": "^0.26.1",
+    "axios": "^1.2.0",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.0",
     "electron": "^19.0.6",
