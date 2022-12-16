@@ -67,3 +67,8 @@
 
 ## Edge cases
 - [ ] When a drop file is a .json, verify if it's possible to save it. 
+
+
+## Current branch
+- actual-save-work (notifs etc.)
+- folder-visualisation

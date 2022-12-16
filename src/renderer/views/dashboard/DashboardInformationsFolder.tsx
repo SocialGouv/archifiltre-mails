@@ -29,6 +29,7 @@ export const DashboardInformationsFolder: FC<{
     } = useBreadcrumbStore();
 
     const infosId = breadcrumbId as InformationsId;
+
     const currentElementTitle =
         history?.last() ?? t("dashboard.informations.allDomains");
 
@@ -73,6 +74,7 @@ export const DashboardInformationsFolder: FC<{
                         <div>
                             <span>
                                 {t(`dashboard.informations.id.${infosId}`)}{" "}
+                                {console.log({ infosId })}
                             </span>
                             <span>{mainInfos.data.name}</span>
                         </div>
