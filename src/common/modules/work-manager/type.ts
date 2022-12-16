@@ -16,7 +16,8 @@ export interface WorkFile {
 export interface UncachedAdditionalDatas {
     deleteIds: string[];
     deletedFolderId: string;
+    exportWorkId: string;
     keepIds: string[];
+    originalPath: string;
     ownerId: string;
-    workHash: string;
 }

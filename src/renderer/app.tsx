@@ -1,5 +1,5 @@
-import "react-toastify/dist/ReactToastify.css";
 import "normalize.css/normalize.css";
+import "react-toastify/dist/ReactToastify.css";
 import "./styles/global.scss";
 
 import React from "react";
@@ -13,7 +13,7 @@ export const App: React.FC = () => (
     <main>
         <AutoUpdateProvider>
             <RouteContextProvider>
-                <ToastContainer />
+                <ToastContainer style={{ fontSize: "13px" }} />
                 <Views />
             </RouteContextProvider>
         </AutoUpdateProvider>

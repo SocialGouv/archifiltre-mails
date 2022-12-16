@@ -3,7 +3,12 @@ import type {
     PstExtractDatas,
     PstProgressState,
 } from "@common/modules/pst-extractor/type";
-import { bytesToGigabytes, createToast, isJsonFile } from "@common/utils";
+import {
+    bytesToGigabytes,
+    createToast,
+    isJsonFile,
+    isSameFolder,
+} from "@common/utils";
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -37,7 +42,7 @@ const pstProgressInitialState: PstProgressState = {
  * @returns extracted file and progress
  */
 export const usePstExtractor = (): UsePstExtractor => {
-    const [pstFilePath, setPstFilePath] = useState<string>("");
+    const [pstFilePath, setPstFilePath] = useState("");
     const [pstProgress, setPstProgress] = useState<PstProgressState>(
         pstProgressInitialState
     );
@@ -46,7 +51,7 @@ export const usePstExtractor = (): UsePstExtractor => {
     const trackerService = useService("trackerService");
     const { t } = useTranslation();
 
-    const { setExtractDatas } = usePstStore();
+    const { setExtractDatas, setOriginalPath } = usePstStore();
     const { setTotalArchiveSize } = pstContentCounterPerLevelStore();
     const { setTaggedNodesFromWorkLoading } = tagManagerStore();
 
@@ -67,6 +72,7 @@ export const usePstExtractor = (): UsePstExtractor => {
                             from: pstFilePath,
                         });
 
+                    setOriginalPath(uncachedAdditionalDatas.originalPath);
                     setMailBoxOwnerId(uncachedAdditionalDatas.ownerId);
                     setDeletedFolderId(uncachedAdditionalDatas.deletedFolderId);
                     setTaggedNodesFromWorkLoading({
@@ -74,8 +80,21 @@ export const usePstExtractor = (): UsePstExtractor => {
                         keepIds: uncachedAdditionalDatas.keepIds,
                     });
 
+                    if (
+                        !isSameFolder(
+                            pstFilePath,
+                            uncachedAdditionalDatas.originalPath
+                        )
+                    ) {
+                        createToast(
+                            t("notification.downgradedMode"),
+                            "warning",
+                            false
+                        );
+                    }
+
                     trackerService.getProvider().track("Work Reloaded", {
-                        workHash: uncachedAdditionalDatas.workHash,
+                        workHash: uncachedAdditionalDatas.exportWorkId,
                     });
 
                     extractDatas = rest;
@@ -83,6 +102,7 @@ export const usePstExtractor = (): UsePstExtractor => {
                     extractDatas = await pstExtractorService.extract({
                         pstFilePath,
                     });
+                    setOriginalPath(pstFilePath);
                 }
                 console.log("extractDatas", extractDatas);
 
@@ -94,7 +114,7 @@ export const usePstExtractor = (): UsePstExtractor => {
                     ? t("notification.import.wip")
                     : t("notification.import.pst");
 
-                createToast(toastMessage);
+                createToast(toastMessage, "success");
 
                 const totalMail = extractDatas.indexes.size;
 
@@ -121,8 +141,10 @@ export const usePstExtractor = (): UsePstExtractor => {
         pstExtractorService,
         pstFilePath,
         setExtractDatas,
+        setOriginalPath,
         setTaggedNodesFromWorkLoading,
         setTotalArchiveSize,
+        t,
         trackerService,
         workManagerService,
     ]);

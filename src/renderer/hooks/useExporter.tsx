@@ -3,6 +3,7 @@ import type {
     ExporterAsFileType,
     ExporterAsFolderType,
 } from "@common/modules/FileExporterModule";
+import { createToast } from "@common/utils";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -41,6 +42,10 @@ export const useExporter = (): UseExporter => {
             });
 
             if (dialogPath.canceled || !dialogPath.filePath) {
+                createToast(
+                    t("notification.export.cancel", { type }),
+                    "warning"
+                );
                 return;
             }
 
@@ -49,6 +54,8 @@ export const useExporter = (): UseExporter => {
                 dest: dialogPath.filePath,
                 type,
             });
+
+            createToast(t("notification.export.save", { type }), "success");
         },
         [t, extractDatas, pstExporterService, deletedIds]
     );
@@ -65,11 +72,15 @@ export const useExporter = (): UseExporter => {
 
             const dest = result.filePaths[0];
             if (!dest) {
-                // TODO: handle error maybe?
+                createToast(
+                    t("notification.export.cancel", { type }),
+                    "warning"
+                );
                 return;
             }
 
             await pstExporterService.exportMails({ dest, type });
+            createToast(t("notification.export.save", { type }), "success");
         },
         [t, extractDatas, pstExporterService]
     );

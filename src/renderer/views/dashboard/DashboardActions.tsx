@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 
 import { CogPicto, ExportPicto } from "../../components/common/pictos/picto";
 import { useAutoUpdateContext } from "../../context/AutoUpdateContext";
+import { usePstStore } from "../../store/PSTStore";
 import { useSynthesisStore } from "../../store/SynthesisStore";
 import { tagManagerStore } from "../../store/TagManagerStore";
 import { toggleUserConfigPanel } from "../../store/UserConfigPanelStore";
@@ -23,6 +24,7 @@ export const DashboardActions: FC = () => {
     const { ownerId, deletedFolderId } = useSynthesisStore();
     const { keepIds, deleteIds } = tagManagerStore();
     const trackerService = useService("trackerService");
+    const { originalPath } = usePstStore();
 
     const switchExporter = useCallback(() => {
         setExporter((open) => !open);
@@ -47,17 +49,22 @@ export const DashboardActions: FC = () => {
         });
 
         if (dialogPath.canceled || !dialogPath.filePath) {
+            createToast(
+                t("notification.export.cancel", { type: ".json" }),
+                "warning"
+            );
             return;
         }
 
-        const workHash = randomUUID();
+        const exportWorkId = randomUUID();
 
         const uncachedAdditionalDatas: UncachedAdditionalDatas = {
             deleteIds,
             deletedFolderId,
+            exportWorkId,
             keepIds,
+            originalPath,
             ownerId,
-            workHash,
         };
 
         await workManagerService.save({
@@ -65,15 +72,18 @@ export const DashboardActions: FC = () => {
             uncachedAdditionalDatas,
         });
 
-        createToast(t("notification.export.wip"));
-        trackerService?.getProvider().track("Work Saved", { workHash });
+        createToast(t("notification.export.wip"), "success");
+        trackerService
+            ?.getProvider()
+            .track("Work Saved", { workHash: exportWorkId });
     }, [
+        workManagerService,
+        t,
         deleteIds,
         deletedFolderId,
         keepIds,
+        originalPath,
         ownerId,
-        t,
-        workManagerService,
         trackerService,
     ]);
 

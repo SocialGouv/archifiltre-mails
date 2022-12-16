@@ -1,4 +1,6 @@
 import { randomBytes } from "crypto";
+import { dirname } from "path";
+import type { TypeOptions } from "react-toastify";
 import { toast } from "react-toastify";
 
 import { AppError } from "../lib/error/AppError";
@@ -80,12 +82,20 @@ export const bytesToKilobytes = (bytes: number, decimals = 1): number =>
 
 export const isJsonFile = (file: string): boolean => file.endsWith(".json");
 
-export const createToast = (message: string): void => {
+export const createToast = (
+    message: string,
+    type: TypeOptions = "default",
+    autoClose: number | false = 3500
+): void => {
     toast(message, {
-        autoClose: 3500,
+        autoClose,
         closeOnClick: true,
         pauseOnHover: true,
         position: "top-right",
         theme: "light",
+        type,
     });
 };
+
+export const isSameFolder = (path1: string, path2: string): boolean =>
+    dirname(path1) === dirname(path2);
