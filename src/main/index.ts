@@ -1,10 +1,11 @@
-// import "@common/utils/electron";
 import "@common/utils/overload";
+import "./electron-env";
 
 import { IS_DIST_MODE, IS_E2E, IS_PACKAGED } from "@common/config";
 import { getIsomorphicModules } from "@common/lib/core/isomorphic";
 import { AppError } from "@common/lib/error/AppError";
 import { loadModules, unloadModules } from "@common/lib/ModuleManager";
+import { logger } from "@common/logger";
 import { containerModule } from "@common/modules/ContainerModule";
 import type { Module } from "@common/modules/Module";
 import { setupSentry } from "@common/monitoring/sentry";
@@ -14,6 +15,7 @@ import { app, BrowserWindow, Menu } from "electron";
 import path from "path";
 
 import { AppModule } from "./modules/AppModule";
+import { CacheModule } from "./modules/CacheModule";
 import { DevToolsModule } from "./modules/DevToolsModule";
 import { MenuModule } from "./modules/MenuModule";
 import { PstExporterModule } from "./modules/PstExporterModule";
@@ -62,6 +64,7 @@ let mainWindow: BrowserWindow | null = null;
  */
 const createMainWindow = async () => {
     mainWindow = new BrowserWindow({
+        show: false,
         webPreferences: {
             contextIsolation: false,
             defaultEncoding: "UTF-8",
@@ -70,6 +73,10 @@ const createMainWindow = async () => {
             preload: PRELOAD_PATH,
             webSecurity: false,
         },
+    });
+
+    mainWindow.once("ready-to-show", () => {
+        mainWindow?.show();
     });
 
     if (!IS_PACKAGED() && !IS_E2E) mainWindow.webContents.openDevTools();
@@ -98,24 +105,24 @@ const mainWindowRetriever: MainWindowRetriever = async () =>
 app.on("ready", async () => {
     try {
         // load shared/common modules
-        const isomorphicModules = getIsomorphicModules(
-            ["consoleToRendererService", consoleToRendererService],
-            ["mainWindowRetriever", mainWindowRetriever]
-        );
+        const isomorphicModules = getIsomorphicModules([
+            "mainWindowRetriever",
+            mainWindowRetriever,
+        ]);
         const trackerService = containerModule.get("trackerService");
         const modules: Module[] = [
             ...isomorphicModules,
             new AppModule(
                 mainWindowRetriever,
-                consoleToRendererService,
                 containerModule.get("i18nService"),
                 containerModule.get("userConfigService"),
                 trackerService
             ),
             new DevToolsModule(),
+            new CacheModule(),
             new PstExtractorModule(
                 containerModule.get("userConfigService"),
-                consoleToRendererService
+                containerModule.get("pstCacheMainService")
             ),
             new WorkManagerModule(
                 containerModule.get("fileExporterService"),
@@ -124,7 +131,6 @@ app.on("ready", async () => {
                 containerModule.get("pstExtractorMainService")
             ),
             new MenuModule(
-                consoleToRendererService,
                 containerModule.get("pstExtractorMainService"),
                 containerModule.get("i18nService"),
                 containerModule.get("fileExporterService"),
@@ -155,7 +161,7 @@ app.on("ready", async () => {
         app.emit(MAIN_WINDOW_CREATED_APP_EVENT);
     } catch (error: unknown) {
         if (error instanceof AppError) {
-            console.error("Error during app lauching");
+            logger.error("Error during app lauching");
             if (IS_PACKAGED())
                 Sentry.addBreadcrumb({
                     data: {
@@ -164,7 +170,7 @@ app.on("ready", async () => {
                     },
                     type: "info",
                 });
-            else console.error(error.appErrorStack());
+            else logger.error(error.appErrorStack());
         }
         throw error;
     }

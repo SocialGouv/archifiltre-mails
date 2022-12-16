@@ -1,14 +1,10 @@
 import type { MainWindowRetriever } from "..";
-import type {
-    PstCacheMainService,
-    PstExtractorMainService,
-} from "../modules/PstExtractorModule";
-import type { ConsoleToRendererService } from "./ConsoleToRendererService";
+import type { PstCacheMainService } from "../modules/CacheModule";
+import type { PstExtractorMainService } from "../modules/PstExtractorModule";
 
 // add "main-only" services for autocomplete
 declare module "@common/modules/container/type" {
     interface ServicesKeyType {
-        consoleToRendererService: ConsoleToRendererService;
         mainWindowRetriever: MainWindowRetriever;
         pstCacheMainService: PstCacheMainService;
         pstExtractorMainService: PstExtractorMainService;

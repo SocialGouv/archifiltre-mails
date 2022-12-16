@@ -2,6 +2,7 @@ import { noop } from "lodash";
 import { v4 as randomUuid } from "uuid";
 
 import { IS_MAIN } from "../../config";
+import { logger } from "../../logger";
 import { IsomorphicService } from "../../modules/ContainerModule";
 import { ipcMain, ipcRenderer } from "../ipc";
 import type {
@@ -51,7 +52,7 @@ export class PubSub extends IsomorphicService {
             // the trigger with an ipc event (PUBSUB_TRIGGER_EVENT)
             // also save the "unsubscriber" returned function for later usage
             ipcMain.on(PUBSUB_SUBSCRIBE_EVENT, (ipcEvent, id, uuid) => {
-                console.log("[pubsub] renderer asks for subscribe", {
+                logger.log("[pubsub] renderer asks for subscribe", {
                     id,
                     uuid,
                 });
@@ -68,7 +69,7 @@ export class PubSub extends IsomorphicService {
             // get and trigger "unsubscriber" functions (which call the
             // PUBSUB_UNSUBSCRIBE_EVENT back to ipc) and delete them
             ipcMain.on(PUBSUB_UNSUBSCRIBE_EVENT, (event, uuid) => {
-                console.log("[pubsub] renderer asks for unsub", { uuid });
+                logger.log("[pubsub] renderer asks for unsub", { uuid });
                 this.unsubscribersInRenderer.get(uuid)?.();
                 event.returnValue = this.unsubscribersInRenderer.delete(uuid);
             });
@@ -77,7 +78,7 @@ export class PubSub extends IsomorphicService {
             // - basically when a publish is done on main - propagate the
             // trigger to registered renderer listeners
             ipcRenderer.on(PUBSUB_TRIGGER_EVENT, (_, id, event) => {
-                console.log("[pubsub] main triggered an event", {
+                logger.log("[pubsub] main triggered an event", {
                     event,
                     id,
                 });
@@ -98,7 +99,7 @@ export class PubSub extends IsomorphicService {
      */
     public async uninit(): pvoid {
         this.unsubscribersInRenderer.forEach((unsubscribe, uuid) => {
-            console.log("[pubsub] call unsubscribe for ", uuid);
+            logger.log("[pubsub] call unsubscribe for ", uuid);
             unsubscribe();
         });
         this.unsubscribersInRenderer.clear();
@@ -141,7 +142,7 @@ export class PubSub extends IsomorphicService {
                     PUBSUB_UNSUBSCRIBE_EVENT,
                     uuid
                 );
-                console.log("[pubsub] unsubscribe in main !", { done });
+                logger.log("[pubsub] unsubscribe in main !", { done });
             };
             this.unsubscribersInRenderer.set(uuid, unsubscribe);
         }

@@ -12,7 +12,7 @@
   - [x] coverage
   - [x] generate build
 ## Services
-- [ ] Logger (winston + sentry + console + "renderer transport to main")
+- [x] Logger (winston + sentry + console + "renderer transport to main")
 - [x] Tracker (posthog)
 - [x] global and user config (shared over ipc)
 - [x] i18n (i18next + react-i18next (start [here](./src/common/i18n/)))
@@ -67,6 +67,7 @@
 
 ## Edge cases
 - [ ] When a drop file is a .json, verify if it's possible to save it. 
+- [x] windows open pst error (db?) 
 
 
 ## Current branch

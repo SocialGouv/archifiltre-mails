@@ -1,3 +1,4 @@
+import { logger } from "../../logger";
 import type { TrackEvent } from "../type";
 import type { TrackArgs } from "./TrackerProvider";
 import { TrackerProvider } from "./TrackerProvider";
@@ -16,7 +17,7 @@ export class DebugProvider extends TrackerProvider {
 
     public track<TEvent extends TrackEvent>(...args: TrackArgs<TEvent>): void {
         const [event, props] = args;
-        console.info("[DebugTracker] Track", { event, props });
+        logger.debug("[Tracker][DebugProvider] Track", { event, props });
     }
 
     public enable(): void {

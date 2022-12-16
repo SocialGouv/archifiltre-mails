@@ -1,4 +1,5 @@
 import { WORKER_CONFIG_TOKEN, workerConfig } from "@common/config";
+import { logger } from "@common/logger";
 import type {
     SimpleObject,
     StringKeyOf,
@@ -79,6 +80,11 @@ export class WorkerClient<TWorkerConfig extends WorkerConfig> {
             ...(workerData ?? {}),
             [WORKER_CONFIG_TOKEN]: workerConfig,
         };
+        logger.info(
+            "[WorkerClient] Create worker",
+            this.workerPath,
+            this.workerData
+        );
         this.worker = new TSWorker(workerPath, {
             stderr: true,
             workerData: this.workerData,
@@ -105,6 +111,10 @@ export class WorkerClient<TWorkerConfig extends WorkerConfig> {
                 }
             }
         );
+
+        this.worker.on("error", (err) => {
+            logger.error("[WorkerClient] Internal worker error", err);
+        });
     }
 
     public command: CommandFunction<NonNullable<TWorkerConfig["commands"]>> =

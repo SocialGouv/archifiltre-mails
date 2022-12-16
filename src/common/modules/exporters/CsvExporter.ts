@@ -1,6 +1,7 @@
 import { writeFile } from "fs/promises";
 import { Parser } from "json2csv";
 
+import { logger } from "../../logger";
 import type { SimpleObject } from "../../utils/type";
 import type { JsonExporter } from "./Exporter";
 // eslint-disable-next-line unused-imports/no-unused-imports
@@ -11,16 +12,16 @@ import { xlsxExporter } from "./XslxExporter";
  */
 export const csvExporter: JsonExporter = {
     async export<T extends SimpleObject>(obj: T[], dest: string) {
-        console.log("Generate CSV...");
+        logger.info("[CsvExporter] Generate CSV...");
         const parser = new Parser<T>({
             excelStrings: true,
         });
 
         const data = parser.parse(obj);
-        console.log("Export...");
+        logger.info("[CsvExporter] Export...");
         await writeFile(dest, data, {
             encoding: "utf-8",
         });
-        console.info("Done!");
+        logger.info("[CsvExporter] Done!");
     },
 };

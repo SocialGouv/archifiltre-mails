@@ -23,6 +23,7 @@ module.exports =
         if (isProd) {
             config.plugins.push(
                 new webpack.EnvironmentPlugin([
+                    "CACHE_PROVIDER",
                     "TRACKER_MATOMO_ID_SITE",
                     "TRACKER_MATOMO_URL",
                     "TRACKER_PROVIDER",

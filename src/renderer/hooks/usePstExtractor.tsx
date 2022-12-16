@@ -87,7 +87,7 @@ export const usePstExtractor = (): UsePstExtractor => {
                         )
                     ) {
                         createToast(
-                            t("notification.downgradedMode"),
+                            t("startscreen.downgradedMode"),
                             "warning",
                             false
                         );
@@ -104,7 +104,6 @@ export const usePstExtractor = (): UsePstExtractor => {
                     });
                     setOriginalPath(pstFilePath);
                 }
-                console.log("extractDatas", extractDatas);
 
                 const loadTime = Date.now() - beforeExtractTimestamp;
 

@@ -16,6 +16,7 @@
     "dev": "electron-webpack dev",
     "debug": "cross-env 'ELECTRON_ARGS=[\"--inspect-brk=9229\"]' yarn dev",
     "compile": "electron-webpack",
+    "compile-workers": "webpack --config webpack.workers.config.js",
     "dist:win": "electron-builder --x64 --win portable msi nsis",
     "dist:mac": "electron-builder --mac dmg zip",
     "dist:mac-local": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
@@ -55,17 +56,20 @@
       "@nivo/core",
       "@nivo/generators",
       "@sentry/electron",
-      "@socialgouv/archimail-pst-extractor",
       "d3",
+      "electron-log",
       "electron-store",
       "i18next",
       "lodash",
+      "normalize.css",
       "posthog-js",
+      "react",
+      "react-dom",
       "react-dropzone",
       "react-i18next",
       "react-toastify",
       "source-map-support",
-      "tarn",
+      "uuid",
       "zustand"
     ]
   },
@@ -98,6 +102,13 @@
         "to": "static",
         "filter": [
           "**/*"
+        ]
+      },
+      {
+        "from": "node_modules",
+        "to": "natives/",
+        "filter": [
+          "**/*.node"
         ]
       }
     ],
@@ -190,6 +201,7 @@
     "sass": "^1.49.0",
     "sass-loader": "10",
     "semantic-release": "^19.0.3",
+    "string-replace-loader": "^2",
     "stylelint": "^14.9.1",
     "stylelint-config-sass-guidelines": "^9.0.1",
     "stylelint-config-standard": "^26.0.0",
@@ -208,14 +220,15 @@
     "@nivo/generators": "^0.79.0",
     "@sentry/electron": "^3.0.7",
     "@socialgouv/archimail-pst-extractor": "^0.2.0",
+    "classic-level": "^1.2.0",
     "d3": "^7.3.0",
+    "electron-log": "^4.4.8",
     "electron-store": "^8.0.2",
     "electron-updater": "^5.0.5",
     "electron-util": "^0.17.2",
     "fs-extra": "^10.1.0",
     "i18next": "^21.8.10",
     "json2csv": "^5.0.6",
-    "level": "^8.0.0",
     "lodash": "^4.17.21",
     "normalize.css": "^8.0.1",
     "posthog-js": "~1.24.0",

@@ -73,8 +73,7 @@ export const DashboardInformationsFolder: FC<{
                         </div>
                         <div>
                             <span>
-                                {t(`dashboard.informations.id.${infosId}`)}{" "}
-                                {console.log({ infosId })}
+                                {t(`dashboard.informations.id.${infosId}`)}
                             </span>
                             <span>{mainInfos.data.name}</span>
                         </div>

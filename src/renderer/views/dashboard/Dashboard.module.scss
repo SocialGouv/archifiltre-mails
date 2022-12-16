@@ -115,7 +115,7 @@ $dashboard-card-width: calc(50vw - 0.5rem);
   display: flex;
   height: $dashboard-actions-bar;
   justify-content: center;
-  min-width: 300px;
+  min-width: 420px;
 
   .dashboard__actions__search {
     align-items: center;
@@ -338,7 +338,7 @@ $dashboard-card-width: calc(50vw - 0.5rem);
     justify-content: space-between;
     margin-left: auto;
     padding-right: 50px;
-    width: 900px;
+    width: 700px;
   }
 
   .dashboard__impact__item {

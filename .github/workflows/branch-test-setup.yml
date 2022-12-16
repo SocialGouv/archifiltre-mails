@@ -47,6 +47,7 @@ jobs:
           $(yarn global bin)/replace "\"version": \"$TMP_CURRENT_VERSION\"" "\"version": \"$TMP_NEXT_VERSION\"" package.json
           echo ::set-output name=next-version::$TMP_NEXT_VERSION
           yarn compile --no-progress
+          yarn compile-workers --no-progress
         env:
           SKIP_SENTRY_UPLOAD: 1
           TRACKER_MATOMO_ID_SITE: ${{ secrets.TRACKER_MATOMO_ID_SITE }}
@@ -58,6 +59,7 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_URL: ${{ secrets.SENTRY_URL }}
+          CACHE_PROVIDER: file
       - name: Archive dist
         uses: actions/upload-artifact@v2
         with:

@@ -3,6 +3,7 @@ import type FrontPostHog from "posthog-js";
 import type NodeJsPostHog from "posthog-node";
 
 import { IS_MAIN } from "../../config";
+import { logger } from "../../logger";
 import type { TrackEvent } from "../type";
 import type { TrackArgs } from "./TrackerProvider";
 import { TrackerProvider } from "./TrackerProvider";
@@ -32,7 +33,7 @@ export class PosthogProvider extends TrackerProvider<
 
     public async init(): pvoid {
         if (this.inited) {
-            console.warn("[PosthogProvider] Already inited.", this.disabled);
+            logger.warn("[PosthogProvider] Already inited.", this.disabled);
         }
         if (IS_MAIN) {
             this.tracker = new (await import("posthog-node")).default(
@@ -80,7 +81,7 @@ export class PosthogProvider extends TrackerProvider<
     }
 
     public async uninit(): pvoid {
-        console.info("[Tracker][PosthogProvider] Shutdown posthog");
+        logger.info("[Tracker][PosthogProvider] Shutdown posthog");
         if (this.isMain(this.tracker)) {
             this.tracker.shutdown();
         }

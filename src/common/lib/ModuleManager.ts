@@ -1,3 +1,4 @@
+import { logger } from "../logger";
 import type { Module } from "../modules/Module";
 import { ModuleError } from "../modules/Module";
 import { AppError } from "./error/AppError";
@@ -8,7 +9,7 @@ import { AppError } from "./error/AppError";
 export const loadModules = async (...mods: Module[]): pvoid => {
     await Promise.all(
         mods.map(async (mod) => {
-            console.log(`<MODULE_LOADER> ${mod.constructor.name} loading !`);
+            logger.log(`<MODULE_LOADER> ${mod.constructor.name} loading !`);
             await mod.init().catch((error) => {
                 throw new ModuleError(
                     `<MODULE_ERROR> ${mod.constructor.name} failed init.`,
@@ -27,7 +28,7 @@ export const loadModules = async (...mods: Module[]): pvoid => {
 export const unloadModules = async (...mods: Module[]): pvoid => {
     await Promise.all(
         mods.map(async (mod) => {
-            console.warn(
+            logger.warn(
                 `<MODULE_UNLOADER> ${mod.constructor.name} unloading !`
             );
             await mod.uninit().catch((error) => {
