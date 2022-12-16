@@ -6,4 +6,5 @@ sourceMapSupport.install();
 
 module.hot?.accept();
 
+// eslint-disable-next-line no-console
 console.info("[Preload] Inited");

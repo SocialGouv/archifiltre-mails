@@ -1,10 +1,11 @@
+import { logger } from "@common/logger";
 import { Menu } from "electron";
 
 const switchEnableMenus = (enable: boolean, ...ids: string[]): void => {
     for (const id of ids) {
         const menu = Menu.getApplicationMenu()?.getMenuItemById(id);
         if (menu) {
-            console.log(enable ? "enable" : "disable", id);
+            logger.log(enable ? "enable" : "disable", id);
             menu.enabled = enable;
         }
     }

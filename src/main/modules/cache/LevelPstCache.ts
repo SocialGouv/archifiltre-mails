@@ -1,4 +1,4 @@
-import { APP_CACHE } from "@common/config";
+import { logger } from "@common/logger";
 import type {
     AdditionalDatas,
     GroupType,
@@ -11,14 +11,18 @@ import type {
 } from "@common/modules/pst-extractor/type";
 import type { ViewType } from "@common/modules/views/setup";
 import type { AnyFunction, MethodNames } from "@common/utils/type";
-import { Level } from "level";
+import { ClassicLevel as Level } from "classic-level";
 import path from "path";
 
-const ROOT_KEY = "_index_";
-const ATTACHMENTS_KEY = "_attachments_";
-const GROUPS_DB_PREFIX = "_groups_";
-const ADDITIONNAL_DATES_DB_PREFIX = "_additionalDatas_";
-const PST_FETCH_CACHE_PREFIX = "_pstFetchCache_";
+import {
+    AbstractPstCache,
+    ADDITIONNAL_DATAS_DB_PREFIX,
+    ATTACHMENTS_KEY,
+    GROUPS_DB_PREFIX,
+    PST_FETCH_CACHE_PREFIX,
+    ROOT_KEY,
+} from "./AbstractPstCache";
+
 const CACHE_FOLDER_NAME = "archimail-db";
 
 const defaultDbOptions = {
@@ -26,35 +30,49 @@ const defaultDbOptions = {
 };
 
 const SoftLockDb = <
-    TProp extends MethodNames<PstCache>,
-    TMeth extends PstCache[TProp],
+    TProp extends MethodNames<LevelPstCache>,
+    TMeth extends LevelPstCache[TProp],
     TParams extends Parameters<TMeth>
 >(
-    _proto: PstCache,
+    _proto: LevelPstCache,
     _property: TProp,
     descriptor: TypedPropertyDescriptor<TMeth>
 ) => {
     const originalMethod = _proto[_property];
-    descriptor.value = async function (this: PstCache, ...args: TParams) {
+    descriptor.value = async function (this: LevelPstCache, ...args: TParams) {
+        logger.debug(`[PstCache][SoftLockDb][${_property}] before open`);
         await this.db.open();
+        logger.debug(
+            `[PstCache][SoftLockDb][${_property}] after open`,
+            this.db
+        );
         const ret = await (originalMethod as AnyFunction).apply(this, args);
+        logger.debug(`[PstCache][SoftLockDb][${_property}] after exec`, {
+            ret,
+        });
         await this.db.close();
+        logger.debug(
+            `[PstCache][SoftLockDb][${_property}] after close`,
+            this.db
+        );
         return ret;
     } as TMeth;
 };
 
-export class PstCache {
+export class LevelPstCache extends AbstractPstCache {
     public readonly db: Level<string, unknown>;
 
-    private currrentPstID?: string;
-
-    constructor(
-        private readonly cachePath = path.resolve(
-            APP_CACHE(),
-            CACHE_FOLDER_NAME
-        )
-    ) {
-        this.db = new Level(this.cachePath, defaultDbOptions);
+    constructor(cachePath?: string) {
+        super(cachePath);
+        logger.debug("[PstCache] constructor", { cachePath });
+        this.db = new Level(
+            path.resolve(this.cachePath, CACHE_FOLDER_NAME),
+            defaultDbOptions
+        );
+        logger.debug("[PstCache] DB", {
+            db: this.db,
+            status: this.db.status,
+        });
     }
 
     @SoftLockDb
@@ -155,14 +173,14 @@ export class PstCache {
         return ret;
     }
 
-    public openForPst(pstId: string): void {
-        this.currrentPstID = pstId;
+    public async close(): pvoid {
+        return this.db.close();
     }
 
     private getCurrentPstDb() {
-        if (!this.currrentPstID) throw new Error("No PST cache opened yet.");
+        if (!this.currentPstID) throw new Error("No PST cache opened yet.");
         return this.db.sublevel<string, unknown>(
-            this.currrentPstID,
+            this.currentPstID,
             defaultDbOptions
         );
     }
@@ -176,7 +194,7 @@ export class PstCache {
 
     private getCurrentAdditionalDatasDb<T extends keyof AdditionalDatas>() {
         return this.getCurrentPstDb().sublevel<T, AdditionalDatas[T]>(
-            ADDITIONNAL_DATES_DB_PREFIX,
+            ADDITIONNAL_DATAS_DB_PREFIX,
             defaultDbOptions
         );
     }

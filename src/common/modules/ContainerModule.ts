@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { IS_PACKAGED } from "../config";
 import { AppError } from "../lib/error/AppError";
+import { logger } from "../logger";
 import type { UnknownMapping } from "../utils/type";
 import type {
     ReturnServiceType,
@@ -80,7 +81,7 @@ class ContainerModule extends IsomorphicModule {
         await Promise.all(
             [...isomorphicServiceMap.values(), ...serviceMap.values()]
                 .map((service) => {
-                    console.info(
+                    logger.info(
                         `[ContainerModule] ${
                             (service as Service).name
                         } loading !`
@@ -102,7 +103,7 @@ class ContainerModule extends IsomorphicModule {
         await Promise.all(
             [...isomorphicServiceMap.values(), ...serviceMap.values()]
                 .map((service) => {
-                    console.warn(
+                    logger.warn(
                         `[ContainerModule] ${
                             (service as Service).name
                         } unloading !`
