@@ -159,6 +159,8 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
                 (id) => extractDatas.indexes.get(id)!
             );
 
+            console.log({ indexes });
+
             const mails = (await pstExtractorService.getEmails(indexes)).sort(
                 (a, b) => a.receivedTime - b.receivedTime
             );

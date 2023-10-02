@@ -99,3 +99,6 @@ export const createToast = (
 
 export const isSameFolder = (path1: string, path2: string): boolean =>
     dirname(path1) === dirname(path2);
+
+export const isPlural = (count: number, word: string): string =>
+    count > 1 ? `${word}s` : `${word}`;

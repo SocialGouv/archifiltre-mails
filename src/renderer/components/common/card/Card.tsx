@@ -20,6 +20,7 @@ interface CardProps {
         | typeof CARD_LABEL_GREY
         | typeof CARD_LABEL_ORANGE
         | typeof CARD_LABEL_PURPLE;
+    dataView?: "" | "circle" | "hierarchy" | "tree";
     title: string;
 }
 
@@ -28,12 +29,13 @@ export const Card: FC<CardProps> = ({
     title,
     className,
     color = CARD_LABEL_GREY,
+    dataView,
 }) => {
     const cardClassName = className
         ? `${style.card} ${style.className}`
         : `${style.card}`;
     return (
-        <div className={cardClassName}>
+        <div className={cardClassName} data-view={dataView}>
             <div className={style.card__title}>
                 <div
                     className={`${style.card__title__color} ${style[color]}`}

@@ -24,6 +24,7 @@ export const DashboardInformationsMail: FC<{
     const volumeTotal =
         bytesToKilobytes(getFileSizeByMail(mainInfos.data.email.attachments)) +
         AVERAGE_MAIL_SIZE_IN_KO;
+    console.log(mainInfos);
 
     return (
         <div className={style.dashboard__informations__wrapper__mail}>

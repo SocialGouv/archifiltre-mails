@@ -61,6 +61,11 @@ export const DashboardImpact: FC = () => {
                     impactInfo={t("dashboard.impact.totalSize")}
                 />
                 <DashboardImpactItem
+                    img={"img/pictos/desktop.png"}
+                    impactNumber={`${bytesToMegabytes(deleteSize)} Mo`}
+                    impactInfo={t("dashboard.impact.identify")}
+                />
+                <DashboardImpactItem
                     img={"img/pictos/train.png"}
                     impactNumber={`${t(
                         "dashboard.impact.ecologicImpactByTrain",
@@ -71,11 +76,6 @@ export const DashboardImpact: FC = () => {
                     impactInfo={`${t("dashboard.impact.kiloEq", {
                         count: cO2EqKgToDelete,
                     })}`}
-                />
-                <DashboardImpactItem
-                    img={"img/pictos/desktop.png"}
-                    impactNumber={`${bytesToMegabytes(deleteSize)} Mo`}
-                    impactInfo={t("dashboard.impact.identify")}
                 />
             </div>
         </div>

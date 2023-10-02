@@ -36,3 +36,5 @@ declare namespace NodeJS {
         TRACKER_PROVIDER: string;
     }
 }
+
+declare module "react-d3-tree/lib/esm/index.js";

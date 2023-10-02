@@ -19,7 +19,7 @@ $dashboard-card-width: calc(50vw - 0.5rem);
     height: calc(100% - 1.25rem);
     width: $dashboard-card-width;
 
-    :first-child {
+    >:first-child {
       margin: 0 0 2rem;
     }
   }
@@ -212,6 +212,30 @@ $dashboard-card-width: calc(50vw - 0.5rem);
 
     li:not(:last-child) {
       margin: 0 0 0.75rem;
+    }
+  }
+}
+
+.dashboard__viewer__selector {
+  position: absolute;
+  right: 2rem;
+  top: 2rem;
+
+  button {
+    border: solid 2px #4991f7;
+    border-radius: 10px;
+    margin: 0 0.5rem !important;
+    padding: 10px 15px;
+    transition: background 200ms ease;
+
+    &.active {
+      background: #4991f7;
+      color: #fff;
+    }
+
+    &:hover:not(.active) {
+      background: #4991f7;
+      color: #fff;
     }
   }
 }

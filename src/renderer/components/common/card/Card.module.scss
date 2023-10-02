@@ -13,6 +13,12 @@ $dashboard-card-font-text: 12px;
   padding: $dashboard-card-padding;
   position: absolute;
 
+  &[data-view='tree'],
+  &[data-view='hierarchy'] {
+    width: calc(100vw - 1.25rem);
+    z-index: 2;
+  }
+
   .card__title {
     font-size: 1.2rem;
     font-weight: 600;

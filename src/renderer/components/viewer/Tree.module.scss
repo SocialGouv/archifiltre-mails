@@ -1,0 +1,27 @@
+/* stylelint-disable no-descending-specificity */
+/* stylelint-disable declaration-property-value-disallowed-list */
+/* stylelint-disable selector-no-qualifying-type */
+.tree {
+  background: #fcfbfb;
+  height: 100%;
+  width: 100%;
+  z-index: 2;
+
+  &-controls {
+    position: absolute;
+    top: 7.5rem;
+
+    li {
+      margin: 0 0 20px;
+    }
+
+    label {
+      display: table;
+      margin: 0 0 3px;
+    }
+
+    input[type='range'] {
+      height: 5px;
+    }
+  }
+}

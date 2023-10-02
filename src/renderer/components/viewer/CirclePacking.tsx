@@ -24,6 +24,7 @@ import type {
 } from "../../utils/dashboard-viewer-dym";
 import { isMailViewerObject } from "../../utils/dashboard-viewer-dym";
 import { getNodeContainsIds } from "../../utils/tag-manager";
+import { DashboardViewerBreadcrumb } from "../../views/dashboard/DashboardViewerBreadcrumb";
 import { TagManagerMenu } from "../menu/TagManagerMenu";
 import style from "./CirclePacking.module.scss";
 import type { OnBlur } from "./CirclePackingCancellableFocusZone";
@@ -157,6 +158,7 @@ export const CirclePacking: React.FC = () => {
 
     return (
         <>
+            <DashboardViewerBreadcrumb />
             <div
                 id="circle-packing"
                 className={style["circle-packing"]}

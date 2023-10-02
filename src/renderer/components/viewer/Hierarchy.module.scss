@@ -1,0 +1,91 @@
+.hierarchy {
+  &__container {
+    height: 90%;
+    overflow: scroll;
+    width: 40vw;
+  }
+
+  small {
+    font-size: 11px !important;
+  }
+
+  &__node {
+    align-items: center;
+    background: #dfecff;
+    border-radius: 10px;
+    cursor: default;
+    display: flex;
+    height: 30px;
+    justify-content: flex-start;
+    margin: 0 0 10px !important;
+    padding: 0 10px;
+    transition: background 150ms;
+
+    span {
+      small {
+        font-size: 11px;
+      }
+    }
+
+    &__active {
+      background: #3c86f7;
+      color: #fff;
+    }
+
+    &[data-haschild='true'] {
+      cursor: pointer;
+
+      &:hover {
+        background: #3c86f7;
+        color: #fff;
+      }
+    }
+  }
+
+  &__folderCount {
+    margin-left: 5px !important;
+  }
+
+  &__childrenList {
+    border-left: 1px solid;
+    padding-left: 20px;
+
+    &[data-expand='true'] {
+      margin: 0 0 20px;
+    }
+  }
+
+  &__mailList {
+    &__item {
+      align-items: center;
+      background: #dfecff;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      height: 30px;
+      margin: 10px;
+      padding: 0 10px;
+      transition: background 150ms;
+
+      &:hover {
+        background: #3c86f7;
+        color: #fff;
+      }
+
+      &__active {
+        background: #3c86f7;
+        color: #fff;
+      }
+    }
+
+    &__mail {
+      border: solid 1px #3d85f7;
+      border-radius: 10px;
+      padding: 2rem;
+      position: absolute;
+      right: 2.5rem;
+      top: 5rem;
+      width: 40vw;
+    }
+  }
+}
