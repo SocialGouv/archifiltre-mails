@@ -17,14 +17,14 @@ import style from "./Dashboard.module.scss";
 
 export const DashboardInformationsMail: FC<{
     mainInfos: ComputedDatum<MailViewerObject<string>>;
-}> = ({ mainInfos }) => {
+    view?: "domain" | "list";
+}> = ({ mainInfos, view }) => {
     const { t } = useTranslation();
     const { totalFilesize } = pstContentCounterPerLevelStore();
 
     const volumeTotal =
         bytesToKilobytes(getFileSizeByMail(mainInfos.data.email.attachments)) +
         AVERAGE_MAIL_SIZE_IN_KO;
-    console.log(mainInfos);
 
     return (
         <div className={style.dashboard__informations__wrapper__mail}>
@@ -89,9 +89,14 @@ export const DashboardInformationsMail: FC<{
             )}
             <div>
                 <strong>{t("dashboard.informations.percentage")} </strong>
-                {toDecimalsFloat(volumeTotal, 2)}Ko (
-                {getPercentage(volumeTotal, totalFilesize.last() ?? 1, 3)}
-                %)
+                {toDecimalsFloat(volumeTotal, 2)}Ko
+                {view === "list"
+                    ? null
+                    : `(${getPercentage(
+                          volumeTotal,
+                          totalFilesize.last() ?? 1,
+                          3
+                      )}%)`}
             </div>
             <div>
                 <strong>{t("dashboard.informations.mailFocus")}</strong>

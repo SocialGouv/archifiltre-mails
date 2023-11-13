@@ -102,7 +102,7 @@
   "dashboard.viewer.legend.switcher": "Afficher/masquer la légende",
   "dashboard.viewer.previous": "Précédent",
   "dashboard.viewer.restart": "Réinitialiser",
-  "dashboard.viewer.selector.packing": "Par Domaines",
+  "dashboard.viewer.selector.packing": "Par domaines",
   "dashboard.viewer.selector.hierarchy": "Par Liste",
   "dashboard.viewer.selector.tree": "Arbre",
   "dropzone.click-or-drag": "Cliquez ou glissez-déposez vos fichiers ou votre travail en cours ici",

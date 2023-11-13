@@ -102,6 +102,7 @@ export const usePstExtractor = (): UsePstExtractor => {
                     extractDatas = await pstExtractorService.extract({
                         pstFilePath,
                     });
+
                     setOriginalPath(pstFilePath);
                 }
 

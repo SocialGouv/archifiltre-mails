@@ -20,7 +20,7 @@ export const DashboardViewer: React.FC = () => {
     const { t } = useTranslation();
     const [active, updateActive] = useReducer(
         (_: number, next: number) => next,
-        1
+        0
     );
 
     const dataView = activeView(active);

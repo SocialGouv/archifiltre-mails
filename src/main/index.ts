@@ -21,7 +21,7 @@ import { MenuModule } from "./modules/MenuModule";
 import { PstExporterModule } from "./modules/PstExporterModule";
 import { PstExtractorModule } from "./modules/PstExtractorModule";
 import { WorkManagerModule } from "./modules/WorkManagerModule";
-import { consoleToRendererService } from "./services/ConsoleToRendererService";
+// import { consoleToRendererService } from "./services/ConsoleToRendererService";
 
 export type MainWindowRetriever = () => Promise<BrowserWindow>;
 

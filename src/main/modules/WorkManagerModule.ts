@@ -17,11 +17,9 @@ import { Object } from "@common/utils/overload";
 import { readFile } from "fs/promises";
 import path from "path";
 
+import type { PstCacheMainService } from "./CacheModule";
 import { MainModule } from "./MainModule";
-import type {
-    PstCacheMainService,
-    PstExtractorMainService,
-} from "./PstExtractorModule";
+import type { PstExtractorMainService } from "./PstExtractorModule";
 
 export class WorkManagerModule extends MainModule {
     private inited = false;

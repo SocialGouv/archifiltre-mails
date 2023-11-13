@@ -48,6 +48,7 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
         list: viewList,
         setCurrentIndex: setCurrentViewIndex,
     } = viewListStore.getState();
+
     const { extractDatas } = usePstStore();
     const { cancelFocus } = usePstFMInfosStore();
     const { getCurrentViewGroupByFunctions } = useViewGroupByFunctions();
@@ -158,8 +159,6 @@ export const useDymViewerNavigation = (): UseDomainsYearMailsProps => {
             const indexes = node.data.ids.map(
                 (id) => extractDatas.indexes.get(id)!
             );
-
-            console.log({ indexes });
 
             const mails = (await pstExtractorService.getEmails(indexes)).sort(
                 (a, b) => a.receivedTime - b.receivedTime

@@ -44,6 +44,10 @@
 
   &__folderCount {
     margin-left: 5px !important;
+
+    &__indicator {
+      margin-left: 10px;
+    }
   }
 
   &__childrenList {
@@ -68,8 +72,8 @@
       transition: background 150ms;
 
       &:hover {
-        background: #3c86f7;
-        color: #fff;
+        background: #3c86f7 !important;
+        color: #fff !important;
       }
 
       &__active {
