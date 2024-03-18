@@ -40,7 +40,7 @@ jobs:
           CACHE_PROVIDER: file
 
       - name: Archive dist
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: compile-dist
           path: dist/
